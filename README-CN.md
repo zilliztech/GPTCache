@@ -19,6 +19,14 @@ Scenario Cache主要用于缓存用户在使用ChatGPT的问答数据。这个�
 
 ## 😊 快速接入
 
+### alpha 测试包安装
+
+注：可以通过下面指令快速体验这个缓存，值得注意的是或许这不是很稳定。
+
+```bash
+pip install -i https://test.pypi.org/simple/ scenario-cache==0.0.1
+```
+
 1. cache初始化
 ```python
 from scenario_cache.core import cache
@@ -52,7 +60,7 @@ cache.data_manager.close()
 
 ## 🧐 系统流程
 
-![ScenarioCache Flow](design/ScenarioCache.png)
+![Scenario Cache Flow](design/ScenarioCache.png)
 
 系统的核心流程如上图所示：
 
@@ -74,7 +82,7 @@ cache.data_manager.close()
 
 ## 🤩 系统结构
 
-![ScenarioCache Structure](design/ScenarioCacheStructure.png)
+![Scenario Cache Structure](design/ScenarioCacheStructure.png)
 
 1. 用户层，包装openai接口，包括了：使用openai python和http服务，参考：[api-chat](https://platform.openai.com/docs/api-reference/chat) [guide-chat](https://platform.openai.com/docs/guides/chat/introduction)，
 使得用户接入缓存的话，python只需要修改包名，api的话则只需要通过库简单封装成一个http服务即可

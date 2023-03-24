@@ -19,6 +19,14 @@ I believe it is necessary for the following reasons:
 
 ## 😊 Quick Access
 
+### alpha test package install
+
+**Note**: You can quickly experience the cache, it is worth noting that maybe this is not very stable.
+
+```bash
+pip install -i https://test.pypi.org/simple/ scenario-cache==0.0.1
+```
+
 1. Cache init
 ```python
 from scenario_cache.core import cache
@@ -52,7 +60,7 @@ More examples：[example](example/example.md)
 
 ## 🧐 System flow
 
-![ChatGPTCache Flow](design/ScenarioCache.png)
+![Scenario Cache Flow](design/ScenarioCache.png)
 
 The core process of the system is shown in the diagram above:
 
@@ -74,7 +82,7 @@ After obtaining the corresponding result list from the cache, the model needs to
 
 ## 🤩 System Structure
 
-![ScenarioCache Structure](design/ScenarioCacheStructure.png)
+![Scenario Cache Structure](design/ScenarioCacheStructure.png)
 
 1. User layer, wrapping openai interface, including: using openai python and http service, reference: [api-chat](https://platform.openai.com/docs/api-reference/chat) [guide-chat] (https://platform.openai.com/docs/guides/chat/introduction),
 To enable users to access the cache, python only needs to modify the package name, and for api, it only needs to be simply encapsulated into an http service through the library
