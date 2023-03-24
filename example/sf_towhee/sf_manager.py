@@ -16,7 +16,7 @@ def run():
                similarity_threshold=10000,
                similarity_positive=False)
 
-    # you should open it if you first run it
+    # you should OPEN it if you FIRST run it
     # source_messages = [
     #     {"role": "system", "content": "You are a helpful assistant."},
     #     {"role": "user", "content": "what do you think about chatgpt"}

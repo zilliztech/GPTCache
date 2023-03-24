@@ -23,7 +23,7 @@ def run():
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "foo"}
     ]
-    # you should open it if you first run it
+    # you should OPEN it if you FIRST run it
     # cache.data_manager.save("receiver the foo", cache.embedding_func({"messages": mock_messages}))
 
     answer = openai.ChatCompletion.create(

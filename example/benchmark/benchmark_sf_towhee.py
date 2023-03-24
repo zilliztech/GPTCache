@@ -17,7 +17,7 @@ def run():
     cache.init(embedding_func=towhee_embedding,
                data_manager=SFDataManager("sqlite.db", "faiss.index", d),
                evaluation_func=faiss_evaluation,
-               similarity_threshold=100,
+               similarity_threshold=50,
                similarity_positive=False)
 
     i = 0
@@ -25,15 +25,15 @@ def run():
         pair["id"] = str(i)
         i += 1
 
-    print("insert data")
-    for pair in mock_data:
-        source_messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": pair["origin"]}
-        ]
-        cache.data_manager.save(pair["id"], cache.embedding_func({"messages": source_messages}))
-
-    print("end insert data")
+    # you should OPEN it if you FIRST run it
+    # print("insert data")
+    # for pair in mock_data:
+    #     source_messages = [
+    #         {"role": "system", "content": "You are a helpful assistant."},
+    #         {"role": "user", "content": pair["origin"]}
+    #     ]
+    #     cache.data_manager.save(pair["id"], cache.embedding_func({"messages": source_messages}))
+    # print("end insert data")
 
     all_time = 0.0
     hit_cache_positive, hit_cache_negative = 0, 0

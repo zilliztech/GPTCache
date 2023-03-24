@@ -13,8 +13,8 @@ def run():
         {"role": "user", "content": "foo"}
     ]
 
-    # you should open it if you first run it
-    cache.data_manager.save("receiver the foo", cache.embedding_func({"messages": mock_messages}))
+    # you should OPEN it if you FIRST run it
+    # cache.data_manager.save("receiver the foo", cache.embedding_func({"messages": mock_messages}))
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,

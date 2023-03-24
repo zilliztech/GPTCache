@@ -1,0 +1,34 @@
+# Example
+
+## [Basic example](map/map_manager.py)
+
+How to use the map to cache data.
+
+## [Sqlite + Faiss manage cache data](sf_mock/sf_manager.py)
+
+How to use the sqlite to store the scale data and the faiss to query the vector data.
+
+## [Sqlite + Faiss + Towhee](sf_towhee/sf_manager.py)
+
+On the basis of the above example, use [towhee](https://github.com/towhee-io/towhee) for embedding operation
+
+Note: the default embedding model only support the **ENGLISH**. For other languages, you should use the corresponding model.
+
+## [Benchmark](benchmark/benchmark_sf_towhee.py)
+
+The benchmark script about the `Sqlite + Faiss + Towhee`
+
+Test data source: Randomly scrape some information from the webpage (origin), and then let chatgpt produce corresponding data (similar).
+
+- **threshold**: answer evaluation threshold, A smaller value means higher consistency with the content in the cache, a lower cache hit rate, and a lower cache miss hit; a larger value means higher tolerance, a higher cache hit rate, and at the same time also have higher cache misses.
+- **positive**: effective cache hit
+- **negative**: cache hit but the result is wrong
+- **fail count**: cache miss
+
+
+
+ | threshold | average time | positive | negative | fail count |
+|-----------|--------------|----------|----------|------------|
+| 20        | 0.04s        | 455      | 27       | 517        |
+| 50        | 0.09s        | 871      | 86       | 42         |
+| 100       | 0.12s        | 905      | 93       | 1          |
