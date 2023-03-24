@@ -1,10 +1,11 @@
 import setuptools
+from typing import List
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
-def parse_requirements(file_name: str) -> list[str]:
+def parse_requirements(file_name: str) -> List[str]:
     with open(file_name) as f:
         return [
             require.strip() for require in f
