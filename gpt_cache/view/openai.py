@@ -9,7 +9,9 @@ class ChatCompletion:
         context = kwargs.pop("cache_context", {})
         embedding_data = None
         cache_enable = cache.cache_enable_func(*args, **kwargs)
-        if cache_enable:
+        # you want to retry to send the request to chatgpt when the cache is negative
+        cache_skip = kwargs.pop("cache_skip", False)
+        if cache_enable and not cache_skip:
             # start_time = time.time()
             embedding_data = cache.embedding_func(kwargs, extra_param=context.get("embedding_func", None))
             # print("embedding time: {:.2f}s".format(time.time() - start_time))
