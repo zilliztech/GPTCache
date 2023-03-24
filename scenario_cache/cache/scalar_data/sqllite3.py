@@ -8,8 +8,7 @@ class SQLite:
         self.cur = self.con.cursor()
         create_tb_cmd = '''
             CREATE TABLE IF NOT EXISTS cache_data
-            (id TEXT PRIMARY KEY,
-            data TEXT);
+            (id TEXT, data TEXT);
             '''
         self.cur.execute(create_tb_cmd)
 

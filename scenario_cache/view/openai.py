@@ -1,5 +1,4 @@
 import time
-
 import openai
 from ..core import cache
 
@@ -11,13 +10,13 @@ class ChatCompletion:
         embedding_data = None
         cache_enable = cache.cache_enable_func(*args, **kwargs)
         if cache_enable:
-            start_time = time.time()
+            # start_time = time.time()
             embedding_data = cache.embedding_func(kwargs, extra_param=context.get("embedding_func", None))
-            print("embedding time: {:.2f}s".format(time.time() - start_time))
+            # print("embedding time: {:.2f}s".format(time.time() - start_time))
 
-            start_time = time.time()
+            # start_time = time.time()
             cache_data = cache.data_manager.search(embedding_data, extra_param=context.get('search', None))
-            print("search time: {:.2f}s".format(time.time() - start_time))
+            # print("search time: {:.2f}s".format(time.time() - start_time))
 
             rank = cache.evaluation_func(embedding_data, cache_data, extra_param=context.get('evaluation', None))
             if (cache.similarity_positive and rank >= cache.similarity_threshold) \
