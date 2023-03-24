@@ -1,0 +1,4 @@
+openai
+numpy
+faiss-cpu
+towhee
