@@ -1,8 +1,8 @@
-# ScenarioCache
+# GPTCache
 
 [English](README-CN.md) | 中文
 
-Scenario Cache主要用于缓存用户在使用ChatGPT的问答数据。这个系统带来两个好处：
+GPT Cache主要用于缓存用户在使用ChatGPT的问答数据。这个系统带来两个好处：
 
 1. 快速响应用户请求：相比于大模型推理，缓存系统中查找数据将具有更低的延迟，从而更快地响应用户请求。
 2. 降低服务成本：目前大多数ChatGPT服务都是基于请求次数进行收费，如果用户请求命中缓存，就可以减少请求次数，从而降低服务成本。
@@ -24,19 +24,19 @@ Scenario Cache主要用于缓存用户在使用ChatGPT的问答数据。这个�
 注：可以通过下面指令快速体验这个缓存，值得注意的是或许这不是很稳定。
 
 ```bash
-pip install -i https://test.pypi.org/simple/ scenario-cache==0.0.1
+pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.1
 ```
 
 1. cache初始化
 ```python
-from scenario_cache.core import cache
+from gpt_cache.core import cache
 cache.init()
 # it will read the `OPENAI_API_KEY` environment variable
 cache.set_openai_key()
 ```
 2. 替换原始openai包
 ```python
-from scenario_cache.view import openai
+from gpt_cache.view import openai
 
 # openai requests don't need any changes
 answer = openai.ChatCompletion.create(
@@ -60,7 +60,7 @@ cache.data_manager.close()
 
 ## 🧐 系统流程
 
-![Scenario Cache Flow](design/ScenarioCache.png)
+![GPT Cache Flow](design/GPTCache.png)
 
 系统的核心流程如上图所示：
 
@@ -82,7 +82,7 @@ cache.data_manager.close()
 
 ## 🤩 系统结构
 
-![Scenario Cache Structure](design/ScenarioCacheStructure.png)
+![GPT Cache Structure](design/GPTCacheStructure.png)
 
 1. 用户层，包装openai接口，包括了：使用openai python和http服务，参考：[api-chat](https://platform.openai.com/docs/api-reference/chat) [guide-chat](https://platform.openai.com/docs/guides/chat/introduction)，
 使得用户接入缓存的话，python只需要修改包名，api的话则只需要通过库简单封装成一个http服务即可

@@ -1,11 +1,11 @@
 import json
 import time
 
-from scenario_cache.view import openai
-from scenario_cache.core import cache
-from scenario_cache.cache.data_manager import SFDataManager
-from scenario_cache.similarity_evaluation.faiss import faiss_evaluation
-from scenario_cache.embedding.towhee import to_embeddings as towhee_embedding
+from gpt_cache.view import openai
+from gpt_cache.core import cache
+from gpt_cache.cache.data_manager import SFDataManager
+from gpt_cache.similarity_evaluation.faiss import faiss_evaluation
+from gpt_cache.embedding.towhee import to_embeddings as towhee_embedding
 
 d = 768
 

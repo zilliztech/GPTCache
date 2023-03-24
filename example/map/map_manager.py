@@ -1,8 +1,8 @@
 import os
 
-from scenario_cache.cache.data_manager import MapDataManager
-from scenario_cache.view import openai
-from scenario_cache.core import cache
+from gpt_cache.cache.data_manager import MapDataManager
+from gpt_cache.view import openai
+from gpt_cache.core import cache
 
 
 def run():

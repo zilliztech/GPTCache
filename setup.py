@@ -14,16 +14,16 @@ def parse_requirements(file_name: str) -> List[str]:
 
 
 setuptools.setup(
-    name="scenario_cache",
-    packages=['scenario_cache'],
+    name="gpt_cache",
+    packages=['gpt_cache'],
     version="0.0.1",
     author="SimFG",
     author_email="1142838399@qq.com",
-    description="Scenario Cache, make your chatgpt services lower cost and faster",
+    description="GPT Cache, make your chatgpt services lower cost and faster",
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=parse_requirements('requirements.txt'),
-    url="https://github.com/SimFG/ScenarioCache",
+    url="https://github.com/SimFG/gpt-cache",
     license='http://www.apache.org/licenses/LICENSE-2.0',
     python_requires='>=3.8.8',
 )

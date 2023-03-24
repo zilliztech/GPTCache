@@ -1,7 +1,7 @@
-from scenario_cache.view import openai
-from scenario_cache.core import cache
-from scenario_cache.cache.data_manager import SFDataManager
-from scenario_cache.similarity_evaluation.faiss import faiss_evaluation
+from gpt_cache.view import openai
+from gpt_cache.core import cache
+from gpt_cache.cache.data_manager import SFDataManager
+from gpt_cache.similarity_evaluation.faiss import faiss_evaluation
 import numpy as np
 
 

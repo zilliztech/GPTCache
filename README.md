@@ -1,8 +1,8 @@
-# Scenario Cache
+# GPT Cache
 
 English | [中文](README-CN.md)
 
-The Scenario Cache system is mainly used to cache the question-answer data of users in ChatGPT. This system brings two benefits:
+The GPT Cache system is mainly used to cache the question-answer data of users in ChatGPT. This system brings two benefits:
 
 1. Quick response to user requests: compared to large model inference, searching for data in the caching system will have lower latency, enabling faster response to user requests.
 2. Reduced service costs: currently, most ChatGPT services are charged based on the number of requests. If user requests hit the cache, it can reduce the number of requests and thus lower service costs.
@@ -24,28 +24,31 @@ I believe it is necessary for the following reasons:
 **Note**: You can quickly experience the cache, it is worth noting that maybe this is not very stable.
 
 ```bash
-pip install -i https://test.pypi.org/simple/ scenario-cache==0.0.1
+pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.1
 ```
 
 1. Cache init
+
 ```python
-from scenario_cache.core import cache
+from gpt_cache.core import cache
+
 cache.init()
 # it will read the `OPENAI_API_KEY` environment variable
 cache.set_openai_key()
 ```
 2. Replace the original openai package
+
 ```python
-from scenario_cache.view import openai
+from gpt_cache.view import openai
 
 # openai requests don't need any changes
 answer = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "foo"}
-        ],
-    )
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "foo"}
+    ],
+)
 ```
 3. End of request, persistent cache
 ```python
@@ -60,7 +63,7 @@ More examples：[example](example/example.md)
 
 ## 🧐 System flow
 
-![Scenario Cache Flow](design/ScenarioCache.png)
+![GPT Cache Flow](design/GPTCache.png)
 
 The core process of the system is shown in the diagram above:
 
@@ -82,9 +85,9 @@ After obtaining the corresponding result list from the cache, the model needs to
 
 ## 🤩 System Structure
 
-![Scenario Cache Structure](design/ScenarioCacheStructure.png)
+![GPT Cache Structure](design/GPTCacheStructure.png)
 
-1. User layer, wrapping openai interface, including: using openai python and http service, reference: [api-chat](https://platform.openai.com/docs/api-reference/chat) [guide-chat] (https://platform.openai.com/docs/guides/chat/introduction),
+1. User layer, wrapping openai interface, including: using openai python and http service, reference: [api-chat](https://platform.openai.com/docs/api-reference/chat) [guide-chat](https://platform.openai.com/docs/guides/chat/introduction),
 To enable users to access the cache, python only needs to modify the package name, and for api, it only needs to be simply encapsulated into an http service through the library
 2. Embedding layer
 Extract the features in the message, that is, convert the text into a vector
