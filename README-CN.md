@@ -52,7 +52,7 @@ answer = openai.ChatCompletion.create(
 cache.data_manager.close()
 ```
 
-在本地运行，如果想要更好的效果，可以使用示例中的 [Sqlite + Faiss + Towhee](example/sf_towhee/sf_manager.py) 方案，其中 Sqlite + Faiss 进行缓存数据管理，Towhee 进行 embedding 操作。
+在本地运行，如果想要更好的效果，可以使用示例中的 [Sqlite + Faiss + Towhee](example/sf_towhee/sf_manager.py) 方案，其中 Sqlite + Faiss 进行缓存数据管理，Towhee 进行 embedding 操作（仅支持英文，中文需要更换模型）。
 
 在实际生产中，或者有一定用户群里，需要更多的考虑向量搜索这部分，可以了解下 [Milvus](https://github.com/milvus-io/milvus)，当然也有 [Milvus云服务](https://cloud.zilliz.com/) ，快速体验 Milvus 向量检索
 

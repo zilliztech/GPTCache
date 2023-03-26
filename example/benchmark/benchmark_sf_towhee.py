@@ -65,6 +65,8 @@ def run():
     print("cache_hint_positive:", hit_cache_positive)
     print("hit_cache_negative:", hit_cache_negative)
     print("fail_count:", fail_count)
+    print("average embedding time: ", cache.report.average_embedding_time())
+    print("average search time: ", cache.report.average_search_time())
 
     cache.data_manager.close()
 

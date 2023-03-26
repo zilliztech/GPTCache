@@ -55,7 +55,7 @@ answer = openai.ChatCompletion.create(
 cache.data_manager.close()
 ```
 
-Run locally, if you want better results, you can use the example [Sqlite + Faiss + Towhee](example/sf_towhee/sf_manager.py). Among them, Sqlite + Faiss is used for cache data management, and Towhee is used for embedding operations.
+Run locally, if you want better results, you can use the example [Sqlite + Faiss + Towhee](example/sf_towhee/sf_manager.py). Among them, Sqlite + Faiss is used for cache data management, and Towhee(**Only supports English**, Chinese needs to change the model) is used for embedding operations.
 
 In actual production, or in a certain user group, it is necessary to consider the vector search part more, you can get to know [Milvus](https://github.com/milvus-io/milvus)，or [Milvus Cloud](https://cloud.zilliz.com/), which allows you to quickly experience Milvus vector retrieval.
 

@@ -1,5 +1,6 @@
 import os
 
+import gpt_cache.core
 from gpt_cache.cache.data_manager import MapDataManager
 from gpt_cache.view import openai
 from gpt_cache.core import cache

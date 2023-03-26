@@ -1,4 +1,6 @@
 import os
+import time
+
 import openai
 from .embedding.string import to_embeddings as string_embedding
 from .cache.data_manager import DataManager, MapDataManager
@@ -7,6 +9,54 @@ from .similarity_evaluation.string import absolute_evaluation
 
 def cache_all(*args, **kwargs):
     return True
+
+
+def time_cal(func, func_name=None, report_func=None):
+    def inner(*args, **kwargs):
+        time_start = time.time()
+        res = func(*args, **kwargs)
+        delta_time = time.time() - time_start
+        if cache.config.print_func_time:
+            print("func `{}` consume time: {:.2f}s".format(
+                func.__name__ if func_name is None else func_name, delta_time))
+        if report_func is not None:
+            report_func(delta_time)
+        return res
+    return inner
+
+
+class Config:
+    def __init__(self,
+                 print_func_time=False,
+                 report_func_time=True):
+        self.print_func_time = print_func_time
+        self.report_func_time = report_func_time
+
+
+class Report:
+    def __init__(self):
+        self.embedding_all_time = 0
+        self.embedding_count = 0
+        self.search_all_time = 0
+        self.search_count = 0
+        self.hint_cache_count = 0
+
+    def embedding(self, delta_time):
+        self.embedding_all_time += delta_time
+        self.embedding_count += 1
+
+    def search(self, delta_time):
+        self.search_all_time += delta_time
+        self.search_count += 1
+
+    def average_embedding_time(self):
+        return round(self.embedding_all_time / self.embedding_count if self.embedding_count != 0 else 0, 4)
+
+    def average_search_time(self):
+        return round(self.search_all_time / self.search_count if self.embedding_count != 0 else 0, 4)
+
+    def hint_cache(self):
+        self.hint_cache_count += 1
 
 
 class Cache:
@@ -18,6 +68,8 @@ class Cache:
         self.evaluation_func = None
         self.similarity_threshold = None
         self.similarity_positive = True
+        self.config = None
+        self.report = Report()
 
     def init(self,
              cache_enable_func=cache_all,
@@ -26,6 +78,7 @@ class Cache:
              evaluation_func=absolute_evaluation,
              similarity_threshold=100,
              similarity_positive=True,
+             config=Config()
              ):
         self.cache_enable_func = cache_enable_func
         self.embedding_func = embedding_func
@@ -34,6 +87,7 @@ class Cache:
         self.similarity_threshold = similarity_threshold
         self.similarity_positive = similarity_positive
         self.data_manager.init()
+        self.config = config
 
     @staticmethod
     def set_openai_key():
