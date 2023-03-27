@@ -12,13 +12,13 @@ How to use the sqlite to store the scale data and the faiss to query the vector 
 
 On the basis of the above example, use [towhee](https://github.com/towhee-io/towhee) for embedding operation
 
-Note: the default embedding model only support the **ENGLISH**. For other languages, you should use the corresponding model.
+Note: the default embedding model only support the **ENGLISH**. If you want to use the Chinese, you can use the `uer/albert-base-chinese-cluecorpussmall` model. For other languages, you should use the corresponding model.
 
 ## [Benchmark](benchmark/benchmark_sf_towhee.py)
 
 The benchmark script about the `Sqlite + Faiss + Towhee`
 
-Test data source: Randomly scrape some information from the webpage (origin), and then let chatgpt produce corresponding data (similar).
+[Test data source](benchmark/mock_data.json): Randomly scrape some information from the webpage (origin), and then let chatgpt produce corresponding data (similar).
 
 - **threshold**: answer evaluation threshold, A smaller value means higher consistency with the content in the cache, a lower cache hit rate, and a lower cache miss hit; a larger value means higher tolerance, a higher cache hit rate, and at the same time also have higher cache misses.
 - **positive**: effective cache hit

@@ -33,7 +33,8 @@ class ChatCompletion:
         # TODO support stream data
         openai_data = openai.ChatCompletion.create(*args, **kwargs)
         if cache_enable:
-            cache.data_manager.save(get_message_from_openai_answer(openai_data), embedding_data,
+            cache.data_manager.save(get_message_from_openai_answer(openai_data),
+                                    embedding_data,
                                     extra_param=context.get('save', None))
         return openai_data
 

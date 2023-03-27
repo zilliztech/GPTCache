@@ -4,14 +4,13 @@ from gpt_cache.view import openai
 from gpt_cache.core import cache
 from gpt_cache.cache.data_manager import SFDataManager
 from gpt_cache.similarity_evaluation.faiss import faiss_evaluation
-from gpt_cache.embedding.towhee import to_embeddings as towhee_embedding
-
-d = 768
+from gpt_cache.embedding.towhee import Towhee
 
 
 def run():
-    cache.init(embedding_func=towhee_embedding,
-               data_manager=SFDataManager("sqlite.db", "faiss.index", d),
+    towhee = Towhee()
+    cache.init(embedding_func=towhee.to_embeddings,
+               data_manager=SFDataManager("sqlite.db", "faiss.index", towhee.dimension()),
                evaluation_func=faiss_evaluation,
                similarity_threshold=10000,
                similarity_positive=False)
