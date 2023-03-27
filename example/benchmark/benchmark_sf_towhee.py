@@ -25,14 +25,10 @@ def run():
         i += 1
 
     # you should OPEN it if you FIRST run it
-    # print("insert data")
-    # for pair in mock_data:
-    #     source_messages = [
-    #         {"role": "system", "content": "You are a helpful assistant."},
-    #         {"role": "user", "content": pair["origin"]}
-    #     ]
-    #     cache.data_manager.save(pair["id"], cache.embedding_func({"messages": source_messages}))
-    # print("end insert data")
+    print("insert data")
+    for pair in mock_data:
+        cache.data_manager.save(pair["id"], cache.embedding_func(pair["origin"]))
+    print("end insert data")
 
     all_time = 0.0
     hit_cache_positive, hit_cache_negative = 0, 0
@@ -49,7 +45,6 @@ def run():
                 messages=mock_messages,
             )
             res_text = openai.get_message_from_openai_answer(res)
-            # print("res_text", res_text)
             if res_text == pair["id"]:
                 hit_cache_positive += 1
             else:
@@ -66,8 +61,6 @@ def run():
     print("fail_count:", fail_count)
     print("average embedding time: ", cache.report.average_embedding_time())
     print("average search time: ", cache.report.average_search_time())
-
-    cache.data_manager.close()
 
 
 if __name__ == '__main__':

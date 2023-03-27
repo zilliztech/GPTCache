@@ -8,14 +8,15 @@ import numpy as np
 class Faiss:
     index: Index
 
-    def __init__(self, index_file_path, dimension):
+    def __init__(self, index_file_path, dimension, top_k=1):
         self.index_file_path = index_file_path
         self.index = IndexHNSWFlat(dimension, 32)
+        self.top_k = top_k
         if os.path.isfile(index_file_path):
             self.index = faiss.read_index(index_file_path)
 
     def add(self, data):
-        np_data = np.array(data).astype('float32')
+        np_data = np.array(data).astype('float32').reshape(1, -1)
         self.index.add(np_data)
 
     def mult_add(self, datas):
@@ -23,11 +24,16 @@ class Faiss:
         self.index.add(np_data)
 
     def search(self, data):
-        np_data = np.array(data).astype('float32')
-        D, I = self.index.search(np_data, 1)
-        distance = int(D[0, 0] * 100)
-        vector_data = self.index.reconstruct(int(I[0, 0])).reshape(1, -1)
-        return distance, vector_data
+        np_data = np.array(data).astype('float32').reshape(1, -1)
+        D, I = self.index.search(np_data, self.top_k)
+        distances = []
+        for d in D[:1].reshape(-1):
+            if d >= 655:
+                distances.append(int(65500))
+            else:
+                distances.append(int(d) * 100)
+        vector_datas = [self.index.reconstruct(int(i)) for i in I[:1].reshape(-1)]
+        return zip(distances, vector_datas)
 
     def close(self):
         faiss.write_index(self.index, self.index_file_path)

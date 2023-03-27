@@ -1,10 +1,13 @@
+import atexit
 import os
 import time
 
 import openai
+from .embedding.pre_embedding import last_content
 from .embedding.string import to_embeddings as string_embedding
 from .cache.data_manager import DataManager, MapDataManager
 from .similarity_evaluation.string import absolute_evaluation
+from .post_process.post_process import first
 
 
 def cache_all(*args, **kwargs):
@@ -28,9 +31,12 @@ def time_cal(func, func_name=None, report_func=None):
 class Config:
     def __init__(self,
                  print_func_time=False,
-                 report_func_time=True):
+                 report_func_time=True,
+                 top_k=1,
+                 ):
         self.print_func_time = print_func_time
         self.report_func_time = report_func_time
+        self.top_k = top_k
 
 
 class Report:
@@ -63,9 +69,11 @@ class Cache:
     # it should be called when start the cache system
     def __init__(self):
         self.cache_enable_func = None
+        self.pre_embedding_func = None
         self.embedding_func = None
         self.data_manager = None
         self.evaluation_func = None
+        self.post_process_messages_func = None
         self.similarity_threshold = None
         self.similarity_positive = True
         self.config = None
@@ -73,20 +81,24 @@ class Cache:
 
     def init(self,
              cache_enable_func=cache_all,
+             pre_embedding_func=last_content,
              embedding_func=string_embedding,
              data_manager: DataManager = MapDataManager("data_map.txt"),
              evaluation_func=absolute_evaluation,
+             post_process_messages_func=first,
              similarity_threshold=100,
              similarity_positive=True,
              config=Config()
              ):
         self.cache_enable_func = cache_enable_func
+        self.pre_embedding_func = pre_embedding_func
         self.embedding_func = embedding_func
         self.data_manager: DataManager = data_manager
         self.evaluation_func = evaluation_func
+        self.post_process_messages_func = post_process_messages_func
         self.similarity_threshold = similarity_threshold
         self.similarity_positive = similarity_positive
-        self.data_manager.init()
+        self.data_manager.init(top_k=config.top_k)
         self.config = config
 
     @staticmethod
@@ -95,3 +107,11 @@ class Cache:
 
 
 cache = Cache()
+
+
+@atexit.register
+def cache_close():
+    try:
+        cache.data_manager.close()
+    except Exception as e:
+        print(e)

@@ -21,8 +21,8 @@ The benchmark script about the `Sqlite + Faiss + Towhee`
 [Test data source](benchmark/mock_data.json): Randomly scrape some information from the webpage (origin), and then let chatgpt produce corresponding data (similar).
 
 - **threshold**: answer evaluation threshold, A smaller value means higher consistency with the content in the cache, a lower cache hit rate, and a lower cache miss hit; a larger value means higher tolerance, a higher cache hit rate, and at the same time also have higher cache misses.
-- **positive**: effective cache hit
-- **negative**: cache hit but the result is wrong
+- **positive**: effective cache hit, which means entering `similar` to search and get the same result as `origin`
+- **negative**: cache hit but the result is wrong, which means entering `similar` to search and get the different result as `origin`
 - **fail count**: cache miss
 
 

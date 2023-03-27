@@ -15,18 +15,12 @@ def run():
     ]
 
     # you should OPEN it if you FIRST run it
-    # cache.data_manager.save("receiver the foo", cache.embedding_func({"messages": mock_messages}))
+    # cache.data_manager.save("receiver the foo", cache.embedding_func("foo"))
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,
-        cache_context={
-            "search": {
-                "user": "foo"
-            }
-        },
     )
     print(answer)
-    cache.data_manager.close()
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 from gpt_cache.view import openai
-from gpt_cache.core import cache
+from gpt_cache.core import cache, Config
 from gpt_cache.cache.data_manager import SFDataManager
 from gpt_cache.similarity_evaluation.faiss import faiss_evaluation
 import numpy as np
@@ -17,26 +17,22 @@ def run():
                data_manager=SFDataManager("sqlite.db", "faiss.index", d),
                evaluation_func=faiss_evaluation,
                similarity_threshold=10000,
-               similarity_positive=False)
+               similarity_positive=False,
+               config=Config(top_k=3),
+               )
 
     mock_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "foo"}
     ]
     # you should OPEN it if you FIRST run it
-    # cache.data_manager.save("receiver the foo", cache.embedding_func({"messages": mock_messages}))
+    # cache.data_manager.save("receiver the foo", cache.embedding_func("foo"))
 
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,
-        cache_context={
-            "search": {
-                "user": "foo"
-            }
-        },
     )
     print(answer)
-    cache.data_manager.close()
 
 
 if __name__ == '__main__':

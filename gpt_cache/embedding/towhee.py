@@ -2,10 +2,6 @@ import numpy as np
 from towhee.dc2 import pipe, ops
 
 
-def pre_embedding(data, **kwargs):
-    return data.get("messages")[-1]["content"]
-
-
 class Towhee:
     # english model: paraphrase-albert-small-v2
     # chinese model: uer/albert-base-chinese-cluecorpussmall
@@ -20,9 +16,8 @@ class Towhee:
         self.__dimension = len(self.__pipe("foo").get_dict()['vec'])
 
     def to_embeddings(self, data, **kwargs):
-        message = pre_embedding(data, **kwargs)
-        emb = self.__pipe(message).get_dict()['vec']
-        return np.array(emb).astype('float32').reshape(1, -1)
+        emb = self.__pipe(data).get_dict()['vec']
+        return np.array(emb).astype('float32')
 
     def dimension(self):
         return self.__dimension

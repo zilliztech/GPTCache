@@ -1,4 +1,3 @@
-import time
 import openai
 from ..core import cache, time_cal
 
@@ -12,23 +11,27 @@ class ChatCompletion:
         # you want to retry to send the request to chatgpt when the cache is negative
         cache_skip = kwargs.pop("cache_skip", False)
         if cache_enable and not cache_skip:
+            pre_embedding_data = cache.pre_embedding_func(kwargs, extra_param=context.get("pre_embedding_func", None))
             embedding_data = time_cal(cache.embedding_func,
                                       func_name="embedding",
                                       report_func=cache.report.embedding,
-                                      )(kwargs, extra_param=context.get("embedding_func", None))
-            cache_data = time_cal(cache.data_manager.search,
-                                  func_name="search",
-                                  report_func=cache.report.search,
-                                  )(embedding_data, extra_param=context.get('search', None))
-
-            rank = cache.evaluation_func(embedding_data, cache_data, extra_param=context.get('evaluation', None))
-            if (cache.similarity_positive and rank >= cache.similarity_threshold) \
-                    or (not cache.similarity_positive and rank <= cache.similarity_threshold):
-                return_message = cache.data_manager.get_scalar_data(cache_data,
-                                                                    extra_param=context.get('get_scalar_data', None))
-                if return_message is not None:
-                    cache.report.hint_cache()
-                    return construct_resp_from_cache(return_message)
+                                      )(pre_embedding_data, extra_param=context.get("embedding_func", None))
+            cache_data_list = time_cal(cache.data_manager.search,
+                                       func_name="search",
+                                       report_func=cache.report.search,
+                                       )(embedding_data, extra_param=context.get('search', None))
+            return_messages = []
+            for cache_data in cache_data_list:
+                rank = cache.evaluation_func(embedding_data, cache_data, extra_param=context.get('evaluation', None))
+                if (cache.similarity_positive and rank >= cache.similarity_threshold) \
+                        or (not cache.similarity_positive and rank <= cache.similarity_threshold):
+                    return_message = cache.data_manager.get_scalar_data(cache_data,
+                                                                        extra_param=context.get('get_scalar_data', None))
+                    return_messages.append(return_message)
+            if len(return_messages) != 0:
+                return_message = cache.post_process_messages_func(return_messages)
+                cache.report.hint_cache()
+                return construct_resp_from_cache(return_message)
 
         # TODO support stream data
         openai_data = openai.ChatCompletion.create(*args, **kwargs)

@@ -16,11 +16,7 @@ def run():
                similarity_positive=False)
 
     # you should OPEN it if you FIRST run it
-    # source_messages = [
-    #     {"role": "system", "content": "You are a helpful assistant."},
-    #     {"role": "user", "content": "what do you think about chatgpt"}
-    # ]
-    # cache.data_manager.save("chatgpt is a good application", cache.embedding_func({"messages": source_messages}))
+    cache.data_manager.save("chatgpt is a good application", cache.embedding_func("what do you think about chatgpt"))
 
     # distance 77
     mock_messages = [
@@ -38,17 +34,11 @@ def run():
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,
-        cache_context={
-            "search": {
-                "user": "foo"
-            }
-        },
     )
     end_time = time.time()
     print("cache hint time consuming: {:.2f}s".format(end_time - start_time))
 
     print(answer)
-    cache.data_manager.close()
 
 
 if __name__ == '__main__':

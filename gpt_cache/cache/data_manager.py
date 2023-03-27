@@ -7,7 +7,7 @@ from .vector_data.faiss import Faiss
 
 class DataManager(metaclass=ABCMeta):
     @abstractmethod
-    def init(self): pass
+    def init(self, **kwargs): pass
 
     @abstractmethod
     def save(self, data, embedding_data, **kwargs): pass
@@ -27,7 +27,7 @@ class MapDataManager(DataManager):
         self.data = {}
         self.data_path = data_path
 
-    def init(self):
+    def init(self, **kwargs):
         try:
             f = open(self.data_path, 'rb')
             self.data = pickle.load(f)
@@ -44,7 +44,7 @@ class MapDataManager(DataManager):
         return vector_data[1]
 
     def search(self, embedding_data, **kwargs):
-        return self.data[embedding_data]
+        return [self.data[embedding_data]]
 
     def close(self):
         try:
@@ -71,9 +71,9 @@ class SFDataManager(DataManager):
         self.index_path = index_path
         self.dimension = dimension
 
-    def init(self):
+    def init(self, **kwargs):
         self.s = SQLite(self.sqlite_path)
-        self.f = Faiss(self.index_path, self.dimension)
+        self.f = Faiss(self.index_path, self.dimension, top_k=kwargs.get("top_k", 1))
 
     def save(self, data, embedding_data, **kwargs):
         key = sha_data(embedding_data)
