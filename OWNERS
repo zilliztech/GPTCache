@@ -1,0 +1,6 @@
+filters:
+  ".*":
+    reviewers:
+      - SimFG
+    approvers:
+      - SimFG
