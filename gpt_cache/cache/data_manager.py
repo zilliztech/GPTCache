@@ -75,20 +75,22 @@ class SFDataManager(DataManager):
     f: Faiss
 
     # when the size of data reach the max_size, it will remove the clean_size amount of data
-    def __init__(self, sqlite_path, index_path, dimension,
-                 max_size, clean_size):
+    def __init__(self, sqlite_path, index_path, dimension, top_k,
+                 max_size, clean_size, clean_cache_strategy):
         self.sqlite_path = sqlite_path
         self.index_path = index_path
         self.dimension = dimension
+        self.top_k = top_k
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size
+        self.clean_cache_strategy = clean_cache_strategy
         self.clean_cache_thread = None
 
     def init(self, **kwargs):
-        self.s = SQLite(self.sqlite_path, clean_cache_strategy=kwargs.get("clean_cache_strategy", "least_accessed_data"))
+        self.s = SQLite(self.sqlite_path, self.clean_cache_strategy)
         self.cur_size = self.s.count()
-        self.f = Faiss(self.index_path, self.dimension, top_k=kwargs.get("top_k", 1))
+        self.f = Faiss(self.index_path, self.dimension, self.top_k)
 
     def rebuild_index(self, all_data, top_k=1):
         print("rebuild index")
@@ -126,3 +128,7 @@ class SFDataManager(DataManager):
         self.s.close()
         self.f.close()
 
+
+# SVDataManager scalar store and vector store
+class SVDataManager(DataManager):
+    pass

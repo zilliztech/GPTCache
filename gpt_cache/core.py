@@ -33,13 +33,9 @@ class Config:
     def __init__(self,
                  print_func_time=False,
                  report_func_time=True,
-                 top_k=1,
-                 clean_cache_strategy="least_accessed_data",
                  ):
         self.print_func_time = print_func_time
         self.report_func_time = report_func_time
-        self.top_k = top_k
-        self.clean_cache_strategy = clean_cache_strategy
 
 
 class Report:
@@ -91,7 +87,8 @@ class Cache:
              post_process_messages_func=first,
              similarity_threshold=100,
              similarity_positive=True,
-             config=Config()
+             config=Config(),
+             **kwargs
              ):
         self.cache_enable_func = cache_enable_func
         self.pre_embedding_func = pre_embedding_func
@@ -101,7 +98,7 @@ class Cache:
         self.post_process_messages_func = post_process_messages_func
         self.similarity_threshold = similarity_threshold
         self.similarity_positive = similarity_positive
-        self.data_manager.init(top_k=config.top_k, clean_cache_strategy=config.clean_cache_strategy)
+        self.data_manager.init(**kwargs)
         self.config = config
 
     @staticmethod

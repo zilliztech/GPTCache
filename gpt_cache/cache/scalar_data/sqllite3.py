@@ -6,7 +6,7 @@ import numpy as np
 
 class SQLite:
 
-    def __init__(self, db_path, clean_cache_strategy="least_accessed_data"):
+    def __init__(self, db_path, clean_cache_strategy):
         self.con = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
         self.cur = self.con.cursor()
         create_tb_cmd = '''

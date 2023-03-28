@@ -16,11 +16,11 @@ def mock_embeddings(data, **kwargs):
 
 def run():
     cache.init(embedding_func=mock_embeddings,
-               data_manager=get_data_manager("sqlite_faiss",  dimension=d, max_size=8, clean_size=2),
+               data_manager=get_data_manager("sqlite_faiss",  dimension=d, max_size=8, clean_size=2, top_k=3),
                evaluation_func=faiss_evaluation,
                similarity_threshold=10000,
                similarity_positive=False,
-               config=Config(top_k=3),
+               config=Config(),
                )
 
     mock_messages = [

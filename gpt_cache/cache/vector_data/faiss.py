@@ -8,7 +8,7 @@ import numpy as np
 class Faiss:
     index: Index
 
-    def __init__(self, index_file_path, dimension, top_k=1, skip_file=False):
+    def __init__(self, index_file_path, dimension, top_k, skip_file=False):
         self.index_file_path = index_file_path
         self.index = IndexHNSWFlat(dimension, 32)
         self.top_k = top_k
