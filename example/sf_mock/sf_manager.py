@@ -1,6 +1,8 @@
+import time
+
 from gpt_cache.view import openai
 from gpt_cache.core import cache, Config
-from gpt_cache.cache.data_manager import SFDataManager
+from gpt_cache.cache.factory import get_data_manager
 from gpt_cache.similarity_evaluation.faiss import faiss_evaluation
 import numpy as np
 
@@ -14,7 +16,7 @@ def mock_embeddings(data, **kwargs):
 
 def run():
     cache.init(embedding_func=mock_embeddings,
-               data_manager=SFDataManager("sqlite.db", "faiss.index", d),
+               data_manager=get_data_manager("sqlite_faiss",  dimension=d, max_size=8, clean_size=2),
                evaluation_func=faiss_evaluation,
                similarity_threshold=10000,
                similarity_positive=False,
@@ -26,7 +28,8 @@ def run():
         {"role": "user", "content": "foo"}
     ]
     # you should OPEN it if you FIRST run it
-    # cache.data_manager.save("receiver the foo", cache.embedding_func("foo"))
+    for i in range(10):
+        cache.data_manager.save(f"receiver the foo {i}", cache.embedding_func("foo"))
 
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",

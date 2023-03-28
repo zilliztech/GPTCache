@@ -25,8 +25,8 @@ class ChatCompletion:
                 rank = cache.evaluation_func(embedding_data, cache_data, extra_param=context.get('evaluation', None))
                 if (cache.similarity_positive and rank >= cache.similarity_threshold) \
                         or (not cache.similarity_positive and rank <= cache.similarity_threshold):
-                    return_message = cache.data_manager.get_scalar_data(cache_data,
-                                                                        extra_param=context.get('get_scalar_data', None))
+                    return_message = cache.data_manager.get_scalar_data(
+                        cache_data, extra_param=context.get('get_scalar_data', None))
                     return_messages.append(return_message)
             if len(return_messages) != 0:
                 return_message = cache.post_process_messages_func(return_messages)

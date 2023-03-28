@@ -2,3 +2,4 @@ openai
 numpy
 faiss-cpu
 towhee
+cachetools
