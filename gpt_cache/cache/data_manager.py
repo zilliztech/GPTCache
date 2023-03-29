@@ -52,7 +52,10 @@ class MapDataManager(DataManager):
         return vector_data
 
     def search(self, embedding_data, **kwargs):
-        return [self.data[embedding_data]]
+        try:
+            return [self.data[embedding_data]]
+        except KeyError:
+            return []
 
     def close(self):
         try:

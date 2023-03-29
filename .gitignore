@@ -130,6 +130,7 @@ dmypy.json
 
 .idea
 **/data_map.txt
+**/data_map**.txt
 **/faiss.index
 **/sqlite.db
 **/example.py

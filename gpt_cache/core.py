@@ -77,6 +77,7 @@ class Cache:
         self.similarity_positive = True
         self.config = None
         self.report = Report()
+        self.next_cache = None
 
     def init(self,
              cache_enable_func=cache_all,
@@ -88,6 +89,7 @@ class Cache:
              similarity_threshold=0.5,
              similarity_positive=True,
              config=Config(),
+             next_cache=None,
              **kwargs
              ):
         self.cache_enable_func = cache_enable_func
@@ -100,6 +102,12 @@ class Cache:
         self.similarity_positive = similarity_positive
         self.data_manager.init(**kwargs)
         self.config = config
+        self.next_cache = next_cache
+
+    def close(self):
+        self.data_manager.close()
+        if self.next_cache:
+            self.next_cache.close()
 
     @staticmethod
     def set_openai_key():
@@ -112,6 +120,6 @@ cache = Cache()
 @atexit.register
 def cache_close():
     try:
-        cache.data_manager.close()
+        cache.close()
     except Exception as e:
         print(e)

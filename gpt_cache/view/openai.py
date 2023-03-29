@@ -22,6 +22,8 @@ class ChatCompletion:
                                        func_name="search",
                                        report_func=chat_cache.report.search,
                                        )(embedding_data, extra_param=context.get('search', None))
+            if cache_data_list is None:
+                cache_data_list = []
             cache_answers = []
             for cache_data in cache_data_list:
                 cache_question, cache_answer = chat_cache.data_manager.get_scalar_data(
@@ -43,9 +45,15 @@ class ChatCompletion:
                 chat_cache.report.hint_cache()
                 return construct_resp_from_cache(return_message)
 
-        # TODO cache poster -> can chain
         # TODO support stream data
-        openai_data = openai.ChatCompletion.create(*args, **kwargs)
+        next_cache = chat_cache.next_cache
+        if next_cache:
+            print("next_cache")
+            kwargs["cache_obj"] = next_cache
+            openai_data = ChatCompletion.create(*args, **kwargs)
+        else:
+            openai_data = openai.ChatCompletion.create(*args, **kwargs)
+
         if cache_enable:
             chat_cache.data_manager.save(pre_embedding_data,
                                          get_message_from_openai_answer(openai_data),
