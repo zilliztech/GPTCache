@@ -3,8 +3,10 @@ import sqlite3
 
 import numpy as np
 
+from .scalar_store import ScalarStore
 
-class SQLite:
+
+class SQLite(ScalarStore):
 
     def __init__(self, db_path, clean_cache_strategy):
         self.con = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
@@ -19,9 +21,12 @@ class SQLite:
             );'''
         self.cur.execute(create_tb_cmd)
         if clean_cache_strategy == "oldest_created_data":
-            self.clean_cache_func = self.remove_oldest_created_data
+            self.get_clean_cache_data_id = self.get_oldest_created_data
         else:
-            self.clean_cache_func = self.remove_least_accessed_data
+            self.get_clean_cache_data_id = self.get_least_accessed_data
+
+    def init(self, **kwargs):
+        pass
 
     def count(self):
         res = self.cur.execute("SELECT COUNT(id) FROM cache_data")
@@ -36,7 +41,7 @@ class SQLite:
         self.cur.executemany("INSERT INTO cache_data (id, data, embedding_data) VALUES(?, ?, ?)", datas)
         self.con.commit()
 
-    def select(self, key):
+    def select_data(self, key):
         res = self.cur.execute("SELECT data FROM cache_data WHERE id=?", (key, ))
         values = res.fetchone()
         # TODO batch asynchronous update
@@ -56,19 +61,21 @@ class SQLite:
             datas = np.append(datas, row[0], axis=0)
         return datas
 
-    def remove_oldest_created_data(self, count):
-        self.cur.execute("""DELETE FROM cache_data
-                            WHERE id IN (
-                                SELECT id FROM cache_data ORDER BY created_at LIMIT ?
-                            );""", (count,))
-        self.con.commit()
+    def get_oldest_created_data(self, count):
+        return self.cur.execute("SELECT id FROM cache_data ORDER BY created_at LIMIT ?", (count, ))
 
-    def remove_least_accessed_data(self, count):
-        self.cur.execute("""DELETE FROM cache_data
-                    WHERE id IN (
-                        SELECT id FROM cache_data ORDER BY last_access_at LIMIT ?
-                    );""", (count,))
+    def get_least_accessed_data(self, count):
+        return self.cur.execute("SELECT id FROM cache_data ORDER BY last_access_at LIMIT ?", (count, ))
+
+    def clean_cache(self, count):
+        res = self.get_clean_cache_data_id(count)
+        ids = []
+        for row in res.fetchall():
+            ids.append(row[0])
+        delete_sql = "DELETE FROM cache_data WHERE id IN ({})".format(','.join('?' * len(ids)))
+        self.cur.execute(delete_sql, ids)
         self.con.commit()
+        return ids
 
     def close(self):
         self.cur.close()

@@ -2,21 +2,22 @@ import time
 
 from gpt_cache.view import openai
 from gpt_cache.core import cache
-from gpt_cache.cache.factory import get_data_manager
-from gpt_cache.similarity_evaluation.faiss import faiss_evaluation
+from gpt_cache.cache.factory import get_si_data_manager
+from gpt_cache.similarity_evaluation.simple import pair_evaluation
 from gpt_cache.embedding.towhee import Towhee
 
 
 def run():
     towhee = Towhee()
+    data_manager = get_si_data_manager("sqlite", "faiss", dimension=towhee.dimension(), max_size=2000)
     cache.init(embedding_func=towhee.to_embeddings,
-               data_manager=get_data_manager("sqlite_faiss",  dimension=towhee.dimension(), max_size=2000),
-               evaluation_func=faiss_evaluation,
+               data_manager=data_manager,
+               evaluation_func=pair_evaluation,
                similarity_threshold=10000,
                similarity_positive=False)
 
     # you should OPEN it if you FIRST run it
-    # cache.data_manager.save("chatgpt is a good application", cache.embedding_func("what do you think about chatgpt"))
+    cache.data_manager.save("chatgpt is a good application", cache.embedding_func("what do you think about chatgpt"))
 
     # distance 77
     mock_messages = [

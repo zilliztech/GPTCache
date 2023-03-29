@@ -16,8 +16,8 @@ def run():
     ]
 
     # you should OPEN it if you FIRST run it
-    # for i in range(10):
-    #     cache.data_manager.save(f"receiver the foo {i}", cache.embedding_func(f"foo{i}"))
+    for i in range(10):
+        cache.data_manager.save(f"receiver the foo {i}", cache.embedding_func(f"foo{i}"))
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,

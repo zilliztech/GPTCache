@@ -85,7 +85,7 @@ class Cache:
              data_manager: DataManager = get_data_manager("map"),
              evaluation_func=absolute_evaluation,
              post_process_messages_func=first,
-             similarity_threshold=100,
+             similarity_threshold=0.5,
              similarity_positive=True,
              config=Config(),
              **kwargs

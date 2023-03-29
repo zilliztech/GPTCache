@@ -3,3 +3,4 @@ numpy
 faiss-cpu
 towhee
 cachetools
+pymilvus

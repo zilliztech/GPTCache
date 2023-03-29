@@ -1,8 +1,6 @@
-import time
-
 from gpt_cache.view import openai
 from gpt_cache.core import cache, Config
-from gpt_cache.cache.factory import get_si_data_manager
+from gpt_cache.cache.factory import get_ss_data_manager
 from gpt_cache.similarity_evaluation.simple import pair_evaluation
 import numpy as np
 
@@ -15,7 +13,14 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
-    data_manager = get_si_data_manager("sqlite", "faiss", dimension=d, max_size=8, clean_size=2, top_k=3)
+    # milvus
+    data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2)
+    # milvus cloud
+    # data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2,
+    #                                    host="xxx.zillizcloud.com",
+    #                                    port=19530,
+    #                                    user="xxx", password="xxx", is_https=True,
+    #                                    )
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                evaluation_func=pair_evaluation,

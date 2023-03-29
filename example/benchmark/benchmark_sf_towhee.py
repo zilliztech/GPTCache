@@ -3,8 +3,8 @@ import time
 
 from gpt_cache.view import openai
 from gpt_cache.core import cache
-from gpt_cache.cache.factory import get_data_manager
-from gpt_cache.similarity_evaluation.faiss import faiss_evaluation
+from gpt_cache.cache.factory import get_si_data_manager
+from gpt_cache.similarity_evaluation.simple import pair_evaluation
 from gpt_cache.embedding.towhee import Towhee
 
 
@@ -13,10 +13,11 @@ def run():
         mock_data = json.load(mock_file)
 
     towhee = Towhee()
+    data_manager = get_si_data_manager("sqlite", "faiss", dimension=towhee.dimension())
     cache.init(embedding_func=towhee.to_embeddings,
-               data_manager=get_data_manager("sqlite_faiss",  dimension=towhee.dimension()),
-               evaluation_func=faiss_evaluation,
-               similarity_threshold=50,
+               data_manager=data_manager,
+               evaluation_func=pair_evaluation,
+               similarity_threshold=0.5,
                similarity_positive=False)
 
     i = 0

@@ -132,3 +132,5 @@ dmypy.json
 **/data_map.txt
 **/faiss.index
 **/sqlite.db
+**/example.py
+**/example.db
