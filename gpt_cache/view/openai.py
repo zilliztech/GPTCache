@@ -1,3 +1,6 @@
+import logging
+from typing import Iterable
+
 import openai
 from ..core import cache, time_cal
 
@@ -45,7 +48,6 @@ class ChatCompletion:
                 chat_cache.report.hint_cache()
                 return construct_resp_from_cache(return_message)
 
-        # TODO support stream data
         next_cache = chat_cache.next_cache
         if next_cache:
             print("next_cache")
@@ -55,10 +57,25 @@ class ChatCompletion:
             openai_data = openai.ChatCompletion.create(*args, **kwargs)
 
         if cache_enable:
-            chat_cache.data_manager.save(pre_embedding_data,
-                                         get_message_from_openai_answer(openai_data),
-                                         embedding_data,
-                                         extra_param=context.get('save', None))
+            try:
+                if not isinstance(openai_data, Iterable):
+                    chat_cache.data_manager.save(pre_embedding_data,
+                                                 get_message_from_openai_answer(openai_data),
+                                                 embedding_data,
+                                                 extra_param=context.get('save', None))
+                else:
+                    def hook_openai_data(it):
+                        total_answer = ""
+                        for item in it:
+                            total_answer += get_stream_message_from_openai_answer(item)
+                            yield item
+                        chat_cache.data_manager.save(pre_embedding_data,
+                                                     total_answer,
+                                                     embedding_data,
+                                                     extra_param=context.get('save', None))
+                    openai_data = hook_openai_data(openai_data)
+            except Exception as e:
+                logging.warning(f"failed to save the openai data, error:{e}")
         return openai_data
 
 
@@ -80,3 +97,7 @@ def construct_resp_from_cache(return_message):
 
 def get_message_from_openai_answer(openai_data):
     return openai_data['choices'][0]['message']['content']
+
+
+def get_stream_message_from_openai_answer(openai_data):
+    return openai_data['choices'][0]['delta'].get('content', '')
