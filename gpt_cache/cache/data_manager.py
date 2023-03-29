@@ -72,7 +72,7 @@ def sha_data(data):
     return m.hexdigest()
 
 
-# SVDataManager scalar store and vector store
+# SSDataManager scalar store and vector store
 class SSDataManager(DataManager):
     s: ScalarStore
     v: VectorStore
@@ -91,7 +91,7 @@ class SSDataManager(DataManager):
 
     def save(self, question, answer, embedding_data, **kwargs):
         if self.cur_size >= self.max_size:
-            ids = self.s.clean_cache(self.clean_size)
+            ids = self.s.eviction(self.clean_size)
             self.cur_size = self.s.count()
             self.v.delete(ids)
         key = sha_data(embedding_data)
@@ -131,7 +131,7 @@ class SIDataManager(DataManager):
 
     def save(self, question, answer, embedding_data, **kwargs):
         if self.cur_size >= self.max_size:
-            self.s.clean_cache(self.clean_size)
+            self.s.eviction(self.clean_size)
             all_data = self.s.select_all_embedding_data()
             self.cur_size = len(all_data)
             self.v = self.v.rebuild_index(all_data)

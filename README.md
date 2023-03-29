@@ -17,15 +17,17 @@ I believe it is necessary for the following reasons:
 - For a user, there is a certain regularity in the series of questions raised using ChatGPT, which is related to their occupation, lifestyle, personality, etc. For example, the likelihood of a programmer using ChatGPT services is largely related to their work.
 - If your ChatGPT service targets a large user group, categorizing them can increase the probability of relevant questions being cached, thus reducing service costs.
 
-## 😊 Quick Access
+## 😊 Quickly Start
 
 ### alpha test package install
 
-**Note**: You can quickly experience the cache, it is worth noting that maybe this is not very stable.
+**Note**: You can quickly experience the cache, it is worth noting that maybe this is not very **stable**.
 
 ```bash
 pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.1
 ```
+
+If you just want to achieve precise matching cache of requests, that is, two identical requests, you **ONLY** need **TWO** steps to access this cache
 
 1. Cache init
 
@@ -33,7 +35,7 @@ pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.1
 from gpt_cache.core import cache
 
 cache.init()
-# it will read the `OPENAI_API_KEY` environment variable
+# If you use the `openai.api_key = xxx` to set the api key, you need use `cache.set_openai_key()` to replace it
 cache.set_openai_key()
 ```
 2. Replace the original openai package
@@ -41,7 +43,7 @@ cache.set_openai_key()
 ```python
 from gpt_cache.view import openai
 
-# openai requests don't need any changes
+# openai requests DON'T need ANY changes
 answer = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[
@@ -50,55 +52,20 @@ answer = openai.ChatCompletion.create(
     ],
 )
 ```
-3. End of request, persistent cache
-```python
-cache.data_manager.close()
-```
 
 Run locally, if you want better results, you can use the example [Sqlite + Faiss + Towhee](example/sf_towhee/sf_manager.py). Among them, Sqlite + Faiss is used for cache data management, and Towhee is used for embedding operations.
 
-In actual production, or in a certain user group, it is necessary to consider the vector search part more, you can get to know [Milvus](https://github.com/milvus-io/milvus)，or [Milvus Cloud](https://cloud.zilliz.com/), which allows you to quickly experience Milvus vector retrieval.
+In actual production, or in a certain user group, it is necessary to consider the vector search part more, you can get to know [Milvus](https://github.com/milvus-io/milvus)，or [Zilliz Cloud](https://cloud.zilliz.com/), which allows you to quickly experience Milvus vector retrieval.
 
-More examples：[example](example/example.md)
+More Docs：
+- [examples](example/example.md)
+- [system design](doc/system.md)
 
-## 🧐 System flow
 
-![GPT Cache Flow](design/GPTCache.png)
+## 😆 Contributing
 
-The core process of the system is shown in the diagram above:
+Want to help build GPT Cache? Check out our [contributing documentation](doc/contributing.md).
 
-1. The user sends a question to the system, which first processes the question by converting it to a vector and querying it in the vector database using the Embedding operation.
-2. If the query result exists, the relevant data is returned to the user. Otherwise, the system proceeds to the next step.
-3. The user request is forwarded to the ChatGPT service, which returns the data and sends it to the user.
-4. At the same time, the question-answer data is processed using the Embedding operation, and the resulting vector is inserted into the vector database for fast response to future user queries.
-
-## 😵‍💫 System Core
-
-1. How to perform **embedding** operations on cached data
-This part involves two issues: the source of initialization data and the time-consuming data conversion process.
-- For different scenarios, the data can be vastly different. If the same data source is used, the hit rate of the cache will be greatly reduced. There are two possible solutions: collecting data before using the cache, or inserting data into the cache system for embedding training during the system's initialization phase.
-- The time required for data conversion is also an important indicator. If the cache is hit, the overall time should be lower than the inference time of a large-scale model. Otherwise, the system will lose some advantages and reduce user experience.
-2. How to **manage** cached data
-The core process of managing cached data includes data writing, searching, and cleaning. This requires the system being integrated to have the ability of incremental indexing, such as Milvus, and lightweight HNSW index can also meet the requirements. Data cleaning can ensure that the cached data will not increase indefinitely, while also ensuring the efficiency of cache queries.
-3. How to **evaluate** cached results
-After obtaining the corresponding result list from the cache, the model needs to perform question-and-answer similarity matching on the results. If the similarity reaches a certain threshold, the answer will be returned directly to the user. Otherwise, the request will be forwarded to ChatGPT.
-
-## 🤩 System Structure
-
-![GPT Cache Structure](design/GPTCacheStructure.png)
-
-1. User layer, wrapping openai interface, including: using openai python and http service, reference: [api-chat](https://platform.openai.com/docs/api-reference/chat) [guide-chat](https://platform.openai.com/docs/guides/chat/introduction),
-To enable users to access the cache, python only needs to modify the package name, and for api, it only needs to be simply encapsulated into an http service through the library
-2. Embedding layer
-Extract the features in the message, that is, convert the text into a vector
-3. Cache layer
-Manage cached data, including:
-- save scalar, vector data;
-- vector data search;
-- get scalar data based on search results;
-More: set cache data limit, update cache data
-4. Similarity assessment
-Evaluate the search results and give the corresponding credibility
 
 ## 🙏 Thank
 

@@ -26,20 +26,6 @@ def get_data_manager(data_manager_name: str, **kwargs) -> DataManager:
         if scalar_store is None or vector_index is None:
             raise ValueError(f"Missing scalar_store or vector_index parameter for scalar_vector_index")
         return SIDataManager(max_size, clean_size, scalar_store, vector_index)
-    # elif data_manager_name == "sqlite_faiss":
-    #     from .data_manager import SFDataManager
-    #
-    #     dimension = kwargs.get("dimension", 0)
-    #     if dimension <= 0:
-    #         raise ValueError(f"the sqlite_faiss data manager should set the 'dimension' parameter greater than zero, "
-    #                          f"current: {dimension}")
-    #     top_k = kwargs.get("top_k", 1)
-    #     sqlite_path = kwargs.get("sqlite_path", "sqlite.db")
-    #     index_path = kwargs.get("index_path", "faiss.index")
-    #     max_size = kwargs.get("max_size", 1000)
-    #     clean_size = kwargs.get("clean_size", int(max_size * 0.2))
-    #     clean_cache_strategy = kwargs.get("clean_cache_strategy", "least_accessed_data")
-    #     return SFDataManager(sqlite_path, index_path, dimension, top_k, max_size, clean_size, clean_cache_strategy)
     else:
         raise ValueError(f"Unsupported data manager: {data_manager_name}")
 
@@ -47,8 +33,8 @@ def get_data_manager(data_manager_name: str, **kwargs) -> DataManager:
 def _get_scalar_store(scalar_store: str, **kwargs):
     if scalar_store == "sqlite":
         sqlite_path = kwargs.get("sqlite_path", "sqlite.db")
-        clean_cache_strategy = kwargs.get("clean_cache_strategy", "least_accessed_data")
-        store = SQLite(sqlite_path, clean_cache_strategy)
+        eviction_strategy = kwargs.get("eviction_strategy", "least_accessed_data")
+        store = SQLite(sqlite_path, eviction_strategy)
     else:
         raise ValueError(f"Unsupported scalar store: {scalar_store}")
     return store

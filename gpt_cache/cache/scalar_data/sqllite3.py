@@ -8,7 +8,7 @@ from .scalar_store import ScalarStore
 
 class SQLite(ScalarStore):
 
-    def __init__(self, db_path, clean_cache_strategy):
+    def __init__(self, db_path, eviction_strategy):
         self.con = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
         self.cur = self.con.cursor()
         create_tb_cmd = '''
@@ -21,10 +21,10 @@ class SQLite(ScalarStore):
                 last_access_at DATETIME DEFAULT (DATETIME('now', 'localtime'))
             );'''
         self.cur.execute(create_tb_cmd)
-        if clean_cache_strategy == "oldest_created_data":
-            self.get_clean_cache_data_id = self.get_oldest_created_data
+        if eviction_strategy == "oldest_created_data":
+            self.get_eviction_data_id = self.get_oldest_created_data
         else:
-            self.get_clean_cache_data_id = self.get_least_accessed_data
+            self.get_eviction_data_id = self.get_least_accessed_data
 
     def init(self, **kwargs):
         pass
@@ -68,8 +68,8 @@ class SQLite(ScalarStore):
     def get_least_accessed_data(self, count):
         return self.cur.execute("SELECT id FROM cache_data ORDER BY last_access_at LIMIT ?", (count, ))
 
-    def clean_cache(self, count):
-        res = self.get_clean_cache_data_id(count)
+    def eviction(self, count):
+        res = self.get_eviction_data_id(count)
         ids = []
         for row in res.fetchall():
             ids.append(row[0])

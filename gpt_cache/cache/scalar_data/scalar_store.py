@@ -16,9 +16,9 @@ class ScalarStore(metaclass=ABCMeta):
     @abstractmethod
     def select_all_embedding_data(self): pass
 
-    # clean_cache: should return the id list
+    # eviction: should return the id list
     @abstractmethod
-    def clean_cache(self, count): pass
+    def eviction(self, count): pass
 
     @abstractmethod
     def count(self): pass

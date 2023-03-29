@@ -15,7 +15,7 @@ def mock_embeddings(data, **kwargs):
 def run():
     # milvus
     data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2)
-    # milvus cloud
+    # zilliz cloud
     # data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2,
     #                                    host="xxx.zillizcloud.com",
     #                                    port=19530,

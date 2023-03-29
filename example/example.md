@@ -6,13 +6,17 @@ How to use the map to cache data.
 
 ## [Sqlite + Faiss manage cache data](sf_mock/sf_manager.py)
 
-How to use the sqlite to store the scale data and the faiss to query the vector data.
+How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the faiss to query the vector data.
 
 ## [Sqlite + Faiss + Towhee](sf_towhee/sf_manager.py)
 
-On the basis of the above example, use [towhee](https://github.com/towhee-io/towhee) for embedding operation
+On the basis of the above example, use [towhee](https://towhee.io/) for embedding operation
 
 Note: the default embedding model only support the **ENGLISH**. If you want to use the Chinese, you can use the `uer/albert-base-chinese-cluecorpussmall` model. For other languages, you should use the corresponding model.
+
+## [Sqlite + Milvus + Towhee](sqlite_milvus_mock/sqlite_milvus_mock.py)
+
+How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the [milvus](https://milvus.io/docs) to store the vector data.
 
 ## [Benchmark](benchmark/benchmark_sf_towhee.py)
 
