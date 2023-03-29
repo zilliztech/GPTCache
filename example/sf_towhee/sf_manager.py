@@ -16,8 +16,10 @@ def run():
                similarity_threshold=10000,
                similarity_positive=False)
 
-    # you should OPEN it if you FIRST run it
-    cache.data_manager.save("chatgpt is a good application", cache.embedding_func("what do you think about chatgpt"))
+    # you should CLOSE it if you SECONDLY run it
+    question = "what do you think about chatgpt"
+    answer = "chatgpt is a good application"
+    cache.data_manager.save(question, answer, cache.embedding_func(question))
 
     # distance 77
     mock_messages = [

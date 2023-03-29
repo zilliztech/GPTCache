@@ -4,31 +4,45 @@ import time
 from gpt_cache.view import openai
 from gpt_cache.core import cache
 from gpt_cache.cache.factory import get_si_data_manager
+from gpt_cache.similarity_evaluation.towhee import Towhee as EvaluationTowhee
+from gpt_cache.embedding.towhee import Towhee as EmbeddingTowhee
 from gpt_cache.similarity_evaluation.simple import pair_evaluation
-from gpt_cache.embedding.towhee import Towhee
 
 
 def run():
     with open('mock_data.json', 'r') as mock_file:
         mock_data = json.load(mock_file)
 
-    towhee = Towhee()
-    data_manager = get_si_data_manager("sqlite", "faiss", dimension=towhee.dimension())
-    cache.init(embedding_func=towhee.to_embeddings,
+    embedding_towhee = EmbeddingTowhee()
+    evaluation_towhee = EvaluationTowhee()
+
+    def sf_evaluation(src_dict, cache_dict, **kwargs):
+        rank1 = pair_evaluation(src_dict, cache_dict, **kwargs)
+        if rank1 <= 0.5:
+            return evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
+        return 0
+
+    data_manager = get_si_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension())
+    cache.init(embedding_func=embedding_towhee.to_embeddings,
                data_manager=data_manager,
-               evaluation_func=pair_evaluation,
+               evaluation_func=sf_evaluation,
                similarity_threshold=0.5,
-               similarity_positive=False)
+               similarity_positive=True,
+               )
 
     i = 0
     for pair in mock_data:
         pair["id"] = str(i)
         i += 1
 
-    # you should OPEN it if you FIRST run it
+    # you should CLOSE it if you SECONDLY run it
     print("insert data")
+    id_origin = {}
     for pair in mock_data:
-        cache.data_manager.save(pair["id"], cache.embedding_func(pair["origin"]))
+        question = pair["origin"]
+        answer = pair["id"]
+        id_origin[answer] = question
+        cache.data_manager.save(question, answer, cache.embedding_func(question))
     print("end insert data")
 
     all_time = 0.0

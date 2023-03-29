@@ -9,7 +9,7 @@ d = 8
 
 
 def mock_embeddings(data, **kwargs):
-    return np.random.random((1, d)).astype('float32')
+    return np.random.random((d, )).astype('float32')
 
 
 def run():
@@ -33,9 +33,11 @@ def run():
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "foo"}
     ]
-    # you should OPEN it if you FIRST run it
+    # you should CLOSE it if you SECONDLY run it
     for i in range(10):
-        cache.data_manager.save(f"receiver the foo {i}", cache.embedding_func("foo"))
+        question = f"foo{i}"
+        answer = f"receiver the foo {i}"
+        cache.data_manager.save(question, answer, cache.embedding_func(question))
 
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",

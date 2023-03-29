@@ -1,3 +1,3 @@
-def pair_evaluation(src_embedding_data, cache_data, **kwargs):
-    distance, _ = cache_data
+def pair_evaluation(src_dict, cache_dict, **kwargs):
+    distance, _ = cache_dict["search_result"]
     return distance

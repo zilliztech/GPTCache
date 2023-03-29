@@ -15,9 +15,12 @@ def run():
         {"role": "user", "content": "foo5"}
     ]
 
-    # you should OPEN it if you FIRST run it
+    # you should CLOSE it if you SECONDLY run it
     for i in range(10):
-        cache.data_manager.save(f"receiver the foo {i}", cache.embedding_func(f"foo{i}"))
+        question = f"foo{i}"
+        answer = f"receiver the foo {i}"
+        cache.data_manager.save(question, answer, cache.embedding_func(question))
+
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,

@@ -8,7 +8,7 @@ class ScalarStore(metaclass=ABCMeta):
     def init(self, **kwargs): pass
 
     @abstractmethod
-    def insert(self, key, data, embedding_data: np.ndarray): pass
+    def insert(self, key, question, answer, embedding_data: np.ndarray): pass
 
     @abstractmethod
     def select_data(self, key): pass
