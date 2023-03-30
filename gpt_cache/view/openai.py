@@ -50,7 +50,6 @@ class ChatCompletion:
 
         next_cache = chat_cache.next_cache
         if next_cache:
-            print("next_cache")
             kwargs["cache_obj"] = next_cache
             openai_data = ChatCompletion.create(*args, **kwargs)
         else:

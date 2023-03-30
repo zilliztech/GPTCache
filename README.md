@@ -62,6 +62,61 @@ More Docs：
 - [system design](doc/system.md)
 
 
+## 🥳 Feature
+
+- Support the openai chat completion normal and stream request
+- Get top_k similar search results, it can be set when creating the data manager
+- Support the cache chain, see: `Cache#next_cache`
+
+```python
+bak_cache = Cache()
+bak_cache.init()
+cache.init(next_cache=bak_cache)
+```
+
+- Whether to completely skip the current cache, that is, do not search the cache or save the Chat GPT results, see: `Cache#cache_enable_func`
+- In the cache initialization phase, no cache search is performed, but the result returned by the cache chat gpt, see: `cache_skip=True` in `create` request
+
+```python
+openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=mock_messages,
+    cache_skip=True,
+)
+```
+
+- Like Lego bricks, custom assemble all modules, including:
+  - pre-embedding function, get feature information in the original request, such as prompt, last message, etc.
+  - embedding function, convert feature information into a vector for cache search, choose a model that fits your use case
+  - data manager, cache data management, mainly dealing with the search and storage of cache data
+  - cache similarity evaluation function, can use the distance of similar search or additional selection model to ensure that the answer is more accurate
+  - post-process the cache answer list, first, random or custom combination
+
+## 🤗 All Model
+
+- Pre-embedding
+  - get the last message in the request, see: `pre_embedding.py#last_content`
+- Embedding
+  - [towhee](https://towhee.io/), english model: paraphrase-albert-small-v2, chinese model: uer/albert-base-chinese-cluecorpussmall
+  - openai embedding api
+  - string, nothing change
+- Data Manager
+  - scalar store
+    - [sqlite](https://sqlite.org/docs.html)
+  - vector store
+    - [milvus](https://milvus.io/)
+  - vector index
+    - [faiss](https://faiss.ai/)
+- Similarity Evaluation
+  - the search distance, see: `simple.py#pair_evaluation`
+  - [towhee](https://towhee.io/), roberta_duplicate, precise comparison of problems to problems mode, only support the 512 token
+  - string, the cache request and the original request are judged by the exact match of characters
+  - np, use the `linalg.norm`
+- Post Process
+  - choose the most similar
+  - choose randomly
+
+
 ## 😆 Contributing
 
 Want to help build GPT Cache? Check out our [contributing documentation](doc/contributing.md).
