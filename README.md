@@ -24,7 +24,7 @@ I believe it is necessary for the following reasons:
 **Note**: You can quickly experience the cache, it is worth noting that maybe this is not very **stable**.
 
 ```bash
-pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.1
+pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.2
 ```
 
 If you just want to achieve precise matching cache of requests, that is, two identical requests, you **ONLY** need **TWO** steps to access this cache

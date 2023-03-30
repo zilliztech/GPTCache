@@ -16,7 +16,7 @@ def parse_requirements(file_name: str) -> List[str]:
 setuptools.setup(
     name="gpt_cache",
     packages=['gpt_cache'],
-    version="0.0.1",
+    version="0.0.2",
     author="SimFG",
     author_email="1142838399@qq.com",
     description="GPT Cache, make your chatgpt services lower cost and faster",
