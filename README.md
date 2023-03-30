@@ -75,7 +75,7 @@ cache.init(next_cache=bak_cache)
 ```
 
 - Whether to completely skip the current cache, that is, do not search the cache or save the Chat GPT results, see: `Cache#cache_enable_func`
-- In the cache initialization phase, no cache search is performed, but the result returned by the cache chat gpt, see: `cache_skip=True` in `create` request
+- In the cache initialization phase, no cache search is performed, but save the result returned by the chat gpt to cache, see: `cache_skip=True` in `create` request
 
 ```python
 openai.ChatCompletion.create(

@@ -19,10 +19,11 @@ def run():
     def sf_evaluation(src_dict, cache_dict, **kwargs):
         rank1 = pair_evaluation(src_dict, cache_dict, **kwargs)
         if rank1 <= 0.5:
-            return evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
+            rank2 = evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
+            return rank2 if rank2 != 0 else 1
         return 0
 
-    data_manager = get_si_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension())
+    data_manager = get_si_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension(), max_size=100000)
     cache.init(embedding_func=embedding_towhee.to_embeddings,
                data_manager=data_manager,
                evaluation_func=sf_evaluation,
