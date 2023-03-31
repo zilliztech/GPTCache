@@ -1,4 +1,5 @@
 import json
+import os
 import time
 
 from gpt_cache.view import openai
@@ -23,6 +24,10 @@ def run():
             return rank2 if rank2 != 0 else 1
         return 0
 
+    sqlite_file = "sqlite.db"
+    faiss_file = "faiss.index"
+    has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
+
     data_manager = get_si_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension(), max_size=100000)
     cache.init(embedding_func=embedding_towhee.to_embeddings,
                data_manager=data_manager,
@@ -36,15 +41,15 @@ def run():
         pair["id"] = str(i)
         i += 1
 
-    # you should CLOSE it if you SECONDLY run it
-    print("insert data")
-    id_origin = {}
-    for pair in mock_data:
-        question = pair["origin"]
-        answer = pair["id"]
-        id_origin[answer] = question
-        cache.data_manager.save(question, answer, cache.embedding_func(question))
-    print("end insert data")
+    if not has_data:
+        print("insert data")
+        id_origin = {}
+        for pair in mock_data:
+            question = pair["origin"]
+            answer = pair["id"]
+            id_origin[answer] = question
+            cache.data_manager.save(question, answer, cache.embedding_func(question))
+        print("end insert data")
 
     all_time = 0.0
     hit_cache_positive, hit_cache_negative = 0, 0

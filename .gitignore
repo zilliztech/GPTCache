@@ -129,9 +129,8 @@ dmypy.json
 .pyre/
 
 .idea
-**/data_map.txt
 **/data_map**.txt
-**/faiss.index
-**/sqlite.db
+**/faiss**.index
+**/sqlite**.db
 **/example.py
 **/example.db

@@ -1,3 +1,5 @@
+import os
+
 from gpt_cache.view import openai
 from gpt_cache.core import cache, Config
 from gpt_cache.cache.factory import get_ss_data_manager
@@ -13,6 +15,8 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
+    sqlite_file = "sqlite.db"
+    has_data = os.path.isfile(sqlite_file)
     # milvus
     data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2)
     # zilliz cloud
@@ -33,11 +37,11 @@ def run():
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "foo"}
     ]
-    # you should CLOSE it if you SECONDLY run it
-    for i in range(10):
-        question = f"foo{i}"
-        answer = f"receiver the foo {i}"
-        cache.data_manager.save(question, answer, cache.embedding_func(question))
+    if not has_data:
+        for i in range(10):
+            question = f"foo{i}"
+            answer = f"receiver the foo {i}"
+            cache.data_manager.save(question, answer, cache.embedding_func(question))
 
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",

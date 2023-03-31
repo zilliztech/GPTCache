@@ -1,3 +1,4 @@
+import os
 import time
 
 from gpt_cache.view import openai
@@ -9,17 +10,21 @@ from gpt_cache.embedding.towhee import Towhee
 
 def run():
     towhee = Towhee()
-    data_manager = get_si_data_manager("sqlite", "faiss", dimension=towhee.dimension(), max_size=2000)
+    sqlite_file = "sqlite.db"
+    faiss_file = "faiss.index"
+    has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
+    data_manager = get_si_data_manager("sqlite", "faiss",
+                                       dimension=towhee.dimension(), max_size=2000)
     cache.init(embedding_func=towhee.to_embeddings,
                data_manager=data_manager,
                evaluation_func=pair_evaluation,
                similarity_threshold=10000,
                similarity_positive=False)
 
-    # you should CLOSE it if you SECONDLY run it
-    question = "what do you think about chatgpt"
-    answer = "chatgpt is a good application"
-    cache.data_manager.save(question, answer, cache.embedding_func(question))
+    if not has_data:
+        question = "what do you think about chatgpt"
+        answer = "chatgpt is a good application"
+        cache.data_manager.save(question, answer, cache.embedding_func(question))
 
     # distance 77
     mock_messages = [

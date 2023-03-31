@@ -30,6 +30,8 @@ class Faiss(VectorIndex):
         self.index.add(np_data)
 
     def search(self, data):
+        if self.index.ntotal == 0:
+            return None
         np_data = np.array(data).astype('float32').reshape(1, -1)
         D, I = self.index.search(np_data, self.top_k)
         distances = []
