@@ -21,10 +21,7 @@ I believe it is necessary for the following reasons:
 
 **Note**:
 - You can quickly experience the cache, it is worth noting that maybe this is not very **stable**.
-- By default, basically **a few** libraries are installed. When you need to use some features, remember to install related libraries, refer to: [Install Dependencies List](doc/installation.md). For example, if you want to use `milvus` as a vector storage, you should install pymilvus, like:
-```
-pip install pymilvus
-```
+- By default, basically **a few** libraries are installed. When you need to use some features, it will **auto install** related libraries.
 
 ### alpha test package install
 

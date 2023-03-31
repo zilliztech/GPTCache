@@ -1,7 +1,8 @@
+from gpt_cache.util import import_pymilvus
+import_pymilvus()
+
 from uuid import uuid4
-
 import numpy as np
-
 from .vector_store import VectorStore
 from pymilvus import (
     connections,

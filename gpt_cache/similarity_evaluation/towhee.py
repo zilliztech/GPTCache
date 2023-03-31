@@ -1,3 +1,6 @@
+from gpt_cache.util import import_towhee
+import_towhee()
+
 from towhee.dc2 import ops, pipe
 
 
