@@ -10,6 +10,9 @@ from gpt_cache.embedding import Towhee
 
 def run():
     towhee = Towhee()
+    # chinese model
+    # towhee = Towhee(model="uer/albert-base-chinese-cluecorpussmall")
+
     sqlite_file = "sqlite.db"
     faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
