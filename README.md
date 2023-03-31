@@ -23,12 +23,12 @@ I believe it would be necessary for the following reasons:
 
 We also provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/example/benchmark/benchmark_sqlite_faiss_towhee.py) to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
 
-## 😊 Quickly Start
+## 😊 Quick Start
 
 **Note**:
-- You can quickly experience the cache, it is worth noting that maybe this is not very **stable**.
-- By default, basically **a few** libraries are installed. When you need to use some features, it will **auto install** related libraries.
-- If failed to install a library for low pip version, run: `python -m pip install --upgrade pip` 
+- You can quickly experience gpt cache, it's worth noting but remember the repo is under heavy development
+- By default, only **a few** libraries are installed. When you need to use additional features, related libraries will be **automatically installed**.
+- If you have trouble installing a library due to a low pip version, run: `python -m pip install --upgrade pip`
 
 ### pip install
 
@@ -85,7 +85,7 @@ More Docs：
 - [Examples, learn better custom caching](example/example.md)
 
 
-## 🤗 All Module
+## 🤗 All Modules
 
 ![GPTCache Struct](doc/GPTCacheStructure.png)
 
