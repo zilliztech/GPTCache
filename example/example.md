@@ -4,24 +4,11 @@
 
 How to use the map to cache data.
 
-## [Sqlite + Faiss manage cache data](sf_mock/sf_manager.py)
-
-Before running this case, you should install the `faiss-cpu`.
-
-```bash
-pip install faiss-cpu
-```
+## [Sqlite + Faiss manage cache data](sqlite_faiss_mock/sqlite_faiss_mock.py)
 
 How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the faiss to query the vector data.
 
-## [Sqlite + Faiss + Towhee](sf_towhee/sf_manager.py)
-
-Before running this case, you should install the `faiss-cpu` and `towhee`.
-
-```bash
-pip install faiss-cpu
-pip install towhee==0.9.0
-```
+## [Sqlite + Faiss + Towhee](sqlite_faiss_towhee/sqlite_faiss_towhee.py)
 
 On the basis of the above example, use [towhee](https://towhee.io/) for embedding operation
 
@@ -29,24 +16,9 @@ Note: the default embedding model only support the **ENGLISH**. If you want to u
 
 ## [Sqlite + Milvus + Towhee](sqlite_milvus_mock/sqlite_milvus_mock.py)
 
-Before running this case, you should install the `faiss-cpu`, `towhee` and `pymilvus`.
+How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
 
-```bash
-pip install faiss-cpu
-pip install towhee==0.9.0
-pip install pymilvus
-```
-
-How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the [milvus](https://milvus.io/docs) to store the vector data.
-
-## [Benchmark](benchmark/benchmark_sf_towhee.py)
-
-Before running this case, you should install the `faiss-cpu` and `towhee`.
-
-```bash
-pip install faiss-cpu
-pip install towhee==0.9.0
-```
+## [Benchmark](benchmark/benchmark_sqlite_faiss_towhee.py)
 
 The benchmark script about the `Sqlite + Faiss + Towhee`
 

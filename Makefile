@@ -8,6 +8,12 @@ pip_upgrade:
 package:
 	@python setup.py sdist bdist_wheel
 
+upload:
+	@python -m twine upload dist/*
+
+upload_test:
+	@python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
 remove_example_cache.sh:
 	@bash ./script/remove_example_cache.sh
 
