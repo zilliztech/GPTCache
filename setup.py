@@ -17,14 +17,14 @@ def parse_requirements(file_name: str) -> List[str]:
 setuptools.setup(
     name="gpt_cache",
     packages=find_packages(),
-    version="0.0.7",
+    version="0.1.0",
     author="SimFG",
-    author_email="1142838399@qq.com",
+    author_email="bang.fu@zilliz.com",
     description="GPT Cache, make your chatgpt services lower cost and faster",
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=parse_requirements('requirements.txt'),
-    url="https://github.com/SimFG/gpt-cache",
+    url="https://github.com/zilliztech/gpt-cache",
     license='http://www.apache.org/licenses/LICENSE-2.0',
     python_requires='>=3.8.8',
 )

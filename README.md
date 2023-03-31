@@ -2,7 +2,7 @@
 
 English | [中文](README-CN.md)
 
-## What is GPT Cache?
+## 🤠 What is GPT Cache?
 
 Large Language Models (LLMs) are a promising and transformative technology that has rapidly advanced in recent years. These models are capable of generating natural language text and have numerous applications, including chatbots, language translation, and creative writing. However, as the size of these models increases, so do the costs and performance requirements needed to utilize them effectively. This has led to significant challenges in developing on top of large models such as ChatGPT.
 
@@ -58,7 +58,8 @@ If you just want to achieve precise matching cache of requests, that is, two ide
 from gpt_cache.core import cache
 
 cache.init()
-# If you use the `openai.api_key = xxx` to set the api key, you need use `cache.set_openai_key()` to replace it
+# If you use the `openai.api_key = xxx` to set the api key, you need use `cache.set_openai_key()` to replace it.
+# it will read the `OPENAI_API_KEY` environment variable and set it to ensure the security of the key.
 cache.set_openai_key()
 ```
 2. Replace the original openai package
@@ -84,7 +85,7 @@ More Docs：
 - [Examples, learn better custom caching](example/example.md)
 
 
-## 🤗 All Model
+## 🤗 All Module
 
 ![GPTCache Struct](doc/GPTCacheStructure.png)
 
@@ -95,7 +96,7 @@ More Docs：
   - [x] openai embedding api
   - [x] string, nothing change
   - [ ] [cohere](https://docs.cohere.ai/reference/embed) embedding api  
-- Cache, data manager, including search, save or evict
+- Cache, data manager, including search, save or evict. **Other storage types will be implemented one after another**, and everyone is welcome to contribute.
   - scalar store
     - [x] [sqlite](https://sqlite.org/docs.html)
     - [ ] [postgresql](https://www.postgresql.org/)
@@ -117,7 +118,7 @@ More Docs：
 
 ## 😆 Contributing
 
-Want to help build GPT Cache? Check out our [contributing documentation](doc/contributing.md).
+Would you like to contribute to the development of GPT Cache? Take a look at [our contribution guidelines](doc/contributing.md).
 
 
 ## 🙏 Thank

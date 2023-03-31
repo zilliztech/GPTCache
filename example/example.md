@@ -1,5 +1,17 @@
 # Example
 
+Before running an example, **MUST** enter the specific example directory. For example, to run the `map` example, switch to the `map` directory, and then use python to run it.
+
+```bash
+git clone https://github.com/zilliztech/gpt-cache
+cd gpt-cache
+
+cd example/map
+python map_manager.py
+```
+
+If the running example includes a model or complex third-party library (like: faiss, towhee), **the first run** may take **some time** as it needs to download the model runtime environment, model data, dependencies, etc. However, the subsequent runs will be significantly faster.
+
 ## [Basic example](map/map_manager.py)
 
 How to use the map to cache data.
