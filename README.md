@@ -108,7 +108,7 @@ More Docs：
     - [x] [faiss](https://faiss.ai/)
 - Similarity Evaluation, judging the quality of cached answers
   - the search distance, see: `simple.py#pair_evaluation`
-  - [towhee](https://towhee.io/), roberta_duplicate, precise comparison of problems to problems mode, only support the 512 token
+  - [towhee](https://towhee.io/), albert_duplicate, precise comparison of problems to problems mode, only support the 512 token
   - string, the cache request and the original request are judged by the exact match of characters
   - np, use the `linalg.norm`
 - Post Process, how multiple cached answers are returned to the user

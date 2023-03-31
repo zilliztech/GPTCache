@@ -104,7 +104,7 @@ answer = openai.ChatCompletion.create(
     - [x] [faiss](https://faiss.ai/)
 - Similarity Evaluation，评估缓存结果
   - 搜索距离, 参考: `simple.py#pair_evaluation`
-  - [towhee](https://towhee.io/), roberta_duplicate模型, 问题与问题相关性匹配，只支持512个token
+  - [towhee](https://towhee.io/), albert_duplicate模型, 问题与问题相关性匹配，只支持512个token
   - string, 缓存问题和输入问题字符匹配
   - np, 使用`linalg.norm`进行向量距离计算
 - Post Process，如何将多个缓存答案返回给用户
