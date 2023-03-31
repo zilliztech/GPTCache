@@ -2,12 +2,26 @@
 
 English | [中文](README-CN.md)
 
-The GPT Cache system is mainly used to cache the question-answer data of users in ChatGPT. This system brings two benefits:
+## What is GPT Cache?
 
-1. Quick response to user requests: compared to large model inference, searching for data in the caching system will have lower latency, enabling faster response to user requests.
-2. Reduced service costs: currently, most ChatGPT services are charged based on the number of requests. If user requests hit the cache, it can reduce the number of requests and thus lower service costs.
+Large Language Models (LLMs) are a promising and transformative technology that has rapidly advanced in recent years. These models are capable of generating natural language text and have numerous applications, including chatbots, language translation, and creative writing. However, as the size of these models increases, so do the costs and performance requirements needed to utilize them effectively. This has led to significant challenges in developing on top of large models such as ChatGPT.
 
-If the idea 💡 is helpful to you, please feel free to give me a star 🌟, which is helpful to me.
+To address this issue, we have developed GPT Cache, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
+
+1. Quick response to user requests: the caching system provides faster response times compared to large model inference, resulting in lower latency and faster response to user requests.
+2. Reduced service costs: most ChatGPT services are currently charged based on the number of requests. If user requests hit the cache, it can reduce the number of requests and lower service costs.
+
+If you find this idea helpful, please consider giving me a star 🌟, as it helps me as well.
+
+## 🤔 Why would GPT Cache be helpful?
+
+I believe it would be necessary for the following reasons:
+
+- Locality is present everywhere. Like traditional application systems, AIGC applications also face similar hot topics. For instance, ChatGPT itself may be a popular topic among programmers.
+- For purpose-built SaaS services, users tend to ask questions within a specific domain, with both temporal and spatial locality.
+- By utilizing vector similarity search, it is possible to find a similarity relationship between questions and answers at a relatively low cost.
+
+We also provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/example/benchmark/benchmark_sqlite_faiss_towhee.py) to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
 
 ## 😊 Quickly Start
 
@@ -69,13 +83,6 @@ More Docs：
 - [Features, all features currently supported by the cache](doc/feature.md)
 - [Examples, learn better custom caching](example/example.md)
 
-## 🤔 Is Cache necessary?
-
-I believe it is necessary for the following reasons:
-
-- Many question-answer pairs in certain domain services based on ChatGPT have a certain similarity.
-- For a user, there is a certain regularity in the series of questions raised using ChatGPT, which is related to their occupation, lifestyle, personality, etc. For example, the likelihood of a programmer using ChatGPT services is largely related to their work.
-- If your ChatGPT service targets a large user group, categorizing them can increase the probability of relevant questions being cached, thus reducing service costs.
 
 ## 🤗 All Model
 
