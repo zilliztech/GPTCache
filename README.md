@@ -112,14 +112,15 @@ openai.ChatCompletion.create(
 - Pre-embedding
   - get the last message in the request, see: `pre_embedding.py#last_content`
 - Embedding
-  - [towhee](https://towhee.io/), english model: paraphrase-albert-small-v2, chinese model: uer/albert-base-chinese-cluecorpussmall
-  - openai embedding api
-  - string, nothing change
+  - [x] [towhee](https://towhee.io/), english model: paraphrase-albert-small-v2, chinese model: uer/albert-base-chinese-cluecorpussmall
+  - [x] openai embedding api
+  - [x] string, nothing change
+  - [ ] [cohere](https://docs.cohere.ai/reference/embed) embedding api  
 - Data Manager
   - scalar store
-    - [sqlite](https://sqlite.org/docs.html)
-    - TODO [postgresql](https://www.postgresql.org/)
-    - TODO [mysql](https://www.mysql.com/)
+    - [x] [sqlite](https://sqlite.org/docs.html)
+    - [ ] [postgresql](https://www.postgresql.org/)
+    - [ ] [mysql](https://www.mysql.com/)
   - vector store
     - [milvus](https://milvus.io/)
   - vector index
