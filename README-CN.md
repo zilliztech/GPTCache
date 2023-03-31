@@ -21,10 +21,25 @@ GPT Cache主要用于缓存用户在使用ChatGPT的问答数据。这个系统�
 
 ### alpha 测试包安装
 
-注：可以通过下面指令快速体验这个缓存，值得注意的是或许这不是很稳定。
+注：
+- 可以通过下面指令快速体验这个缓存，值得注意的是或许这不是很稳定。
+- 默认情况下，基本上不需要安装什么第三方库。当需要使用一些特性的时候，使用前需要自己进行安装，参考：[安装依赖列表](doc/installation.md)。例如，如果想使用milvus做为向量存储，应该安装pymilvus，即：
+```
+pip install pymilvus
+```
 
 ```bash
-pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.1
+# create conda new environment
+conda create --name gpt-cache python=3.8
+conda activate gpt-cache
+
+# clone gpt cache repo
+git clone https://github.com/zilliztech/gpt-cache
+cd gpt-cache
+
+# install the repo
+pip install -r requirements.txt
+python setup.py install
 ```
 
 如果只是想实现请求的精准匹配缓存，即两次一模一样的请求，则只需要**两步**就可以接入这个cache !!!
@@ -100,6 +115,8 @@ openai.ChatCompletion.create(
 - Data Manager
   - 标量存储
     - [sqlite](https://sqlite.org/docs.html)
+    - TODO [postgresql](https://www.postgresql.org/)
+    - TODO [mysql](https://www.mysql.com/)
   - 向量存储
     - [milvus](https://milvus.io/)
   - 向量索引
