@@ -8,7 +8,7 @@ class Towhee:
     def __init__(self):
         self._pipe = (
             pipe.input('text', 'candidate')
-                .map(('text', 'candidate'), 'similarity', ops.towhee.roberta_duplicate())
+                .map(('text', 'candidate'), 'similarity', ops.towhee.albert_duplicate())
                 .output('similarity')
         )
 
