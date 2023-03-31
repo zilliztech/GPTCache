@@ -46,6 +46,8 @@ class ChatCompletion:
             if len(cache_answers) != 0:
                 return_message = chat_cache.post_process_messages_func([t[1] for t in cache_answers])
                 chat_cache.report.hint_cache()
+                if kwargs.get("stream", False):
+                    return construct_stream_resp_from_cache(return_message)
                 return construct_resp_from_cache(return_message)
 
         next_cache = chat_cache.next_cache
@@ -83,15 +85,52 @@ def construct_resp_from_cache(return_message):
         "gpt_cache": True,
         "choices": [
             {
-                'message': {
-                    'role': 'assistant',
-                    'content': return_message
+                "message": {
+                    "role": "assistant",
+                    "content": return_message
                 },
-                'finish_reason': 'stop',
-                'index': 0
+                "finish_reason": "stop",
+                "index": 0
             }
         ]
     }
+
+
+def construct_stream_resp_from_cache(return_message):
+    return [
+        {
+            "choices": [
+                {
+                    "delta": {
+                        "role": "assistant"
+                    },
+                    "finish_reason": None,
+                    "index": 0
+                }
+            ],
+        },
+        {
+            "choices": [
+                {
+                    "delta": {
+                        "content": return_message
+                    },
+                    "finish_reason": None,
+                    "index": 0
+                }
+            ],
+        },
+        {
+            "gpt_cache": True,
+            "choices": [
+                {
+                  "delta": {},
+                  "finish_reason": "stop",
+                  "index": 0
+                }
+              ],
+        }
+    ]
 
 
 def get_message_from_openai_answer(openai_data):

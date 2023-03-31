@@ -6,17 +6,19 @@ from gpt_cache.core import cache, Cache
 
 
 def run():
-    dirname, _ = os.path.split(os.path.abspath(__file__))
+    dir_name, _ = os.path.split(os.path.abspath(__file__))
     bak_cache = Cache()
-    bak_data_file = dirname + "/data_map_bak.txt"
+    bak_data_file = dir_name + "/data_map_bak.txt"
     bak_cache.init(data_manager=get_data_manager("map",
                                                  data_path=bak_data_file,
                                                  max_size=10))
-    data_file = dirname + "/data_map.txt"
+    data_file = dir_name + "/data_map.txt"
     cache.init(data_manager=get_data_manager("map",
                                              data_path=data_file,
                                              max_size=10),
                next_cache=bak_cache)
+
+    cache.set_openai_key()
     mock_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "foo15"}
