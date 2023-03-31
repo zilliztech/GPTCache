@@ -94,9 +94,10 @@ openai.ChatCompletion.create(
 - Pre-embedding
   - 获取请求的最后一条消息, 参考: `pre_embedding.py#last_content`
 - Embedding
-  - [towhee](https://towhee.io/), 英语模型: paraphrase-albert-small-v2, 中文模型: uer/albert-base-chinese-cluecorpussmall
-  - openai embedding api
-  - string, 不做任何处理
+  - [x] [towhee](https://towhee.io/), 英语模型: paraphrase-albert-small-v2, 中文模型: uer/albert-base-chinese-cluecorpussmall
+  - [x] openai embedding api
+  - [x] string, 不做任何处理
+  - [ ] [cohere](https://docs.cohere.ai/reference/embed) embedding api  
 - Data Manager
   - 标量存储
     - [sqlite](https://sqlite.org/docs.html)
