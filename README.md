@@ -19,12 +19,27 @@ I believe it is necessary for the following reasons:
 
 ## 😊 Quickly Start
 
+**Note**:
+- You can quickly experience the cache, it is worth noting that maybe this is not very **stable**.
+- By default, basically **a few** libraries are installed. When you need to use some features, remember to install related libraries. For example, if you want to use `milvus` as a vector storage, you should install pymilvus, like:
+```
+pip install pymilvus
+```
+
 ### alpha test package install
 
-**Note**: You can quickly experience the cache, it is worth noting that maybe this is not very **stable**.
-
 ```bash
-pip install -i https://test.pypi.org/simple/ gpt-cache==0.0.2
+# create conda new environment
+conda create --name gpt-cache python=3.8
+conda activate gpt-cache
+
+# clone gpt cache repo
+git clone https://github.com/zilliztech/gpt-cache
+cd gpt-cache
+
+# install the repo
+pip install -r requirements.txt
+python setup.py install
 ```
 
 If you just want to achieve precise matching cache of requests, that is, two identical requests, you **ONLY** need **TWO** steps to access this cache
@@ -103,6 +118,8 @@ openai.ChatCompletion.create(
 - Data Manager
   - scalar store
     - [sqlite](https://sqlite.org/docs.html)
+    - TODO [postgresql](https://www.postgresql.org/)
+    - TODO [mysql](https://www.mysql.com/)
   - vector store
     - [milvus](https://milvus.io/)
   - vector index

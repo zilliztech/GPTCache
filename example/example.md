@@ -6,9 +6,22 @@ How to use the map to cache data.
 
 ## [Sqlite + Faiss manage cache data](sf_mock/sf_manager.py)
 
+Before running this case, you should install the `faiss-cpu`.
+
+```bash
+pip install faiss-cpu
+```
+
 How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the faiss to query the vector data.
 
 ## [Sqlite + Faiss + Towhee](sf_towhee/sf_manager.py)
+
+Before running this case, you should install the `faiss-cpu` and `towhee`.
+
+```bash
+pip install faiss-cpu
+pip install towhee==0.9.0
+```
 
 On the basis of the above example, use [towhee](https://towhee.io/) for embedding operation
 
@@ -16,9 +29,24 @@ Note: the default embedding model only support the **ENGLISH**. If you want to u
 
 ## [Sqlite + Milvus + Towhee](sqlite_milvus_mock/sqlite_milvus_mock.py)
 
+Before running this case, you should install the `faiss-cpu`, `towhee` and `pymilvus`.
+
+```bash
+pip install faiss-cpu
+pip install towhee==0.9.0
+pip install pymilvus
+```
+
 How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the [milvus](https://milvus.io/docs) to store the vector data.
 
 ## [Benchmark](benchmark/benchmark_sf_towhee.py)
+
+Before running this case, you should install the `faiss-cpu` and `towhee`.
+
+```bash
+pip install faiss-cpu
+pip install towhee==0.9.0
+```
 
 The benchmark script about the `Sqlite + Faiss + Towhee`
 
@@ -29,10 +57,20 @@ The benchmark script about the `Sqlite + Faiss + Towhee`
 - **negative**: cache hit but the result is wrong, which means entering `similar` to search and get the different result as `origin`
 - **fail count**: cache miss
 
-
+data file: [mock_data.json](benchmark/mock_data.json)
+similarity evaluation func: pair_evaluation (search distance)
 
  | threshold | average time | positive | negative | fail count |
 |-----------|--------------|----------|----------|------------|
 | 20        | 0.04s        | 455      | 27       | 517        |
 | 50        | 0.09s        | 871      | 86       | 42         |
+| 100       | 0.12s        | 905      | 93       | 1          |
+
+data file: [mock_data.json](benchmark/similiar_qqp.json)
+similarity evaluation func: pair_evaluation + towhee (question similarity model)
+
+| threshold | average time | positive | negative | fail count |
+|-----------|--------------|----------|----------|------------|
+| 20        | 0.04s        | 455      | 27       | 517        |
+| 50        | 0.23s        | 717      | 53       | 229        |
 | 100       | 0.12s        | 905      | 93       | 1          |

@@ -1,4 +1,5 @@
 import setuptools
+from setuptools import find_packages
 from typing import List
 
 with open("README.md", "r") as fh:
@@ -15,8 +16,8 @@ def parse_requirements(file_name: str) -> List[str]:
 
 setuptools.setup(
     name="gpt_cache",
-    packages=['gpt_cache'],
-    version="0.0.2",
+    packages=find_packages(),
+    version="0.0.7",
     author="SimFG",
     author_email="1142838399@qq.com",
     description="GPT Cache, make your chatgpt services lower cost and faster",

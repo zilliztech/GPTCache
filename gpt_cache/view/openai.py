@@ -1,5 +1,5 @@
 import logging
-from typing import Iterable
+from typing import Iterator
 
 import openai
 from ..core import cache, time_cal
@@ -57,7 +57,7 @@ class ChatCompletion:
 
         if cache_enable:
             try:
-                if not isinstance(openai_data, Iterable):
+                if not isinstance(openai_data, Iterator):
                     chat_cache.data_manager.save(pre_embedding_data,
                                                  get_message_from_openai_answer(openai_data),
                                                  embedding_data,

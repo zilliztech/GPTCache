@@ -5,8 +5,8 @@ import time
 from gpt_cache.view import openai
 from gpt_cache.core import cache
 from gpt_cache.cache.factory import get_si_data_manager
-from gpt_cache.similarity_evaluation.towhee import Towhee as EvaluationTowhee
-from gpt_cache.embedding.towhee import Towhee as EmbeddingTowhee
+from gpt_cache.similarity_evaluation import Towhee as EvaluationTowhee
+from gpt_cache.embedding import Towhee as EmbeddingTowhee
 from gpt_cache.similarity_evaluation.simple import pair_evaluation
 
 

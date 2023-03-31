@@ -1,7 +1,6 @@
 from .data_manager import DataManager, SIDataManager, SSDataManager
 from .scalar_data.sqllite3 import SQLite
-from .vector_data.faiss import Faiss
-from .vector_data.milvus import Milvus
+from .vector_data import Milvus, Faiss
 
 
 def get_data_manager(data_manager_name: str, **kwargs) -> DataManager:
