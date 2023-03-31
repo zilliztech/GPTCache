@@ -65,12 +65,3 @@ similarity evaluation func: pair_evaluation (search distance)
 | 20        | 0.04s        | 455      | 27       | 517        |
 | 50        | 0.09s        | 871      | 86       | 42         |
 | 100       | 0.12s        | 905      | 93       | 1          |
-
-data file: [mock_data.json](benchmark/similiar_qqp.json)
-similarity evaluation func: pair_evaluation + towhee (question similarity model)
-
-| threshold | average time | positive | negative | fail count |
-|-----------|--------------|----------|----------|------------|
-| 20        | 0.04s        | 455      | 27       | 517        |
-| 50        | 0.23s        | 717      | 53       | 229        |
-| 100       | 0.12s        | 905      | 93       | 1          |

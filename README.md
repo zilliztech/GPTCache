@@ -122,9 +122,9 @@ openai.ChatCompletion.create(
     - [ ] [postgresql](https://www.postgresql.org/)
     - [ ] [mysql](https://www.mysql.com/)
   - vector store
-    - [milvus](https://milvus.io/)
+    - [x] [milvus](https://milvus.io/)
   - vector index
-    - [faiss](https://faiss.ai/)
+    - [x] [faiss](https://faiss.ai/)
 - Similarity Evaluation
   - the search distance, see: `simple.py#pair_evaluation`
   - [towhee](https://towhee.io/), roberta_duplicate, precise comparison of problems to problems mode, only support the 512 token

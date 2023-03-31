@@ -115,13 +115,13 @@ openai.ChatCompletion.create(
   - [ ] [cohere](https://docs.cohere.ai/reference/embed) embedding api  
 - Data Manager
   - 标量存储
-    - [sqlite](https://sqlite.org/docs.html)
-    - TODO [postgresql](https://www.postgresql.org/)
-    - TODO [mysql](https://www.mysql.com/)
+    - [x] [sqlite](https://sqlite.org/docs.html)
+    - [ ] [postgresql](https://www.postgresql.org/)
+    - [ ] [mysql](https://www.mysql.com/)
   - 向量存储
-    - [milvus](https://milvus.io/)
+    - [x] [milvus](https://milvus.io/)
   - 向量索引
-    - [faiss](https://faiss.ai/)
+    - [x] [faiss](https://faiss.ai/)
 - Similarity Evaluation
   - 搜索距离, 参考: `simple.py#pair_evaluation`
   - [towhee](https://towhee.io/), roberta_duplicate模型, 问题与问题相关性匹配，只支持512个token
