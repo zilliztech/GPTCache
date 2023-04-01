@@ -89,7 +89,8 @@ More Docs：
     - [x]  Support OpenAI chatGPT API
     - [ ]  Support for other LLMs, such as Hugging Face Hub, Anthropic, and self-hosted models like LLaMa.
 - **Pre-processor**: Extracts the key information from the request and preprocess
-    - [x]  Apply user-defined preprocessing logic.
+    - [x]  Basic analysis and parse of the request
+    - [ ]  Apply user-defined preprocessing logic.
 - **Context Buffer**: Maintains session context.
     - [x] Store conversation windows.
     - [x] Store conversation summary.
@@ -115,12 +116,12 @@ More Docs：
         - [x]  FIFO evition policy
         - [ ]  More complicated eviction policies
 - **Ranker**: Evaluate similarity by judging the quality of cached answers:
-    - [ ] Use the search distance, as described in `simple.py#pair_evaluation`.
-    - [ ] [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
-    - [ ] Exact string comparison, judge the cache request and the original request based on the exact match of characters.
-    - [ ] For numpy arrays, use `linalg.norm`.
-    - [x] BM25 and other similarity measurements
-    - [x] Other deap learning models
+    - [x] Use the search distance, as described in `simple.py#pair_evaluation`.
+    - [x] [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
+    - [x] Exact string comparison, judge the cache request and the original request based on the exact match of characters.
+    - [x] For numpy arrays, use `linalg.norm`.
+    - [ ] BM25 and other similarity measurements
+    - [ ] Other deap learning models
 - **Post-processor**: Determine whcih multiple cached answers to the user:
     - Choose the most similar answer.
     - Choose randomly.
