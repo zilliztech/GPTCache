@@ -85,19 +85,22 @@ More Docs：
 
 ![GPTCache Struct](doc/GPTCacheStructure.png)
 
-- View, the user interface layer:
+- **Adapter**: The user interface to adapt different LLM model requests to the GPT cache protocol. 
     - [x]  Support OpenAI chatGPT API
-    - [ ]  Support for other LLMs, such as Google Bard, Anthropic and LLaMa.
-- Pre-processing, extract the key information from the request:
-    - Obtain the last message from the request using `pre_embedding.py#last_content`
-    - Obtain the session context (TODO)
-- Embedding, Embed the text into a vector for similarity search:
+    - [ ]  Support for other LLMs, such as Hugging Face Hub, Anthropic, and self-hosted models like LLaMa.
+- **Pre-processor**: Extracts the key information from the request and preprocess
+    - [x]  Apply user-defined preprocessing logic.
+- **Context Buffer**: Maintains session context.
+    - [x] Store conversation windows.
+    - [x] Store conversation summary.
+    - [x] Store prompts.
+- **Encoder**: Embed the text into a dense vector for similarity search:
     - [x]  Use [towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model for English and uer/albert-base-chinese-cluecorpussmall for Chinese.
     - [x]  Use the OpenAI embedding API.
     - [x]  Keep the text as a string without any changes.
     - [ ]  Use the [cohere](https://docs.cohere.ai/reference/embed) embedding API.
     - [ ]  Support [Hugging Face](https://huggingface.co/) embedding API.
-- Cache manager, which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome:
+- **Cache manager**: which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome:
     - Scalar store:
         - [x]  Use [SQLite](https://sqlite.org/docs.html).
         - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
@@ -107,16 +110,18 @@ More Docs：
         - [x]  Use [Zilliz Cloud](https://cloud.zilliz.com/).
         - [x]  Use [FAISS](https://faiss.ai/).
         - [ ]  Use other vector databases
-    - Eviction Handler
-        - [X]  LRU eviction policy
-        - [X]  FIFO evition policy
+    - Eviction Policy
+        - [x]  LRU eviction policy
+        - [x]  FIFO evition policy
         - [ ]  More complicated eviction policies
-- Evaluator, Evaluate similarity by judging the quality of cached answers:
-    - Use the search distance, as described in `simple.py#pair_evaluation`.
-    - [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison of problems to problems mode. It supports only 512 tokens.
-    - For string comparison, judge the cache request and the original request based on the exact match of characters.
-    - For numpy arrays, use `linalg.norm`.
-- Post-processing: determine how to return multiple cached answers to the user:
+- **Ranker**: Evaluate similarity by judging the quality of cached answers:
+    - [ ] Use the search distance, as described in `simple.py#pair_evaluation`.
+    - [ ] [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
+    - [ ] Exact string comparison, judge the cache request and the original request based on the exact match of characters.
+    - [ ] For numpy arrays, use `linalg.norm`.
+    - [x] BM25 and other similarity measurements
+    - [x] Other deap learning models
+- **Post-processor**: Determine whcih multiple cached answers to the user:
     - Choose the most similar answer.
     - Choose randomly.
     - Other ranking policies
