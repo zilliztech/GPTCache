@@ -1,8 +1,8 @@
 import os
 
-from gpt_cache.cache.factory import get_data_manager
-from gpt_cache.core import cache
-from gpt_cache.view import openai
+from gptcache.cache.factory import get_data_manager
+from gptcache.core import cache
+from gptcache.view import openai
 
 
 def run():

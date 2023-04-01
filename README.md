@@ -29,7 +29,7 @@ We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/exampl
 ### pip install
 
 ```bash
-pip install gpt_cache
+pip install gptcache
 ```
 
 ### dev install
@@ -51,7 +51,7 @@ If you just want to achieve precise matching cache of requests, that is, two ide
 1. Cache init
 
 ```python
-from gpt_cache.core import cache
+from gptcache.core import cache
 
 cache.init()
 # If you use the `openai.api_key = xxx` to set the api key, you need use `cache.set_openai_key()` to replace it.
@@ -61,7 +61,7 @@ cache.set_openai_key()
 2. Replace the original openai package
 
 ```python
-from gpt_cache.view import openai
+from gptcache.view import openai
 
 # openai requests DON'T need ANY changes
 answer = openai.ChatCompletion.create(

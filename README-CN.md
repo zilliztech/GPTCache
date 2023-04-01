@@ -33,15 +33,15 @@
 ### pip 安装
 
 ```bash
-pip install gpt_cache
+pip install gptcache
 ```
 
 ### dev 安装
 
 ```bash
 # clone gpt cache repo
-git clone https://github.com/zilliztech/gpt-cache
-cd gpt-cache
+git clone https://github.com/zilliztech/gptcache
+cd gptcache
 
 # install the repo
 pip install -r requirements.txt
@@ -54,7 +54,7 @@ python setup.py install
 
 1. cache初始化
 ```python
-from gpt_cache.core import cache
+from gptcache.core import cache
 cache.init()
 # 如果使用`openai.api_key = xxx`设置API KEY，需要用下面语句替换它
 # 方法读取OPENAI_API_KEY环境变量并进行设置，保证key的安全性 
@@ -62,7 +62,7 @@ cache.set_openai_key()
 ```
 2. 替换原始openai包
 ```python
-from gpt_cache.view import openai
+from gptcache.view import openai
 
 # openai请求不需要做任何改变
 answer = openai.ChatCompletion.create(

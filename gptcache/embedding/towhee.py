@@ -1,4 +1,4 @@
-from gpt_cache.util import import_towhee
+from gptcache.util import import_towhee
 import_towhee()
 
 import numpy as np

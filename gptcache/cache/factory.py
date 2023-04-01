@@ -55,7 +55,7 @@ def get_ss_data_manager(scalar_store: str, vector_store: str, **kwargs):
     max_size, clean_size, dimension, top_k = _get_common_params(**kwargs)
     scalar = _get_scalar_store(scalar_store, **kwargs)
     if vector_store == "milvus":
-        vector = Milvus(collection_name="gpt_cache", dim=dimension, top_k=top_k, **kwargs)
+        vector = Milvus(collection_name="gptcache", dim=dimension, top_k=top_k, **kwargs)
     else:
         raise ValueError(f"Unsupported vector store: {vector_store}")
     return SSDataManager(max_size, clean_size, scalar, vector)

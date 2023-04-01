@@ -1,4 +1,4 @@
-from gpt_cache.util import import_pymilvus
+from gptcache.util import import_pymilvus
 import_pymilvus()
 
 from uuid import uuid4

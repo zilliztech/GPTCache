@@ -1,11 +1,11 @@
-from gpt_cache.util import import_faiss
+from gptcache.util import import_faiss
 import_faiss()
 
 import os
 import faiss
 from faiss import IndexHNSWFlat, Index
 import numpy as np
-from gpt_cache.cache.vector_data.vector_index import VectorIndex
+from gptcache.cache.vector_data.vector_index import VectorIndex
 
 
 class Faiss(VectorIndex):

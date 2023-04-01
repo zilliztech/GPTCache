@@ -2,12 +2,12 @@ import json
 import os
 import time
 
-from gpt_cache.view import openai
-from gpt_cache.core import cache
-from gpt_cache.cache.factory import get_si_data_manager
-from gpt_cache.similarity_evaluation import Towhee as EvaluationTowhee
-from gpt_cache.embedding import Towhee as EmbeddingTowhee
-from gpt_cache.similarity_evaluation.simple import pair_evaluation
+from gptcache.view import openai
+from gptcache.core import cache
+from gptcache.cache.factory import get_si_data_manager
+from gptcache.similarity_evaluation import Towhee as EvaluationTowhee
+from gptcache.embedding import Towhee as EmbeddingTowhee
+from gptcache.similarity_evaluation.simple import pair_evaluation
 
 
 def run():

@@ -10,7 +10,7 @@ class ChatCompletion:
     def create(cls, *args, **kwargs):
         chat_cache = kwargs.pop("cache_obj", cache)
         cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
-        context = kwargs.pop("cache_context", {})
+        context = kwargs.get("cache_context", {})
         embedding_data = None
         # you want to retry to send the request to chatgpt when the cache is negative
         cache_skip = kwargs.pop("cache_skip", False)
@@ -82,7 +82,7 @@ class ChatCompletion:
 
 def construct_resp_from_cache(return_message):
     return {
-        "gpt_cache": True,
+        "gptcache": True,
         "choices": [
             {
                 "message": {
@@ -121,14 +121,14 @@ def construct_stream_resp_from_cache(return_message):
             ],
         },
         {
-            "gpt_cache": True,
+            "gptcache": True,
             "choices": [
                 {
                   "delta": {},
                   "finish_reason": "stop",
                   "index": 0
                 }
-              ],
+            ],
         }
     ]
 
