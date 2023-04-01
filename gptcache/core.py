@@ -104,10 +104,12 @@ class Cache:
         self.config = config
         self.next_cache = next_cache
 
-    def close(self):
-        self.data_manager.close()
-        if self.next_cache:
-            self.next_cache.close()
+        @atexit.register
+        def close():
+            try:
+                self.data_manager.close()
+            except Exception as e:
+                print(e)
 
     @staticmethod
     def set_openai_key():
@@ -115,11 +117,3 @@ class Cache:
 
 
 cache = Cache()
-
-
-@atexit.register
-def cache_close():
-    try:
-        cache.close()
-    except Exception as e:
-        print(e)
