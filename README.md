@@ -9,8 +9,6 @@ To address this issue, we have developed GPT Cache, a project that focuses on ca
 1. Quick response to user requests: the caching system provides faster response times compared to large model inference, resulting in lower latency and faster response to user requests.
 2. Reduced service costs: most LLM services are currently charged based on the number of tokens. If user requests hit the cache, it can reduce the number of requests and lower service costs.
 
-If you find this idea helpful, please consider giving me a star 🌟, as it helps me as well.
-
 ## 🤔 Why would GPT Cache be helpful?
 
 A good analogy for GptCache is to think of it as a more semantic version of Redis. In GptCache, hits are not limited to exact matches, but rather also include prompts and context similar to previous queries. We believe that the traditional cache design still works for AIGC applications for the following reasons:
