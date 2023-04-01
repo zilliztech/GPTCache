@@ -36,7 +36,7 @@ pip install gptcache
 
 ```bash
 # clone gpt cache repo
-git clone https://github.com/zilliztech/gpt-cache
+git clone https://github.com/zilliztech/gptcache
 cd gpt-cache
 
 # install the repo
@@ -61,7 +61,7 @@ cache.set_openai_key()
 2. Replace the original openai package
 
 ```python
-from gptcache.view import openai
+from gptcache.adapter import openai
 
 # openai requests DON'T need ANY changes
 answer = openai.ChatCompletion.create(
@@ -91,17 +91,17 @@ More Docs：
 - **Pre-processor**: Extracts the key information from the request and preprocess
     - [x]  Basic analysis and parse of the request
     - [ ]  Apply user-defined preprocessing logic.
-- **Context Buffer**: Maintains session context.
-    - [x] Store conversation windows.
-    - [x] Store conversation summary.
-    - [x] Store prompts.
-- **Encoder**: Embed the text into a dense vector for similarity search:
+- [ ] **Context Buffer**: Maintains session context.
+    - [ ] Store conversation windows.
+    - [ ] Store conversation summary.
+    - [ ] Store prompts.
+- **Encoder**: Embed the text into a dense vector for similarity search.
     - [x]  Use [towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model for English and uer/albert-base-chinese-cluecorpussmall for Chinese.
     - [x]  Use the OpenAI embedding API.
     - [x]  Keep the text as a string without any changes.
     - [ ]  Use the [cohere](https://docs.cohere.ai/reference/embed) embedding API.
     - [ ]  Support [Hugging Face](https://huggingface.co/) embedding API.
-- **Cache manager**: which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome:
+- **Cache manager**: which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome.
     - Scalar store:
         - [x]  Use [SQLite](https://sqlite.org/docs.html).
         - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
@@ -113,16 +113,16 @@ More Docs：
         - [ ]  Use other vector databases
     - Eviction Policy
         - [x]  LRU eviction policy
-        - [x]  FIFO evition policy
+        - [x]  FIFO eviction policy
         - [ ]  More complicated eviction policies
-- **Ranker**: Evaluate similarity by judging the quality of cached answers:
+- **Ranker**: Evaluate similarity by judging the quality of cached answers.
     - [x] Use the search distance, as described in `simple.py#pair_evaluation`.
     - [x] [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
     - [x] Exact string comparison, judge the cache request and the original request based on the exact match of characters.
     - [x] For numpy arrays, use `linalg.norm`.
     - [ ] BM25 and other similarity measurements
     - [ ] Other deap learning models
-- **Post-processor**: Determine which cached answers to the user, and generate the response
+- **Post-processor**: Determine which cached answers to the user, and generate the response.
     - [X] Choose the most similar answer.
     - [X] Choose randomly.
     - [ ] Other Probability-based policy 

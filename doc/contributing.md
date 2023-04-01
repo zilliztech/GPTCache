@@ -90,18 +90,18 @@ refer to the implementation of [MapDataManager, SSDataManager or SIDataManager](
 
 ## Add a embedding function
 
-refer to the implementation of [towhee](../gptcache/embedding/towhee.py) or [openai](../gptcache/embedding/openai.py).
+refer to the implementation of [towhee](../gptcache/encoder/towhee.py) or [openai](../gptcache/encoder/openai.py).
 
-1. Add a new python file to [embedding](../gptcache/embedding) directory
+1. Add a new python file to [embedding](../gptcache/encoder) directory
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the embedding function and **make sure** your output dimension
 4. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
 
 ## Add a similarity evaluation function
 
-refer to the implementation of [pair_evaluation](../gptcache/similarity_evaluation/simple.py) or [towhee](../gptcache/similarity_evaluation/towhee.py)
+refer to the implementation of [pair_evaluation](../gptcache/ranker/simple.py) or [towhee](../gptcache/ranker/towhee.py)
 
-1. Make sure the input params, you can learn more about in the [user view](../gptcache/view/openai.py) model
+1. Make sure the input params, you can learn more about in the [user view](../gptcache/adapter/openai.py) model
 ```python
 rank = chat_cache.evaluation_func({
     "question": pre_embedding_data,
@@ -118,15 +118,15 @@ rank = chat_cache.evaluation_func({
 
 ## Add a method to post-process the cache answer list
 
-refer to the implementation of [first or random_one](../gptcache/post_process/post_process.py)
+refer to the implementation of [first or random_one](../gptcache/processor/post.py)
 
-1. Make sure the input params, you can learn more about in the [user view](../gptcache/view/openai.py) model
+1. Make sure the input params, you can learn more about in the [user view](../gptcache/adapter/openai.py) model
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the post method
 4. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
 
 # Add a new process in handling chatgpt requests
 
-1. Need to have a clear understanding of the current process, refer to the [user view](../gptcache/view/openai.py) model
+1. Need to have a clear understanding of the current process, refer to the [user view](../gptcache/adapter/openai.py) model
 2. Add a new process
 3. Make sure all examples work properly

@@ -14,7 +14,7 @@ upload:
 upload_test:
 	@python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
-remove_example_cache.sh:
+remove_example_cache:
 	@bash ./script/remove_example_cache.sh
 
 create_conda_env:

@@ -1,11 +1,11 @@
 import os
 import time
 
-from gptcache.view import openai
+from gptcache.adapter import openai
 from gptcache.core import cache
 from gptcache.cache.factory import get_si_data_manager
-from gptcache.similarity_evaluation.simple import pair_evaluation
-from gptcache.embedding import Towhee
+from gptcache.ranker.simple import pair_evaluation
+from gptcache.encoder import Towhee
 
 
 def run():
@@ -29,13 +29,13 @@ def run():
         answer = "chatgpt is a good application"
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
-    # distance 77
+    # distance 0.77
     mock_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "what do you feel like chatgpt"}
     ]
 
-    # distance 21
+    # distance 0.21
     # mock_messages = [
     #     {"role": "system", "content": "You are a helpful assistant."},
     #     {"role": "user", "content": "what do you think chatgpt"}

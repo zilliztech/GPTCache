@@ -1,7 +1,5 @@
 # 🥳 Feature
 
-English | [中文](feature_cn.md)
-
 - Support the openai chat completion normal and stream request
 - Get top_k similar search results, it can be set when creating the data manager
 - Support the cache chain, see: `Cache#next_cache`
@@ -24,8 +22,10 @@ openai.ChatCompletion.create(
 ```
 
 - Like Lego bricks, custom assemble all modules, including:
-  - pre-embedding function, get feature information in the original request, such as prompt, last message, etc.
-  - embedding function, convert feature information into a vector for cache search, choose a model that fits your use case
-  - data manager, cache data management, mainly dealing with the search and storage of cache data
-  - cache similarity evaluation function, can use the distance of similar search or additional selection model to ensure that the answer is more accurate
-  - post-process the cache answer list, first, random or custom combination
+  - Adapter: The user interface to adapt different LLM model requests to the GPT cache protocol
+  - Pre-processor: Extracts the key information from the request and preprocess
+  - Context Buffer: Maintains session context
+  - Encoder: Embed the text into a dense vector for similarity search
+  - Cache manager: which includes searching, saving, or evicting data
+  - Ranker: Evaluate similarity by judging the quality of cached answers
+  - Post-processor: Determine which cached answers to the user, and generate the response

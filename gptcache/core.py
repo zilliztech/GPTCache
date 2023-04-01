@@ -3,12 +3,12 @@ import os
 import time
 
 import openai
-from .embedding.pre_embedding import last_content
-from .embedding.string import to_embeddings as string_embedding
+from .encoder.string import to_embeddings as string_embedding
 from .cache.data_manager import DataManager
 from .cache.factory import get_data_manager
-from .similarity_evaluation.string import absolute_evaluation
-from .post_process.post_process import first
+from .processor.post import first
+from .processor.pre import last_content
+from .ranker.string import absolute_evaluation
 
 
 def cache_all(*args, **kwargs):
@@ -67,6 +67,7 @@ class Report:
 class Cache:
     # it should be called when start the cache system
     def __init__(self):
+        self.has_init = False
         self.cache_enable_func = None
         self.pre_embedding_func = None
         self.embedding_func = None
@@ -92,6 +93,7 @@ class Cache:
              next_cache=None,
              **kwargs
              ):
+        self.has_init = True
         self.cache_enable_func = cache_enable_func
         self.pre_embedding_func = pre_embedding_func
         self.embedding_func = embedding_func

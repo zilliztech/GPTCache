@@ -3,9 +3,9 @@ import time
 
 from gptcache.cache.factory import get_data_manager, get_si_data_manager
 from gptcache.core import cache, Cache
-from gptcache.embedding import Towhee
-from gptcache.similarity_evaluation.simple import pair_evaluation
-from gptcache.view import openai
+from gptcache.encoder import Towhee
+from gptcache.ranker.simple import pair_evaluation
+from gptcache.adapter import openai
 
 
 def run():

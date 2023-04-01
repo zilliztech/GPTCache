@@ -1,9 +1,9 @@
 import os
 
-from gptcache.view import openai
+from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_si_data_manager
-from gptcache.similarity_evaluation.simple import pair_evaluation
+from gptcache.ranker.simple import pair_evaluation
 import numpy as np
 
 

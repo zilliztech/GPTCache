@@ -2,7 +2,7 @@ from typing import Iterator
 
 import openai
 
-from .processor import process
+from .adapter import adapt
 
 
 class ChatCompletion:
@@ -30,7 +30,7 @@ class ChatCompletion:
 
                 return hook_openai_data(llm_data)
 
-        return process(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
+        return adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
 
 
 def construct_resp_from_cache(return_message):

@@ -1,7 +1,7 @@
 import os
 
 from gptcache.cache.factory import get_data_manager
-from gptcache.view import openai
+from gptcache.adapter import openai
 from gptcache.core import cache, Cache
 
 

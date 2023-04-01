@@ -1,10 +1,13 @@
 import logging
 
 from ..core import cache, time_cal
+from ..util.error import NotInitError
 
 
-def process(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
+def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
     chat_cache = kwargs.pop("cache_obj", cache)
+    if not chat_cache.has_init:
+        raise NotInitError()
     cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
     context = kwargs.get("cache_context", {})
     embedding_data = None
@@ -47,7 +50,7 @@ def process(llm_handler, cache_data_convert, update_cache_callback, *args, **kwa
     next_cache = chat_cache.next_cache
     if next_cache:
         kwargs["cache_obj"] = next_cache
-        llm_data = process(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
+        llm_data = adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
     else:
         llm_data = llm_handler(*args, **kwargs)
 
