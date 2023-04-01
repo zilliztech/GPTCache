@@ -24,9 +24,9 @@ We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/exampl
 ## 😊 Quick Start
 
 **Note**:
-- You can quickly experience gpt cache, it's worth noting but remember the repo is under heavy development
-- By default, only **a few** libraries are installed. When you need to use additional features, related libraries will be **automatically installed**.
-- If you have trouble installing a library due to a low pip version, run: `python -m pip install --upgrade pip`
+- You can quickly try GPT cache and put it into a production environment without heavy development. However, please note that the repository is still under heavy development.
+- By default, only a limited number of libraries are installed to support the basic cache functionalities. When you need to use additional features, the related libraries will be **automatically installed**.
+- If you encounter issues installing a library due to a low pip version, run: `python -m pip install --upgrade pip`.
 
 ### pip install
 
