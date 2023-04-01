@@ -89,31 +89,35 @@ More Docs：
 
 ![GPTCache Struct](doc/GPTCacheStructure.png)
 
-- Pre-embedding, get the key information in the request
-  - get the last message in the request, see: `pre_embedding.py#last_content`
-- Embedding, transfer the text to vector for similarity search
-  - [x] [towhee](https://towhee.io/), english model: paraphrase-albert-small-v2, chinese model: uer/albert-base-chinese-cluecorpussmall
-  - [x] openai embedding api
-  - [x] string, nothing change
-  - [ ] [cohere](https://docs.cohere.ai/reference/embed) embedding api  
-- Cache, data manager, including search, save or evict. **Other storage types will be implemented one after another**, and everyone is welcome to contribute.
-  - scalar store
-    - [x] [sqlite](https://sqlite.org/docs.html)
-    - [ ] [postgresql](https://www.postgresql.org/)
-    - [ ] [mysql](https://www.mysql.com/)
-  - vector store
-    - [x] [milvus](https://milvus.io/)
-    - [x] [zilliz cloud](https://cloud.zilliz.com/)
-  - vector index
-    - [x] [faiss](https://faiss.ai/)
-- Similarity Evaluation, judging the quality of cached answers
-  - the search distance, see: `simple.py#pair_evaluation`
-  - [towhee](https://towhee.io/), albert_duplicate, precise comparison of problems to problems mode, only support the 512 token
-  - string, the cache request and the original request are judged by the exact match of characters
-  - np, use the `linalg.norm`
-- Post Process, how multiple cached answers are returned to the user
-  - choose the most similar
-  - choose randomly
+- Pre-processing, extract the key information from the request:
+    - Obtain the last message from the request using `pre_embedding.py#last_content`
+    - Obtain the session context (TODO)
+- Embed the text into a vector for similarity search:
+    - [x]  Use [towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model for English and uer/albert-base-chinese-cluecorpussmall for Chinese.
+    - [x]  Use the OpenAI embedding API.
+    - [x]  Keep the text as a string without any changes.
+    - [ ]  Use the [cohere](https://docs.cohere.ai/reference/embed) embedding API.
+    - [ ]  Use Hugging Face support.
+- Cache data manager, which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome:
+    - Scalar store:
+        - [x]  Use [SQLite](https://sqlite.org/docs.html).
+        - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
+        - [ ]  Use [MySQL](https://www.mysql.com/).
+    - Vector store:
+        - [x]  Use [Milvus](https://milvus.io/).
+        - [x]  Use [Zilliz Cloud](https://cloud.zilliz.com/).
+        - [ ]  Use other vector databases
+    - Vector index:
+        - [x]  Use [FAISS](https://faiss.ai/).
+- Evaluate similarity by judging the quality of cached answers:
+    - Use the search distance, as described in `simple.py#pair_evaluation`.
+    - [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison of problems to problems mode. It supports only 512 tokens.
+    - For string comparison, judge the cache request and the original request based on the exact match of characters.
+    - For numpy arrays, use `linalg.norm`.
+- Post-processing: determine how to return multiple cached answers to the user:
+    - Choose the most similar answer.
+    - Choose randomly.
+    - Other ranking policies
 
 
 ## 😆 Contributing
