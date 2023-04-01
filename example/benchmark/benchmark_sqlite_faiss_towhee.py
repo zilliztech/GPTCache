@@ -15,14 +15,22 @@ def run():
         mock_data = json.load(mock_file)
 
     embedding_towhee = EmbeddingTowhee()
-    evaluation_towhee = EvaluationTowhee()
+
+    # if you want more accurate results,
+    # you can use towhee's results to evaluate the model,
+    # it will make the results more accurate, but the cache hit rate will decrease
+
+    # evaluation_towhee = EvaluationTowhee()
+    # def sf_evaluation(src_dict, cache_dict, **kwargs):
+    #     rank1 = pair_evaluation(src_dict, cache_dict, **kwargs)
+    #     return rank1
+    #     if rank1 <= 0.5:
+    #         rank2 = evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
+    #         return rank2 if rank2 != 0 else 1
+    #     return 0
 
     def sf_evaluation(src_dict, cache_dict, **kwargs):
-        rank1 = pair_evaluation(src_dict, cache_dict, **kwargs)
-        if rank1 <= 0.5:
-            rank2 = evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
-            return rank2 if rank2 != 0 else 1
-        return 0
+        return pair_evaluation(src_dict, cache_dict, **kwargs)
 
     sqlite_file = "sqlite.db"
     faiss_file = "faiss.index"
