@@ -87,16 +87,19 @@ More Docs：
 
 ![GPTCache Struct](doc/GPTCacheStructure.png)
 
+- View, the user interface layer:
+    - [x]  Support OpenAI chatGPT API
+    - [ ]  Support for other LLMs, such as Google Bard, Anthropic and LLaMa.
 - Pre-processing, extract the key information from the request:
     - Obtain the last message from the request using `pre_embedding.py#last_content`
     - Obtain the session context (TODO)
-- Embed the text into a vector for similarity search:
+- Embedding, Embed the text into a vector for similarity search:
     - [x]  Use [towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model for English and uer/albert-base-chinese-cluecorpussmall for Chinese.
     - [x]  Use the OpenAI embedding API.
     - [x]  Keep the text as a string without any changes.
     - [ ]  Use the [cohere](https://docs.cohere.ai/reference/embed) embedding API.
     - [ ]  Support [Hugging Face](https://huggingface.co/) embedding API.
-- Cache data manager, which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome:
+- Cache manager, which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome:
     - Scalar store:
         - [x]  Use [SQLite](https://sqlite.org/docs.html).
         - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
@@ -104,10 +107,13 @@ More Docs：
     - Vector store:
         - [x]  Use [Milvus](https://milvus.io/).
         - [x]  Use [Zilliz Cloud](https://cloud.zilliz.com/).
-        - [ ]  Use other vector databases
-    - Vector index:
         - [x]  Use [FAISS](https://faiss.ai/).
-- Evaluate similarity by judging the quality of cached answers:
+        - [ ]  Use other vector databases
+    - Eviction Handler
+        - [X]  LRU eviction policy
+        - [X]  FIFO evition policy
+        - [ ]  More complicated eviction policies
+- Evaluator, Evaluate similarity by judging the quality of cached answers:
     - Use the search distance, as described in `simple.py#pair_evaluation`.
     - [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison of problems to problems mode. It supports only 512 tokens.
     - For string comparison, judge the cache request and the original request based on the exact match of characters.
