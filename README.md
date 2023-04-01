@@ -46,7 +46,7 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
-### quick usage
+### example usage
 
 If you just want to achieve precise matching cache of requests, that is, two identical requests, you **ONLY** need **TWO** steps to access this cache
 
