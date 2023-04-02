@@ -25,7 +25,6 @@ def run():
                evaluation_func=pair_evaluation,
                similarity_threshold=10000,
                similarity_positive=False,
-               config=Config(),
                )
 
     mock_messages = [

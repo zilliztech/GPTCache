@@ -54,7 +54,7 @@ class Milvus(VectorStore):
                 password=password,  # type: ignore
                 secure=use_security,
             )
-        collection_name = kwargs.get("collection_name", "c" + uuid4().hex)
+        collection_name = kwargs.get("collection_name", "gptcache")
         create_new = kwargs.get("create_new", False)
         dim = kwargs.get("dim", 0)
         if dim <= 0:
