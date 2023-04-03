@@ -28,9 +28,10 @@ def run():
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                evaluation_func=pair_evaluation,
-               similarity_threshold=10000,
-               similarity_positive=False,
-               config=Config(),
+               config=Config(
+                       similarity_threshold=10000,
+                       similarity_positive=False,
+                   ),
                )
 
     mock_messages = [

@@ -27,6 +27,8 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         if cache_data_list is None:
             cache_data_list = []
         cache_answers = []
+        similarity_positive = chat_cache.config.similarity_positive
+        similarity_threshold = chat_cache.config.similarity_threshold
         for cache_data in cache_data_list:
             cache_question, cache_answer = chat_cache.data_manager.get_scalar_data(
                 cache_data, extra_param=context.get('get_scalar_data', None))
@@ -38,8 +40,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 "answer": cache_answer,
                 "search_result": cache_data,
             }, extra_param=context.get('evaluation', None))
-            if (chat_cache.similarity_positive and rank >= chat_cache.similarity_threshold) \
-                    or (not chat_cache.similarity_positive and rank <= chat_cache.similarity_threshold):
+            if (similarity_positive and similarity_threshold) or (not similarity_positive and similarity_threshold):
                 cache_answers.append((rank, cache_answer))
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         if len(cache_answers) != 0:

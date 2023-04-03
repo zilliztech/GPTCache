@@ -3,7 +3,7 @@ import os
 import time
 
 from gptcache.adapter import openai
-from gptcache.core import cache
+from gptcache.core import cache, Config
 from gptcache.cache.factory import get_si_data_manager
 from gptcache.ranker import Towhee as EvaluationTowhee
 from gptcache.encoder import Towhee as EmbeddingTowhee
@@ -40,8 +40,10 @@ def run():
     cache.init(embedding_func=embedding_towhee.to_embeddings,
                data_manager=data_manager,
                evaluation_func=sf_evaluation,
-               similarity_threshold=0.5,
-               similarity_positive=True,
+               config=Config(
+                   similarity_threshold=0.5,
+                   similarity_positive=True,
+                    ),
                )
 
     i = 0

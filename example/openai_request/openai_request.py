@@ -2,7 +2,7 @@ import os
 import time
 
 from gptcache.cache.factory import get_data_manager, get_si_data_manager
-from gptcache.core import cache, Cache
+from gptcache.core import cache, Cache, Config
 from gptcache.encoder import Towhee
 from gptcache.ranker.simple import pair_evaluation
 from gptcache.adapter import openai
@@ -63,8 +63,11 @@ def run():
     one_cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
                    evaluation_func=pair_evaluation,
-                   similarity_threshold=1,
-                   similarity_positive=False)
+                   config=Config(
+                       similarity_threshold=1,
+                       similarity_positive=False,
+                        ),
+                   )
 
     question1 = "what do you think about chatgpt"
     question2 = "what do you feel like chatgpt"
@@ -92,8 +95,6 @@ def run():
     end_time = time.time()
     print("time consuming: {:.2f}s".format(end_time - start_time))
     print(answer)
-
-    one_cache.close()
 
 
 if __name__ == '__main__':

@@ -20,22 +20,26 @@ def time_cal(func, func_name=None, report_func=None):
         time_start = time.time()
         res = func(*args, **kwargs)
         delta_time = time.time() - time_start
-        if cache.config.print_func_time:
-            print("func `{}` consume time: {:.2f}s".format(
-                func.__name__ if func_name is None else func_name, delta_time))
+        if cache.config.log_time_func:
+            cache.config.log_time_func(func.__name__ if func_name is None else func_name, delta_time)
         if report_func is not None:
             report_func(delta_time)
         return res
+
     return inner
 
 
 class Config:
     def __init__(self,
-                 print_func_time=False,
-                 report_func_time=True,
+                 log_time_func=None,
+                 enable_report_time=True,
+                 similarity_threshold=0.5,
+                 similarity_positive=True,
                  ):
-        self.print_func_time = print_func_time
-        self.report_func_time = report_func_time
+        self.log_time_func = log_time_func
+        self.enable_report_time = enable_report_time
+        self.similarity_threshold = similarity_threshold
+        self.similarity_positive = similarity_positive
 
 
 class Report:
@@ -74,8 +78,6 @@ class Cache:
         self.data_manager = None
         self.evaluation_func = None
         self.post_process_messages_func = None
-        self.similarity_threshold = None
-        self.similarity_positive = True
         self.config = None
         self.report = Report()
         self.next_cache = None
@@ -87,8 +89,6 @@ class Cache:
              data_manager: DataManager = get_data_manager("map"),
              evaluation_func=absolute_evaluation,
              post_process_messages_func=first,
-             similarity_threshold=0.5,
-             similarity_positive=True,
              config=Config(),
              next_cache=None,
              **kwargs
@@ -100,8 +100,6 @@ class Cache:
         self.data_manager: DataManager = data_manager
         self.evaluation_func = evaluation_func
         self.post_process_messages_func = post_process_messages_func
-        self.similarity_threshold = similarity_threshold
-        self.similarity_positive = similarity_positive
         self.data_manager.init(**kwargs)
         self.config = config
         self.next_cache = next_cache
