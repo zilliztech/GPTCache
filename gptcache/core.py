@@ -32,12 +32,10 @@ def time_cal(func, func_name=None, report_func=None):
 class Config:
     def __init__(self,
                  log_time_func=None,
-                 enable_report_time=True,
                  similarity_threshold=0.5,
                  similarity_positive=True,
                  ):
         self.log_time_func = log_time_func
-        self.enable_report_time = enable_report_time
         self.similarity_threshold = similarity_threshold
         self.similarity_positive = similarity_positive
 

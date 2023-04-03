@@ -23,7 +23,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         cache_data_list = time_cal(chat_cache.data_manager.search,
                                    func_name="search",
                                    report_func=chat_cache.report.search,
-                                   )(embedding_data, extra_param=context.get('search', None))
+                                   )(embedding_data, extra_param=context.get('search_func', None))
         if cache_data_list is None:
             cache_data_list = []
         cache_answers = []
@@ -33,13 +33,13 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             cache_question, cache_answer = chat_cache.data_manager.get_scalar_data(
                 cache_data, extra_param=context.get('get_scalar_data', None))
             rank = chat_cache.evaluation_func({
-                "question": pre_embedding_data,
-                "embedding": embedding_data,
-            }, {
-                "question": cache_question,
-                "answer": cache_answer,
-                "search_result": cache_data,
-            }, extra_param=context.get('evaluation', None))
+                    "question": pre_embedding_data,
+                    "embedding": embedding_data,
+                }, {
+                    "question": cache_question,
+                    "answer": cache_answer,
+                    "search_result": cache_data,
+                }, extra_param=context.get('evaluation_func', None))
             if (similarity_positive and similarity_threshold <= rank) \
                     or (not similarity_positive and similarity_threshold >= rank):
                 cache_answers.append((rank, cache_answer))
@@ -62,7 +62,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 chat_cache.data_manager.save(pre_embedding_data,
                                              handled_llm_data,
                                              embedding_data,
-                                             extra_param=context.get('save', None))
+                                             extra_param=context.get('save_func', None))
 
             llm_data = update_cache_callback(llm_data, update_cache_func)
         except Exception as e:
