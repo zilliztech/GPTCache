@@ -59,7 +59,7 @@ refer to the implementation of [sqlite](../gptcache/cache/scalar_data/sqllite3.p
 1. Implement the [ScalarStore](../gptcache/cache/scalar_data/scalar_store.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 4. Add the new store to the [_get_scalar_store](../gptcache/cache/factory.py) method
-5. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
+5. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 ## Add a vector store type
 
@@ -68,7 +68,7 @@ refer to the implementation of [milvus](../gptcache/cache/vector_data/milvus.py)
 1. Implement the [VectorStore](../gptcache/cache/vector_data/vector_store.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Add the new store to the [get_ss_data_manager](../gptcache/cache/factory.py) method
-4. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
+4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 ## Add a vector index type
 
@@ -77,7 +77,7 @@ refer to the implementation of [faiss](../gptcache/cache/vector_data/faiss.py).
 1. Implement the [VectorIndex](../gptcache/cache/vector_data/vector_index.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Add the new store to the [get_si_data_manager](../gptcache/cache/factory.py) method
-4. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
+4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 ## Add a new data manager
 
@@ -85,8 +85,7 @@ refer to the implementation of [MapDataManager, SSDataManager or SIDataManager](
 
 1. Implement the [DataManager](../gptcache/cache/data_manager.py) interface
 2. Add the new store to the [get_data_manager](../gptcache/cache/factory.py) method
-3. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
-4. Add the installation method to [Install Dependencies List](installation.md) if a third-party library is newly added
+3. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 ## Add a embedding function
 
@@ -95,7 +94,7 @@ refer to the implementation of [towhee](../gptcache/encoder/towhee.py) or [opena
 1. Add a new python file to [embedding](../gptcache/encoder) directory
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the embedding function and **make sure** your output dimension
-4. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
+4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 ## Add a similarity evaluation function
 
@@ -114,7 +113,7 @@ rank = chat_cache.evaluation_func({
 ```
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the similarity evaluation function
-4. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
+4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 ## Add a method to post-process the cache answer list
 
@@ -123,7 +122,7 @@ refer to the implementation of [first or random_one](../gptcache/processor/post.
 1. Make sure the input params, you can learn more about in the [user view](../gptcache/adapter/openai.py) model
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the post method
-4. Add a usage example to [example](../example) directory and add the corresponding content to [example.md](../example/example.md) [README.md](../README.md)
+4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 # Add a new process in handling chatgpt requests
 

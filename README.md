@@ -17,7 +17,7 @@ A good analogy for GptCache is to think of it as a more semantic version of Redi
 - For purpose-built SaaS services, users tend to ask questions within a specific domain, with both temporal and spatial locality.
 - By utilizing vector similarity search, it is possible to find a similarity relationship between questions and answers at a relatively low cost.
 
-We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/example/benchmark/benchmark_sqlite_faiss_towhee.py) to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
+We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_towhee.py) to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
 
 ## 😊 Quick Start
 
@@ -76,14 +76,14 @@ answer = openai.ChatCompletion.create(
 If you want to experience vector similarity search cache locally, you can use the example [Sqlite + Faiss + Towhee](example/sqlite_faiss_towhee/sqlite_faiss_towhee.py).
 
 More Docs：
-- [System Design, how it was constructed](doc/system.md)
-- [Features, all features currently supported by the cache](doc/feature.md)
-- [Examples, learn better custom caching](example/example.md)
+- [System Design, how it was constructed](docs/system.md)
+- [Features, all features currently supported by the cache](docs/feature.md)
+- [Examples, learn better custom caching](examples/example.md)
 
 
 ## 🤗 Modules Overview
 
-![GPTCache Struct](doc/GPTCacheStructure.png)
+![GPTCache Struct](docs/GPTCacheStructure.png)
 
 - **LLM Adapter**: The user interface to adapt different LLM model requests to the GPT cache protocol. 
     - [x]  Support OpenAI chatGPT API
