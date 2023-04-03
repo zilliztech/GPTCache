@@ -1,0 +1,30 @@
+name: Enhancement Request
+description: As a developer, I want to make an enhancement for GPT Cache
+title: "[Enhancement]:"
+labels: [kind/enhancement]
+body:
+- type: markdown
+  attributes:
+    value: |
+      Thanks for taking the time to request/suggest an enhancement for GPT Cache! Please fill the form in English!
+- type: textarea
+  attributes:
+    label: What would you like to be added?
+    description: A concise description of what you're expecting/suggesting.
+    placeholder: |
+      I would like to suggest/request a feature that's like...
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: Why is this needed?
+    description: A concise description of the reason/motivation
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: Anything else?
+    description: |
+      Links? References? Anything that will give us more context about this!
+  validations:
+    required: false
