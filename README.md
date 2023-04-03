@@ -100,7 +100,10 @@ More Docs：
     - [x]  Use the OpenAI embedding API.
     - [x]  Keep the text as a string without any changes.
     - [ ]  Use the [cohere](https://docs.cohere.ai/reference/embed) embedding API.
+    - [ ]  Support [PaddleNLP](https://github.com/PaddlePaddle/PaddleNLP) embedding API.
+    - [ ]  Support [fastText](https://fasttext.cc) embedding API.
     - [ ]  Support [Hugging Face](https://huggingface.co/) embedding API.
+    - [ ]  Support [SentenceTransformers](https://www.sbert.net) embedding API.
 - **Cache manager**: which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome.
     - Scalar store:
         - [x]  Use [SQLite](https://sqlite.org/docs.html).
