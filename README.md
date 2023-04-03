@@ -131,8 +131,3 @@ More Docs：
 ## 😆 Contributing
 
 Would you like to contribute to the development of GPT Cache? Take a look at [our contribution guidelines](doc/contributing.md).
-
-
-## 🙏 Thank
-
-Thanks to my colleagues in the company [Zilliz](https://zilliz.com/) for their inspiration and technical support.
