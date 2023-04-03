@@ -109,16 +109,23 @@ More Docs：
         - [x]  Use [SQLite](https://sqlite.org/docs.html).
         - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
         - [ ]  Use [MySQL](https://www.mysql.com/).
+        - [ ]  Use [MongoDB](https://www.mongodb.com/)
         - [ ]  Use [MariaDB](https://mariadb.org/).
         - [ ]  Use [SQL Server](https://www.microsoft.com/en-us/sql-server/).
         - [ ]  Use [Oracle](https://www.oracle.com/).
         - [ ]  Use [Redis](https://redis.io/).
         - [ ]  Use [Minio](https://min.io/).
         - [ ]  Use [Habse](https://hbase.apache.org//).
+        - [ ]  Use [ElasticSearch](https://www.elastic.co/)
+        - [ ]  Use [zincsearch](https://zinc.dev/) 
+        - [ ]  Use other scalar databases
     - Vector store:
         - [x]  Use [Milvus](https://milvus.io/).
         - [x]  Use [Zilliz Cloud](https://cloud.zilliz.com/).
         - [x]  Use [FAISS](https://faiss.ai/).
+        - [ ]  Use [Qdrant](https://qdrant.tech/)
+        - [ ]  Use [Chroma](https://www.trychroma.com/)
+        - [ ]  Use [PGVector](https://github.com/pgvector/pgvector)
         - [ ]  Use other vector databases
     - Eviction Policy
         - [x]  LRU eviction policy

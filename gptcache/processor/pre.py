@@ -1,6 +1,7 @@
 def last_content(data, **kwargs):
     return data.get("messages")[-1]["content"]
 
+
 def all_content(data, **kwargs):
     s = ""
     messages = data.get("messages")
