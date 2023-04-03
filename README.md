@@ -85,7 +85,7 @@ More Docs：
 
 ![GPTCache Struct](doc/GPTCacheStructure.png)
 
-- **Adapter**: The user interface to adapt different LLM model requests to the GPT cache protocol. 
+- **LLM Adapter**: The user interface to adapt different LLM model requests to the GPT cache protocol. 
     - [x]  Support OpenAI chatGPT API
     - [ ]  Support for other LLMs, such as Hugging Face Hub, Anthropic, and self-hosted models like LLaMa.
 - **Pre-processor**: Extracts the key information from the request and preprocess
