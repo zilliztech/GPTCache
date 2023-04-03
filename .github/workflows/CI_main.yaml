@@ -1,0 +1,53 @@
+name: Test on pull request
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'example/**'
+      - 'gptcache/**'
+      - '!**.md'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'example/**'
+      - 'gptcache/**'
+      - '!**.md'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  test-gpt-cache-cli-main:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        data_manager_mode: [sqlite_faiss_mock, sqlite_faiss_towhee]
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+          cache: pip
+
+      - name: Install dependency
+        shell: bash
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build and install
+        shell: bash
+        run: |
+          python setup.py install
+
+      - name: Run examples
+        timeout-minutes: 10
+        shell: bash
+        working-directory: example/${{ matrix.data_manager_mode }}
+        run: |
+          python ${{ matrix.data_manager_mode }}.py
