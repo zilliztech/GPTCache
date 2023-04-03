@@ -27,7 +27,7 @@ def run():
                evaluation_func=pair_evaluation,
                config=Config(
                        log_time_func=log_time_func,
-                       similarity_threshold=10000,
+                       similarity_threshold=1,
                        similarity_positive=False,
                    ),
                )
@@ -37,13 +37,11 @@ def run():
         answer = "chatgpt is a good application"
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
-    # distance 0.77
     mock_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "what do you feel like chatgpt"}
     ]
 
-    # distance 0.21
     # mock_messages = [
     #     {"role": "system", "content": "You are a helpful assistant."},
     #     {"role": "user", "content": "what do you think chatgpt"}

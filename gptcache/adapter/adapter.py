@@ -40,7 +40,8 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 "answer": cache_answer,
                 "search_result": cache_data,
             }, extra_param=context.get('evaluation', None))
-            if (similarity_positive and similarity_threshold) or (not similarity_positive and similarity_threshold):
+            if (similarity_positive and similarity_threshold <= rank) \
+                    or (not similarity_positive and similarity_threshold >= rank):
                 cache_answers.append((rank, cache_answer))
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         if len(cache_answers) != 0:
