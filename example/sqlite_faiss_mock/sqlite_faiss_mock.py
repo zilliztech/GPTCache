@@ -24,7 +24,7 @@ def run():
                data_manager=data_manager,
                evaluation_func=pair_evaluation,
                config=Config(
-                       similarity_threshold=0,
+                       similarity_threshold=10000,
                        similarity_positive=False,
                    ),
                )
