@@ -21,34 +21,34 @@ pull_request_rules:
         add:
           - dco-passed
 
-  - name: Blocking PR if missing a related issue or PR doesn't have kind/improvement label
-    conditions:
-      - base=main
-      - and:
-        - -body~=\#[0-9]{1,6}(\s+|$)
-        - -body~=https://github.com/zilliztech/GPTCache/issues/[0-9]{1,6}(\s+|$)
-      - -label=kind/improvement
-      - -title~=\[automated\]
-    actions:
-      label:
-        add:
-          - do-not-merge/missing-related-issue
-      comment:
-        message: |
-          @{{author}} Please associate the related issue to the body of your Pull Request.  (eg. “issue: #<xyz>”)
+  # - name: Blocking PR if missing a related issue or PR doesn't have kind/improvement label
+  #   conditions:
+  #     - base=main
+  #     - and:
+  #       - -body~=\#[0-9]{1,6}(\s+|$)
+  #       - -body~=https://github.com/zilliztech/GPTCache/issues/[0-9]{1,6}(\s+|$)
+  #     - -label=kind/improvement
+  #     - -title~=\[automated\]
+  #   actions:
+  #     label:
+  #       add:
+  #         - do-not-merge/missing-related-issue
+  #     comment:
+  #       message: |
+  #         @{{author}} Please associate the related issue to the body of your Pull Request.  (eg. “issue: #<xyz>”)
 
-  - name: Dismiss block label if related issue be added into PR
-    conditions:
-      - base=main
-      - or:
-        - or:
-          - body~=\#[0-9]{1,6}(\s+|$)
-          - body~=https://github.com/milvus-io/knowhere/issues/[0-9]{1,6}(\s+|$)
-        - label=kind/improvement
-    actions:
-      label:
-        remove:
-          - do-not-merge/missing-related-issue
+  # - name: Dismiss block label if related issue be added into PR
+  #   conditions:
+  #     - base=main
+  #     - or:
+  #       - or:
+  #         - body~=\#[0-9]{1,6}(\s+|$)
+  #         - body~=https://github.com/milvus-io/knowhere/issues/[0-9]{1,6}(\s+|$)
+  #       - label=kind/improvement
+  #   actions:
+  #     label:
+  #       remove:
+  #         - do-not-merge/missing-related-issue
 
   - name: Test passed for code changed
     conditions:
@@ -65,7 +65,7 @@ pull_request_rules:
     conditions:
       - base=main
       - title~=\[skip ci\]
-      - -files~=^(?=.*((\.(sh|py)|Makefile))).*$
+      - -files~=^(?=.*((\.(sh|py|yaml)|Makefile))).*$
     actions:
       label:
         add:
@@ -78,7 +78,7 @@ pull_request_rules:
         - "status-success!=test-gpt-cache-cli-main (map)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_towhee)"
-      - files~=^(?=.*((\.(sh|py)|Makefile))).*$
+      - files~=^(?=.*((\.(sh|py|yaml)|Makefile))).*$
     actions:
       label:
         remove:
