@@ -93,10 +93,6 @@ More Docs：
 - **Pre-processor**: Extracts the key information from the request and preprocess
     - [x]  Basic analysis and parse of the request
     - [ ]  Apply user-defined preprocessing logic.
-- [ ] **Context Buffer**: Maintains session context.
-    - [ ] Store conversation windows.
-    - [ ] Store conversation summary.
-    - [ ] Store prompts.
 - **Encoder**: Embed the text into a dense vector for similarity search.
     - [x]  Use [towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model for English and uer/albert-base-chinese-cluecorpussmall for Chinese.
     - [x]  Use the OpenAI embedding API.
@@ -106,22 +102,21 @@ More Docs：
     - [ ]  Support [fastText](https://fasttext.cc) embedding API.
     - [ ]  Support [Hugging Face](https://huggingface.co/) embedding API.
     - [ ]  Support [SentenceTransformers](https://www.sbert.net) embedding API.
-- **Cache manager**: which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome.
-    - Cache storage:
-        - [x]  Use [SQLite](https://sqlite.org/docs.html).
-        - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
-        - [ ]  Use [MySQL](https://www.mysql.com/).
-        - [ ]  Use [MongoDB](https://www.mongodb.com/)
-        - [ ]  Use [MariaDB](https://mariadb.org/).
-        - [ ]  Use [SQL Server](https://www.microsoft.com/en-us/sql-server/).
-        - [ ]  Use [Oracle](https://www.oracle.com/).
-        - [ ]  Use [Redis](https://redis.io/).
-        - [ ]  Use [Minio](https://min.io/).
-        - [ ]  Use [Habse](https://hbase.apache.org//).
-        - [ ]  Use [ElasticSearch](https://www.elastic.co/)
-        - [ ]  Use [zincsearch](https://zinc.dev/) 
-        - [ ]  Use other scalar databases
-    - Vector store:
+- **Cache storage**:
+    - [x]  Use [SQLite](https://sqlite.org/docs.html).
+    - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
+    - [ ]  Use [MySQL](https://www.mysql.com/).
+    - [ ]  Use [MongoDB](https://www.mongodb.com/).
+    - [ ]  Use [MariaDB](https://mariadb.org/).
+    - [ ]  Use [SQL Server](https://www.microsoft.com/en-us/sql-server/).
+    - [ ]  Use [Oracle](https://www.oracle.com/).
+    - [ ]  Use [Redis](https://redis.io/).
+    - [ ]  Use [Minio](https://min.io/).
+    - [ ]  Use [Habse](https://hbase.apache.org//).
+    - [ ]  Use [ElasticSearch](https://www.elastic.co/)
+    - [ ]  Use [zincsearch](https://zinc.dev/) 
+    - [ ]  Use other scalar databases
+- **Vector store**:
         - [x]  Use [Milvus](https://milvus.io/).
         - [x]  Use [Zilliz Cloud](https://cloud.zilliz.com/).
         - [x]  Use [FAISS](https://faiss.ai/).
@@ -129,7 +124,7 @@ More Docs：
         - [ ]  Use [Chroma](https://www.trychroma.com/)
         - [ ]  Use [PGVector](https://github.com/pgvector/pgvector)
         - [ ]  Use other vector databases
-    - Eviction Policy
+- **Eviction Policy**
         - [x]  LRU eviction policy
         - [x]  FIFO eviction policy
         - [ ]  More complicated eviction policies
