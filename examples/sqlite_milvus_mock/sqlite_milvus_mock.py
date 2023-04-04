@@ -3,7 +3,7 @@ import os
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.ranker.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 import numpy as np
 
 
@@ -15,7 +15,7 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
-    sqlite_file = "sqlite.db"
+    sqlite_file = "gptcache.db"
     has_data = os.path.isfile(sqlite_file)
     # milvus
     data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2)

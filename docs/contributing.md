@@ -22,7 +22,7 @@ First check which part you want to contribute:
 # The __init__.py file of the same directory under the new file
 __all__ = ['Milvus']
 
-from gptcache.util.lazy_import import LazyImport
+from gptcache.utils.lazy_import import LazyImport
 
 milvus = LazyImport('milvus', globals(), 'gptcache.cache.vector_data.milvus')
 
@@ -89,16 +89,16 @@ refer to the implementation of [MapDataManager, SSDataManager or SIDataManager](
 
 ## Add a embedding function
 
-refer to the implementation of [towhee](../gptcache/encoder/towhee.py) or [openai](../gptcache/encoder/openai.py).
+refer to the implementation of [towhee](../gptcache/embedding/towhee.py) or [openai](../gptcache/embedding/openai.py).
 
-1. Add a new python file to [embedding](../gptcache/encoder) directory
+1. Add a new python file to [embedding](../gptcache/embedding) directory
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the embedding function and **make sure** your output dimension
 4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
 
 ## Add a similarity evaluation function
 
-refer to the implementation of [pair_evaluation](../gptcache/ranker/simple.py) or [towhee](../gptcache/ranker/towhee.py)
+refer to the implementation of [pair_evaluation](../gptcache/similarity_evaluation/simple.py) or [towhee](../gptcache/similarity_evaluation/towhee.py)
 
 1. Make sure the input params, you can learn more about in the [user view](../gptcache/adapter/openai.py) model
 ```python

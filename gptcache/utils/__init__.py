@@ -1,4 +1,5 @@
-__all__ = ['import_pymilvus', 'import_towhee', 'import_faiss']
+__all__ = ['import_pymilvus', 'import_towhee',
+           'import_faiss', 'import_sqlalchemy']
 
 from .dependency_control import prompt_install
 

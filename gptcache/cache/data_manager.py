@@ -7,7 +7,7 @@ import numpy as np
 from .scalar_data.base import ScalarStorage
 from .vector_data.base import VectorBase, ClearStrategy
 from .eviction import EvictionManager
-from ..util.error import CacheError
+from ..utils.error import CacheError
 
 
 class DataManager(metaclass=ABCMeta):

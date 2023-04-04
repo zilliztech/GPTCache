@@ -1,7 +1,7 @@
 import logging
 import copy
 from ..core import cache, time_cal
-from ..util.error import NotInitError
+from ..utils.error import NotInitError
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):

@@ -1,6 +1,6 @@
 __all__ = ['Milvus', 'Faiss', 'Chromadb']
 
-from gptcache.util.lazy_import import LazyImport
+from gptcache.utils.lazy_import import LazyImport
 
 milvus = LazyImport('milvus', globals(), 'gptcache.cache.vector_data.milvus')
 faiss = LazyImport('faiss', globals(), 'gptcache.cache.vector_data.faiss')

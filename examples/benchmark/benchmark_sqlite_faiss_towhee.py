@@ -5,9 +5,9 @@ import time
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.ranker import Towhee as EvaluationTowhee
-from gptcache.encoder import Towhee as EmbeddingTowhee
-from gptcache.ranker.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation import Towhee as EvaluationTowhee
+from gptcache.embedding import Towhee as EmbeddingTowhee
+from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
 
 def run():
@@ -42,7 +42,7 @@ def run():
         def range(self):
             return 0.0, 1.0
 
-    sqlite_file = "sqlite.db"
+    sqlite_file = "gptcache.db"
     faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
 

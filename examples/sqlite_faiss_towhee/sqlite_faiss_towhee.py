@@ -4,8 +4,8 @@ import time
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.ranker.simple import SearchDistanceEvaluation
-from gptcache.encoder import Towhee
+from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.embedding import Towhee
 
 
 def run():
@@ -13,7 +13,7 @@ def run():
     # chinese model
     # towhee = Towhee(model="uer/albert-base-chinese-cluecorpussmall")
 
-    sqlite_file = "sqlite.db"
+    sqlite_file = "gptcache.db"
     faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
     data_manager = get_ss_data_manager("sqlite", "faiss",
