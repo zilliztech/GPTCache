@@ -107,7 +107,7 @@ More Docs：
     - [ ]  Support [Hugging Face](https://huggingface.co/) embedding API.
     - [ ]  Support [SentenceTransformers](https://www.sbert.net) embedding API.
 - **Cache manager**: which includes searching, saving, or evicting data. Additional storage support will be added in the future, and contributions are welcome.
-    - Scalar store:
+    - Cache storage:
         - [x]  Use [SQLite](https://sqlite.org/docs.html).
         - [ ]  Use [PostgreSQL](https://www.postgresql.org/).
         - [ ]  Use [MySQL](https://www.mysql.com/).
