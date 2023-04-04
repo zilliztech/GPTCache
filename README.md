@@ -39,7 +39,7 @@ pip install gptcache
 ```bash
 # clone gpt cache repo
 git clone https://github.com/zilliztech/gptcache
-cd gpt-cache
+cd gptcache
 
 # install the repo
 pip install -r requirements.txt
