@@ -65,7 +65,7 @@ pull_request_rules:
     conditions:
       - base=main
       - title~=\[skip ci\]
-      - -files~=^(?=.*((\.(sh|py|yaml)|Makefile))).*$
+      - -files~=^(?=.*((\.(sh|py)|Makefile))).*$
     actions:
       label:
         add:
@@ -78,7 +78,7 @@ pull_request_rules:
         - "status-success!=test-gpt-cache-cli-main (map)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_towhee)"
-      - files~=^(?=.*((\.(sh|py|yaml)|Makefile))).*$
+      - files~=^(?=.*((\.(sh|py)|Makefile))).*$
     actions:
       label:
         remove:

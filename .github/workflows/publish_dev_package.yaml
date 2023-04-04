@@ -23,17 +23,10 @@ jobs:
       uses: actions/setup-python@v2.3.1
       with:
         python-version: 3.8
-    - name: Get history and tags for SCM versioning
-      run: |
-          git fetch --prune --unshallow
-          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-    # - name: Run Test
+    # - name: Get history and tags for SCM versioning
     #   run: |
-    #     cd  tests/testcases
-    #     python3 -m pip install -U pip
-    #     python3 -m pip install --no-cache-dir -r requirements.text
-    #     export TOWHEE_WORKER=True
-    #     python3 -W ignore test_main.py
+    #       git fetch --prune --unshallow
+    #       git fetch --depth=1 origin +refs/tags/*:refs/tags/*
     - name: Install pypa/build
       run: >-
         python -m
@@ -51,6 +44,6 @@ jobs:
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
-        user: "${{ secrets.TEST_PYPI_USER }}"
-        password: "${{ secrets.TEST_PYPI_PASSWORD }}"
+        user: ${{ secrets.PYPI_TEST_USER }}
+        password: ${{ secrets.PYPI_TEST_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
