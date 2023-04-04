@@ -1,22 +1,19 @@
-import io
-import sqlite3
+__all__ = ['SQLDataBase', 'SQL_URL']
 
-import numpy as np
+from gptcache.util.lazy_import import LazyImport
 
-
-def adapt_array(arr):
-    out = io.BytesIO()
-    np.save(out, arr)
-    out.seek(0)
-    return sqlite3.Binary(out.read())
+sql_database = LazyImport('milvus', globals(), 'gptcache.cache.scalar_data.sqlalchemy')
 
 
-def convert_array(text):
-    out = io.BytesIO(text)
-    out.seek(0)
-    return np.load(out)
+def SQLDataBase(**kwargs):
+    return sql_database.SQLDataBase(**kwargs)
 
 
-sqlite3.register_adapter(np.ndarray, adapt_array)
-sqlite3.register_converter("np_array", convert_array)
-
+SQL_URL = {
+        'sqlite': 'sqlite:///./gpt_cache.db',
+        'postgresql': 'postgresql+psycopg2://user:password@hostname:port/database_name',
+        'mysql': 'mysql+pymysql://user:password@hostname:port/database_name',
+        'mariadb': 'mariadb+pymysql://user:password@hostname:port/database_name',
+        'sqlserver': 'mssql+pyodbc://user:password@database_name',
+        'oracle': 'oracle+zxjdbc://user:password@hostname:port/database_name',
+}
