@@ -1,12 +1,12 @@
 name: Publish package to TestPyPI
 on:
-  # push:
-  #   branches:
-  #     - 'main'
-  #   paths:
-  #     - 'gptcache/**'
-  #     - '!**.md'
-  #     - '.github/workflows/publish_dev_package.yaml'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'gptcache/**'
+      - '!**.md'
+      - '.github/workflows/publish_dev_package.yaml'
   pull_request:
     branches:
       - main
