@@ -83,7 +83,7 @@ More Docs：
 - [Examples, learn better custom caching](examples/example.md)
 
 
-## 🤗 Modules Overview
+## 🤗 Modules
 
 ![GPTCache Struct](docs/GPTCacheStructure.png)
 
@@ -117,17 +117,17 @@ More Docs：
     - [ ]  Use [zincsearch](https://zinc.dev/) 
     - [ ]  Use other scalar databases
 - **Vector store**:
-        - [x]  Use [Milvus](https://milvus.io/).
-        - [x]  Use [Zilliz Cloud](https://cloud.zilliz.com/).
-        - [x]  Use [FAISS](https://faiss.ai/).
-        - [ ]  Use [Qdrant](https://qdrant.tech/)
-        - [ ]  Use [Chroma](https://www.trychroma.com/)
-        - [ ]  Use [PGVector](https://github.com/pgvector/pgvector)
-        - [ ]  Use other vector databases
+    - [x]  Use [Milvus](https://milvus.io/).
+    - [x]  Use [Zilliz Cloud](https://cloud.zilliz.com/).
+    - [x]  Use [FAISS](https://faiss.ai/).
+    - [ ]  Use [Qdrant](https://qdrant.tech/)
+    - [ ]  Use [Chroma](https://www.trychroma.com/)
+    - [ ]  Use [PGVector](https://github.com/pgvector/pgvector)
+    - [ ]  Use other vector databases
 - **Eviction Policy**
-        - [x]  LRU eviction policy
-        - [x]  FIFO eviction policy
-        - [ ]  More complicated eviction policies
+    - [x]  LRU eviction policy
+    - [x]  FIFO eviction policy
+    - [ ]  More complicated eviction policies
 - **Ranker**: Evaluate similarity by judging the quality of cached answers.
     - [x] Use the search distance, as described in `simple.py#pair_evaluation`.
     - [x] [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
