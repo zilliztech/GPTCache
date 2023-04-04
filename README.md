@@ -2,6 +2,8 @@
 
 ## 🤠 What is GPT Cache?
 
+[![](https://dcbadge.vercel.app/api/server/6adMQxSpJS?compact=true&style=flat)](https://discord.gg/28EQnWZAgQ)
+
 Large Language Models (LLMs) are a promising and transformative technology that has rapidly advanced in recent years. These models are capable of generating natural language text and have numerous applications, including chatbots, language translation, and creative writing. However, as the size of these models increases, so do the costs and performance requirements needed to utilize them effectively. This has led to significant challenges in developing on top of large models such as ChatGPT.
 
 To address this issue, we have developed GPT Cache, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
@@ -146,4 +148,4 @@ More Docs：
 
 ## 😆 Contributing
 
-Would you like to contribute to the development of GPT Cache? Take a look at [our contribution guidelines](doc/contributing.md).
+Would you like to contribute to the development of GPT Cache? Take a look at [our contribution guidelines](docs/contributing.md).

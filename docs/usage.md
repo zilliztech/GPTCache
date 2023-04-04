@@ -173,7 +173,7 @@ class Cache:
     cache.init(data_manager=data_manager)
     ```
 
-    3. *get_ss_data_manager*, retrieves the corresponding data manager for scalar databases and vector index, this will be deprecated.
+    3. *get_si_data_manager*, retrieves the corresponding data manager for scalar databases and vector index, this will be deprecated.
 
     ```python
     # common param list
@@ -306,7 +306,6 @@ openai.ChatCompletion.create(
 - **cache_skip**: skip the cache search, but still store the results returned by the LLM model. These stored results can be used to retry when the cached result is unsatisfactory. Additionally, during the startup phase of the cache system, you can avoid performing a cache search altogether and directly save the data, which can then be used for data accumulation.
 
 ```python
-```python
 question = "what do you think about chatgpt"
 
 openai.ChatCompletion.create(
@@ -316,5 +315,4 @@ openai.ChatCompletion.create(
     ],
     cache_skip=True
 )
-```
 ```
