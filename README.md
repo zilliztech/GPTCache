@@ -92,18 +92,21 @@ More Docs：
 
 ![GPTCache Struct](docs/GPTCacheStructure.png)
 
-- **LLM Adapter**: The user interface to adapt different LLM model requests to the GPT cache protocol.
+- **LLM Adapter**: 
+The LLM Adapter is designed to integrate different LLM models by unifying their APIs and request protocols. GPTCache offers a standardized interface for this purpose, with current support for ChatGPT integration.
   - [x] Support OpenAI chatGPT API.
   - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic, and self-hosted models like LLaMa.
-- **Embedding Extractor**: Embed the text into a dense vector for similarity search.
-  - [x] Keep the text as a string without any changes.
-  - [x] Support the OpenAI embedding API.
+- **Embedding Extractor**: 
+This module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
+  - [x] Disable embedding. This will turn GPTCache into a keyword-matching cache.
+  - [x] Support OpenAI embedding API.
   - [x] Support [Towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model.
   - [ ] Support [Hugging Face](https://huggingface.co/) embedding API.
   - [ ] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
   - [ ] Support [fastText](https://fasttext.cc) embedding API.
   - [ ] Support [SentenceTransformers](https://www.sbert.net) embedding API.
 - **Cache Storage**:
+Cache Storage is where the response from LLMs, such as ChatGPT, is stored. Cached responses are retrieved to assist in evaluating similarity and are returned to the requester if there is a good semantic match. At present, GPTCache supports SQLite and offers a universally accessible interface for extension of this module.
   - [x] Support [SQLite](https://sqlite.org/docs.html).
   - [ ] Support [PostgreSQL](https://www.postgresql.org/).
   - [ ] Support [MySQL](https://www.mysql.com/).
@@ -118,6 +121,7 @@ More Docs：
   - [ ] Support [zincsearch](https://zinc.dev/)
   - [ ] Support other storages
 - **Vector Store**:
+The Vector Store module helps find the K most similar requests from the input request's extracted embedding. The results can help assess similarity. GPTCache provides a user-friendly interface that supports various vector stores, including Milvus, Zilliz Cloud, and FAISS. More options will be available in the future.
   - [x] Support [Milvus](https://milvus.io/).
   - [x] Support [Zilliz Cloud](https://cloud.zilliz.com/).
   - [x] Support [FAISS](https://faiss.ai/).
@@ -125,18 +129,23 @@ More Docs：
   - [ ] Support [Chroma](https://www.trychroma.com/)
   - [ ] Support [PGVector](https://github.com/pgvector/pgvector)
   - [ ] Support other vector databases
-- **Cache Manager**
-  - Eviction Policy
+- **Cache Manager**:
+The Cache Manager is responsible for controlling the operation of both the Cache Storage and Vector components.
+  - **Eviction Policy**:
+  Currently, GPTCache makes decisions about evictions based solely on the number of lines. This approach can result in inaccurate resource evaluation and may cause out-of-memory (OOM) errors. We are actively investigating and developing a more sophisticated strategy.
     - [x] LRU eviction policy
     - [x] FIFO eviction policy
     - [ ] More complicated eviction policies
-- **Similarity Evaluator**: Evaluate similarity by judging the quality of cached answers.
-  - [x] Use the search distance, as described in `simple.py#pair_evaluation`.
-  - [x] [Towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
-  - [x] Exact string comparison, judge the cache request and the original request based on the exact match of characters.
-  - [x] For numpy arrays, use `linalg.norm`.
+- **Similarity Evaluator**: This module collects data from both the Cache Storage and Vector Store, and uses various strategies to determine the similarity between the input request and the requests from the Vector Store. Based on this similarity, it determines whether a request matches the cache. GPTCache provides a standardized interface for integrating various strategies, along with a collection of implementations to use. The following similarity definitions are currently supported or will be supported in the future:
+  - [x] The distance we obtain from the Vector Store.
+  - [x] A model-based similarity determined using the albert_duplicate model from [Towhee](https://towhee.io/).
+  - [x] Exact matches between the input request and the requests obtained from the Vector Store.
+  - [x] Distance represented by applying linalg.norm from numpy to the embeddings.
   - [ ] BM25 and other similarity measurements
   - [ ] Support other models
+ 
+  
+  **Note**:Not all combinations of different modules may be compatible with each other. For instance, if we disable the **Embedding Extractor**, the **Vector Store** may not function as intended. We are currently working on implementing a combination sanity check for **GPTCache**.
 
 ## 😆 Contributing
 
