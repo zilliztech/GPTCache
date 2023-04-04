@@ -1,10 +1,11 @@
-from gptcache.util import import_towhee
+from .similarity_evaluation import SimilarityEvaluation
+from ..util import import_towhee
 import_towhee()
 
 from towhee.dc2 import ops, pipe
 
 
-class Towhee:
+class Towhee(SimilarityEvaluation):
     def __init__(self):
         self._pipe = (
             pipe.input('text', 'candidate')
@@ -20,3 +21,6 @@ class Towhee:
             return self._pipe(src_question, [cache_question]).get_dict()['similarity'][0]
         except Exception:
             return 0
+
+    def range(self):
+        return 0.0, 1.0

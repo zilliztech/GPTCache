@@ -5,7 +5,7 @@ from gptcache.adapter import openai
 from gptcache.cache.factory import get_ss_data_manager
 from gptcache.core import cache, Config
 from gptcache.encoder import Towhee
-from gptcache.ranker.simple import pair_evaluation
+from gptcache.ranker.simple import SearchDistanceEvaluation
 
 sqlite_file = "sqlite.db"
 faiss_file = "faiss.index"
@@ -33,11 +33,9 @@ def test_hint():
 
     cache.init(embedding_func=towhee.to_embeddings,
                data_manager=data_manager,
-               evaluation_func=pair_evaluation,
+               similarity_evaluation=SearchDistanceEvaluation(),
                config=Config(
                    log_time_func=log_time_func,
-                   similarity_threshold=1,
-                   similarity_positive=False,
                ),
                )
 
@@ -68,11 +66,10 @@ def test_miss():
 
     cache.init(embedding_func=towhee.to_embeddings,
                data_manager=data_manager,
-               evaluation_func=pair_evaluation,
+               similarity_evaluation=SearchDistanceEvaluation,
                config=Config(
                    log_time_func=log_time_func,
                    similarity_threshold=0,
-                   similarity_positive=False,
                ),
                )
 

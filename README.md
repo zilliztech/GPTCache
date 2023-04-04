@@ -29,6 +29,7 @@ We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/exampl
 
 - You can quickly try GPT cache and put it into a production environment without heavy development. However, please note that the repository is still under heavy development.
 - By default, only a limited number of libraries are installed to support the basic cache functionalities. When you need to use additional features, the related libraries will be **automatically installed**.
+- Make sure that the Python version is 3.8.1 or higher.
 - If you encounter issues installing a library due to a low pip version, run: `python -m pip install --upgrade pip`.
 
 ### pip install
@@ -41,8 +42,8 @@ pip install gptcache
 
 ```bash
 # clone gpt cache repo
-git clone https://github.com/zilliztech/gptcache
-cd gptcache
+git clone https://github.com/zilliztech/GPTCache.git
+cd GPTCache
 
 # install the repo
 pip install -r requirements.txt
@@ -79,7 +80,7 @@ answer = openai.ChatCompletion.create(
 )
 ```
 
-If you want to experience vector similarity search cache locally, you can use the example [Sqlite + Faiss + Towhee](example/sqlite_faiss_towhee/sqlite_faiss_towhee.py).
+If you want to experience vector similarity search cache locally, you can use the example [Sqlite + Faiss + Towhee](examples/sqlite_faiss_towhee/sqlite_faiss_towhee.py).
 
 More Docs：
 
