@@ -1,6 +1,8 @@
 import hashlib
 from abc import abstractmethod, ABCMeta
 import pickle
+import numpy as np
+from typing import Callable
 
 import cachetools
 
@@ -14,21 +16,21 @@ class DataManager(metaclass=ABCMeta):
     def init(self, **kwargs): pass
 
     @abstractmethod
-    def save(self, question, answer, embedding_data, **kwargs): pass
+    def save(self, question: str, answer: str, embedding_data: np.ndarray, **kwargs): pass
 
     # should return the tuple, (question, answer)
     @abstractmethod
-    def get_scalar_data(self, vector_data, **kwargs): pass
+    def get_scalar_data(self, search_data, **kwargs): pass
 
     @abstractmethod
-    def search(self, embedding_data, **kwargs): pass
+    def search(self, embedding_data: np.ndarray, **kwargs): pass
 
     @abstractmethod
     def close(self): pass
 
 
 class MapDataManager(DataManager):
-    def __init__(self, data_path, max_size, get_data_container=None):
+    def __init__(self, data_path: str, max_size: int, get_data_container: Callable = None):
         if get_data_container is None:
             self.data = cachetools.LRUCache(max_size)
         else:
@@ -45,13 +47,13 @@ class MapDataManager(DataManager):
         except PermissionError:
             print(f'You don\'t have permission to access this file <${self.data_path}>.')
 
-    def save(self, question, answer, embedding_data, **kwargs):
+    def save(self, question: str, answer: str, embedding_data: np.ndarray, **kwargs):
         self.data[embedding_data] = (question, answer)
 
-    def get_scalar_data(self, vector_data, **kwargs):
-        return vector_data
+    def get_scalar_data(self, search_data, **kwargs):
+        return search_data
 
-    def search(self, embedding_data, **kwargs):
+    def search(self, embedding_data: np.ndarray, **kwargs):
         try:
             return [self.data[embedding_data]]
         except KeyError:
@@ -66,7 +68,7 @@ class MapDataManager(DataManager):
             print(f'You don\'t have permission to access this file <${self.data_path}>.')
 
 
-def sha_data(data):
+def sha_data(data: np.ndarray):
     m = hashlib.sha1()
     m.update(data.astype('float32').tobytes())
     return m.hexdigest()
@@ -77,7 +79,7 @@ class SSDataManager(DataManager):
     s: ScalarStore
     v: VectorStore
 
-    def __init__(self, max_size, clean_size, s, v):
+    def __init__(self, max_size: int, clean_size: int, s: ScalarStore, v: VectorStore):
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size
@@ -89,7 +91,7 @@ class SSDataManager(DataManager):
         self.v.init(**kwargs)
         self.cur_size = self.s.count()
 
-    def save(self, question, answer, embedding_data, **kwargs):
+    def save(self, question: str, answer: str, embedding_data: np.ndarray, **kwargs):
         if self.cur_size >= self.max_size:
             ids = self.s.eviction(self.clean_size)
             self.cur_size = self.s.count()
@@ -104,7 +106,7 @@ class SSDataManager(DataManager):
         key = sha_data(vector_data)
         return self.s.select_data(key)
 
-    def search(self, embedding_data, **kwargs):
+    def search(self, embedding_data: np.ndarray, **kwargs):
         return self.v.search(embedding_data)
 
     def close(self):
@@ -117,7 +119,7 @@ class SIDataManager(DataManager):
     s: ScalarStore
     v: VectorIndex
 
-    def __init__(self, max_size, clean_size, s, v):
+    def __init__(self, max_size: int, clean_size: int, s: ScalarStore, v: VectorIndex):
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size
@@ -129,7 +131,7 @@ class SIDataManager(DataManager):
         self.v.init(**kwargs)
         self.cur_size = self.s.count()
 
-    def save(self, question, answer, embedding_data, **kwargs):
+    def save(self, question: str, answer: str, embedding_data: np.ndarray, **kwargs):
         if self.cur_size >= self.max_size:
             self.s.eviction(self.clean_size)
             all_data = self.s.select_all_embedding_data()
@@ -145,7 +147,7 @@ class SIDataManager(DataManager):
         key = sha_data(vector_data)
         return self.s.select_data(key)
 
-    def search(self, embedding_data, **kwargs):
+    def search(self, embedding_data: np.ndarray, **kwargs):
         return self.v.search(embedding_data)
 
     def close(self):

@@ -1,6 +1,7 @@
 import atexit
 import os
 import time
+from typing import Callable
 
 import openai
 from .encoder.string import to_embeddings as string_embedding
@@ -15,7 +16,7 @@ def cache_all(*args, **kwargs):
     return True
 
 
-def time_cal(func, func_name=None, report_func=None):
+def time_cal(func: Callable, func_name: str = None, report_func: Callable = None):
     def inner(*args, **kwargs):
         time_start = time.time()
         res = func(*args, **kwargs)
@@ -31,9 +32,9 @@ def time_cal(func, func_name=None, report_func=None):
 
 class Config:
     def __init__(self,
-                 log_time_func=None,
-                 similarity_threshold=0.5,
-                 similarity_positive=True,
+                 log_time_func: Callable = None,
+                 similarity_threshold: float = 0.5,
+                 similarity_positive: bool = True,
                  ):
         self.log_time_func = log_time_func
         self.similarity_threshold = similarity_threshold
@@ -48,11 +49,11 @@ class Report:
         self.search_count = 0
         self.hint_cache_count = 0
 
-    def embedding(self, delta_time):
+    def embedding(self, delta_time: float):
         self.embedding_all_time += delta_time
         self.embedding_count += 1
 
-    def search(self, delta_time):
+    def search(self, delta_time: float):
         self.search_all_time += delta_time
         self.search_count += 1
 

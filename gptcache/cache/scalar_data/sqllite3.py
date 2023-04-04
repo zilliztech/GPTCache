@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Iterable, Tuple
 import sqlite3
 
 import numpy as np
@@ -8,7 +9,7 @@ from .scalar_store import ScalarStore
 
 class SQLite(ScalarStore):
 
-    def __init__(self, db_path, eviction_strategy):
+    def __init__(self, db_path: str, eviction_strategy: str):
         self.con = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
         self.cur = self.con.cursor()
         create_tb_cmd = '''
@@ -33,16 +34,16 @@ class SQLite(ScalarStore):
         res = self.cur.execute("SELECT COUNT(id) FROM cache_data")
         return res.fetchone()[0]
 
-    def insert(self, key, question, answer, embedding_data: np.ndarray):
+    def insert(self, key: str, question: str, answer: str, embedding_data: np.ndarray):
         self.cur.execute("INSERT INTO cache_data (id, question, answer, embedding_data) VALUES (?, ?, ?, ?)",
                          (key, question, answer, embedding_data))
         self.con.commit()
 
-    def mult_insert(self, datas):
+    def mult_insert(self, datas: Iterable[Tuple[str, str, str, np.ndarray]]):
         self.cur.executemany("INSERT INTO cache_data (id, question, answer, embedding_data) VALUES(?, ?, ?, ?)", datas)
         self.con.commit()
 
-    def select_data(self, key):
+    def select_data(self, key: str):
         res = self.cur.execute("SELECT question, answer FROM cache_data WHERE id=?", (key, ))
         values = res.fetchone()
         # TODO batch asynchronous update
@@ -62,13 +63,13 @@ class SQLite(ScalarStore):
             datas = np.append(datas, row[0].reshape(1, -1), axis=0)
         return datas
 
-    def get_oldest_created_data(self, count):
+    def get_oldest_created_data(self, count: int):
         return self.cur.execute("SELECT id FROM cache_data ORDER BY created_at LIMIT ?", (count, ))
 
-    def get_least_accessed_data(self, count):
+    def get_least_accessed_data(self, count: int):
         return self.cur.execute("SELECT id FROM cache_data ORDER BY last_access_at LIMIT ?", (count, ))
 
-    def eviction(self, count):
+    def eviction(self, count: int):
         res = self.get_eviction_data_id(count)
         ids = []
         for row in res.fetchall():

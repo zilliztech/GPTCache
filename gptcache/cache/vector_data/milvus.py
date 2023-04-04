@@ -68,7 +68,7 @@ class Milvus(VectorStore):
                 kwargs.get("search_params", None) or self.default_search_params[self.index_params["index_type"]]
         )
 
-    def _create_collection(self, collection_name, create_new):
+    def _create_collection(self, collection_name: str, create_new: bool):
         if utility.has_collection(collection_name, using=self.alias) and create_new:
             utility.drop_collection(collection_name, using=self.alias)
 
@@ -118,7 +118,7 @@ class Milvus(VectorStore):
     def init(self, **kwargs):
         pass
 
-    def add(self, key, data: np.ndarray):
+    def add(self, key: str, data: np.ndarray):
         entities = [
             [key],
             data.reshape(1, self.dim)
@@ -147,7 +147,7 @@ class Milvus(VectorStore):
             search_tuples.append((pks[query_row["pk"]], np.array(query_row["embedding"])))
         return search_tuples
 
-    def delete(self, ids):
+    def delete(self, ids: list[str]):
         pks = ",".join(['"' + x + '"' for x in ids])
         self.col.delete(f"pk in [{pks}]")
 

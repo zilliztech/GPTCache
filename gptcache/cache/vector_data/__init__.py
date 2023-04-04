@@ -10,5 +10,5 @@ def Milvus(**kwargs):
     return milvus.Milvus(**kwargs)
 
 
-def Faiss(index_file_path, dimension, top_k, skip_file=False):
+def Faiss(index_file_path: str, dimension: int, top_k: int, skip_file=False):
     return faiss.Faiss(index_file_path, dimension, top_k, skip_file)

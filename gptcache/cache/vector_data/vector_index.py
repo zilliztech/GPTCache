@@ -8,13 +8,13 @@ class VectorIndex(metaclass=ABCMeta):
     def init(self, **kwargs): pass
 
     @abstractmethod
-    def add(self, key, data: np.ndarray): pass
+    def add(self, key: str, data: np.ndarray): pass
 
     @abstractmethod
     def search(self, data: np.ndarray): pass
 
     @abstractmethod
-    def rebuild_index(self, all_data): pass
+    def rebuild_index(self, all_data: list[any]): pass
 
     @abstractmethod
     def close(self): pass
