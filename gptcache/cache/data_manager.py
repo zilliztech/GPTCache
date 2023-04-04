@@ -1,4 +1,5 @@
 import hashlib
+import numpy as np
 from abc import abstractmethod, ABCMeta
 import pickle
 
@@ -66,6 +67,8 @@ class MapDataManager(DataManager):
 
 
 def sha_data(data):
+    if isinstance(data, list):
+        data = np.array(data)
     m = hashlib.sha1()
     m.update(data.astype('float32').tobytes())
     return m.hexdigest()

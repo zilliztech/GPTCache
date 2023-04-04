@@ -28,3 +28,12 @@ def import_faiss():
     except ModuleNotFoundError as e:  # pragma: no cover
         prompt_install('faiss-cpu==1.6.5')
         import faiss  # pylint: disable=ungrouped-imports
+
+
+def import_chromadb():
+    try:
+        # pylint: disable=unused-import
+        import chromadb
+    except ModuleNotFoundError as e:  # pragma: no cover
+        prompt_install('chromadb')
+        import chromadb  # pylint: disable=ungrouped-imports        
