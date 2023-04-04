@@ -90,9 +90,6 @@ More Docs：
 - **LLM Adapter**: The user interface to adapt different LLM model requests to the GPT cache protocol. 
     - [x]  Support OpenAI chatGPT API
     - [ ]  Support for other LLMs, such as Hugging Face Hub, Anthropic, and self-hosted models like LLaMa.
-- **Pre-processor**: Extracts the key information from the request and preprocess
-    - [x]  Basic analysis and parse of the request
-    - [ ]  Apply user-defined preprocessing logic.
 - **Encoder**: Embed the text into a dense vector for similarity search.
     - [x]  Use [towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model for English and uer/albert-base-chinese-cluecorpussmall for Chinese.
     - [x]  Use the OpenAI embedding API.
@@ -124,10 +121,11 @@ More Docs：
     - [ ]  Use [Chroma](https://www.trychroma.com/)
     - [ ]  Use [PGVector](https://github.com/pgvector/pgvector)
     - [ ]  Use other vector databases
-- **Eviction Policy**
-    - [x]  LRU eviction policy
-    - [x]  FIFO eviction policy
-    - [ ]  More complicated eviction policies
+- **Cache Manager**
+    - Eviction Policy
+        - [x]  LRU eviction policy
+        - [x]  FIFO eviction policy
+        - [ ]  More complicated eviction policies
 - **Similarity Evaluator**: Evaluate similarity by judging the quality of cached answers.
     - [x] Use the search distance, as described in `simple.py#pair_evaluation`.
     - [x] [Towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
