@@ -36,4 +36,13 @@ def import_chromadb():
         import chromadb
     except ModuleNotFoundError as e:  # pragma: no cover
         prompt_install('chromadb')
-        import chromadb  # pylint: disable=ungrouped-imports        
+        import chromadb  # pylint: disable=ungrouped-imports
+
+
+def import_qdrant_client():
+    try:
+        # pylint: disable=unused-import
+        import qdrant_client
+    except ModuleNotFoundError as e:  # pragma: no cover
+        prompt_install('qdrant-client')
+        import qdrant_client  # pylint: disable=ungrouped-imports

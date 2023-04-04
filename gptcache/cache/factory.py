@@ -1,6 +1,6 @@
 from .data_manager import DataManager, SSDataManager
 from .scalar_data.sqllite3 import SQLite
-from .vector_data import Milvus, Faiss, Chromadb
+from .vector_data import Milvus, Faiss, Chromadb, Qdrant
 from ..util.error import NotFoundStoreError, ParamError
 
 
@@ -58,6 +58,9 @@ def get_ss_data_manager(scalar_store: str, vector_store: str, **kwargs):
         _check_dimension(dimension)
         index_path = kwargs.pop("index_path", "faiss.index")
         vector = Faiss(index_path, dimension, top_k)
+    elif vector_store == "qdrant":
+        _check_dimension(dimension)
+        vector = Qdrant(dim=dimension, top_k=top_k, **kwargs)
     elif vector_store == "chromadb":
         vector = Chromadb(top_k=top_k, **kwargs)
     else:
