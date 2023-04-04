@@ -2,7 +2,7 @@
 
 ## 🤠 What is GPT Cache?
 
-[![](https://dcbadge.vercel.app/api/server/28EQnWZAgQ?compact=true&style=flat)](https://discord.gg/28EQnWZAgQ)
+[![](https://dcbadge.vercel.app/api/server/Q8C6WEjSWV?compact=true&style=flat)](https://discord.gg/Q8C6WEjSWV)
 
 Large Language Models (LLMs) are a promising and transformative technology that has rapidly advanced in recent years. These models are capable of generating natural language text and have numerous applications, including chatbots, language translation, and creative writing. However, as the size of these models increases, so do the costs and performance requirements needed to utilize them effectively. This has led to significant challenges in developing on top of large models such as ChatGPT.
 
