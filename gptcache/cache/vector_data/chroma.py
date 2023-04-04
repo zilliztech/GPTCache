@@ -2,8 +2,6 @@ from gptcache.util import import_chromadb
 import_chromadb()
 
 import chromadb
-from uuid import uuid4
-import numpy as np
 from .base import VectorBase, ClearStrategy
 
 
