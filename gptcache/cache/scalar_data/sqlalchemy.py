@@ -30,14 +30,6 @@ class CacheTable(Base):
 
 
 class SQLDataBase(ScalarStorage):
-    url_list = {
-        'sqlite': 'sqlite:///./gpt_cache.db',
-        'postgresql': 'postgresql+psycopg2://user:password@hostname:port/database_name',
-        'mysql': 'mysql+pymysql://user:password@hostname:port/database_name',
-        'mariadb': 'mariadb+pymysql://user:password@hostname:port/database_name',
-        'sqlserver': 'mssql+pyodbc://user:password@database_name',
-        'oracle': 'oracle+zxjdbc://user:password@hostname:port/database_name',
-    }
     """
     Using sqlalchemy to manage SQLite, PostgreSQL, MySQL, MariaDB, SQL Server and Oracle.
     """
