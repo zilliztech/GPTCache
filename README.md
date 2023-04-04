@@ -140,10 +140,6 @@ More Docs：
     - [x] For numpy arrays, use `linalg.norm`.
     - [ ] BM25 and other similarity measurements
     - [ ] Other deap learning models
-- **Post-processor**: Determine which cached answers to the user, and generate the response.
-    - [X] Choose the most similar answer.
-    - [X] Choose randomly.
-    - [ ] Other Probability-based policy 
 
 
 ## 😆 Contributing
