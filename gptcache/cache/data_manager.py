@@ -5,8 +5,7 @@ import pickle
 import cachetools
 
 from .scalar_data.scalar_store import ScalarStore
-from .vector_data.vector_store import VectorStore
-from .vector_data.vector_index import VectorIndex
+from .vector_data.base import VectorBase
 
 
 class DataManager(metaclass=ABCMeta):
@@ -75,7 +74,7 @@ def sha_data(data):
 # SSDataManager scalar store and vector store
 class SSDataManager(DataManager):
     s: ScalarStore
-    v: VectorStore
+    v: VectorBase
 
     def __init__(self, max_size, clean_size, s, v):
         self.max_size = max_size
@@ -115,7 +114,7 @@ class SSDataManager(DataManager):
 # SIDataManager scalar store and vector index
 class SIDataManager(DataManager):
     s: ScalarStore
-    v: VectorIndex
+    v: VectorBase
 
     def __init__(self, max_size, clean_size, s, v):
         self.max_size = max_size
@@ -134,7 +133,7 @@ class SIDataManager(DataManager):
             self.s.eviction(self.clean_size)
             all_data = self.s.select_all_embedding_data()
             self.cur_size = len(all_data)
-            self.v = self.v.rebuild_index(all_data)
+            self.v = self.v.delete(all_data)
         key = sha_data(embedding_data)
         self.s.insert(key, question, answer, embedding_data)
         self.v.add(key, embedding_data)

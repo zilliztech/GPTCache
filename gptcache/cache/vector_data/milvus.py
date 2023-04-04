@@ -3,7 +3,7 @@ import_pymilvus()
 
 from uuid import uuid4
 import numpy as np
-from .vector_store import VectorStore
+from .base import VectorBase
 from pymilvus import (
     connections,
     utility,
@@ -15,7 +15,7 @@ from pymilvus import (
 )
 
 
-class Milvus(VectorStore):
+class Milvus(VectorBase):
 
     def __init__(self, **kwargs):
         host = kwargs.get("host", "localhost")
@@ -115,10 +115,7 @@ class Milvus(VectorStore):
 
         self.col.load()
 
-    def init(self, **kwargs):
-        pass
-
-    def add(self, key, data: np.ndarray):
+    def add(self, key: str, data: np.ndarray):
         entities = [
             [key],
             data.reshape(1, self.dim)
