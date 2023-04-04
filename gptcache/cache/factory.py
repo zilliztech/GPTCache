@@ -1,4 +1,4 @@
-from .data_manager import DataManager, SIDataManager, SSDataManager
+from .data_manager import DataManager, SSDataManager
 from .scalar_data.sqllite3 import SQLite
 from .vector_data import Milvus, Faiss
 from ..util.error import NotFoundStoreError, ParamError
@@ -19,14 +19,6 @@ def get_data_manager(data_manager_name: str, **kwargs) -> DataManager:
         if scalar_store is None or vector_store is None:
             raise ParamError(f"Missing scalar_store or vector_store parameter for scalar_vector")
         return SSDataManager(max_size, clean_size, scalar_store, vector_store)
-    elif data_manager_name == "scalar_vector_index":
-        scalar_store = kwargs.pop("scalar_store", None)
-        vector_index = kwargs.pop("vector_index", None)
-        max_size = kwargs.pop("max_size", 1000)
-        clean_size = kwargs.pop("clean_size", int(max_size * 0.2))
-        if scalar_store is None or vector_index is None:
-            raise ParamError(f"Missing scalar_store or vector_index parameter for scalar_vector_index")
-        return SIDataManager(max_size, clean_size, scalar_store, vector_index)
     else:
         raise NotFoundStoreError("data manager", data_manager_name)
 
@@ -58,20 +50,9 @@ def get_ss_data_manager(scalar_store: str, vector_store: str, **kwargs):
     scalar = _get_scalar_store(scalar_store, **kwargs)
     if vector_store == "milvus":
         vector = Milvus(dim=dimension, top_k=top_k, **kwargs)
+    elif vector_store == "faiss":
+        index_path = kwargs.pop("index_path", "faiss.index")
+        vector = Faiss(index_path, dimension, top_k)        
     else:
         raise NotFoundStoreError("vector store", vector_store)
     return SSDataManager(max_size, clean_size, scalar, vector)
-
-
-# scalar_store + vector_index
-def get_si_data_manager(scalar_store: str, vector_index: str, **kwargs):
-    max_size, clean_size, dimension, top_k = _get_common_params(**kwargs)
-    store = _get_scalar_store(scalar_store, **kwargs)
-
-    if vector_index == "faiss":
-        index_path = kwargs.pop("index_path", "faiss.index")
-        index = Faiss(index_path, dimension, top_k)
-    else:
-        raise NotFoundStoreError("vector index", vector_index)
-
-    return SIDataManager(max_size, clean_size, store, index)

@@ -2,7 +2,7 @@ import atexit
 import os
 
 from gptcache.adapter import openai
-from gptcache.cache.factory import get_si_data_manager
+from gptcache.cache.factory import get_ss_data_manager
 from gptcache.core import cache, Config
 from gptcache.encoder import Towhee
 from gptcache.ranker.simple import pair_evaluation
@@ -25,7 +25,7 @@ def test_hint():
         os.remove(sqlite_file)
     if os.path.isfile(faiss_file):
         os.remove(faiss_file)
-    data_manager = get_si_data_manager("sqlite", "faiss",
+    data_manager = get_ss_data_manager("sqlite", "faiss",
                                        dimension=towhee.dimension(), max_size=2000)
 
     def log_time_func(func_name, delta_time):
@@ -60,7 +60,7 @@ def test_miss():
         os.remove(sqlite_file)
     if os.path.isfile(faiss_file):
         os.remove(faiss_file)
-    data_manager = get_si_data_manager("sqlite", "faiss",
+    data_manager = get_ss_data_manager("sqlite", "faiss",
                                        dimension=towhee.dimension(), max_size=2000)
 
     def log_time_func(func_name, delta_time):

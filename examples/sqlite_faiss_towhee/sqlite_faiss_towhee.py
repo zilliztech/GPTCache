@@ -3,7 +3,7 @@ import time
 
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
-from gptcache.cache.factory import get_si_data_manager
+from gptcache.cache.factory import get_ss_data_manager
 from gptcache.ranker.simple import pair_evaluation
 from gptcache.encoder import Towhee
 
@@ -16,7 +16,7 @@ def run():
     sqlite_file = "sqlite.db"
     faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
-    data_manager = get_si_data_manager("sqlite", "faiss",
+    data_manager = get_ss_data_manager("sqlite", "faiss",
                                        dimension=towhee.dimension(), max_size=2000)
 
     def log_time_func(func_name, delta_time):

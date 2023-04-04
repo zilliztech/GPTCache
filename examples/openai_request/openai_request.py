@@ -1,7 +1,7 @@
 import os
 import time
 
-from gptcache.cache.factory import get_data_manager, get_si_data_manager
+from gptcache.cache.factory import get_data_manager
 from gptcache.core import cache, Cache, Config
 from gptcache.encoder import Towhee
 from gptcache.ranker.simple import pair_evaluation
@@ -57,7 +57,7 @@ def run():
 
     # similarity test
     towhee = Towhee()
-    data_manager = get_si_data_manager("sqlite", "faiss",
+    data_manager = get_ss_data_manager("sqlite", "faiss",
                                        dimension=towhee.dimension(), max_size=2000)
     one_cache = Cache()
     one_cache.init(embedding_func=towhee.to_embeddings,

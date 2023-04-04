@@ -3,7 +3,7 @@ import_pymilvus()
 
 from uuid import uuid4
 import numpy as np
-from .base import VectorBase
+from .base import VectorBase, ClearStrategy
 from pymilvus import (
     connections,
     utility,
@@ -143,6 +143,9 @@ class Milvus(VectorBase):
         for query_row in query_result:
             search_tuples.append((pks[query_row["pk"]], np.array(query_row["embedding"])))
         return search_tuples
+
+    def clear_strategy(self):
+        return ClearStrategy.DELETE    
 
     def delete(self, ids):
         pks = ",".join(['"' + x + '"' for x in ids])
