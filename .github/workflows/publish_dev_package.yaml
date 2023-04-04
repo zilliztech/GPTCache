@@ -10,11 +10,13 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - '**'
 
 jobs:
   build-n-publish:
     name: Build and Publish GPTCache to TestPyPI
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
