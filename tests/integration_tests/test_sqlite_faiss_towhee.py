@@ -4,10 +4,10 @@ import os
 from gptcache.adapter import openai
 from gptcache.cache.factory import get_ss_data_manager
 from gptcache.core import cache, Config
-from gptcache.encoder import Towhee
-from gptcache.ranker.simple import SearchDistanceEvaluation
+from gptcache.embedding import Towhee
+from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
-sqlite_file = "sqlite.db"
+sqlite_file = "gptcache.db"
 faiss_file = "faiss.index"
 
 

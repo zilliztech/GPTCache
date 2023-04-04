@@ -1,7 +1,7 @@
 from .data_manager import DataManager, SSDataManager
 from .scalar_data import SQLDataBase, SQL_URL
 from .vector_data import Milvus, Faiss, Chromadb
-from ..util.error import NotFoundStoreError, ParamError
+from ..utils.error import NotFoundStoreError, ParamError
 
 
 def get_data_manager(data_manager_name: str, **kwargs) -> DataManager:

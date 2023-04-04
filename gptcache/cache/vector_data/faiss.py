@@ -1,4 +1,4 @@
-from gptcache.util import import_faiss
+from gptcache.utils import import_faiss
 import_faiss()
 
 import os

@@ -132,5 +132,7 @@ dmypy.json
 **/data_map**.txt
 **/faiss**.index
 **/sqlite**.db
+**/gpt_cache**.db
 **/example.py
 **/example.db
+**/.chroma

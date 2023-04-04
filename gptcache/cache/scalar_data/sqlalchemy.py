@@ -1,4 +1,4 @@
-from gptcache.util import import_sqlalchemy
+from gptcache.utils import import_sqlalchemy
 import_sqlalchemy()
 
 import numpy as np

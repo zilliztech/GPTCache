@@ -22,7 +22,7 @@ if [[ "$1" == "create" ]]; then
     conda activate "$env_name"
     echo "conda environment '$env_name' activated."
 elif [[ "$1" == "remove" ]]; then
-    conda deactivate "$env_name"
+    conda deactivate
     # 删除 conda 环境
     if [[ -n "$2" ]]; then
         env_name="$2"

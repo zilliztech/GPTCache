@@ -4,7 +4,7 @@ from chromadb.config import Settings
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.ranker.simple import pair_evaluation
+from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 import numpy as np
 
 
@@ -15,17 +15,16 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
-    sqlite_file = "sqlite.db"
+    sqlite_file = "gptcache.db"
     has_data = os.path.isfile(sqlite_file)
     # milvus
     data_manager = get_ss_data_manager("sqlite", "chromadb", max_size=8, clean_size=2, client_settings={})
 
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
-               evaluation_func=pair_evaluation,
+               similarity_evaluation=SearchDistanceEvaluation(),
                config=Config(
-                       similarity_threshold=10000,
-                       similarity_positive=False,
+                       similarity_threshold=0,
                    ),
                )
 

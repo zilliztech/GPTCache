@@ -1,4 +1,4 @@
-from gptcache.util import import_chromadb
+from gptcache.utils import import_chromadb
 import_chromadb()
 
 import chromadb

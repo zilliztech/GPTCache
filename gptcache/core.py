@@ -3,14 +3,14 @@ import os
 import time
 
 import openai
-from .encoder.string import to_embeddings as string_embedding
+from .embedding.string import to_embeddings as string_embedding
 from .cache.data_manager import DataManager
 from .cache.factory import get_data_manager
 from .processor.post import first
 from .processor.pre import last_content
-from .ranker.similarity_evaluation import SimilarityEvaluation
-from .ranker.string import AbsoluteEvaluation
-from .util.error import CacheError
+from .similarity_evaluation.similarity_evaluation import SimilarityEvaluation
+from .similarity_evaluation.string import AbsoluteEvaluation
+from .utils.error import CacheError
 
 
 def cache_all(*args, **kwargs):
