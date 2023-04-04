@@ -1,18 +1,19 @@
 import logging
-
+import copy
 from ..core import cache, time_cal
 from ..util.error import NotInitError
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
+    copy_kwargs = copy.deepcopy(kwargs)
     chat_cache = kwargs.pop("cache_obj", cache)
     if not chat_cache.has_init:
         raise NotInitError()
     cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
-    context = kwargs.get("cache_context", {})
+    context = kwargs.pop("cache_context", {})
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
-    cache_skip = kwargs.get("cache_skip", False)
+    cache_skip = kwargs.pop("cache_skip", False)
     pre_embedding_data = chat_cache.pre_embedding_func(kwargs,
                                                        extra_param=context.get("pre_embedding_func", None))
     if cache_enable and not cache_skip:
@@ -51,6 +52,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
 
     next_cache = chat_cache.next_cache
     if next_cache:
+        kwargs = copy_kwargs
         kwargs["cache_obj"] = next_cache
         llm_data = adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
     else:
