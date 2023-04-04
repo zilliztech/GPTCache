@@ -3,37 +3,44 @@ __all__ = ['import_pymilvus', 'import_towhee', 'import_faiss']
 from .dependency_control import prompt_install
 
 
+# pylint: disable=unused-import
+# pylint: disable=ungrouped-imports
+# pragma: no cover
 def import_pymilvus():
     try:
-        # pylint: disable=unused-import
         import pymilvus
-    except ModuleNotFoundError as e:  # pragma: no cover
+    except ModuleNotFoundError as e:
         prompt_install('pymilvus')
-        import pymilvus  # pylint: disable=ungrouped-imports
+        import pymilvus
 
 
 def import_towhee():
     try:
-        # pylint: disable=unused-import
         import towhee
-    except ModuleNotFoundError as e:  # pragma: no cover
+    except ModuleNotFoundError as e:
         prompt_install('towhee==0.9.0')
-        import towhee  # pylint: disable=ungrouped-imports
+        import towhee
 
 
 def import_faiss():
     try:
-        # pylint: disable=unused-import
         import faiss
-    except ModuleNotFoundError as e:  # pragma: no cover
+    except ModuleNotFoundError as e:
         prompt_install('faiss-cpu==1.6.5')
-        import faiss  # pylint: disable=ungrouped-imports
+        import faiss
 
 
 def import_chromadb():
     try:
-        # pylint: disable=unused-import
         import chromadb
-    except ModuleNotFoundError as e:  # pragma: no cover
+    except ModuleNotFoundError as e:
         prompt_install('chromadb')
-        import chromadb  # pylint: disable=ungrouped-imports        
+        import chromadb
+
+
+def import_sqlalchemy():
+    try:
+        import sqlalchemy
+    except ModuleNotFoundError as e:
+        prompt_install('sqlalchemy')
+        import sqlalchemy

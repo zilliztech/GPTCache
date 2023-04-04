@@ -1,5 +1,5 @@
 from .data_manager import DataManager, SSDataManager
-from .scalar_data.sqllite3 import SQLite
+from .scalar_data.sqlalchemy import SQLDataBase
 from .vector_data import Milvus, Faiss, Chromadb
 from ..util.error import NotFoundStoreError, ParamError
 
@@ -24,10 +24,9 @@ def get_data_manager(data_manager_name: str, **kwargs) -> DataManager:
 
 
 def _get_scalar_store(scalar_store: str, **kwargs):
-    if scalar_store == "sqlite":
-        sqlite_path = kwargs.pop("sqlite_path", "sqlite.db")
-        eviction_strategy = kwargs.pop("eviction_strategy", "least_accessed_data")
-        store = SQLite(sqlite_path, eviction_strategy)
+    if scalar_store in ["sqlite", "postgresql", "mysql", "mariadb", "sqlserver", "oracle"]:
+        sql_url = kwargs.pop("sql_url", SQLDataBase.url_list[scalar_store])
+        store = SQLDataBase(sql_url)
     else:
         raise NotFoundStoreError("scalar store", scalar_store)
     return store

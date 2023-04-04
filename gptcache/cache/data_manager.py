@@ -1,13 +1,12 @@
 import hashlib
-import numpy as np
 from abc import abstractmethod, ABCMeta
 import pickle
-
 import cachetools
 import numpy as np
 
-from .scalar_data.scalar_store import ScalarStore
+from .scalar_data.base import ScalarStorage
 from .vector_data.base import VectorBase, ClearStrategy
+from .eviction import EvictionManager
 from ..util.error import CacheError
 
 
@@ -84,7 +83,7 @@ def normalize(vec):
 
 
 class SSDataManager(DataManager):
-    s: ScalarStore
+    s: ScalarStorage
     v: VectorBase
 
     def __init__(self, max_size, clean_size, s, v):
@@ -93,6 +92,7 @@ class SSDataManager(DataManager):
         self.clean_size = clean_size
         self.s = s
         self.v = v
+        self.eviction = EvictionManager(s, v)
 
     def init(self, **kwargs):
         self.s.init(**kwargs)
@@ -100,31 +100,31 @@ class SSDataManager(DataManager):
         self.cur_size = self.s.count()
 
     def _clear(self):
-        if self.v.clear_strategy() == ClearStrategy.DELETE:
-            ids = self.s.eviction(self.clean_size)
-            self.cur_size = self.s.count()
-            self.v.delete(ids)
+        self.eviction.soft_evict(self.clean_size)
+        if not self.eviction.check_evict():
+            pass
+        elif self.v.clear_strategy() == ClearStrategy.DELETE:
+            self.eviction.delete()
         elif self.v.clear_strategy() == ClearStrategy.REBUILD:
-            self.s.eviction(self.clean_size)
-            all_data = self.s.select_all_embedding_data()
-            self.cur_size = len(all_data)
-            self.v.rebuild(all_data)
+            self.eviction.rebuild()
         else:
-            raise RuntimeError('Unkown clear strategy')
+            raise RuntimeError('Unknown clear strategy')
+        self.cur_size = self.s.count()
 
     def save(self, question, answer, embedding_data, **kwargs):
         if self.cur_size >= self.max_size:
             self._clear()
         embedding_data = normalize(embedding_data)
         key = sha_data(embedding_data)
-        self.s.insert(key, question, answer, embedding_data)
+        self.s.insert(key, question, answer, embedding_data.astype('float32'))
         self.v.add(key, embedding_data)
         self.cur_size += 1
 
     def get_scalar_data(self, search_data, **kwargs):
         distance, vector_data = search_data
         key = sha_data(vector_data)
-        return self.s.select_data(key)
+        self.s.update_access_time(key)
+        return self.s.get_data_by_id(key)
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)
