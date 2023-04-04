@@ -1,4 +1,4 @@
-name: Test on pull request
+name: Integration test on pull request
 
 on:
   push:
@@ -22,12 +22,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-gpt-cache-cli-main:
+  integration-test-gpt-cache-cli-main:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        data_manager_mode: [map, sqlite_faiss_mock, sqlite_faiss_towhee]
     steps:
       - uses: actions/checkout@main
 
@@ -47,9 +45,15 @@ jobs:
         run: |
           python setup.py install
 
-      - name: Run examples
+      - name: Install test dependency
+        shell: bash
+        working-directory: tests
+        run: |
+          pip install -r requirements.txt
+
+      - name: Integration Tests
         timeout-minutes: 10
         shell: bash
-        working-directory: examples/${{ matrix.data_manager_mode }}
+        working-directory: tests/integration_tests
         run: |
-          python ${{ matrix.data_manager_mode }}.py
+          python3 -m pytest ./
