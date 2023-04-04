@@ -31,8 +31,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         similarity_positive = chat_cache.config.similarity_positive
         similarity_threshold = chat_cache.config.similarity_threshold
         for cache_data in cache_data_list:
-            cache_question, cache_answer = chat_cache.data_manager.get_scalar_data(
+            ret = chat_cache.data_manager.get_scalar_data(
                 cache_data, extra_param=context.get('get_scalar_data', None))
+            if ret is None:
+                continue
+            cache_question, cache_answer = ret
             rank = chat_cache.evaluation_func({
                     "question": pre_embedding_data,
                     "embedding": embedding_data,

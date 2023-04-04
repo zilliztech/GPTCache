@@ -5,8 +5,7 @@ import pickle
 import cachetools
 
 from .scalar_data.scalar_store import ScalarStore
-from .vector_data.vector_store import VectorStore
-from .vector_data.vector_index import VectorIndex
+from .vector_data.base import VectorBase, ClearStrategy
 
 
 class DataManager(metaclass=ABCMeta):
@@ -72,10 +71,9 @@ def sha_data(data):
     return m.hexdigest()
 
 
-# SSDataManager scalar store and vector store
 class SSDataManager(DataManager):
     s: ScalarStore
-    v: VectorStore
+    v: VectorBase
 
     def __init__(self, max_size, clean_size, s, v):
         self.max_size = max_size
@@ -89,52 +87,22 @@ class SSDataManager(DataManager):
         self.v.init(**kwargs)
         self.cur_size = self.s.count()
 
-    def save(self, question, answer, embedding_data, **kwargs):
-        if self.cur_size >= self.max_size:
+    def _clear(self):
+        if self.v.clear_strategy() == ClearStrategy.DELETE:
             ids = self.s.eviction(self.clean_size)
             self.cur_size = self.s.count()
-            self.v.delete(ids)
-        key = sha_data(embedding_data)
-        self.s.insert(key, question, answer, embedding_data)
-        self.v.add(key, embedding_data)
-        self.cur_size += 1
-
-    def get_scalar_data(self, search_data, **kwargs):
-        distance, vector_data = search_data
-        key = sha_data(vector_data)
-        return self.s.select_data(key)
-
-    def search(self, embedding_data, **kwargs):
-        return self.v.search(embedding_data)
-
-    def close(self):
-        self.s.close()
-        self.v.close()
-
-
-# SIDataManager scalar store and vector index
-class SIDataManager(DataManager):
-    s: ScalarStore
-    v: VectorIndex
-
-    def __init__(self, max_size, clean_size, s, v):
-        self.max_size = max_size
-        self.cur_size = 0
-        self.clean_size = clean_size
-        self.s = s
-        self.v = v
-
-    def init(self, **kwargs):
-        self.s.init(**kwargs)
-        self.v.init(**kwargs)
-        self.cur_size = self.s.count()
-
-    def save(self, question, answer, embedding_data, **kwargs):
-        if self.cur_size >= self.max_size:
+            self.v.delete(ids)            
+        elif self.v.clear_strategy() == ClearStrategy.REBUILD:
             self.s.eviction(self.clean_size)
             all_data = self.s.select_all_embedding_data()
             self.cur_size = len(all_data)
-            self.v = self.v.rebuild_index(all_data)
+            self.v.rebuild(all_data)
+        else:
+            raise RuntimeError('Unkown clear strategy')
+
+    def save(self, question, answer, embedding_data, **kwargs):
+        if self.cur_size >= self.max_size:
+            self._clear()
         key = sha_data(embedding_data)
         self.s.insert(key, question, answer, embedding_data)
         self.v.add(key, embedding_data)
