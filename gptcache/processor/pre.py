@@ -11,3 +11,7 @@ def all_content(data, **kwargs):
         else:
             s += message["content"] + "\n"
     return s
+
+
+def nop(data, **kwargs):
+    return data

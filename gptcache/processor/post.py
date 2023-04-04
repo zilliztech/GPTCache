@@ -7,3 +7,7 @@ def random_one(messages):
 
 def first(messages):
     return messages[0]
+
+
+def nop(message):
+    return message
