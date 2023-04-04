@@ -12,6 +12,7 @@ on:
       - main
     paths:
       - '**'
+      - '.github/workflows/publish_dev_package.yaml'
 
 jobs:
   build-n-publish:
