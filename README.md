@@ -128,7 +128,7 @@ More Docs：
     - [x]  LRU eviction policy
     - [x]  FIFO eviction policy
     - [ ]  More complicated eviction policies
-- **Ranker**: Evaluate similarity by judging the quality of cached answers.
+- **Similarity Evaluator**: Evaluate similarity by judging the quality of cached answers.
     - [x] Use the search distance, as described in `simple.py#pair_evaluation`.
     - [x] [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
     - [x] Exact string comparison, judge the cache request and the original request based on the exact match of characters.
