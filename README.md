@@ -1,6 +1,6 @@
 # GPT Cache
 
-[![test](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
+[![Test](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![](https://dcbadge.vercel.app/api/server/28EQnWZAgQ?compact=true&style=flat)](https://discord.gg/28EQnWZAgQ)
 
