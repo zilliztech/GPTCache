@@ -4,9 +4,11 @@ from abc import abstractmethod, ABCMeta
 import pickle
 
 import cachetools
+import numpy as np
 
 from .scalar_data.scalar_store import ScalarStore
 from .vector_data.base import VectorBase, ClearStrategy
+from ..util.error import CacheError
 
 
 class DataManager(metaclass=ABCMeta):
@@ -41,9 +43,10 @@ class MapDataManager(DataManager):
             self.data = pickle.load(f)
             f.close()
         except FileNotFoundError:
-            print(f'File <${self.data_path}> is not found.')
+            # print(f'File <${self.data_path}> is not found.')
+            return
         except PermissionError:
-            print(f'You don\'t have permission to access this file <${self.data_path}>.')
+            raise CacheError(f'You don\'t have permission to access this file <${self.data_path}>.')
 
     def save(self, question, answer, embedding_data, **kwargs):
         self.data[embedding_data] = (question, answer)
@@ -74,6 +77,12 @@ def sha_data(data):
     return m.hexdigest()
 
 
+def normalize(vec):
+    magnitude = np.linalg.norm(vec)
+    normalized_v = vec / magnitude
+    return normalized_v
+
+
 class SSDataManager(DataManager):
     s: ScalarStore
     v: VectorBase
@@ -94,7 +103,7 @@ class SSDataManager(DataManager):
         if self.v.clear_strategy() == ClearStrategy.DELETE:
             ids = self.s.eviction(self.clean_size)
             self.cur_size = self.s.count()
-            self.v.delete(ids)            
+            self.v.delete(ids)
         elif self.v.clear_strategy() == ClearStrategy.REBUILD:
             self.s.eviction(self.clean_size)
             all_data = self.s.select_all_embedding_data()
@@ -106,6 +115,7 @@ class SSDataManager(DataManager):
     def save(self, question, answer, embedding_data, **kwargs):
         if self.cur_size >= self.max_size:
             self._clear()
+        embedding_data = normalize(embedding_data)
         key = sha_data(embedding_data)
         self.s.insert(key, question, answer, embedding_data)
         self.v.add(key, embedding_data)
@@ -117,6 +127,7 @@ class SSDataManager(DataManager):
         return self.s.select_data(key)
 
     def search(self, embedding_data, **kwargs):
+        embedding_data = normalize(embedding_data)
         return self.v.search(embedding_data)
 
     def close(self):

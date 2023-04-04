@@ -8,7 +8,9 @@ from .cache.data_manager import DataManager
 from .cache.factory import get_data_manager
 from .processor.post import first
 from .processor.pre import last_content
-from .ranker.string import absolute_evaluation
+from .ranker.similarity_evaluation import SimilarityEvaluation
+from .ranker.string import AbsoluteEvaluation
+from .util.error import CacheError
 
 
 def cache_all(*args, **kwargs):
@@ -30,14 +32,15 @@ def time_cal(func, func_name=None, report_func=None):
 
 
 class Config:
+
     def __init__(self,
                  log_time_func=None,
                  similarity_threshold=0.5,
-                 similarity_positive=True,
                  ):
+        if similarity_threshold < 0 or similarity_threshold > 1:
+            raise CacheError("Invalid the similarity threshold param")
         self.log_time_func = log_time_func
         self.similarity_threshold = similarity_threshold
-        self.similarity_positive = similarity_positive
 
 
 class Report:
@@ -67,6 +70,8 @@ class Report:
 
 
 class Cache:
+    similarity_evaluation: SimilarityEvaluation
+
     # it should be called when start the cache system
     def __init__(self):
         self.has_init = False
@@ -74,7 +79,6 @@ class Cache:
         self.pre_embedding_func = None
         self.embedding_func = None
         self.data_manager = None
-        self.evaluation_func = None
         self.post_process_messages_func = None
         self.config = None
         self.report = Report()
@@ -85,7 +89,7 @@ class Cache:
              pre_embedding_func=last_content,
              embedding_func=string_embedding,
              data_manager: DataManager = get_data_manager("map"),
-             evaluation_func=absolute_evaluation,
+             similarity_evaluation=AbsoluteEvaluation(),
              post_process_messages_func=first,
              config=Config(),
              next_cache=None,
@@ -96,7 +100,7 @@ class Cache:
         self.pre_embedding_func = pre_embedding_func
         self.embedding_func = embedding_func
         self.data_manager: DataManager = data_manager
-        self.evaluation_func = evaluation_func
+        self.similarity_evaluation = similarity_evaluation
         self.post_process_messages_func = post_process_messages_func
         self.data_manager.init(**kwargs)
         self.config = config

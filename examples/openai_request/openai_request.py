@@ -1,10 +1,10 @@
 import os
 import time
 
-from gptcache.cache.factory import get_data_manager
+from gptcache.cache.factory import get_data_manager, get_ss_data_manager
 from gptcache.core import cache, Cache, Config
 from gptcache.encoder import Towhee
-from gptcache.ranker.simple import pair_evaluation
+from gptcache.ranker.simple import SearchDistanceEvaluation
 from gptcache.adapter import openai
 
 
@@ -62,11 +62,7 @@ def run():
     one_cache = Cache()
     one_cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
-                   evaluation_func=pair_evaluation,
-                   config=Config(
-                       similarity_threshold=1,
-                       similarity_positive=False,
-                        ),
+                   similarity_evaluation=SearchDistanceEvaluation(),
                    )
 
     question1 = "what do you think about chatgpt"

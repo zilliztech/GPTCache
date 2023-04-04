@@ -7,7 +7,7 @@ from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
 from gptcache.ranker import Towhee as EvaluationTowhee
 from gptcache.encoder import Towhee as EmbeddingTowhee
-from gptcache.ranker.simple import pair_evaluation
+from gptcache.ranker.simple import SearchDistanceEvaluation
 
 
 def run():
@@ -21,16 +21,26 @@ def run():
     # it will make the results more accurate, but the cache hit rate will decrease
 
     # evaluation_towhee = EvaluationTowhee()
-    # def sf_evaluation(src_dict, cache_dict, **kwargs):
-    #     rank1 = pair_evaluation(src_dict, cache_dict, **kwargs)
-    #     return rank1
-    #     if rank1 <= 0.5:
-    #         rank2 = evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
-    #         return rank2 if rank2 != 0 else 1
-    #     return 0
+    # class WrapEvaluation(SearchDistanceEvaluation):
+    #
+    #     def __init__(self):
+    #         self.evaluation_towhee = EvaluationTowhee()
+    #
+    #     def evaluation(self, src_dict, cache_dict, **kwargs):
+    #         rank1 = super().evaluation(src_dict, cache_dict, **kwargs)
+    #         if rank1 <= 0.5:
+    #             rank2 = evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
+    #             return rank2 if rank2 != 0 else 1
+    #
+    #     def range(self):
+    #         return 0.0, 1.0
 
-    def sf_evaluation(src_dict, cache_dict, **kwargs):
-        return pair_evaluation(src_dict, cache_dict, **kwargs)
+    class WrapEvaluation(SearchDistanceEvaluation):
+        def evaluation(self, src_dict, cache_dict, **kwargs):
+            return super().evaluation(src_dict, cache_dict, **kwargs)
+
+        def range(self):
+            return 0.0, 1.0
 
     sqlite_file = "sqlite.db"
     faiss_file = "faiss.index"
@@ -39,11 +49,7 @@ def run():
     data_manager = get_ss_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension(), max_size=100000)
     cache.init(embedding_func=embedding_towhee.to_embeddings,
                data_manager=data_manager,
-               evaluation_func=sf_evaluation,
-               config=Config(
-                   similarity_threshold=0.5,
-                   similarity_positive=True,
-                    ),
+               similarity_evaluation=WrapEvaluation(),
                )
 
     i = 0
