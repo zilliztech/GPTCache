@@ -1,6 +1,6 @@
 from .data_manager import DataManager, SSDataManager
 from .scalar_data.sqllite3 import SQLite
-from .vector_data import Milvus, Faiss
+from .vector_data import Milvus, Faiss, Chromadb
 from ..util.error import NotFoundStoreError, ParamError
 
 
@@ -38,10 +38,13 @@ def _get_common_params(**kwargs):
     clean_size = kwargs.pop("clean_size", int(max_size * 0.2))
     top_k = kwargs.pop("top_k", 1)
     dimension = kwargs.pop("dimension", 0)
+    return max_size, clean_size, dimension, top_k
+
+
+def _check_dimension(dimension):
     if dimension <= 0:
         raise ParamError(f"the data manager should set the 'dimension' parameter greater than zero, "
                          f"current: {dimension}")
-    return max_size, clean_size, dimension, top_k
 
 
 # scalar_store + vector_store
@@ -49,10 +52,14 @@ def get_ss_data_manager(scalar_store: str, vector_store: str, **kwargs):
     max_size, clean_size, dimension, top_k = _get_common_params(**kwargs)
     scalar = _get_scalar_store(scalar_store, **kwargs)
     if vector_store == "milvus":
+        _check_dimension(dimension)
         vector = Milvus(dim=dimension, top_k=top_k, **kwargs)
     elif vector_store == "faiss":
+        _check_dimension(dimension)
         index_path = kwargs.pop("index_path", "faiss.index")
-        vector = Faiss(index_path, dimension, top_k)        
+        vector = Faiss(index_path, dimension, top_k)
+    elif vector_store == "chromadb":
+        vector = Chromadb(top_k=top_k, **kwargs)
     else:
         raise NotFoundStoreError("vector store", vector_store)
     return SSDataManager(max_size, clean_size, scalar, vector)
