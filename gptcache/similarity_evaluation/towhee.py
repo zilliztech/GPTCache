@@ -9,7 +9,7 @@ class Towhee(SimilarityEvaluation):
     def __init__(self):
         self._pipe = (
             pipe.input('text', 'candidate')
-                .map(('text', 'candidate'), 'similarity', ops.towhee.albert_duplicate())
+                .map(('text', 'candidate'), 'similarity', ops.towhee.albert_duplicate_onnx())
                 .output('similarity')
         )
 

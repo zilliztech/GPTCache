@@ -11,7 +11,7 @@ from gptcache.embedding import Towhee
 def run():
     towhee = Towhee()
     # chinese model
-    # towhee = Towhee(model="uer/albert-base-chinese-cluecorpussmall")
+    # towhee = Towhee(model="uer/albert-base-chinese-cluecorpussmall-onnx")
 
     sqlite_file = "gptcache.db"
     faiss_file = "faiss.index"
