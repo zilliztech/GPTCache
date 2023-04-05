@@ -53,6 +53,7 @@ pull_request_rules:
   - name: Test passed for code changed
     conditions:
       - base=main
+      - "status-success=Build GPTCache PYPI Package"
       - "status-success=integration-test-gpt-cache-cli-main"
       - "status-success=test-gpt-cache-cli-main (map, 3.8)"
       - "status-success=unit-test-main"
@@ -80,6 +81,7 @@ pull_request_rules:
     conditions:
       - base=main
       - or:
+        - "status-success!=Build GPTCache PYPI Package"
         - "status-success!=integration-test-gpt-cache-cli-main"
         - "status-success!=test-gpt-cache-cli-main (map, 3.8)"
         - "status-success!=unit-test-main"
