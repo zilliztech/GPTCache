@@ -1,6 +1,9 @@
 import atexit
 import os
 import pytest
+from base.client_base import Base
+from utils.util_log import test_log as log
+from common import common_func as cf
 
 from gptcache.adapter import openai
 from gptcache.cache.factory import get_ss_data_manager
@@ -8,19 +11,8 @@ from gptcache.core import cache, Config
 from gptcache.embedding import Towhee
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
-sqlite_file = "gptcache.db"
-faiss_file = "faiss.index"
 
-
-@atexit.register
-def remove_file():
-    if os.path.isfile(sqlite_file):
-        os.remove(sqlite_file)
-    if os.path.isfile(faiss_file):
-        os.remove(faiss_file)
-
-
-class TestSqliteInvalid:
+class TestSqliteInvalid(Base):
 
     """
     ******************************************************************
@@ -29,6 +21,7 @@ class TestSqliteInvalid:
     """
 
     @pytest.mark.parametrize("threshold", [-1, 2, 2.0, '0.5'])
+    @pytest.mark.tags("L1")
     def test_invalid_similarity_threshold(self, threshold):
         """
         target: test init: invalid similarity threshold
@@ -36,32 +29,25 @@ class TestSqliteInvalid:
         expected: raise exception and report the error
         """
         towhee = Towhee()
-        if os.path.isfile(sqlite_file):
-            os.remove(sqlite_file)
-        if os.path.isfile(faiss_file):
-            os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension, max_size=2000)
-
-        def log_time_func(func_name, delta_time):
-            print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
-
+                                            dimension=towhee.dimension, max_size=2000)
         is_exception = False
         try:
             cache.init(embedding_func=towhee.to_embeddings,
                        data_manager=data_manager,
                        similarity_evaluation=SearchDistanceEvaluation,
                        config=Config(
-                           log_time_func=log_time_func,
+                           log_time_func=cf.log_time_func,
                            similarity_threshold=threshold,
                        ),
                        )
         except Exception as e:
-            print(e)
+            log.info(e)
             is_exception = True
 
         assert is_exception
 
+    @pytest.mark.tags("L1")
     def test_no_openai_key(self):
         """
         target: test no openai key when could not hit in cache
@@ -69,21 +55,13 @@ class TestSqliteInvalid:
         expected: raise exception and report the error
         """
         towhee = Towhee()
-        if os.path.isfile(sqlite_file):
-            os.remove(sqlite_file)
-        if os.path.isfile(faiss_file):
-            os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension, max_size=2000)
-
-        def log_time_func(func_name, delta_time):
-            print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
-
+                                            dimension=towhee.dimension, max_size=2000)
         cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation,
                    config=Config(
-                       log_time_func=log_time_func,
+                       log_time_func=cf.log_time_func,
                        similarity_threshold=1,
                    ),
                    )
@@ -98,12 +76,13 @@ class TestSqliteInvalid:
                 ],
             )
         except Exception as e:
+            log.info(e)
             is_exception = True
 
         assert is_exception
 
 
-class TestSqliteFaiss:
+class TestSqliteFaiss(Base):
 
     """
     ******************************************************************
@@ -111,6 +90,7 @@ class TestSqliteFaiss:
     ******************************************************************
     """
 
+    @pytest.mark.tags("L1")
     def test_hit_default(self):
         """
         target: test hit the cache function
@@ -119,21 +99,13 @@ class TestSqliteFaiss:
         """
 
         towhee = Towhee()
-        if os.path.isfile(sqlite_file):
-            os.remove(sqlite_file)
-        if os.path.isfile(faiss_file):
-            os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension, max_size=2000)
-
-        def log_time_func(func_name, delta_time):
-            print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
-
+                                            dimension=towhee.dimension, max_size=2000)
         cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation(),
                    config=Config(
-                       log_time_func=log_time_func,
+                       log_time_func=cf.log_time_func,
                    ),
                    )
 
@@ -149,6 +121,7 @@ class TestSqliteFaiss:
             ],
         )
 
+    @pytest.mark.tags("L1")
     def test_hit(self):
         """
         target: test hit the cache function
@@ -157,21 +130,13 @@ class TestSqliteFaiss:
         """
 
         towhee = Towhee()
-        if os.path.isfile(sqlite_file):
-            os.remove(sqlite_file)
-        if os.path.isfile(faiss_file):
-            os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension, max_size=2000)
-
-        def log_time_func(func_name, delta_time):
-            print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
-
+                                            dimension=towhee.dimension, max_size=2000)
         cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation(),
                    config=Config(
-                       log_time_func=log_time_func,
+                       log_time_func=cf.log_time_func,
                        similarity_threshold=0.8,
                    ),
                    )
@@ -188,6 +153,7 @@ class TestSqliteFaiss:
             ],
         )
 
+    @pytest.mark.tags("L1")
     def test_miss(self):
         """
         target: test miss the cache function
@@ -195,21 +161,13 @@ class TestSqliteFaiss:
         expected: raise exception and report the error
         """
         towhee = Towhee()
-        if os.path.isfile(sqlite_file):
-            os.remove(sqlite_file)
-        if os.path.isfile(faiss_file):
-            os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension, max_size=2000)
-
-        def log_time_func(func_name, delta_time):
-            print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
-
+                                            dimension=towhee.dimension, max_size=2000)
         cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation,
                    config=Config(
-                       log_time_func=log_time_func,
+                       log_time_func=cf.log_time_func,
                        similarity_threshold=0,
                    ),
                    )
@@ -228,10 +186,49 @@ class TestSqliteFaiss:
                 ],
             )
         except Exception as e:
+            log.info(e)
             is_exception = True
 
         assert is_exception
 
+    @pytest.mark.tags("L1")
+    def test_disable_cache(self):
+        """
+        target: test cache not enabled
+        method: set cache enable as false
+        expected: hit successfully
+        """
+
+        towhee = Towhee()
+        data_manager = get_ss_data_manager("sqlite", "faiss",
+                                            dimension=towhee.dimension, max_size=2000)
+        cache.init(cache_enable_func=cf.disable_cache,
+                   embedding_func=towhee.to_embeddings,
+                   data_manager=data_manager,
+                   similarity_evaluation=SearchDistanceEvaluation(),
+                   config=Config(
+                       log_time_func=cf.log_time_func,
+                   ),
+                   )
+
+        question = "what do you think about chatgpt"
+        answer = "chatgpt is a good application"
+        cache.data_manager.save(question, answer, cache.embedding_func(question))
+
+        is_exception = False
+        try:
+            openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": "what do you feel like chatgpt"}
+                ],
+            )
+        except Exception as e:
+            log.info(e)
+            is_exception = True
+
+        assert is_exception
 
 
 
