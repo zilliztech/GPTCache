@@ -12,10 +12,10 @@ class Towhee:
     Example:
         .. code-block:: python
         
-            from gptcache.embedding import towhee
+            from gptcache.embedding import Towhee
             
             test_sentence = "Hello, world." 
-            encoder = towhee(model="paraphrase-albert-small-v2")
+            encoder = Towhee(model="paraphrase-albert-small-v2")
             embed = encoder.to_embeddings(test_sentence)
     """
     def __init__(self, model = "paraphrase-albert-small-v2-onnx"):
@@ -50,5 +50,6 @@ class Towhee:
         emb = self._pipe(data).get_dict()['vec']
         return np.array(emb).astype('float32')
 
+    @property
     def dimension(self):
         return self.__dimension

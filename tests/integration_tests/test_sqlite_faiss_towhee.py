@@ -41,7 +41,7 @@ class TestSqliteInvalid:
         if os.path.isfile(faiss_file):
             os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension(), max_size=2000)
+                                           dimension=towhee.dimension, max_size=2000)
 
         def log_time_func(func_name, delta_time):
             print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
@@ -74,7 +74,7 @@ class TestSqliteInvalid:
         if os.path.isfile(faiss_file):
             os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension(), max_size=2000)
+                                           dimension=towhee.dimension, max_size=2000)
 
         def log_time_func(func_name, delta_time):
             print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
@@ -124,7 +124,7 @@ class TestSqliteFaiss:
         if os.path.isfile(faiss_file):
             os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension(), max_size=2000)
+                                           dimension=towhee.dimension, max_size=2000)
 
         def log_time_func(func_name, delta_time):
             print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
@@ -162,7 +162,7 @@ class TestSqliteFaiss:
         if os.path.isfile(faiss_file):
             os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension(), max_size=2000)
+                                           dimension=towhee.dimension, max_size=2000)
 
         def log_time_func(func_name, delta_time):
             print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
@@ -200,7 +200,7 @@ class TestSqliteFaiss:
         if os.path.isfile(faiss_file):
             os.remove(faiss_file)
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                           dimension=towhee.dimension(), max_size=2000)
+                                           dimension=towhee.dimension, max_size=2000)
 
         def log_time_func(func_name, delta_time):
             print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))

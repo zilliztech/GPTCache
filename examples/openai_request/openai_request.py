@@ -58,7 +58,7 @@ def run():
     # similarity test
     towhee = Towhee()
     data_manager = get_ss_data_manager("sqlite", "faiss",
-                                       dimension=towhee.dimension(), max_size=2000)
+                                       dimension=towhee.dimension, max_size=2000)
     one_cache = Cache()
     one_cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
