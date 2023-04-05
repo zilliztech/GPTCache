@@ -37,7 +37,7 @@ class Cohere:
         :param data: text in string.
         :type data: str
 
-        :return: a text embedding in shape of (dim,).e
+        :return: a text embedding in shape of (dim,).
         """
         if not isinstance(data, list):
             data = [data]
@@ -50,7 +50,6 @@ class Cohere:
         """Embedding dimension.
 
         :return: embedding dimension
-        :type: int
         """
         if not self.__dimension:
             foo_emb = self.to_embeddings("foo")

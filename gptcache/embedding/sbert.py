@@ -31,7 +31,7 @@ class SBERT:
         :param data: text in string.
         :type data: str
 
-        :return `numpy.ndarray`: a text embedding in shape of (dim,).
+        :return: a text embedding in shape of (dim,).
         """
         if not isinstance(data, list):
             data = [data]
@@ -45,7 +45,7 @@ class SBERT:
     def dimension(self):
         """Embedding dimension.
 
-        :return `int`: embedding dimension
+        :return: embedding dimension
         """
         if not self.__dimension:
             self.__dimension == self.to_embeddings("foo")

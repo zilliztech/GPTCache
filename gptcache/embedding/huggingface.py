@@ -40,7 +40,7 @@ class Huggingface:
         """Generate embedding given text input
 
         :param data: text in string.
-        :type: str
+        :type data: str
 
         :return: a text embedding in shape of (dim,).
         """

@@ -1,5 +1,5 @@
-GPTCache Embedding
-==================
+Embedding
+=========
 
 GPTCache wraps different embedding methods.
 
