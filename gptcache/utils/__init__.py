@@ -1,8 +1,9 @@
 __all__ = ['import_pymilvus', 'import_towhee',
            'import_faiss', 'import_chromadb',
            'import_sqlalchemy', 'import_sql_client',
-           'import_huggingface', 'import_torch'
-           'import_sbert', 'import_cohere']
+           'import_huggingface', 'import_torch',
+           'import_sbert', 'import_onnxruntime', 
+           'import_huggingface_hub', 'import_cohere']
 
 from .dependency_control import prompt_install
 
@@ -52,6 +53,19 @@ def import_torch():
         prompt_install('torch')
         import torch
 
+def import_huggingface_hub(): 
+    try:
+        import huggingface_hub
+    except ModuleNotFoundError as e:
+        prompt_install('huggingface-hub')
+        import huggingface_hub
+
+def import_onnxruntime():
+    try:
+        import onnxruntime
+    except ModuleNotFoundError as e:
+        prompt_install('onnxruntime')
+        import onnxruntime
 
 def import_faiss():
     try:
