@@ -278,7 +278,7 @@ class Cache:
 
 ```python
 towhee = Towhee()
-data_manager = get_si_data_manager("sqlite", "faiss", dimension=towhee.dimension())
+data_manager = get_si_data_manager("sqlite", "faiss", dimension=towhee.dimension)
 one_cache = Cache()
 one_cache.init(embedding_func=towhee.to_embeddings,
                data_manager=data_manager,

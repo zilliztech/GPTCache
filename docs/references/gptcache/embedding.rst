@@ -1,8 +1,11 @@
 GPTCache Embedding
 ==================
 
-.. automodule:: gptcache.embedding.towhee
+.. automodule:: gptcache.embedding.openai
    :members:
 
-.. automodule:: gptcache.embedding.openai
+.. automodule:: gptcache.embedding.huggingface
+   :members:
+
+.. automodule:: gptcache.embedding.towhee
    :members:

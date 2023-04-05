@@ -46,7 +46,7 @@ def run():
     faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
 
-    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension(), max_size=100000)
+    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension, max_size=100000)
     cache.init(embedding_func=embedding_towhee.to_embeddings,
                data_manager=data_manager,
                similarity_evaluation=WrapEvaluation(),
