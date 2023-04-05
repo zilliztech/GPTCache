@@ -1,4 +1,4 @@
-name: Integration test on pull request
+name: Integration test
 
 on:
   push:
