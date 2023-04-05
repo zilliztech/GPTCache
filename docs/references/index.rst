@@ -5,4 +5,10 @@ API References
    :maxdepth: 1
    :caption: Contents:
 
-   gptcache/embedding
+   core
+   adapter
+   cache
+   embedding
+   processor
+   similarity_evaluation
+   utils

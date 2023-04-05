@@ -52,7 +52,6 @@ class OpenAI:
         """Embedding dimension.
 
         :return: embedding dimension
-        :type: int
         """
         if not self.__dimension:
             foo_emb = self.to_embeddings("foo")
