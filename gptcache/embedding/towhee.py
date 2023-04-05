@@ -4,9 +4,20 @@ import_towhee()
 import numpy as np
 from towhee.dc2 import pipe, ops
 
-class Towhee: 
+class Towhee:
     # english model: paraphrase-albert-small-v2-onnx
     # chinese model: uer/albert-base-chinese-cluecorpussmall-onnx
+    """Generate text embedding for given text using Towhee.
+
+    Example:
+        .. code-block:: python
+        
+            from gptcache.embedding import towhee
+            
+            test_sentence = "Hello, world." 
+            encoder = towhee(model="paraphrase-albert-small-v2")
+            embed = encoder.to_embeddings(test_sentence)
+    """
     def __init__(self, model = "paraphrase-albert-small-v2-onnx"):
         if model == "paraphrase-albert-small-v2-onnx":
             self._pipe = (
@@ -32,6 +43,7 @@ class Towhee:
                     .map('vec', 'vec', ops.towhee.np_normalize())
                     .output('text', 'vec')
             )
+        
         self.__dimension = len(self._pipe("foo").get_dict()['vec'])
 
     def to_embeddings(self, data, **kwargs):
@@ -40,7 +52,3 @@ class Towhee:
 
     def dimension(self):
         return self.__dimension
-
-        
-
-

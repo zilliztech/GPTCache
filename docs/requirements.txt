@@ -1,0 +1,19 @@
+openai
+sphinx
+pyqt5<5.13
+pyqtwebengine<5.13
+nbsphinx
+autodoc_pydantic
+myst_nb
+sphinx-autobuild
+sphinx_book_theme
+sphinx_rtd_theme
+sphinx-typlog-theme
+sphinx-panels
+sphinx_copybutton
+pydata-sphinx-theme
+# python_docs_theme
+# sphinx_markdown_tables
+# sphinx_rtd_theme
+# recommonmark
+# sphinx_markdown_tables
