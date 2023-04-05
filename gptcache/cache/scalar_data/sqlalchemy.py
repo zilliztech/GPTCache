@@ -3,12 +3,12 @@ import_sqlalchemy()
 
 import numpy as np
 from datetime import datetime
-from sqlalchemy import func, create_engine, Column
-from sqlalchemy.types import String, DateTime, VARBINARY, Integer
+from sqlalchemy import func, create_engine, Column, Sequence
+from sqlalchemy.types import String, DateTime, LargeBinary, Integer
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from .base import ScalarStorage, TABLE_NAME
+from .base import ScalarStorage, TABLE_NAME, TABLE_NAME_SEQ
 
 Base = declarative_base()
 
@@ -19,13 +19,29 @@ class CacheTable(Base):
     """
     __tablename__ = TABLE_NAME
 
-    uid = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    id = Column(String, nullable=False)
-    data = Column(String, nullable=False)
-    reply = Column(String, nullable=False)
+    uid = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(500), nullable=False)
+    data = Column(String(1000), nullable=False)
+    reply = Column(String(1000), nullable=False)
     create_on = Column(DateTime, default=datetime.now)
     last_access = Column(DateTime, default=datetime.now)
-    embedding_data = Column(VARBINARY, nullable=True)
+    embedding_data = Column(LargeBinary, nullable=True)
+    state = Column(Integer, default=0)
+
+
+class CacheTableSequence(Base):
+    """
+    cache_table_sequence
+    """
+    __tablename__ = TABLE_NAME_SEQ
+
+    uid = Column(Integer, Sequence('id_seq', start=1), primary_key=True, autoincrement=True)
+    id = Column(String(500), nullable=False)
+    data = Column(String(1000), nullable=False)
+    reply = Column(String(1000), nullable=False)
+    create_on = Column(DateTime, default=datetime.now)
+    last_access = Column(DateTime, default=datetime.now)
+    embedding_data = Column(LargeBinary, nullable=True)
     state = Column(Integer, default=0)
 
 
@@ -33,11 +49,15 @@ class SQLDataBase(ScalarStorage):
     """
     Using sqlalchemy to manage SQLite, PostgreSQL, MySQL, MariaDB, SQL Server and Oracle.
     """
-    def __init__(self, url: str = 'sqlite:///./gpt_cache.db'):
+    def __init__(self, url: str = 'sqlite:///./gpt_cache.db', db_type: str = 'sqlite'):
         self._url = url
         self._engine = None
         self._session = None
-        self._model = CacheTable
+        self._db_type = db_type
+        if self._db_type == 'oracle':
+            self._model = CacheTableSequence
+        else:
+            self._model = CacheTable
         self.init()
 
     def init(self):
@@ -50,6 +70,7 @@ class SQLDataBase(ScalarStorage):
         self._model.__table__.create(bind=self._engine, checkfirst=True)
 
     def insert(self, key, data, reply, embedding_data: np.ndarray = None):
+        embedding_data = embedding_data.tobytes()
         model_obj = self._model(id=key, data=data, reply=reply, embedding_data=embedding_data)
         self._session.add(model_obj)
         self._session.commit()
