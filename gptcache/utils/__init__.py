@@ -1,7 +1,8 @@
 __all__ = ['import_pymilvus', 'import_towhee',
            'import_faiss', 'import_chromadb',
            'import_sqlalchemy', 'import_sql_client',
-           'import_huggingface', 'import_torch']
+           'import_huggingface', 'import_torch'
+           'import_sbert']
 
 from .dependency_control import prompt_install
 
@@ -16,6 +17,12 @@ def import_pymilvus():
         prompt_install('pymilvus')
         import pymilvus
 
+def import_sbert():
+    try:
+        import sentence_transformers
+    except ModuleNotFoundError:
+        prompt_install('sentence-transformers')
+        import sentence_transformers
 
 def import_towhee():
     try:
