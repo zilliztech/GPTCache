@@ -1,4 +1,5 @@
-from gptcache.utils import import_onnxruntime, import_huggingface_hub
+from gptcache.utils import import_onnxruntime, import_huggingface_hub, import_huggingface
+import_huggingface()
 import_onnxruntime()
 import_huggingface_hub()
 import numpy as np
@@ -47,6 +48,7 @@ class Onnx:
         sentence_embs = np.sum(token_embeddings * input_mask_expanded, 1) / np.maximum(input_mask_expanded.sum(1), 1e-9)
         return sentence_embs
 
+    @property
     def dimension(self):
         return self.__dimension
 

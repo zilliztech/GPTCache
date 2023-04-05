@@ -5,8 +5,8 @@ import time
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.similarity_evaluation import Towhee as EvaluationTowhee
-from gptcache.embedding import Towhee as EmbeddingTowhee
+from gptcache.similarity_evaluation import Onnx as EvaluationOnnx
+from gptcache.embedding import Onnx as EmbeddingOnnx
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
 
@@ -14,24 +14,24 @@ def run():
     with open('mock_data.json', 'r') as mock_file:
         mock_data = json.load(mock_file)
 
-    embedding_towhee = EmbeddingTowhee()
+    embedding_onnx = EmbeddingOnnx()
 
     # if you want more accurate results,
-    # you can use towhee's results to evaluate the model,
+    # you can use onnx's results to evaluate the model,
     # it will make the results more accurate, but the cache hit rate will decrease
 
-    # evaluation_towhee = EvaluationTowhee()
+    # evaluation_onnx = EvaluationOnnx()
     # class WrapEvaluation(SearchDistanceEvaluation):
-    #
+    # 
     #     def __init__(self):
-    #         self.evaluation_towhee = EvaluationTowhee()
-    #
+    #         self.evaluation_onnx = EvaluationOnnx()
+    # 
     #     def evaluation(self, src_dict, cache_dict, **kwargs):
     #         rank1 = super().evaluation(src_dict, cache_dict, **kwargs)
     #         if rank1 <= 0.5:
-    #             rank2 = evaluation_towhee.evaluation(src_dict, cache_dict, **kwargs)
+    #             rank2 = evaluation_onnx.evaluation(src_dict, cache_dict, **kwargs)
     #             return rank2 if rank2 != 0 else 1
-    #
+    # 
     #     def range(self):
     #         return 0.0, 1.0
 
@@ -46,8 +46,8 @@ def run():
     faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
 
-    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=embedding_towhee.dimension, max_size=100000)
-    cache.init(embedding_func=embedding_towhee.to_embeddings,
+    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=embedding_onnx.dimension, max_size=100000)
+    cache.init(embedding_func=embedding_onnx.to_embeddings,
                data_manager=data_manager,
                similarity_evaluation=WrapEvaluation(),
                )

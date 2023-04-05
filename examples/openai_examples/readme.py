@@ -63,14 +63,14 @@ print("Cache loading.....")
 
 from gptcache.core import cache
 from gptcache.adapter import openai
-from gptcache.embedding import Towhee
+from gptcache.embedding import Onnx
 from gptcache.cache.factory import get_ss_data_manager
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
-towhee = Towhee()
-data_manager = get_ss_data_manager("sqlite", "faiss", dimension=towhee.dimension)
+onnx = Onnx()
+data_manager = get_ss_data_manager("sqlite", "faiss", dimension=onnx.dimension)
 cache.init(
-    embedding_func=towhee.to_embeddings,
+    embedding_func=onnx.to_embeddings,
     data_manager=data_manager,
     similarity_evaluation=SearchDistanceEvaluation(),
     )
