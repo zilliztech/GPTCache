@@ -4,7 +4,7 @@ import time
 from gptcache.cache.factory import get_data_manager, get_ss_data_manager
 from gptcache.core import cache, Cache, Config
 from gptcache.embedding import Towhee
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 from gptcache.adapter import openai
 
 

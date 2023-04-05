@@ -7,7 +7,7 @@ from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
 from gptcache.similarity_evaluation import Towhee as EvaluationTowhee
 from gptcache.embedding import Towhee as EmbeddingTowhee
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 
 def run():

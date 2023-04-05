@@ -7,7 +7,7 @@ import numpy as np
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 
 d = 8

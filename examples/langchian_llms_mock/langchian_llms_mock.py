@@ -4,7 +4,7 @@ from gptcache.adapter.langchain_llms import LangChainLLMs
 from langchain.llms import OpenAI
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 from gptcache.processor.post import nop as postnop
 from gptcache.processor.pre import nop as prenop
 import numpy as np
