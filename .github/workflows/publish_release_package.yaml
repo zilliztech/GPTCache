@@ -1,4 +1,4 @@
-name: Publish package to TestPyPI
+name: Publish package to PyPI
 # on:
 #   push:
 #     branches:
@@ -21,7 +21,7 @@ on:
 
 jobs:
   build-n-publish:
-    name: Build and Publish GPTCache to TestPyPI
+    name: Build and Publish GPTCache to PyPI
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
@@ -33,7 +33,7 @@ jobs:
     #   run: |
     #       git fetch --prune --unshallow
     #       git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-    - name: Install pypa/build
+    - name: Install pypi/build
       run: >-
         python -m
         pip install
