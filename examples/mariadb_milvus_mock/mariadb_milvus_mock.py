@@ -1,5 +1,3 @@
-import os
-
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
@@ -8,6 +6,7 @@ import numpy as np
 
 
 d = 8
+has_data = False
 
 
 def mock_embeddings(data, **kwargs):
@@ -15,10 +14,8 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
-    faiss_file = "faiss.index"
-    has_data = os.path.isfile(faiss_file)
-    data_manager = get_ss_data_manager("postgresql", "faiss",
-                                       dimension=d, max_size=8, clean_size=2, top_k=3)
+    # `sql_url` defaults to 'mariadb+pymysql://root:123456@127.0.0.1:3307/mysql'
+    data_manager = get_ss_data_manager("mariadb", "milvus", dimension=d, max_size=8, clean_size=2)
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                similarity_evaluation=SearchDistanceEvaluation(),

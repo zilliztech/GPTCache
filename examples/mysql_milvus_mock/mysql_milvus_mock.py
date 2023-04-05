@@ -1,9 +1,3 @@
-from gptcache.utils import import_cxoracle
-import_cxoracle()
-
-import cx_Oracle
-import os
-
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
@@ -12,6 +6,7 @@ import numpy as np
 
 
 d = 8
+has_data = False
 
 
 def mock_embeddings(data, **kwargs):
@@ -19,12 +14,8 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
-    cx_Oracle.init_oracle_client(lib_dir="/Users/root/Downloads/instantclient_19_8")
-
-    faiss_file = "faiss.index"
-    has_data = os.path.isfile(faiss_file)
-    data_manager = get_ss_data_manager("oracle", "faiss",
-                                       dimension=d, max_size=8, clean_size=2, top_k=3)
+    # `sql_url` defaults to 'mysql+pymysql://root:123456@127.0.0.1:3306/mysql'
+    data_manager = get_ss_data_manager("mysql", "milvus", dimension=d, max_size=8, clean_size=2)
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                similarity_evaluation=SearchDistanceEvaluation(),

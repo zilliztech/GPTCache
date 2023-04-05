@@ -24,11 +24,33 @@ How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale da
 
 On the basis of the above example, use [towhee](https://towhee.io/) for embedding operation
 
-Note: the default embedding model only support the **ENGLISH**. If you want to use the Chinese, you can use the `uer/albert-base-chinese-cluecorpussmall-onnx` model. For other languages, you should use the corresponding model.
-
 ## [Sqlite + Milvus + Towhee](sqlite_milvus_mock/sqlite_milvus_mock.py)
 
 How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
+
+## [PostgreSQL + Milvus](postgresql_milvus_mock/postgresql_milvus_mock.py)
+
+How to use the [PostgreSQL](https://www.postgresql.org/) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
+
+> Note: you can set with your own **postgresql** with the `sql_url` parameter, such as the pseudocode `get_ss_data_manager("postgresql", "faiss", sql_url="postgresql+psycopg2://<username>:<password>@<host>:<port>/<database>")`
+>
+> And it is same as the **mysql**, **mariadb**, **sql server** and **oracle** database, more details refer to [the engine documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#supported-databases).
+
+## [Mysql + Milvus](mysql_milvus_mock/mysql_milvus_mock.py)
+
+How to use the [MySQL](https://www.mysql.com/) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
+
+## [MariaDB + Milvus](mariadb_milvus_mock/mariadb_milvus_mock.py)
+
+How to use the [MariaDB](https://mariadb.org/) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
+
+## [SQL Server + Milvus](mssql_milvus_mock/mssql_milvus_mock.py)
+
+How to use the [SQL Server](https://www.microsoft.com/en-us/sql-server/) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
+
+## [Oracle+Milvus](oracle_milvus_mock/oracle_milvus_mock.py)
+
+How to use the [Oracle](https://www.oracle.com/) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
 
 ## [Benchmark](benchmark/benchmark_sqlite_faiss_towhee.py)
 
