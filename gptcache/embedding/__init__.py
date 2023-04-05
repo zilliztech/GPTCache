@@ -5,5 +5,5 @@ from gptcache.utils.lazy_import import LazyImport
 towhee = LazyImport('towhee', globals(), 'gptcache.embedding.towhee')
 
 
-def Towhee(model="paraphrase-albert-small-v2"):
+def Towhee(model="paraphrase-albert-small-v2-onnx"):
     return towhee.Towhee(model)

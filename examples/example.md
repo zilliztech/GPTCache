@@ -24,7 +24,7 @@ How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale da
 
 On the basis of the above example, use [towhee](https://towhee.io/) for embedding operation
 
-Note: the default embedding model only support the **ENGLISH**. If you want to use the Chinese, you can use the `uer/albert-base-chinese-cluecorpussmall` model. For other languages, you should use the corresponding model.
+Note: the default embedding model only support the **ENGLISH**. If you want to use the Chinese, you can use the `uer/albert-base-chinese-cluecorpussmall-onnx` model. For other languages, you should use the corresponding model.
 
 ## [Sqlite + Milvus + Towhee](sqlite_milvus_mock/sqlite_milvus_mock.py)
 

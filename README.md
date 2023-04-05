@@ -102,7 +102,7 @@ The LLM Adapter is designed to integrate different LLM models by unifying their 
 This module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
   - [x] Disable embedding. This will turn GPTCache into a keyword-matching cache.
   - [x] Support OpenAI embedding API.
-  - [x] Support [Towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model.
+  - [x] Support [Towhee](https://towhee.io/) with the paraphrase-albert-small-v2-onnx model.
   - [ ] Support [Hugging Face](https://huggingface.co/) embedding API.
   - [ ] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
   - [ ] Support [fastText](https://fasttext.cc) embedding API.
