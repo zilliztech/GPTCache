@@ -8,6 +8,9 @@ from sentence_transformers import SentenceTransformer
 class SBERT:
     """Generate sentence embedding for given text using pretrained models of Sentence Transformers.
 
+    :param model: model name, defaults to "all-MiniLM-L6-v2".
+    :type model: str
+
     Example:
         .. code-block:: python
         
@@ -23,6 +26,13 @@ class SBERT:
         self.__dimension = None
 
     def to_embeddings(self, data, **kwargs):
+        """Generate embedding given text input
+
+        :param data: text in string.
+        :type data: str
+
+        :return `numpy.ndarray`: a text embedding in shape of (dim,).
+        """
         if not isinstance(data, list):
             data = [data]
         emb = self.model.encode(data).squeeze(0)
@@ -33,6 +43,10 @@ class SBERT:
     
     @property
     def dimension(self):
+        """Embedding dimension.
+
+        :return `int`: embedding dimension
+        """
         if not self.__dimension:
             self.__dimension == self.to_embeddings("foo")
         return self.__dimension
