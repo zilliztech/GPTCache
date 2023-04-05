@@ -8,27 +8,35 @@ from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 from gptcache.adapter import openai
 
 
-def run():
+def response_text(openai_resp):
+    return openai_resp['choices'][0]['message']['content']
+
+
+def cache_init():
     dir_name, _ = os.path.split(os.path.abspath(__file__))
-    data_file = dir_name + "/data_map.txt"
-    cache.init(data_manager=get_data_manager("map",
-                                             data_path=data_file,
-                                             max_size=10))
+    cache.init(data_manager=get_data_manager("map"))
     os.environ["OPENAI_API_KEY"] = "API KEY"
     cache.set_openai_key()
 
-    # base request test
-    response = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
-        messages=[
-            {'role': 'user',
-             'content': 'Count to 5, with a comma between each number and no newlines. E.g., 1, 2, 3, ...'}
-        ],
-        temperature=0,
-    )
-    print(f'Received: {response}')
 
-    # stream request test
+def base_request():
+    for _ in range(2):
+        start_time = time.time()
+        response = openai.ChatCompletion.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {
+                    'role': 'user',
+                    'content': 'Count to 5, with a comma between each number and no newlines. E.g., 1, 2, 3, ...'
+                }
+            ],
+            temperature=0,
+        )
+        print("Time consuming: {:.2f}s".format(time.time() - start_time))
+        print(f'Received: {response_text(response)}')
+
+
+def stream_request():
     for _ in range(2):
         start_time = time.time()
         response = openai.ChatCompletion.create(
@@ -52,13 +60,13 @@ def run():
         # print the time delay and text received
         full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
         end_time = time.time()
-        print("time consuming: {:.2f}s".format(end_time - start_time))
+        print("Time consuming: {:.2f}s".format(end_time - start_time))
         print(f"Full conversation received: {full_reply_content}")
 
-    # similarity test
+
+def similar_request():
     towhee = Towhee()
-    data_manager = get_ss_data_manager("sqlite", "faiss",
-                                       dimension=towhee.dimension, max_size=2000)
+    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=towhee.dimension)
     one_cache = Cache()
     one_cache.init(embedding_func=towhee.to_embeddings,
                    data_manager=data_manager,
@@ -77,8 +85,8 @@ def run():
         cache_obj=one_cache
     )
     end_time = time.time()
-    print("time consuming: {:.2f}s".format(end_time - start_time))
-    print(answer)
+    print("Time consuming: {:.2f}s".format(end_time - start_time))
+    print(f'Received: {response_text(answer)}')
 
     start_time = time.time()
     answer = openai.ChatCompletion.create(
@@ -89,9 +97,12 @@ def run():
         cache_obj=one_cache
     )
     end_time = time.time()
-    print("time consuming: {:.2f}s".format(end_time - start_time))
-    print(answer)
+    print("Time consuming: {:.2f}s".format(end_time - start_time))
+    print(f'Received: {response_text(answer)}')
 
 
 if __name__ == '__main__':
-    run()
+    cache_init()
+    base_request()
+    stream_request()
+    similar_request()

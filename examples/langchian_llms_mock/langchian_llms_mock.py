@@ -4,7 +4,7 @@ from gptcache.adapter.langchain_llms import LangChainLLMs
 from langchain.llms import OpenAI
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_ss_data_manager
-from gptcache.similarity_evaluation.simple import pair_evaluation
+from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 from gptcache.processor.post import nop as postnop
 from gptcache.processor.pre import nop as prenop
 import numpy as np
@@ -27,10 +27,9 @@ def run():
                pre_embedding_func=prenop,
                post_process_messages_func=postnop,
                data_manager=data_manager,
-               evaluation_func=pair_evaluation,
+               evaluation_func=SearchDistanceEvaluation(),
                config=Config(
-                       similarity_threshold=10000,
-                       similarity_positive=False,
+                       similarity_threshold=0,
                    ),
                )
 

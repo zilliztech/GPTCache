@@ -31,7 +31,7 @@ We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/exampl
 
 - You can quickly try GPT cache and put it into a production environment without heavy development. However, please note that the repository is still under heavy development.
 - By default, only a limited number of libraries are installed to support the basic cache functionalities. When you need to use additional features, the related libraries will be **automatically installed**.
-- Make sure that the Python version is 3.8.1 or higher.
+- Make sure that the Python version is **3.8.1 or higher**, check: `python --version`
 - If you encounter issues installing a library due to a low pip version, run: `python -m pip install --upgrade pip`.
 
 ### pip install
@@ -54,35 +54,153 @@ python setup.py install
 
 ### example usage
 
-If you just want to achieve precise matching cache of requests, that is, two identical requests, you **ONLY** need **TWO** steps to access this cache
+These examples will help you understand how to use exact and similar matching in caching. 
 
-1. Cache init
+And before running the example, **make sure** the OPENAI_API_KEY environment variable is set by executing `echo $OPENAI_API_KEY`. 
+
+If it is not already set, it can be set by using `OPENAI_API_KEY=YOUR_API_KEY`. 
+
+> It's important to note that this method is only effective temporarily, so if you want a permanent effect, you'll need to modify the environment variable configuration file. For instance, on a Mac, you can modify the file located at `/etc/profile`.
+
+<details>
+
+<summary> Click to <strong>SHOW</strong> example code </summary>
+
+#### OpenAI API original usage
+
+```python
+import os
+import time
+
+import openai
+
+
+def response_text(openai_resp):
+    return openai_resp['choices'][0]['message']['content']
+
+
+question = 'what‘s chatgpt'
+
+# OpenAI API original usage
+openai.api_key = os.getenv("OPENAI_API_KEY")
+start_time = time.time()
+response = openai.ChatCompletion.create(
+  model='gpt-3.5-turbo',
+  messages=[
+    {
+        'role': 'user',
+        'content': question
+    }
+  ],
+)
+print(f'Question: {question}')
+print("Time consuming: {:.2f}s".format(time.time() - start_time))
+print(f'Answer: {response_text(response)}\n')
+
+```
+
+#### OpenAI API + GPT Cache, exact match cache
+
+> If you ask ChatGPT the exact same two questions, the answer to the second question will be obtained from the cache without requesting ChatGPT again.
+
+```python
+import time
+
+
+def response_text(openai_resp):
+    return openai_resp['choices'][0]['message']['content']
+
+print("Cache loading.....")
+
+# To use GPT cache, that's all you need
+# -------------------------------------------------
+from gptcache.core import cache
+from gptcache.adapter import openai
+
+cache.init()
+cache.set_openai_key()
+# -------------------------------------------------
+
+question = "what's github"
+for _ in range(2):
+    start_time = time.time()
+    response = openai.ChatCompletion.create(
+      model='gpt-3.5-turbo',
+      messages=[
+        {
+            'role': 'user',
+            'content': question
+        }
+      ],
+    )
+    print(f'Question: {question}')
+    print("Time consuming: {:.2f}s".format(time.time() - start_time))
+    print(f'Answer: {response_text(response)}\n')
+```
+
+#### OpenAI API + GPT Cache, similar search cache
+
+> After obtaining an answer from ChatGPT in response to several similar questions, the answers to subsequent questions can be retrieved from the cache without the need to request ChatGPT again.
+
+```python
+import time
+
+
+def response_text(openai_resp):
+    return openai_resp['choices'][0]['message']['content']
+
+from gptcache.core import cache
+from gptcache.adapter import openai
+from gptcache.embedding import Towhee
+from gptcache.cache.factory import get_ss_data_manager
+from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+
+print("Cache loading.....")
+
+towhee = Towhee()
+data_manager = get_ss_data_manager("sqlite", "faiss", dimension=towhee.dimension())
+cache.init(
+    embedding_func=towhee.to_embeddings,
+    data_manager=data_manager,
+    similarity_evaluation=SearchDistanceEvaluation(),
+    )
+cache.set_openai_key()
+
+questions = [
+    "what's github",
+    "can you explain what GitHub is",
+    "can you tell me more about GitHub"
+    "what is the purpose of GitHub"
+]
+
+for question in questions:
+    for _ in range(2):
+        start_time = time.time()
+        response = openai.ChatCompletion.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {
+                    'role': 'user',
+                    'content': question
+                }
+            ],
+        )
+        print(f'Question: {question}')
+        print("Time consuming: {:.2f}s".format(time.time() - start_time))
+        print(f'Answer: {response_text(response)}\n')
+```
+
+</details>
+
+To use GPTCache exclusively, only the following lines of code are required, and there is no need to modify any existing code.
 
 ```python
 from gptcache.core import cache
-
-cache.init()
-# If you use the `openai.api_key = xxx` to set the api key, you need use `cache.set_openai_key()` to replace it.
-# it will read the `OPENAI_API_KEY` environment variable and set it to ensure the security of the key.
-cache.set_openai_key()
-```
-
-2. Replace the original openai package
-
-```python
 from gptcache.adapter import openai
 
-# openai requests DON'T need ANY changes
-answer = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "foo"}
-    ],
-)
+cache.init()
+cache.set_openai_key()
 ```
-
-If you want to experience vector similarity search cache locally, you can use the example [Sqlite + Faiss + Towhee](examples/sqlite_faiss_towhee/sqlite_faiss_towhee.py).
 
 More Docs：
 
@@ -128,7 +246,7 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [Zilliz Cloud](https://cloud.zilliz.com/).
   - [x] Support [FAISS](https://faiss.ai/).
   - [ ] Support [Qdrant](https://qdrant.tech/)
-  - [ ] Support [Chroma](https://www.trychroma.com/)
+  - [x] Support [Chroma](https://www.trychroma.com/)
   - [ ] Support [PGVector](https://github.com/pgvector/pgvector)
   - [ ] Support other vector databases
 - **Cache Manager**:
