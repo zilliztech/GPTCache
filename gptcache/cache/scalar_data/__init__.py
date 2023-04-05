@@ -10,10 +10,10 @@ def SQLDataBase(**kwargs):
 
 
 SQL_URL = {
-        'sqlite': 'sqlite:///./gpt_cache.db',
-        'postgresql': 'postgresql+psycopg2://user:password@hostname:port/database_name',
-        'mysql': 'mysql+pymysql://user:password@hostname:port/database_name',
-        'mariadb': 'mariadb+pymysql://user:password@hostname:port/database_name',
-        'sqlserver': 'mssql+pyodbc://user:password@database_name',
-        'oracle': 'oracle+zxjdbc://user:password@hostname:port/database_name',
+        'sqlite': 'sqlite:///./sqlite.db',
+        'postgresql': 'postgresql+psycopg2://postgres:123456@127.0.0.1:5432/postgres',
+        'mysql': 'mysql+pymysql://root:123456@127.0.0.1:3306/mysql',
+        'mariadb': 'mariadb+pymysql://root:123456@127.0.0.1:3307/mysql',
+        'sqlserver': 'mssql+pyodbc://sa:Strongpsw_123@127.0.0.1:1434/msdb?driver=ODBC+Driver+17+for+SQL+Server',
+        'oracle': 'oracle+cx_oracle://oracle:123456@127.0.0.1:1521/?service_name=helowin&encoding=UTF-8&nencoding=UTF-8',
 }

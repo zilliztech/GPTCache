@@ -1,5 +1,6 @@
 __all__ = ['import_pymilvus', 'import_towhee',
-           'import_faiss', 'import_sqlalchemy',
+           'import_faiss', 'import_chromadb',
+           'import_sqlalchemy', 'import_sql_client',
            'import_huggingface', 'import_torch']
 
 from .dependency_control import prompt_install
@@ -60,3 +61,49 @@ def import_sqlalchemy():
     except ModuleNotFoundError as e:
         prompt_install('sqlalchemy')
         import sqlalchemy
+
+
+def import_postgresql():
+    try:
+        import psycopg2
+    except ModuleNotFoundError as e:
+        prompt_install('psycopg2-binary')
+        import psycopg2
+
+
+def import_pymysql():
+    try:
+        import pymysql
+    except ModuleNotFoundError as e:
+        prompt_install('pymysql')
+        import pymysql
+
+
+# `brew install unixodbc` in mac
+# and install PyODBC driver.
+def import_pyodbc():
+    try:
+        import pyodbc
+    except ModuleNotFoundError as e:
+        prompt_install('pyodbc')
+        import pyodbc
+
+
+# install cx-Oracle driver.
+def import_cxoracle():
+    try:
+        import cx_Oracle
+    except ModuleNotFoundError as e:
+        prompt_install('cx_Oracle')
+        import cx_Oracle
+
+
+def import_sql_client(db_name):
+    if db_name == 'postgresql':
+        import_postgresql()
+    elif db_name in ['mysql', 'mariadb']:
+        import_pymysql()
+    elif db_name == 'sqlserver':
+        import_pyodbc()
+    elif db_name == 'oracle':
+        import_cxoracle()

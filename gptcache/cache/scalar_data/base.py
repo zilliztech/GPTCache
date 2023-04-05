@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 
 TABLE_NAME = 'cache_table'
+TABLE_NAME_SEQ = 'cache_table_sequence'
 
 
 class ScalarStorage(metaclass=ABCMeta):
