@@ -1,5 +1,5 @@
 from .similarity_evaluation import SimilarityEvaluation
-from ..util import import_towhee
+from ..utils import import_towhee
 import_towhee()
 
 from towhee.dc2 import ops, pipe
@@ -18,6 +18,8 @@ class Towhee(SimilarityEvaluation):
         try:
             src_question = src_dict["question"]
             cache_question = cache_dict["question"]
+            if src_question == cache_question:
+                return 1
             return self._pipe(src_question, [cache_question]).get_dict()['similarity'][0]
         except Exception:
             return 0
