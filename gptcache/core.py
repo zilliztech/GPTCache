@@ -35,7 +35,7 @@ class Config:
 
     def __init__(self,
                  log_time_func=None,
-                 similarity_threshold=0.5,
+                 similarity_threshold=0.8,
                  ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError("Invalid the similarity threshold param")
