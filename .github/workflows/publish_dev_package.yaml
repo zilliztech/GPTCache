@@ -33,7 +33,7 @@ jobs:
     #   run: |
     #       git fetch --prune --unshallow
     #       git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-    - name: Install pypa/build
+    - name: Install pypi/build
       run: >-
         python -m
         pip install

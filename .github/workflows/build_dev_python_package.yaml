@@ -1,14 +1,5 @@
 name: Build dev package
 on:
-  push:
-    branches:
-      - 'main'
-    paths:
-      - 'examples/**'
-      - 'gptcache/**'
-      - 'tests/**'
-      - '!**.md'
-      - '.github/workflows/**'
   pull_request:
     branches:
       - main
@@ -21,7 +12,7 @@ on:
 
 jobs:
   build-n-publish:
-    name: Build and Publish GPTCache to TestPyPI
+    name: Build GPTCache PYPI Package
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
@@ -48,9 +39,9 @@ jobs:
         --outdir dist/
         .
     - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: |
-            dist
-            !dist/**/*.md
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: |
+          dist
+          !dist/**/*.md
