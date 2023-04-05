@@ -2,7 +2,7 @@ __all__ = ['import_pymilvus', 'import_towhee',
            'import_faiss', 'import_chromadb',
            'import_sqlalchemy', 'import_sql_client',
            'import_huggingface', 'import_torch'
-           'import_sbert']
+           'import_sbert', 'import_cohere']
 
 from .dependency_control import prompt_install
 
@@ -23,6 +23,13 @@ def import_sbert():
     except ModuleNotFoundError:
         prompt_install('sentence-transformers')
         import sentence_transformers
+
+def import_cohere():
+    try:
+        import cohere
+    except ModuleNotFoundError:
+        prompt_install('cohere')
+        import cohere
 
 def import_towhee():
     try:

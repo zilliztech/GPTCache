@@ -10,6 +10,11 @@ gptcache.embedding.openai
 .. automodule:: gptcache.embedding.openai
    :members:
 
+gptcache.embedding.cohere
+-------------------------
+.. automodule:: gptcache.embedding.cohere
+   :members:
+
 gptcache.embedding.huggingface
 ------------------------------
 .. automodule:: gptcache.embedding.huggingface
