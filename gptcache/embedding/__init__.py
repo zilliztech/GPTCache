@@ -1,4 +1,4 @@
-__all__ = ['Towhee', 'OpenAI', 'Huggingface', 'SBERT']
+__all__ = ['Towhee', 'OpenAI', 'Huggingface', 'SBERT', 'Onnx']
 
 from gptcache.utils.lazy_import import LazyImport
 
@@ -6,6 +6,7 @@ towhee = LazyImport('towhee', globals(), 'gptcache.embedding.towhee')
 openai = LazyImport('openai', globals(), 'gptcache.embedding.openai')
 huggingface = LazyImport('huggingface', globals(), 'gptcache.embedding.huggingface')
 sbert = LazyImport('sbert', globals(), 'gptcache.embedding.sbert')
+onnx = LazyImport('onnx', globals(), 'gptcache.embedding.onnx')
 
 
 def Towhee(model="paraphrase-albert-small-v2-onnx"):
@@ -19,3 +20,6 @@ def Huggingface(model="sentence-transformers/all-mpnet-base-v2"):
 
 def SBERT(model="all-MiniLM-L6-v2"):
     return sbert.SBERT(model)
+
+def Onnx(model="GPTCache/paraphrase-albert-onnx"):
+    return onnx.Onnx(model)
