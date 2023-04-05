@@ -60,8 +60,8 @@ pull_request_rules:
       - "status-success=test-gpt-cache-cli-main (map, 3.9)"
       - "status-success=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.8)"
       - "status-success=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.9)"
-      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_towhee, 3.8)"
-      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_towhee, 3.9)"
+      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.8)"
+      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.9)"
     actions:
       label:
         add:
@@ -88,8 +88,8 @@ pull_request_rules:
         - "status-success!=test-gpt-cache-cli-main (map, 3.9)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.8)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.9)"
-        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_towhee, 3.8)"
-        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_towhee, 3.9)"
+        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.8)"
+        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.9)"
       - files~=^(?=.*((\.(sh|py)|Makefile))).*$
     actions:
       label:

@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        data_manager_mode: [map, sqlite_faiss_mock, sqlite_faiss_towhee]
+        data_manager_mode: [map, sqlite_faiss_mock, sqlite_faiss_onnx]
         python: [ 3.8, 3.9 ]
     steps:
       - uses: actions/checkout@main
