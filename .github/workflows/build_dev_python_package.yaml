@@ -1,23 +1,23 @@
 name: Publish package to TestPyPI
-# on:
-#   push:
-#     branches:
-#       - 'main'
-#     paths:
-#       - 'gptcache/**'
-#       - '!**.md'
-#       - '.github/workflows/publish_dev_package.yaml'
-#   pull_request:
-#     branches:
-#       - main
-#     paths:
-#       - '.github/workflows/publish_dev_package.yaml'
 on:
-  workflow_dispatch:
-      # tags:
-      #   description: 'Test scenario tags'
-      #   required: false
-      #   type: boolean
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/**'
 
 jobs:
   build-n-publish:
@@ -47,8 +47,10 @@ jobs:
         --wheel
         --outdir dist/
         .
-    - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.PYPI_TEST_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
+    - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: |
+            dist
+            !dist/**/*.md
