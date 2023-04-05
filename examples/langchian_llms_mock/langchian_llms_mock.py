@@ -1,51 +1,44 @@
 import os
 
-from gptcache.adapter.langchain_llms import LangChainLLMs
+from langchain import Cohere
 from langchain.llms import OpenAI
-from gptcache.core import cache, Config
-from gptcache.cache.factory import get_ss_data_manager
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+
+from gptcache.adapter.langchain_llms import LangChainLLMs
+from gptcache.core import cache, Cache
 from gptcache.processor.post import nop as postnop
-from gptcache.processor.pre import nop as prenop
-import numpy as np
-
-
-d = 8
-
-
-def mock_embeddings(data, **kwargs):
-    return np.random.random((d, )).astype('float32')
+from gptcache.processor.pre import get_prompt
 
 
 def run():
-    sqlite_file = "gptcache.db"
-    faiss_file = "faiss.index"
-    has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
-    data_manager = get_ss_data_manager("sqlite", "faiss",
-                                       dimension=d, max_size=8, clean_size=2, top_k=3)
-    cache.init(embedding_func=mock_embeddings,
-               pre_embedding_func=prenop,
-               post_process_messages_func=postnop,
-               data_manager=data_manager,
-               evaluation_func=SearchDistanceEvaluation(),
-               config=Config(
-                       similarity_threshold=0,
-                   ),
-               )
+    data_file = "data_map.txt"
+    has_data = os.path.isfile(data_file)
+    llm_cache = Cache()
+    llm_cache.init(
+        pre_embedding_func=get_prompt,
+        post_process_messages_func=postnop,
+    )
 
-    mock_messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "foo"}
-    ]
     if not has_data:
         for i in range(10):
             question = f"foo{i}"
             answer = f"receiver the foo {i}"
             cache.data_manager.save(question, answer, cache.embedding_func(question))
 
+    question = "foo0"
 
-    llm = LangChainLLMs(OpenAI(model_name="text-ada-001", n=2, best_of=2))
-    answer = llm(mock_messages)
+    os.environ["OPENAI_API_KEY"] = "API"
+    langchain_openai = OpenAI(model_name="text-ada-001")
+    llm = LangChainLLMs(langchain_openai)
+    answer = llm(question, cache_obj=llm_cache)
+    print(answer)
+    answer = llm(question, cache_obj=llm_cache)
+    print(answer)
+
+    # TODO install cohere auto
+    os.environ["COHERE_API_KEY"] = "API_KEY"
+    langchain_cohere = Cohere()
+    llm = LangChainLLMs(langchain_cohere)
+    answer = llm(question, cache_obj=llm_cache)
     print(answer)
 
 

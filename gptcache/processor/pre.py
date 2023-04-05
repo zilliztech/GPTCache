@@ -15,3 +15,7 @@ def all_content(data, **kwargs):
 
 def nop(data, **kwargs):
     return data
+
+
+def get_prompt(data, **kwargs):
+    return data.get("prompt")

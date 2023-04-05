@@ -80,7 +80,7 @@ class Cache:
         self.embedding_func = None
         self.data_manager = None
         self.post_process_messages_func = None
-        self.config = None
+        self.config = Config()
         self.report = Report()
         self.next_cache = None
 
