@@ -1,6 +1,6 @@
 # Contributing to GPT Cache
 
-Before contributing to GPT Cache, it is recommended to read the [system design article](system.md). 
+Before contributing to GPT Cache, it is recommended to read the [system design article](./system.md). 
 
 In the process of contributing, pay attention to **the parameter type**, because there is currently no type restriction added.
 
@@ -54,53 +54,53 @@ import_pymilvus()
 
 ## Add a scalar store type
 
-refer to the implementation of [sqlite](../gptcache/cache/scalar_data/sqllite3.py).
+refer to the implementation of [sqlite](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/scalar_data/sqllite3.py).
 
-1. Implement the [ScalarStore](../gptcache/cache/scalar_data/scalar_store.py) interface
+1. Implement the [ScalarStore](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/scalar_data/scalar_store.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
-4. Add the new store to the [_get_scalar_store](../gptcache/cache/factory.py) method
-5. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
+4. Add the new store to the [_get_scalar_store](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/factory.py) method
+5. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/example.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a vector store type
 
-refer to the implementation of [milvus](../gptcache/cache/vector_data/milvus.py).
+refer to the implementation of [milvus](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/vector_data/milvus.py).
 
-1. Implement the [VectorStore](../gptcache/cache/vector_data/vector_store.py) interface
+1. Implement the [VectorStore](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/vector_data/vector_store.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
-3. Add the new store to the [get_ss_data_manager](../gptcache/cache/factory.py) method
-4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
+3. Add the new store to the [get_ss_data_manager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/factory.py) method
+4. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/example.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a vector index type
 
-refer to the implementation of [faiss](../gptcache/cache/vector_data/faiss.py).
+refer to the implementation of [faiss](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/vector_data/faiss.py).
 
-1. Implement the [VectorIndex](../gptcache/cache/vector_data/vector_index.py) interface
+1. Implement the [VectorIndex](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/vector_data/vector_index.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
-3. Add the new store to the [get_si_data_manager](../gptcache/cache/factory.py) method
-4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
+3. Add the new store to the [get_si_data_manager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/factory.py) method
+4. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/example.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a new data manager
 
-refer to the implementation of [MapDataManager, SSDataManager or SIDataManager](../gptcache/cache/data_manager.py).
+refer to the implementation of [MapDataManager, SSDataManager or SIDataManager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/data_manager.py).
 
-1. Implement the [DataManager](../gptcache/cache/data_manager.py) interface
-2. Add the new store to the [get_data_manager](../gptcache/cache/factory.py) method
-3. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
+1. Implement the [DataManager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/data_manager.py) interface
+2. Add the new store to the [get_data_manager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/factory.py) method
+3. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/example.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a embedding function
 
-refer to the implementation of [towhee](../gptcache/embedding/towhee.py) or [openai](../gptcache/embedding/openai.py).
+refer to the implementation of [towhee](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding/towhee.py) or [openai](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding/openai.py).
 
-1. Add a new python file to [embedding](../gptcache/embedding) directory
+1. Add a new python file to [embedding](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding) directory
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the embedding function and **make sure** your output dimension
-4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
+4. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/example.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a similarity evaluation function
 
-refer to the implementation of [pair_evaluation](../gptcache/similarity_evaluation/simple.py) or [towhee](../gptcache/similarity_evaluation/towhee.py)
+refer to the implementation of [pair_evaluation](https://github.com/zilliztech/GPTCache/blob/main/gptcache/similarity_evaluation/simple.py) or [towhee](https://github.com/zilliztech/GPTCache/blob/main/gptcache/similarity_evaluation/towhee.py)
 
-1. Make sure the input params, you can learn more about in the [user view](../gptcache/adapter/openai.py) model
+1. Make sure the input params, you can learn more about in the [user view](https://github.com/zilliztech/GPTCache/blob/main/gptcache/adapter/openai.py) model
 ```python
 rank = chat_cache.evaluation_func({
     "question": pre_embedding_data,
@@ -113,19 +113,19 @@ rank = chat_cache.evaluation_func({
 ```
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the similarity evaluation function
-4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
+4. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/example.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a method to post-process the cache answer list
 
-refer to the implementation of [first or random_one](../gptcache/processor/post.py)
+refer to the implementation of [first or random_one](https://github.com/zilliztech/GPTCache/blob/main/gptcache/processor/post.py)
 
-1. Make sure the input params, you can learn more about in the [user view](../gptcache/adapter/openai.py) model
+1. Make sure the input params, you can learn more about in the [user view](https://github.com/zilliztech/GPTCache/blob/main/gptcache/adapter/openai.py) model
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the post method
-4. Add a usage example to [example](../examples) directory and add the corresponding content to [example.md](../examples/example.md) [README.md](../README.md)
+4. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/example.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 # Add a new process in handling chatgpt requests
 
-1. Need to have a clear understanding of the current process, refer to the [user view](../gptcache/adapter/openai.py) model
+1. Need to have a clear understanding of the current process, refer to the [user view](https://github.com/zilliztech/GPTCache/blob/main/gptcache/adapter/openai.py) model
 2. Add a new process
 3. Make sure all examples work properly
