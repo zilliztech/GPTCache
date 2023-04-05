@@ -6,6 +6,11 @@ import os
 class OpenAI:
     """Generate text embedding for given text using OpenAI.
 
+    :param model: model name, defaults to "text-embedding-ada-002".
+    :type model: str
+    :param api_key: OpenAI API Key. When the parameter is not specified, it will load the key by default if it is available.
+    :type api_key: str
+
     Example:
         .. code-block:: python
 
@@ -29,6 +34,13 @@ class OpenAI:
             self.__dimension = None
     
     def to_embeddings(self, data):
+        """Generate embedding given text input
+
+        :param data: text in string.
+        :type data: str
+
+        :return: a text embedding in shape of (dim,).
+        """
         sentence_embeddings = openai.Embedding.create(
             model=self.model,
             input=data
@@ -37,6 +49,11 @@ class OpenAI:
 
     @property
     def dimension(self):
+        """Embedding dimension.
+
+        :return: embedding dimension
+        :type: int
+        """
         if not self.__dimension:
             foo_emb = self.to_embeddings("foo")
             self.__dimension = len(foo_emb)

@@ -10,6 +10,9 @@ from transformers import AutoTokenizer, AutoModel
 class Huggingface:
     """Generate sentence embedding for given text using pretrained models from Huggingface transformers.
 
+    :param model: model name, defaults to "sentence-transformers/all-MiniLM-L6-v2".
+    :type model: str
+
     Example:
         .. code-block:: python
         
@@ -34,6 +37,13 @@ class Huggingface:
             self.__dimension = config.hidden_size
 
     def to_embeddings(self, data, **kwargs):
+        """Generate embedding given text input
+
+        :param data: text in string.
+        :type: str
+
+        :return: a text embedding in shape of (dim,).
+        """
         if not isinstance(data, list):
             data = [data]
         inputs = self.tokenizer(data, padding=True, truncation=True, return_tensors='pt')
@@ -42,7 +52,6 @@ class Huggingface:
         return np.array(emb).astype('float32')
     
     def post_proc(self, token_embeddings, inputs):
-        token_embeddings = token_embeddings
         attention_mask = inputs['attention_mask']
         input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
         sentence_embs = torch.sum(
@@ -51,4 +60,8 @@ class Huggingface:
 
     @property
     def dimension(self):
+        """Embedding dimension.
+
+        :return: embedding dimension
+        """
         return self.__dimension
