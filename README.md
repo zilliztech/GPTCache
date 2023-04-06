@@ -48,12 +48,6 @@ We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/exampl
 - Make sure that the Python version is **3.8.1 or higher**, check: `python --version`
 - If you encounter issues installing a library due to a low pip version, run: `python -m pip install --upgrade pip`.
 
-### pip install
-
-```bash
-pip install gptcache
-```
-
 ### dev install
 
 ```bash
@@ -274,7 +268,7 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
   - [x] Exact matches between the input request and the requests obtained from the **Vector Store**.
   - [x] Distance represented by applying linalg.norm from numpy to the embeddings.
   - [ ] BM25 and other similarity measurements
-  - [ ] Support other models
+  - [ ] Support other model serving framework such as PyTorch
  
   
   **Note**:Not all combinations of different modules may be compatible with each other. For instance, if we disable the **Embedding Extractor**, the **Vector Store** may not function as intended. We are currently working on implementing a combination sanity check for **GPTCache**.
