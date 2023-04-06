@@ -7,7 +7,6 @@ DEFAULT_ENV_NAME="gpt-cache"
 # Usage: ./manage_conda_env.sh remove [env_name]
 
 if [[ "$1" == "create" ]]; then
-    # 创建 conda 环境
     if [[ -n "$2" ]]; then
         env_name="$2"
     else
@@ -23,7 +22,6 @@ if [[ "$1" == "create" ]]; then
     echo "conda environment '$env_name' activated."
 elif [[ "$1" == "remove" ]]; then
     conda deactivate
-    # 删除 conda 环境
     if [[ -n "$2" ]]; then
         env_name="$2"
     else

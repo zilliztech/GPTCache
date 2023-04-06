@@ -23,7 +23,7 @@ A good analogy for GptCache is to think of it as a more semantic version of Redi
 - For purpose-built SaaS services, users tend to ask questions within a specific domain, with both temporal and spatial locality.
 - By utilizing vector similarity search, it is possible to find a similarity relationship between questions and answers at a relatively low cost.
 
-We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_towhee.py) to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
+We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py) to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
 
 ## 😊 Quick Start
 
@@ -58,7 +58,7 @@ These examples will help you understand how to use exact and similar matching in
 
 And before running the example, **make sure** the OPENAI_API_KEY environment variable is set by executing `echo $OPENAI_API_KEY`. 
 
-If it is not already set, it can be set by using `OPENAI_API_KEY=YOUR_API_KEY`. 
+If it is not already set, it can be set by using `export OPENAI_API_KEY=YOUR_API_KEY` on Unix/Linux/MacOS system or `set OPENAI_API_KEY=YOUR_API_KEY` on Windows system. 
 
 > It's important to note that this method is only effective temporarily, so if you want a permanent effect, you'll need to modify the environment variable configuration file. For instance, on a Mac, you can modify the file located at `/etc/profile`.
 
@@ -151,16 +151,16 @@ def response_text(openai_resp):
 
 from gptcache.core import cache
 from gptcache.adapter import openai
-from gptcache.embedding import Towhee
+from gptcache.embedding import Onnx
 from gptcache.cache.factory import get_ss_data_manager
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
 print("Cache loading.....")
 
-towhee = Towhee()
-data_manager = get_ss_data_manager("sqlite", "faiss", dimension=towhee.dimension())
+onnx = Onnx()
+data_manager = get_ss_data_manager("sqlite", "faiss", dimension=onnx.dimension)
 cache.init(
-    embedding_func=towhee.to_embeddings,
+    embedding_func=onnx.to_embeddings,
     data_manager=data_manager,
     similarity_evaluation=SearchDistanceEvaluation(),
     )
@@ -174,20 +174,19 @@ questions = [
 ]
 
 for question in questions:
-    for _ in range(2):
-        start_time = time.time()
-        response = openai.ChatCompletion.create(
-            model='gpt-3.5-turbo',
-            messages=[
-                {
-                    'role': 'user',
-                    'content': question
-                }
-            ],
-        )
-        print(f'Question: {question}')
-        print("Time consuming: {:.2f}s".format(time.time() - start_time))
-        print(f'Answer: {response_text(response)}\n')
+    start_time = time.time()
+    response = openai.ChatCompletion.create(
+        model='gpt-3.5-turbo',
+        messages=[
+            {
+                'role': 'user',
+                'content': question
+            }
+        ],
+    )
+    print(f'Question: {question}')
+    print("Time consuming: {:.2f}s".format(time.time() - start_time))
+    print(f'Answer: {response_text(response)}\n')
 ```
 
 </details>
@@ -206,7 +205,7 @@ More Docs：
 
 - [System Design, how it was constructed](docs/system.md)
 - [Features, all features currently supported by the cache](docs/feature.md)
-- [Examples, learn better custom caching](examples/example.md)
+- [Examples, learn better custom caching](examples/README.md)
 
 ## 🤗 Modules
 
@@ -220,11 +219,12 @@ The LLM Adapter is designed to integrate different LLM models by unifying their 
 This module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
   - [x] Disable embedding. This will turn GPTCache into a keyword-matching cache.
   - [x] Support OpenAI embedding API.
-  - [x] Support [Towhee](https://towhee.io/) with the paraphrase-albert-small-v2-onnx model.
-  - [ ] Support [Hugging Face](https://huggingface.co/) embedding API.
-  - [ ] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
+  - [x] Support [ONNX](https://onnx.ai/) with the paraphrase-albert-small-v2-onnx model.
+  - [x] Support [Hugging Face](https://huggingface.co/) embedding API.
+  - [x] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
   - [ ] Support [fastText](https://fasttext.cc) embedding API.
-  - [ ] Support [SentenceTransformers](https://www.sbert.net) embedding API.
+  - [x] Support [SentenceTransformers](https://www.sbert.net) embedding API.
+  - [ ] Support other embedding apis
 - **Cache Storage**:
 **Cache Storage** is where the response from LLMs, such as ChatGPT, is stored. Cached responses are retrieved to assist in evaluating similarity and are returned to the requester if there is a good semantic match. At present, GPTCache supports SQLite and offers a universally accessible interface for extension of this module.
   - [x] Support [SQLite](https://sqlite.org/docs.html).
@@ -259,7 +259,7 @@ The **Cache Manager** is responsible for controlling the operation of both the *
 - **Similarity Evaluator**: 
 This module collects data from both the **Cache Storage** and **Vector Store**, and uses various strategies to determine the similarity between the input request and the requests from the **Vector Store**. Based on this similarity, it determines whether a request matches the cache. GPTCache provides a standardized interface for integrating various strategies, along with a collection of implementations to use. The following similarity definitions are currently supported or will be supported in the future:
   - [x] The distance we obtain from the **Vector Store**.
-  - [x] A model-based similarity determined using the albert_duplicate model from [Towhee](https://towhee.io/).
+  - [x] A model-based similarity determined using the albert_duplicate model from [ONNX](https://onnx.ai/).
   - [x] Exact matches between the input request and the requests obtained from the **Vector Store**.
   - [x] Distance represented by applying linalg.norm from numpy to the embeddings.
   - [ ] BM25 and other similarity measurements
