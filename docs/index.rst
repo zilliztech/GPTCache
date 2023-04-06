@@ -107,26 +107,19 @@ To use GPTCache exclusively, only the following lines of code are required, and 
 
 More Docs:
 
-- `Usage, how to use GPTCache better <./usage.md>`_
-- `Features, all features currently supported by the cache <./feature.md>`_
+- `Usage, how to use GPTCache better <./usage.html>`_
+- `Features, all features currently supported by the cache <./feature.html>`_
 - `Examples, learn better custom caching <https://github.com/zilliztech/GPTCache/tree/main/examples>`_
 
-
-Usage
------
-
-GPTCache is easy to understand and can boost your LLM API speed by 100x in just two steps:
-
-1. Build your cache, which includes deciding on embedding functions, similarity evaluation functions, where to store the data, and eviction configurations.
-2. Choose your adapter. GPTCache currently supports the OpenAI chatGPT interface and langchain interface. Langchain supports a variety of LLMs, such as Anthropic, Llama-cpp, Huggingface hub, and Cohere.
-
 .. toctree::
-   :maxdepth: 2
-   :caption: Usage
-   :name: usage
+   :maxdepth: 1
+   :caption: Getting Started
+   :name: getting-started
    :hidden:
 
-   usage
+   usage.md
+   feature.md
+
 
 
 Modules
@@ -189,7 +182,7 @@ Contributing
 
 WWe are extremely open to contributions, be it through new features, enhanced infrastructure, or improved documentation.
 
-For comprehensive instructions on how to contribute, please refer to our `contribution guide <docs/contributing.md>`_.
+For comprehensive instructions on how to contribute, please refer to our `contribution guide <contributing.html>`_.
 
 .. toctree::
    :maxdepth: 1
@@ -197,4 +190,4 @@ For comprehensive instructions on how to contribute, please refer to our `contri
    :name: contributing
    :hidden:
 
-   contributing
+   contributing.md
