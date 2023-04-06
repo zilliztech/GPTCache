@@ -278,7 +278,10 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
   
   **Note**:Not all combinations of different modules may be compatible with each other. For instance, if we disable the **Embedding Extractor**, the **Vector Store** may not function as intended. We are currently working on implementing a combination sanity check for **GPTCache**.
 
-## 😆 Contributing
+## 😇 Roadmap
+
+
+## 😍 Contributing
 We are extremely open to contributions, be it through new features, enhanced infrastructure, or improved documentation.
 
 For comprehensive instructions on how to contribute, please refer to our [contribution guide](docs/contributing.md).
