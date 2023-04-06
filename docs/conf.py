@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'GPT Cache'
+project = 'GPTCache'
 copyright = '2023, Zilliz'
 author = 'Zilliz'
 

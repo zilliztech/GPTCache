@@ -9,8 +9,6 @@ The LLM Adapter is designed to integrate different LLM models by unifying their 
   - [✓] Support OpenAI chatGPT API.
   - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic, and self-hosted models like LLaMa.
 
-**API Reference**: You can find more about APIs and examples [here](./references/adapter.html).
-
 ## Embedding Generator 
 
 This **Embedding Generator** module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
@@ -22,8 +20,6 @@ This **Embedding Generator** module is created to extract embeddings from reques
   - [✓] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
   - [✓] Support [SentenceTransformers](https://www.sbert.net) embedding API.
   - [✓] Support [fastText](https://fasttext.cc) embedding API.
-
-**API Reference**: You can find more about APIs and examples [here](./references/embedding.html).
 
 ## Cache Storage
 
@@ -42,8 +38,6 @@ This **Embedding Generator** module is created to extract embeddings from reques
   - [ ] Support [ElasticSearch](https://www.elastic.co/)
   - [ ] Support [zincsearch](https://zinc.dev/)
   - [ ] Support other storages
-
-**API Reference**: You can find more about APIs and examples [here](./references/cache.html).
 
 ## Vector Store
 
@@ -77,9 +71,9 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
   - [✓] Distance represented by applying linalg.norm from numpy to the embeddings.
   - [ ] BM25 and other similarity measurements
   - [ ] Support other models
-
-**API Reference**: You can find more about APIs and examples [here](./references/similarity_evaluation.html).
  
-  
+
+<br>
+
 #### Note: 
 Not all combinations of different modules may be compatible with each other. For instance, if we disable the **Embedding Extractor**, the **Vector Store** may not function as intended. We are currently working on implementing a combination sanity check for **GPTCache**.
