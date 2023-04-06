@@ -48,7 +48,7 @@ pip install gptcache
 ### dev install
 
 ```bash
-# clone gptcache repo
+# clone GPTCache repo
 git clone https://github.com/zilliztech/GPTCache.git
 cd GPTCache
 
