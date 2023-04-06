@@ -1,3 +1,3 @@
 """ Initialized parameters """
-sqlite_file = 'gptcache.db'
+sqlite_file = 'sqlite.db'
 faiss_file = 'faiss.index'

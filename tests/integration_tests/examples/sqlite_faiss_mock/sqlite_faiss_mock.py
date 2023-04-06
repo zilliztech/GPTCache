@@ -15,7 +15,7 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
-    sqlite_file = 'gptcache.db'
+    sqlite_file = 'sqlite.db'
     faiss_file = 'faiss.index'
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
     data_manager = get_data_manager('sqlite', 'faiss',
