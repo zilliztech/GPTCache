@@ -1,6 +1,6 @@
-# Contributing to GPT Cache
+# 😆 Contributing to GPT Cache
 
-Before contributing to GPT Cache, it is recommended to read the [system design article](./system.md). 
+Before contributing to GPT Cache, it is recommended to read the [system design article](./system.md).
 
 In the process of contributing, pay attention to **the parameter type**, because there is currently no type restriction added.
 
