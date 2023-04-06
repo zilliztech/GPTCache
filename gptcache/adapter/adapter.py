@@ -5,7 +5,6 @@ from ..utils.error import NotInitError
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
-    copy_kwargs = copy.deepcopy(kwargs)
     chat_cache = kwargs.pop("cache_obj", cache)
     if not chat_cache.has_init:
         raise NotInitError()
@@ -55,8 +54,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
 
     next_cache = chat_cache.next_cache
     if next_cache:
-        kwargs = copy_kwargs
         kwargs["cache_obj"] = next_cache
+        kwargs["cache_context"] = context
+        kwargs["cache_skip"] = cache_skip
         llm_data = adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
     else:
         llm_data = llm_handler(*args, **kwargs)
