@@ -4,7 +4,7 @@ import pickle
 import cachetools
 import numpy as np
 
-from .scalar_data.base import ScalarStorage
+from .scalar_data.base import CacheStorage
 from .vector_data.base import VectorBase, ClearStrategy
 from .eviction import EvictionManager
 from ..utils.error import CacheError
@@ -83,7 +83,18 @@ def normalize(vec):
 
 
 class SSDataManager(DataManager):
-    s: ScalarStorage
+    """Generate SSDataManage to manager the data.
+
+    :param max_size: the max size for the cache, defaults to 1000.
+    :type max_size: int.
+    :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
+    :type clean_size: int.
+    :param s: CacheStorage to manager the scalar data.
+    :type s: CacheStorage.
+    :param v: VectorBase to manager the vector data.
+    :type v:  VectorBase.
+    """
+    s: CacheStorage
     v: VectorBase
 
     def __init__(self, max_size, clean_size, s, v):
@@ -112,6 +123,25 @@ class SSDataManager(DataManager):
         self.cur_size = self.s.count()
 
     def save(self, question, answer, embedding_data, **kwargs):
+        """Save the data and vectors to cache and vector storage.
+
+        :param question: question data.
+        :type question: str
+        :param answer: answer data.
+        :type answer: str
+        :param embedding_data: vector data.
+        :type embedding_data: np.ndarray
+
+        Example:
+            .. code-block:: python
+
+                import numpy as np
+                from gptcache.cache.factory import get_ss_data_manager
+
+                data_manager = get_ss_data_manager("sqlite", "faiss", dimension=128)
+                data_manager.save('hello', 'hi', np.random.random((128, )).astype('float32'))
+        """
+
         if self.cur_size >= self.max_size:
             self._clear()
         embedding_data = normalize(embedding_data)
