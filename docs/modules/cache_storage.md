@@ -11,6 +11,6 @@
   - [ ] Support [Redis](https://redis.io/).
   - [ ] Support [Minio](https://min.io/).
   - [ ] Support [HBase](https://hbase.apache.org/).
-  - [ ] Support [ElasticSearch](https://www.elastic.co/)
-  - [ ] Support [zincsearch](https://zinc.dev/)
-  - [ ] Support other storages
+  - [ ] Support [ElasticSearch](https://www.elastic.co/).
+  - [ ] Support [zincsearch](https://zinc.dev/).
+  - [ ] Support other storages.

@@ -5,6 +5,5 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
   - [✓] A model-based similarity determined using the GPTCache/albert-duplicate-onnx model from [ONNX](https://onnx.ai/).
   - [✓] Exact matches between the input request and the requests obtained from the **Vector Store**.
   - [✓] Distance represented by applying linalg.norm from numpy to the embeddings.
-  - [ ] BM25 and other similarity measurements
-  - [ ] Support other models
- 
+  - [ ] BM25 and other similarity measurements.
+  - [ ] Support other model serving framework such as PyTorch.
