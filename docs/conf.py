@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'GPTCache'
-copyright = '2023, Zilliz'
-author = 'Zilliz'
+copyright = '2023, Zilliz Inc.'
+author = 'Zilliz Inc.'
 
 # The full version, including alpha/beta/rc tags
 release = 'main'
