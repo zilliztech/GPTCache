@@ -233,7 +233,7 @@ This module is created to extract embeddings from requests for similarity search
   - [x] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
   - [x] Support [fastText](https://fasttext.cc) embedding API.
   - [x] Support [SentenceTransformers](https://www.sbert.net) embedding API.
-  - [ ] Support other embedding apis
+  - [ ] Support other embedding APIs.
 - **Cache Storage**:
 **Cache Storage** is where the response from LLMs, such as ChatGPT, is stored. Cached responses are retrieved to assist in evaluating similarity and are returned to the requester if there is a good semantic match. At present, GPTCache supports SQLite and offers a universally accessible interface for extension of this module.
   - [x] Support [SQLite](https://sqlite.org/docs.html).
@@ -246,31 +246,31 @@ This module is created to extract embeddings from requests for similarity search
   - [ ] Support [Redis](https://redis.io/).
   - [ ] Support [Minio](https://min.io/).
   - [ ] Support [HBase](https://hbase.apache.org/).
-  - [ ] Support [ElasticSearch](https://www.elastic.co/)
-  - [ ] Support [zincsearch](https://zinc.dev/)
-  - [ ] Support other storages
+  - [ ] Support [ElasticSearch](https://www.elastic.co/).
+  - [ ] Support [zincsearch](https://zinc.dev/).
+  - [ ] Support other storages.
 - **Vector Store**:
 The **Vector Store** module helps find the K most similar requests from the input request's extracted embedding. The results can help assess similarity. GPTCache provides a user-friendly interface that supports various vector stores, including Milvus, Zilliz Cloud, and FAISS. More options will be available in the future.
-  - [x] Support [Milvus](https://milvus.io/), a open-source vector database for production-ready AI/LLM applicaionts 
-  - [x] Support [Zilliz Cloud](https://cloud.zilliz.com/), a fully-managed cloud vector database based on Milvus
+  - [x] Support [Milvus](https://milvus.io/), an open-source vector database for production-ready AI/LLM applicaionts. 
+  - [x] Support [Zilliz Cloud](https://cloud.zilliz.com/), a fully-managed cloud vector database based on Milvus.
   - [x] Support [FAISS](https://faiss.ai/), a library for efficient similarity search and clustering of dense vectors.
   - [ ] Support Pinecone.
-  - [ ] Support other vector databases
+  - [ ] Support other vector databases.
 - **Cache Manager**:
 The **Cache Manager** is responsible for controlling the operation of both the **Cache Storage** and **Vector Store**.
   - **Eviction Policy**:
   Currently, GPTCache makes decisions about evictions based solely on the number of lines. This approach can result in inaccurate resource evaluation and may cause out-of-memory (OOM) errors. We are actively investigating and developing a more sophisticated strategy.
-    - [x] LRU eviction policy
-    - [x] FIFO eviction policy
-    - [ ] More complicated eviction policies
+    - [x] Support LRU eviction policy.
+    - [x] Support FIFO eviction policy.
+    - [ ] Support more complicated eviction policies.
 - **Similarity Evaluator**: 
 This module collects data from both the **Cache Storage** and **Vector Store**, and uses various strategies to determine the similarity between the input request and the requests from the **Vector Store**. Based on this similarity, it determines whether a request matches the cache. GPTCache provides a standardized interface for integrating various strategies, along with a collection of implementations to use. The following similarity definitions are currently supported or will be supported in the future:
   - [x] The distance we obtain from the **Vector Store**.
   - [x] A model-based similarity determined using the GPTCache/albert-duplicate-onnx model from [ONNX](https://onnx.ai/).
   - [x] Exact matches between the input request and the requests obtained from the **Vector Store**.
   - [x] Distance represented by applying linalg.norm from numpy to the embeddings.
-  - [ ] BM25 and other similarity measurements
-  - [ ] Support other model serving framework such as PyTorch
+  - [ ] BM25 and other similarity measurements.
+  - [ ] Support other model serving framework such as PyTorch.
  
   
   **Note**:Not all combinations of different modules may be compatible with each other. For instance, if we disable the **Embedding Extractor**, the **Vector Store** may not function as intended. We are currently working on implementing a combination sanity check for **GPTCache**.
