@@ -65,7 +65,7 @@ from gptcache.core import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
 from gptcache.cache.factory import get_data_manager
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 onnx = Onnx()
 data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)

@@ -26,7 +26,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=parse_requirements('requirements.txt'),
-    url="https://github.com/zilliztech/gptcache",
-    license='http://www.apache.org/licenses/LICENSE-2.0',
+    url="https://github.com/zilliztech/GPTCache",
+    license='https://opensource.org/license/mit/',
     python_requires='>=3.8.1',
 )

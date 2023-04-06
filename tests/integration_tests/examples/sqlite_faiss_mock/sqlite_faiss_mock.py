@@ -3,7 +3,7 @@ import os
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_data_manager
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 import numpy as np
 
 

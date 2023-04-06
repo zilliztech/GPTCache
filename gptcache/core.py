@@ -9,7 +9,7 @@ from .cache.factory import get_user_data_manager
 from .processor.post import first
 from .processor.pre import last_content
 from .similarity_evaluation.similarity_evaluation import SimilarityEvaluation
-from .similarity_evaluation.string import ExactMatchEvaluation
+from .similarity_evaluation.exact_match import ExactMatchEvaluation
 from .utils.error import CacheError
 
 
@@ -139,6 +139,7 @@ class Cache:
 
         :param cache_enable_func: a function to enable cache, defaults to ``cache_all``
         :param pre_embedding_func: a function to preprocess embedding, defaults to ``last_content``
+        :param embedding_func: a function to extract embeddings from requests for similarity search, defaults to ``string_embedding``
         :param data_manager: a ``DataManager`` module, defaults to ``get_user_data_manager("map")``
         :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``AbsoluteEvaluation()``
         :param post_process_messages_func: a function to post-process messages, defaults to ``first``
