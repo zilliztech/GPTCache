@@ -51,6 +51,6 @@ jobs:
       - name: Run examples
         timeout-minutes: 10
         shell: bash
-        working-directory: examples/${{ matrix.data_manager_mode }}
+        working-directory: tests/integration_tests/examples/${{ matrix.data_manager_mode }}
         run: |
           python ${{ matrix.data_manager_mode }}.py
