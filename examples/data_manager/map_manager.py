@@ -1,6 +1,6 @@
 import os
 
-from gptcache.cache.factory import get_user_data_manager
+from gptcache.manager.factory import get_user_data_manager
 from gptcache.adapter import openai
 from gptcache import cache
 

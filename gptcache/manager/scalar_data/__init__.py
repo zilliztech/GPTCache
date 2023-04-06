@@ -2,7 +2,7 @@ __all__ = ['SQLDataBase', 'SQL_URL']
 
 from gptcache.utils.lazy_import import LazyImport
 
-sql_database = LazyImport('milvus', globals(), 'gptcache.cache.scalar_data.sqlalchemy')
+sql_database = LazyImport('milvus', globals(), 'gptcache.manager.scalar_data.sqlalchemy')
 
 
 def SQLDataBase(**kwargs):

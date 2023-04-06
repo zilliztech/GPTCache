@@ -4,8 +4,8 @@ import time
 import openai
 
 from .embedding.string import to_embeddings as string_embedding
-from .cache.data_manager import DataManager
-from .cache.factory import get_user_data_manager
+from .manager.data_manager import DataManager
+from .manager.factory import get_user_data_manager
 from .processor.post import first
 from .processor.pre import last_content
 from .similarity_evaluation.similarity_evaluation import SimilarityEvaluation

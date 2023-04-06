@@ -2,7 +2,7 @@ import os
 import unittest
 import numpy as np
 
-from gptcache.cache.factory import get_data_manager
+from gptcache.manager.factory import get_data_manager
 
 DIM = 8
 

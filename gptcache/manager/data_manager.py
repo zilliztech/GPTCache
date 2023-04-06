@@ -136,9 +136,9 @@ class SSDataManager(DataManager):
             .. code-block:: python
 
                 import numpy as np
-                from gptcache.cache.factory import get_ss_data_manager
+                from gptcache.manager.factory import get_data_manager
 
-                data_manager = get_ss_data_manager("sqlite", "faiss", dimension=128)
+                data_manager = get_data_manager("sqlite", "faiss", dimension=128)
                 data_manager.save('hello', 'hi', np.random.random((128, )).astype('float32'))
         """
 

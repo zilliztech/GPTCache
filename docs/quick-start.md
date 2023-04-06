@@ -127,7 +127,7 @@ def response_text(openai_resp):
 from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Towhee
-from gptcache.cache.factory import get_ss_data_manager
+from gptcache.manager.factory import get_data_manager
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
 print("Cache loading.....")
