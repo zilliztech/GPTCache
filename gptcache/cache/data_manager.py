@@ -93,17 +93,20 @@ class SSDataManager(DataManager):
     :type s: CacheStorage.
     :param v: VectorBase to manager the vector data.
     :type v:  VectorBase.
+    :param eviction: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
+    :type eviction:  str.
     """
     s: CacheStorage
     v: VectorBase
 
-    def __init__(self, max_size, clean_size, s, v):
+    def __init__(self, max_size, clean_size, s, v, eviction='LRU'):
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size
         self.s = s
         self.v = v
-        self.eviction = EvictionManager(s, v)
+        self.eviction = EvictionManager(s, v, eviction)
+        self.init()
 
     def init(self, **kwargs):
         self.s.init(**kwargs)

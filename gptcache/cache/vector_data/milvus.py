@@ -145,7 +145,7 @@ class Milvus(VectorBase):
         return search_tuples
 
     def clear_strategy(self):
-        return ClearStrategy.DELETE    
+        return ClearStrategy.DELETE
 
     def delete(self, ids):
         pks = ",".join(['"' + x + '"' for x in ids])

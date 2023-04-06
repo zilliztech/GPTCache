@@ -6,9 +6,10 @@ class EvictionManager:
     MAX_MARK_RATE = 0.1
     BATCH_SIZE = 100000
 
-    def __init__(self, scalar_storage, vector_base):
+    def __init__(self, scalar_storage, vector_base, policy="LRU"):
         self._scalar_storage = scalar_storage
         self._vector_base = vector_base
+        self._policy = policy
 
     def check_evict(self):
         mark_count = self._scalar_storage.count(state=-1)
@@ -34,6 +35,9 @@ class EvictionManager:
             offset += self.BATCH_SIZE
 
     def soft_evict(self, count):
-        marked_keys = self._scalar_storage.get_old_access(count)
+        if self._policy == "FIFO":
+            marked_keys = self._scalar_storage.get_old_create(count)
+        else:
+            marked_keys = self._scalar_storage.get_old_access(count)
         marked_keys = [i[0] for i in marked_keys]
         self._scalar_storage.update_state(marked_keys)
