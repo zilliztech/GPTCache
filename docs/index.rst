@@ -39,7 +39,7 @@ A good analogy for GptCache is to think of it as a more semantic version of Redi
 - For purpose-built SaaS services, users tend to ask questions within a specific domain, with both temporal and spatial locality.
 - By utilizing vector similarity search, it is possible to find a similarity relationship between questions and answers at a relatively low cost.
 
-We provide `benchmark <https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_towhee.py>`_ to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
+We provide `benchmark <https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py>`_ to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
 
 😆 Contributing
 ===============

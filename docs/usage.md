@@ -95,42 +95,37 @@ class Cache:
     ```
 
     ```python
-    class Towhee: 
-        # english model: paraphrase-albert-small-v2-onnx
-        # chinese model: uer/albert-base-chinese-cluecorpussmall-onnx
-        def __init__(self, model = "paraphrase-albert-small-v2-onnx"):
-            if model == "paraphrase-albert-small-v2-onnx":
-                self._pipe = (
-                    pipe.input('text')
-                        .map('text', 'vec',
-                            ops.towhee.paraphrase_albert_small_v2_onnx())
-                        .map('vec', 'vec', ops.towhee.np_normalize())
-                        .output('text', 'vec')
-                )
-            elif model == "uer/albert-base-chinese-cluecorpussmall-onnx":
-                self._pipe = (
-                    pipe.input('text')
-                        .map('text', 'vec',
-                             ops.towhee.albert_base_chinese_onnx())
-                        .map('vec', 'vec', ops.towhee.np_normalize())
-                        .output('text', 'vec')
-                )
+    class Cohere:
+
+        def __init__(self, model: str="large", api_key: str=None, **kwargs):
+            self.co = cohere.Client(api_key)
+            self.model = model
+
+            if model in self.dim_dict():
+                self.__dimension = self.dim_dict()[model]
             else:
-                self._pipe = (
-                    pipe.input('text')
-                        .map('text', 'vec',
-                             ops.sentence_embedding.transformers(model_name=model))
-                        .map('vec', 'vec', ops.towhee.np_normalize())
-                        .output('text', 'vec')
-                )
-            self.__dimension = len(self._pipe("foo").get_dict()['vec'])
+                self.__dimension = None
+    
+        def to_embeddings(self, data):
+            if not isinstance(data, list):
+                data = [data]
+            response = self.co.embed(texts=data, model=self.model)
+            embeddings = response.embeddings
+            return np.array(embeddings).astype('float32').squeeze(0)
 
-        def to_embeddings(self, data, **kwargs):
-            emb = self._pipe(data).get_dict()['vec']
-            return np.array(emb).astype('float32')
-
+        @property
         def dimension(self):
+            if not self.__dimension:
+                foo_emb = self.to_embeddings("foo")
+                self.__dimension = len(foo_emb)
             return self.__dimension
+    
+        @staticmethod
+        def dim_dict():
+            return {
+                "large": 4096,
+                "small": 1024
+            }
     ```
 
     Note that if you intend to use the model, it should be packaged with a class. The model will be loaded when the object is created to avoid unnecessary loading when not in use. This also ensures that the model is not loaded multiple times during program execution.
@@ -234,20 +229,16 @@ class Cache:
   ```
   
   ```python
-  class Towhee:
+  class ModelEvaluation:
       def __init__(self):
-          self._pipe = (
-              pipe.input('text', 'candidate')
-                  .map(('text', 'candidate'), 'similarity', ops.towhee.albert_duplicate())
-                  .output('similarity')
-          )
+          self.model = initialize_model()
   
       # WARNING: the model cannot evaluate text with more than 512 tokens
       def evaluation(self, src_dict, cache_dict, **kwargs):
           try:
               src_question = src_dict["question"]
               cache_question = cache_dict["question"]
-              return self._pipe(src_question, [cache_question]).get_dict()['similarity'][0]
+              return self.model(src_question, [cache_question])
           except Exception:
               return 0
   ```
@@ -277,10 +268,10 @@ class Cache:
 - **cache_obj**: customize request cache, use global variable cache by default.
 
 ```python
-towhee = Towhee()
-data_manager = get_si_data_manager("sqlite", "faiss", dimension=towhee.dimension)
+onnx = Onnx()
+data_manager = get_si_data_manager("sqlite", "faiss", dimension=onnx.dimension)
 one_cache = Cache()
-one_cache.init(embedding_func=towhee.to_embeddings,
+one_cache.init(embedding_func=onnx.to_embeddings,
                data_manager=data_manager,
                evaluation_func=pair_evaluation,
                config=Config(

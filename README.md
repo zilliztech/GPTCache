@@ -219,7 +219,7 @@ The LLM Adapter is designed to integrate different LLM models by unifying their 
 This module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
   - [x] Disable embedding. This will turn GPTCache into a keyword-matching cache.
   - [x] Support OpenAI embedding API.
-  - [x] Support [ONNX](https://onnx.ai/) with the paraphrase-albert-small-v2-onnx model.
+  - [x] Support [ONNX](https://onnx.ai/) with the GPTCache/paraphrase-albert-onnx model.
   - [x] Support [Hugging Face](https://huggingface.co/) embedding API.
   - [x] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
   - [ ] Support [fastText](https://fasttext.cc) embedding API.
@@ -259,7 +259,7 @@ The **Cache Manager** is responsible for controlling the operation of both the *
 - **Similarity Evaluator**: 
 This module collects data from both the **Cache Storage** and **Vector Store**, and uses various strategies to determine the similarity between the input request and the requests from the **Vector Store**. Based on this similarity, it determines whether a request matches the cache. GPTCache provides a standardized interface for integrating various strategies, along with a collection of implementations to use. The following similarity definitions are currently supported or will be supported in the future:
   - [x] The distance we obtain from the **Vector Store**.
-  - [x] A model-based similarity determined using the albert_duplicate model from [ONNX](https://onnx.ai/).
+  - [x] A model-based similarity determined using the GPTCache/albert-duplicate-onnx model from [ONNX](https://onnx.ai/).
   - [x] Exact matches between the input request and the requests obtained from the **Vector Store**.
   - [x] Distance represented by applying linalg.norm from numpy to the embeddings.
   - [ ] BM25 and other similarity measurements
