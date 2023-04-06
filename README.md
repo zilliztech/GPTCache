@@ -1,4 +1,4 @@
-# GPTCache: A Library for Creating Semantic Cache to Store Responses from LLM Queries
+# GPTCache : A Library for Creating Semantic Cache to Store Responses from LLM Queries
 Boost LLM API Speed by 100x ⚡, Slash Costs by 10x 💰
 
 [![Release](https://img.shields.io/pypi/v/gptcache?label=Release&color)](https://pypi.org/project/gptcache/)
