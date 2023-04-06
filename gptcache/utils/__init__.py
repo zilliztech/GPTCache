@@ -1,10 +1,8 @@
-__all__ = ['import_pymilvus', 'import_towhee',
+__all__ = ['import_pymilvus', 'import_huggingface_hub',
            'import_faiss', 'import_chromadb',
            'import_sqlalchemy', 'import_sql_client',
            'import_huggingface', 'import_torch',
-           'import_sbert', 'import_onnxruntime', 
-           'import_huggingface_hub', 'import_cohere']
-
+           'import_sbert', 'import_onnxruntime', 'import_cohere' ]
 from .dependency_control import prompt_install
 
 
@@ -31,13 +29,6 @@ def import_cohere():
     except ModuleNotFoundError:
         prompt_install('cohere')
         import cohere
-
-def import_towhee():
-    try:
-        import towhee
-    except ModuleNotFoundError as e:
-        prompt_install('towhee==0.9.0')
-        import towhee
 
 def import_huggingface():
     try:

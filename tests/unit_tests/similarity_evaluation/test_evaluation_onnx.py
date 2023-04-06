@@ -1,10 +1,10 @@
 import math
 
-from gptcache.similarity_evaluation import Towhee
+from gptcache.similarity_evaluation import Onnx
 
 
-def test_towhee():
-    evaluation = Towhee()
+def test_onnx():
+    evaluation = Onnx()
 
     range_min, range_max = evaluation.range()
     assert math.isclose(range_min, 0.0)
@@ -43,3 +43,4 @@ def test_towhee():
         }
     )
     assert score < 0.1
+

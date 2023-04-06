@@ -8,7 +8,7 @@ from common import common_func as cf
 from gptcache.adapter import openai
 from gptcache.cache.factory import get_ss_data_manager
 from gptcache.core import cache, Config
-from gptcache.embedding import Towhee
+from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
 
@@ -28,12 +28,12 @@ class TestSqliteInvalid(Base):
         method: input non-num and num which is out of range [0, 1]
         expected: raise exception and report the error
         """
-        towhee = Towhee()
+        onnx = Onnx()
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                            dimension=towhee.dimension, max_size=2000)
+                                            dimension=onnx.dimension, max_size=2000)
         is_exception = False
         try:
-            cache.init(embedding_func=towhee.to_embeddings,
+            cache.init(embedding_func=onnx.to_embeddings,
                        data_manager=data_manager,
                        similarity_evaluation=SearchDistanceEvaluation,
                        config=Config(
@@ -54,10 +54,10 @@ class TestSqliteInvalid(Base):
         method: set similarity_threshold as 1 and no openai key
         expected: raise exception and report the error
         """
-        towhee = Towhee()
+        onnx = Onnx()
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                            dimension=towhee.dimension, max_size=2000)
-        cache.init(embedding_func=towhee.to_embeddings,
+                                            dimension=onnx.dimension, max_size=2000)
+        cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation,
                    config=Config(
@@ -98,10 +98,10 @@ class TestSqliteFaiss(Base):
         expected: hit successfully
         """
 
-        towhee = Towhee()
+        onnx = Onnx()
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                            dimension=towhee.dimension, max_size=2000)
-        cache.init(embedding_func=towhee.to_embeddings,
+                                            dimension=onnx.dimension, max_size=2000)
+        cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation(),
                    config=Config(
@@ -129,10 +129,10 @@ class TestSqliteFaiss(Base):
         expected: hit successfully
         """
 
-        towhee = Towhee()
+        onnx = Onnx()
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                            dimension=towhee.dimension, max_size=2000)
-        cache.init(embedding_func=towhee.to_embeddings,
+                                            dimension=onnx.dimension, max_size=2000)
+        cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation(),
                    config=Config(
@@ -160,10 +160,10 @@ class TestSqliteFaiss(Base):
         method: set similarity_threshold as 0
         expected: raise exception and report the error
         """
-        towhee = Towhee()
+        onnx = Onnx()
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                            dimension=towhee.dimension, max_size=2000)
-        cache.init(embedding_func=towhee.to_embeddings,
+                                            dimension=onnx.dimension, max_size=2000)
+        cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation,
                    config=Config(
@@ -199,11 +199,11 @@ class TestSqliteFaiss(Base):
         expected: hit successfully
         """
 
-        towhee = Towhee()
+        onnx = Onnx()
         data_manager = get_ss_data_manager("sqlite", "faiss",
-                                            dimension=towhee.dimension, max_size=2000)
+                                            dimension=onnx.dimension, max_size=2000)
         cache.init(cache_enable_func=cf.disable_cache,
-                   embedding_func=towhee.to_embeddings,
+                   embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation(),
                    config=Config(

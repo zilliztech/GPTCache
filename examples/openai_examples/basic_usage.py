@@ -3,7 +3,7 @@ import time
 
 from gptcache.cache.factory import get_data_manager, get_ss_data_manager
 from gptcache.core import cache, Cache, Config
-from gptcache.embedding import Towhee
+from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 from gptcache.adapter import openai
 
@@ -65,10 +65,10 @@ def stream_request():
 
 
 def similar_request():
-    towhee = Towhee()
-    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=towhee.dimension)
+    onnx = Onnx()
+    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=onnx.dimension)
     one_cache = Cache()
-    one_cache.init(embedding_func=towhee.to_embeddings,
+    one_cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation(),
                    )
