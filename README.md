@@ -20,7 +20,7 @@ Twitter: https://twitter.com/zilliz_universe.
 
 ## 🚀 What is GPTCache?
 
-ChatGPT and various large language models (LLMs) boast incredible versatility, enabling the development of a wide range of applications. However, ChatGPT might exhibit slow response times, especially when dealing with a significant number of requests. Additionally, as your application grows in popularity and encounters higher traffic levels, the expenses related to ChatGPT API calls can become substantial. 
+ChatGPT and various large language models (LLMs) boast incredible versatility, enabling the development of a wide range of applications. However, LLM service might exhibit slow response times, especially when dealing with a significant number of requests. Additionally, as your application grows in popularity and encounters higher traffic levels, the expenses related to LLM API calls can become substantial. 
 
 To tackle this challenge, we have created GPTCache, a project dedicated to building a semantic cache for storing LLM responses. This library offers three primary benefits:
 
