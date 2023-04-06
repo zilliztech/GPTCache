@@ -2,7 +2,7 @@ import os
 
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
-from gptcache.cache.factory import get_ss_data_manager
+from gptcache.cache.factory import get_data_manager
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 import numpy as np
 
@@ -18,9 +18,9 @@ def run():
     sqlite_file = "gptcache.db"
     has_data = os.path.isfile(sqlite_file)
     # milvus
-    data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2)
+    data_manager = get_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2)
     # zilliz cloud
-    # data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2,
+    # data_manager = get_data_manager("sqlite", "milvus", dimension=d, max_size=8, clean_size=2,
     #                                    host="xxx.zillizcloud.com",
     #                                    port=19530,
     #                                    user="xxx", password="xxx", is_https=True,

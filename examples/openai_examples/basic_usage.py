@@ -1,7 +1,7 @@
 import os
 import time
 
-from gptcache.cache.factory import get_data_manager, get_ss_data_manager
+from gptcache.cache.factory import get_data_manager, get_user_data_manager
 from gptcache.core import cache, Cache, Config
 from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
@@ -14,7 +14,7 @@ def response_text(openai_resp):
 
 def cache_init():
     dir_name, _ = os.path.split(os.path.abspath(__file__))
-    cache.init(data_manager=get_data_manager("map"))
+    cache.init(data_manager=get_user_data_manager("map"))
     os.environ["OPENAI_API_KEY"] = "API KEY"
     cache.set_openai_key()
 
@@ -66,7 +66,7 @@ def stream_request():
 
 def similar_request():
     onnx = Onnx()
-    data_manager = get_ss_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+    data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
     one_cache = Cache()
     one_cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,

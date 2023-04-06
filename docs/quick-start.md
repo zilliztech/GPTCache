@@ -180,4 +180,4 @@ cache.set_openai_key()
 **More Docs**
 - [System Design, how it was constructed](./system.md)
 - [Features, all features currently supported by the cache](./feature.md)
-- [Examples, learn better custom caching](https://github.com/zilliztech/GPTCache/blob/main/examples/README.md)
+- [Examples, learn better custom caching](https://github.com/zilliztech/GPTCache/blob/main/examples)

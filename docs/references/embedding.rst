@@ -25,3 +25,8 @@ gptcache.embedding.sbert
 .. automodule:: gptcache.embedding.sbert
    :members:
 
+gptcache.embedding.fasttext
+---------------------------
+.. automodule:: gptcache.embedding.fasttext
+   :members:
+

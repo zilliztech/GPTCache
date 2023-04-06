@@ -64,11 +64,11 @@ print("Cache loading.....")
 from gptcache.core import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
-from gptcache.cache.factory import get_ss_data_manager
+from gptcache.cache.factory import get_data_manager
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
 onnx = Onnx()
-data_manager = get_ss_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
 cache.init(
     embedding_func=onnx.to_embeddings,
     data_manager=data_manager,

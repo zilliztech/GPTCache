@@ -8,7 +8,7 @@ from sqlalchemy.types import String, DateTime, LargeBinary, Integer
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from .base import ScalarStorage, TABLE_NAME, TABLE_NAME_SEQ
+from .base import CacheStorage, TABLE_NAME, TABLE_NAME_SEQ
 
 Base = declarative_base()
 
@@ -45,7 +45,7 @@ class CacheTableSequence(Base):
     state = Column(Integer, default=0)
 
 
-class SQLDataBase(ScalarStorage):
+class SQLDataBase(CacheStorage):
     """
     Using sqlalchemy to manage SQLite, PostgreSQL, MySQL, MariaDB, SQL Server and Oracle.
     """
