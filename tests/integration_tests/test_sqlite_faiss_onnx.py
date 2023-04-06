@@ -6,7 +6,7 @@ from utils.util_log import test_log as log
 from common import common_func as cf
 
 from gptcache.adapter import openai
-from gptcache.cache.factory import get_ss_data_manager
+from gptcache.cache.factory import get_data_manager
 from gptcache.core import cache, Config
 from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
@@ -29,7 +29,7 @@ class TestSqliteInvalid(Base):
         expected: raise exception and report the error
         """
         onnx = Onnx()
-        data_manager = get_ss_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager("sqlite", "faiss",
                                             dimension=onnx.dimension, max_size=2000)
         is_exception = False
         try:
@@ -55,7 +55,7 @@ class TestSqliteInvalid(Base):
         expected: raise exception and report the error
         """
         onnx = Onnx()
-        data_manager = get_ss_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager("sqlite", "faiss",
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -99,7 +99,7 @@ class TestSqliteFaiss(Base):
         """
 
         onnx = Onnx()
-        data_manager = get_ss_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager("sqlite", "faiss",
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -130,7 +130,7 @@ class TestSqliteFaiss(Base):
         """
 
         onnx = Onnx()
-        data_manager = get_ss_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager("sqlite", "faiss",
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -161,7 +161,7 @@ class TestSqliteFaiss(Base):
         expected: raise exception and report the error
         """
         onnx = Onnx()
-        data_manager = get_ss_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager("sqlite", "faiss",
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -200,7 +200,7 @@ class TestSqliteFaiss(Base):
         """
 
         onnx = Onnx()
-        data_manager = get_ss_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager("sqlite", "faiss",
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(cache_enable_func=cf.disable_cache,
                    embedding_func=onnx.to_embeddings,

@@ -6,7 +6,7 @@ import numpy as np
 
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
-from gptcache.cache.factory import get_ss_data_manager
+from gptcache.cache.factory import get_data_manager
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 
 
@@ -23,7 +23,7 @@ def run():
     cx_Oracle.init_oracle_client(lib_dir="/Users/root/Downloads/instantclient_19_8")
 
     # `sql_url` defaults to 'oracle+cx_oracle://oracle:123456@127.0.0.1:1521/?service_name=helowin&encoding=UTF-8&nencoding=UTF-8'
-    data_manager = get_ss_data_manager("oracle", "milvus", dimension=d, max_size=8, clean_size=2)
+    data_manager = get_data_manager("oracle", "milvus", dimension=d, max_size=8, clean_size=2)
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                similarity_evaluation=SearchDistanceEvaluation(),

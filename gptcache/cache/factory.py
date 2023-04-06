@@ -5,7 +5,7 @@ from ..utils.error import NotFoundStoreError, ParamError
 from ..utils import import_sql_client
 
 
-def get_data_manager(data_manager_name: str, **kwargs) -> DataManager:
+def get_user_data_manager(data_manager_name: str, **kwargs) -> DataManager:
     if data_manager_name == "map":
         from .data_manager import MapDataManager
 
@@ -49,7 +49,7 @@ def _check_dimension(dimension):
 
 
 # scalar_store + vector_store
-def get_ss_data_manager(cache_store: str, vector_store: str, **kwargs):
+def get_data_manager(cache_store: str, vector_store: str, **kwargs):
     """Generate SSDataManager with the cache and vector configuration.
 
     :param cache_store: the name of the cache storage, it is support "sqlite", "postgresql", "mysql", "mariadb", "sqlserver" and  "oracle" now.
