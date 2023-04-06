@@ -28,7 +28,7 @@ To tackle this challenge, we have created GPTCache, a project dedicated to build
 2. **Decreased expenses**: Most LLM services charge fees based on a combination of number of requests and [token count](https://openai.com/pricing). By caching query results, GPTCache reduces both the number of requests and the number of tokens sent to the LLM service, which in turn minimizes the overall cost of using the service. 
 3. **Improved scalability and availability**: LLM services frequently enforce [rate limits](https://platform.openai.com/docs/guides/rate-limits), which are constraints that APIs place on the number of times a user or client can access the server within a given timeframe. Hitting a rate limit means that additional requests will be blocked until a certain period has elapsed, leading to a service outage. GPTCache can easily scale to accommodate an increasing volume of of queries, ensuring consistent performance as your application's user base expands.
 
-## 🤔 How does GTPCache work?
+## 🤔 How does it work?
 
 A good analogy for GptCache is to think of it as a more semantic version of Redis. In GptCache, hits are not limited to exact matches, but rather also include prompts and context similar to previous queries. We believe that the traditional cache design still works for AIGC applications due to the following reasons:
 
