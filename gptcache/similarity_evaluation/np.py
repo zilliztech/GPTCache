@@ -44,6 +44,7 @@ class NumpyNormEvaluation(SimilarityEvaluation):
 
     def evaluation(self, src_dict, cache_dict, **kwargs):
         """Evaluate the similarity score of pair.
+        
         :param src_dict: the query dictionary to evaluate with cache.
         :type src_dict: Dict
         :param cache_dict: the cache dictionary.

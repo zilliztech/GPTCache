@@ -6,7 +6,7 @@ This module is created to extract embeddings from requests for similarity search
   - [x] Support [ONNX](https://onnx.ai/) with the GPTCache/paraphrase-albert-onnx model.
   - [x] Support [Hugging Face](https://huggingface.co/) embedding API.
   - [x] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
-  - [ ] Support [fastText](https://fasttext.cc) embedding API.
+  - [x] Support [fastText](https://fasttext.cc) embedding API.
   - [x] Support [SentenceTransformers](https://www.sbert.net) embedding API.
   - [ ] Support other embedding apis
 

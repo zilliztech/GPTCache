@@ -25,6 +25,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
 
     Example:
         .. code-block:: python
+
             from gptcache.similarity_evaluation import OnnxModelEvaluation
             
             evaluation = OnnxModelEvaluation()
@@ -47,6 +48,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
     # WARNING: the model cannot evaluate text with more than 512 tokens
     def evaluation(self, src_dict, cache_dict, **kwargs):
         """Evaluate the similarity score of pair.
+
         :param src_dict: the query dictionary to evaluate with cache.
         :type src_dict: Dict
         :param cache_dict: the cache dictionary.
@@ -72,6 +74,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
 
     def inference(self, reference: str, candidates: List[str]) -> np.ndarray:
         """Inference the ONNX model.
+        
         :param reference: reference sentence.
         :type reference: str 
         :param candidates: candidate sentences.
