@@ -20,12 +20,13 @@ Twitter: https://twitter.com/zilliz_universe.
 
 ## 🤠 What is GPTCache?
 
-ChatGPT and various large language models (LLMs) possess remarkable adaptability, facilitating the creation of numerous applications. However, ChatGPT might exhibit slow response times, especially when dealing with a significant number of requests. Moreover, as your application grows in popularity and encounters higher traffic levels, the expenses related to ChatGPT API calls can become substantial. 
+ChatGPT and various large language models (LLMs) boast incredible versatility, enabling the development of a wide range of applications. However, ChatGPT might exhibit slow response times, especially when dealing with a significant number of requests. Additionally, as your application grows in popularity and encounters higher traffic levels, the expenses related to ChatGPT API calls can become substantial. 
 
-To address this issue, we have developed GPTCache, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
+To tackle this challenge, we have created GPTCache, a project dedicated to building a semantic cache for storing LLM responses. This library offers three primary benefits:
 
-1. Quick response to user requests: the caching system provides faster response times compared to large model inference, resulting in lower latency and faster response to user requests.
-2. Reduced service costs: most LLM services are currently charged based on the number of tokens. If user requests hit the cache, it can reduce the number of requests and lower service costs.
+1. **Enhanced performance**: LLMs employ generative AI algorithms to generate responses in real-time, a process that can sometimes be time-consuming. However, when a query is cached, the response time significantly improves, as the result is fetched directly from the cache, eliminating the need to interact with the LLM service. In most situations, GPTCache can also provide superior query throughput compared to standard LLM services.
+2. **Decreased expenses**: Most LLM services [charge fees](https://openai.com/pricing) based on a combination of number of requests and token count. By caching query results, GPTCache reduces both the number of requests and the number of tokens sent to the LLM service, which in turn minimizes the overall cost of using the service. 
+3. **Improved** scalability and availability**: LLM services frequently enforce [rate limits](https://platform.openai.com/docs/guides/rate-limits), which are constraints that APIs place on the number of times a user or client can access the server within a given timeframe. Hitting a rate limit means that additional requests will be blocked until a certain period has elapsed, leading to a service outage. GPTCache can easily scale to accommodate an increasing volume of of queries, ensuring consistent performance as your application's user base expands.
 
 ## 🤔 Why would GPTCache be helpful?
 
@@ -257,8 +258,6 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [Milvus](https://milvus.io/).
   - [x] Support [Zilliz Cloud](https://cloud.zilliz.com/).
   - [x] Support [FAISS](https://faiss.ai/).
-  - [x] Support [Chroma](https://www.trychroma.com/)
-  - [ ] Support [PGVector](https://github.com/pgvector/pgvector)
   - [ ] Support other vector databases
 - **Cache Manager**:
 The **Cache Manager** is responsible for controlling the operation of both the **Cache Storage** and **Vector Store**.
