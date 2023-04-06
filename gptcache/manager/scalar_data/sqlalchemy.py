@@ -56,7 +56,7 @@ class SQLDataBase(CacheStorage):
     """
     Using sqlalchemy to manage SQLite, PostgreSQL, MySQL, MariaDB, SQL Server and Oracle.
     """
-    def __init__(self, db_type: str = 'sqlite', url: str = 'sqlite:///./gptcache.db', table_name: str = 'gptcache'):
+    def __init__(self, db_type: str = 'sqlite', url: str = 'sqlite:///./sqlite.db', table_name: str = 'gptcache'):
         self._url = url
         self._model = get_model(table_name, db_type)
         self._engine = create_engine(self._url)

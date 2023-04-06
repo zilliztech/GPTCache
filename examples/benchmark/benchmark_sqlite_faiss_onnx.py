@@ -31,6 +31,7 @@ def run():
     #         if rank1 <= 0.5:
     #             rank2 = evaluation_onnx.evaluation(src_dict, cache_dict, **kwargs)
     #             return rank2 if rank2 != 0 else 1
+    #         return 0
     # 
     #     def range(self):
     #         return 0.0, 1.0
@@ -40,9 +41,9 @@ def run():
             return super().evaluation(src_dict, cache_dict, **kwargs)
 
         def range(self):
-            return 0.0, 1.0
+            return super().range()
 
-    sqlite_file = 'gptcache.db'
+    sqlite_file = 'sqlite.db'
     faiss_file = 'faiss.index'
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
 
@@ -50,6 +51,9 @@ def run():
     cache.init(embedding_func=embedding_onnx.to_embeddings,
                data_manager=data_manager,
                similarity_evaluation=WrapEvaluation(),
+               config=Config(
+                   similarity_threshold=0.95
+               ),
                )
 
     i = 0

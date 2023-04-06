@@ -455,6 +455,6 @@ similarity evaluation func: pair_evaluation (search distance)
 
  | threshold | average time | positive | negative | fail count |
 |-----------|--------------|----------|----------|------------|
-| 20        | 0.04s        | 455      | 27       | 517        |
-| 50        | 0.09s        | 871      | 86       | 42         |
-| 100       | 0.12s        | 905      | 93       | 1          |
+| 0.95      | 0.12s        | 425      | 25       | 549        |
+| 0.9       | 0.23s        | 804      | 77       | 118        |
+| 0.8       | 0.26s        | 904      | 92       | 3          |
