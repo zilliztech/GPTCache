@@ -25,19 +25,28 @@ ChatGPT and various large language models (LLMs) boast incredible versatility, e
 
 To tackle this challenge, we have created GPTCache, a project dedicated to building a semantic cache for storing LLM responses. This library offers the following primary benefits:
 
-1. **Decreased expenses**: Most LLM services charge fees based on a combination of number of requests and [token count](https://openai.com/pricing). By caching query results, GPTCache reduces both the number of requests and the number of tokens sent to the LLM service. This minimizes the overall cost of using the service. 
-2. **Enhanced performance**: LLMs employ generative AI algorithms to generate responses in real-time, a process that can sometimes be time-consuming. However, when a similar query is cached, the response time significantly improves, as the result is fetched directly from the cache, eliminating the need to interact with the LLM service. In most situations, GPTCache can also provide superior query throughput compared to standard LLM services.
-3. **Improved scalability and availability**: LLM services frequently enforce [rate limits](https://platform.openai.com/docs/guides/rate-limits), which are constraints that APIs place on the number of times a user or client can access the server within a given timeframe. Hitting a rate limit means that additional requests will be blocked until a certain period has elapsed, leading to a service outage. With GPTCache, you can easily scale to accommodate an increasing volume of of queries, ensuring consistent performance as your application's user base expands.
-4. **Flexible development environment**: When developing LLM applications, an LLM APIs connection is required to prove concepts. GPTCache offers the same interface as LLM APIs and can store LLM-generated or mocked data. This helps to verify your application's features without connecting to the LLM APIs or even the network.
+- **Decreased expenses**: Most LLM services charge fees based on a combination of number of requests and [token count](https://openai.com/pricing). By caching query results, GPTCache reduces both the number of requests and the number of tokens sent to the LLM service. This minimizes the overall cost of using the service. 
+- **Enhanced performance**: LLMs employ generative AI algorithms to generate responses in real-time, a process that can sometimes be time-consuming. However, when a similar query is cached, the response time significantly improves, as the result is fetched directly from the cache, eliminating the need to interact with the LLM service. In most situations, GPTCache can also provide superior query throughput compared to standard LLM services.
+- **Improved scalability and availability**: LLM services frequently enforce [rate limits](https://platform.openai.com/docs/guides/rate-limits), which are constraints that APIs place on the number of times a user or client can access the server within a given timeframe. Hitting a rate limit means that additional requests will be blocked until a certain period has elapsed, leading to a service outage. With GPTCache, you can easily scale to accommodate an increasing volume of of queries, ensuring consistent performance as your application's user base expands.
+- **Flexible development environment**: When developing LLM applications, an LLM APIs connection is required to prove concepts. GPTCache offers the same interface as LLM APIs and can store LLM-generated or mocked data. This helps to verify your application's features without connecting to the LLM APIs or even the network.
 
 ## 🤔 How does it work?
 
 Online services often exhibit data locality, with users frequently accessing popular or trending content. Cache systems take advantage of this behavior by storing commonly accessed data, which in turn reduces data retrieval time, improves response times, and eases the burden on backend servers. Traditional cache systems typically utilize an exact match between a new query and a cached query to determine if the requested content is available in the cache before fetching the data.
 
-However, using an exact match approach for LLM caches is less effective due to the complexity and variability of LLM queries, resulting in a low cache hit rate. To address this issue, GPTCache adopt alternative strategies like semantic caching. Semantic caching identifies and stores similar or related queries, thereby increasing cache hit probability and enhancing overall caching efficiency. GPTCache employs embedding algorithms to convert queries into embeddings and uses a vector store for similarity search on these embeddings. This process allows GPTCache to identify and retrieve similar or related queries from the cache storage, as illustrated in the [Modules section](https://github.com/zilliztech/GPTCache#-modules). 
+However, using an exact match approach for LLM caches is less effective due to the complexity and variability of LLM queries, resulting in a low cache hit rate. To address this issue, GPTCache adopt alternative strategies like semantic caching. Semantic caching identifies and stores similar or related queries, thereby increasing cache hit probability and enhancing overall caching efficiency. 
 
-In semantic caching, there are three key measurement dimensions: false positives, false negatives, and latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
-We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py) to illustrate the concept. 
+GPTCache employs embedding algorithms to convert queries into embeddings and uses a vector store for similarity search on these embeddings. This process allows GPTCache to identify and retrieve similar or related queries from the cache storage, as illustrated in the [Modules section](https://github.com/zilliztech/GPTCache#-modules). 
+
+Featuring a modular design, GPTCache makes it easy for users to customize their own semantic cache. The system offers various implementations for each module, and users can even develop their own implementations to suit their specific needs.
+
+In a semantic cache, false positives can occur during cache hits and false negatives during cache misses. GPTCache provides the following three metrics to evaluate its accuracy and performance:
+
+- Precision: the ratio of true positives to the total of true positives and false positives.
+- Recall: the ratio of true positives to the total of true positives and false negatives.
+- Latency: the time required for a query to be processed and the corresponding data to be fetched from the cache.
+
+An [example benchmark](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py) is provided for users to get started with GPTCache.
 
 ## 😊 Quick Start
 
