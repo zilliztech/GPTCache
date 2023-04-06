@@ -155,13 +155,13 @@ def response_text(openai_resp):
 from gptcache.core import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
-from gptcache.cache.factory import get_ss_data_manager
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.cache.factory import get_data_manager
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 print("Cache loading.....")
 
 onnx = Onnx()
-data_manager = get_ss_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
 cache.init(
     embedding_func=onnx.to_embeddings,
     data_manager=data_manager,
@@ -206,7 +206,6 @@ cache.set_openai_key()
 
 More Docs：
 
-- [System Design, how it was constructed](docs/system.md)
 - [Features, all features currently supported by the cache](docs/feature.md)
 - [Examples, learn better custom caching](examples/README.md)
 

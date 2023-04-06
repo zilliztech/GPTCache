@@ -7,7 +7,7 @@ from gptcache.core import cache, Config
 from gptcache.cache.factory import get_data_manager
 from gptcache.similarity_evaluation import Onnx as EvaluationOnnx
 from gptcache.embedding import Onnx as EmbeddingOnnx
-from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 
 def run():
