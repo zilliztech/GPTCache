@@ -1,0 +1,25 @@
+name: pylint
+on:
+  pull_request:
+    branches:
+      - main
+      # file paths to consider in the event
+    paths:
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/pylint.yml'
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.0.0
+    - name: Setup Python
+      uses: actions/setup-python@v3.0.0
+      with:
+        python-version: 3.8
+    - name: Python pylint
+      run: |
+        pip install pylint==2.10.2
+        pylint --rcfile=pylint.conf --output-format=colorized gptcache && pylint --rcfile=pylint.conf --output-format=colorized tests.unit_tests
