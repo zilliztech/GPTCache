@@ -1,6 +1,6 @@
 # 😆 Contributing to GPTCache
 
-Before contributing to GPTCache, it is recommended to read the [system design article](./system.md).
+Before contributing to GPTCache, it is recommended to read the [usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md).
 
 In the process of contributing, pay attention to **the parameter type**, because there is currently no type restriction added.
 
