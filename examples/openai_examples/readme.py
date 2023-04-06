@@ -28,11 +28,11 @@ print(f'Question: {question}')
 print("Time consuming: {:.2f}s".format(time.time() - start_time))
 print(f'Answer: {response_text(response)}\n')
 
-# GPT Cache exact matching usage
-print("GPT Cache exact matching example.....")
+# GPTCache exact matching usage
+print("GPTCache exact matching example.....")
 print("Cache loading.....")
 
-# To use GPT cache, that's all you need
+# To use GPTCache, that's all you need
 # -------------------------------------------------
 from gptcache.core import cache
 from gptcache.adapter import openai
@@ -57,8 +57,8 @@ for _ in range(2):
     print("Time consuming: {:.2f}s".format(time.time() - start_time))
     print(f'Answer: {response_text(response)}\n')
 
-# GPT Cache similar search usage
-print("GPT Cache similar search example.....")
+# GPTCache similar search usage
+print("GPTCache similar search example.....")
 print("Cache loading.....")
 
 from gptcache.core import cache

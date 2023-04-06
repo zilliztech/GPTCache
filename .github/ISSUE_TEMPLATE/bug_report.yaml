@@ -1,5 +1,5 @@
 name: 🐞 Bug Report
-description: Create a bug report to help us improve GPT Cache
+description: Create a bug report to help us improve GPTCache
 title: "[Bug]: "
 body:
 - type: markdown

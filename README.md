@@ -22,12 +22,12 @@ Twitter: https://twitter.com/zilliz_universe.
 
 ChatGPT and various large language models (LLMs) possess remarkable adaptability, facilitating the creation of numerous applications. However, ChatGPT might exhibit slow response times, especially when dealing with a significant number of requests. Moreover, as your application grows in popularity and encounters higher traffic levels, the expenses related to ChatGPT API calls can become substantial. 
 
-To address this issue, we have developed GPT Cache, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
+To address this issue, we have developed GPTCache, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
 
 1. Quick response to user requests: the caching system provides faster response times compared to large model inference, resulting in lower latency and faster response to user requests.
 2. Reduced service costs: most LLM services are currently charged based on the number of tokens. If user requests hit the cache, it can reduce the number of requests and lower service costs.
 
-## 🤔 Why would GPT Cache be helpful?
+## 🤔 Why would GPTCache be helpful?
 
 A good analogy for GptCache is to think of it as a more semantic version of Redis. In GptCache, hits are not limited to exact matches, but rather also include prompts and context similar to previous queries. We believe that the traditional cache design still works for AIGC applications due to the following reasons:
 
@@ -41,7 +41,7 @@ We provide [benchmarks](https://github.com/zilliztech/gpt-cache/blob/main/exampl
 
 **Note**:
 
-- You can quickly try GPT cache and put it into a production environment without heavy development. However, please note that the repository is still under heavy development.
+- You can quickly try GPTCache and put it into a production environment without heavy development. However, please note that the repository is still under heavy development.
 - By default, only a limited number of libraries are installed to support the basic cache functionalities. When you need to use additional features, the related libraries will be **automatically installed**.
 - Make sure that the Python version is **3.8.1 or higher**, check: `python --version`
 - If you encounter issues installing a library due to a low pip version, run: `python -m pip install --upgrade pip`.
@@ -55,7 +55,7 @@ pip install gptcache
 ### dev install
 
 ```bash
-# clone gpt cache repo
+# clone GPTCache repo
 git clone https://github.com/zilliztech/GPTCache.git
 cd GPTCache
 
@@ -111,7 +111,7 @@ print(f'Answer: {response_text(response)}\n')
 
 ```
 
-#### OpenAI API + GPT Cache, exact match cache
+#### OpenAI API + GPTCache, exact match cache
 
 > If you ask ChatGPT the exact same two questions, the answer to the second question will be obtained from the cache without requesting ChatGPT again.
 
@@ -124,7 +124,7 @@ def response_text(openai_resp):
 
 print("Cache loading.....")
 
-# To use GPT cache, that's all you need
+# To use GPTcache, that's all you need
 # -------------------------------------------------
 from gptcache.core import cache
 from gptcache.adapter import openai
@@ -150,7 +150,7 @@ for _ in range(2):
     print(f'Answer: {response_text(response)}\n')
 ```
 
-#### OpenAI API + GPT Cache, similar search cache
+#### OpenAI API + GPTCache, similar search cache
 
 > After obtaining an answer from ChatGPT in response to several similar questions, the answers to subsequent questions can be retrieved from the cache without the need to request ChatGPT again.
 
@@ -224,7 +224,7 @@ More Docs：
 
 - **LLM Adapter**: 
 The LLM Adapter is designed to integrate different LLM models by unifying their APIs and request protocols. GPTCache offers a standardized interface for this purpose, with current support for ChatGPT integration.
-  - [x] Support OpenAI chatGPT API.
+  - [x] Support OpenAI ChatGPT API.
   - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic, and self-hosted models like LLaMa.
 - **Embedding Generator**: 
 This module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
@@ -281,4 +281,4 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
 
 ## 😆 Contributing
 
-Would you like to contribute to the development of GPT Cache? Take a look at [our contribution guidelines](docs/contributing.md).
+Would you like to contribute to the development of GPTCache? Take a look at [our contribution guidelines](docs/contributing.md).

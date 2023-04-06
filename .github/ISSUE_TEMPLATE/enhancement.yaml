@@ -1,12 +1,12 @@
 name: Enhancement Request
-description: As a developer, I want to make an enhancement for GPT Cache
+description: As a developer, I want to make an enhancement for GPTCache
 title: "[Enhancement]:"
 labels: [kind/enhancement]
 body:
 - type: markdown
   attributes:
     value: |
-      Thanks for taking the time to request/suggest an enhancement for GPT Cache! Please fill the form in English!
+      Thanks for taking the time to request/suggest an enhancement for GPTCache! Please fill the form in English!
 - type: textarea
   attributes:
     label: What would you like to be added?
