@@ -30,7 +30,7 @@ class ExactMatchEvaluation(SimilarityEvaluation):
 
         :return: evaluation score.
         """
-        return 1 if cache_dict["question"] == src_dict["question"] else 0
+        return 1 if cache_dict['question'] == src_dict['question'] else 0
 
     def range(self):
         """Range of similarity score.

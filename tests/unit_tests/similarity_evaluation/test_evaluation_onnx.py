@@ -12,10 +12,10 @@ def test_onnx():
 
     score = evaluation.evaluation(
         {
-            "question": "hello"
+            'question': 'hello'
         },
         {
-            "question": "hello"
+            'question': 'hello'
         }
     )
     assert math.isclose(score, 1.0)
@@ -26,20 +26,20 @@ def test_onnx():
 
     score = evaluation.evaluation(
         {
-            "question": query
+            'question': query
         },
         {
-            "question": candidate_1
+            'question': candidate_1
         }
     )
     assert score > 0.8
 
     score = evaluation.evaluation(
         {
-            "question": query
+            'question': query
         },
         {
-            "question": candidate_2
+            'question': candidate_2
         }
     )
     assert score < 0.1

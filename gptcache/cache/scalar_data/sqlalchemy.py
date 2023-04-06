@@ -58,12 +58,7 @@ class SQLDataBase(CacheStorage):
     """
     def __init__(self, db_type: str = 'sqlite', url: str = 'sqlite:///./gptcache.db', table_name: str = 'gptcache'):
         self._url = url
-        self._engine = None
-        self._session = None
         self._model = get_model(table_name, db_type)
-        self.init()
-
-    def init(self):
         self._engine = create_engine(self._url)
         Session = sessionmaker(bind=self._engine)
         self._session = Session()

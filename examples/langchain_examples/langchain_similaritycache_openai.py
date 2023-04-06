@@ -7,7 +7,7 @@ from langchain import PromptTemplate
 
 from gptcache.adapter.langchain_llms import LangChainLLMs
 from gptcache.cache.factory import get_data_manager
-from gptcache.core import Cache
+from gptcache import Cache
 from gptcache.embedding import Onnx
 from gptcache.processor.pre import get_prompt
 from gptcache.processor.post import nop as postnop

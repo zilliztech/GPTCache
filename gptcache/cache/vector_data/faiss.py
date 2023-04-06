@@ -5,6 +5,7 @@ import os
 import faiss
 from faiss import IndexHNSWFlat, Index
 import numpy as np
+
 from .base import VectorBase, ClearStrategy
 
 

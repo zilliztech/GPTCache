@@ -4,28 +4,29 @@ import pickle
 import cachetools
 import numpy as np
 
+from gptcache.utils.error import CacheError
 from .scalar_data.base import CacheStorage
 from .vector_data.base import VectorBase, ClearStrategy
 from .eviction import EvictionManager
-from ..utils.error import CacheError
 
 
 class DataManager(metaclass=ABCMeta):
     @abstractmethod
-    def init(self, **kwargs): pass
-
-    @abstractmethod
-    def save(self, question, answer, embedding_data, **kwargs): pass
+    def save(self, question, answer, embedding_data, **kwargs):
+        pass
 
     # should return the tuple, (question, answer)
     @abstractmethod
-    def get_scalar_data(self, vector_data, **kwargs): pass
+    def get_scalar_data(self, vector_data, **kwargs):
+        pass
 
     @abstractmethod
-    def search(self, embedding_data, **kwargs): pass
+    def search(self, embedding_data, **kwargs):
+        pass
 
     @abstractmethod
-    def close(self): pass
+    def close(self):
+        pass
 
 
 class MapDataManager(DataManager):
@@ -35,6 +36,7 @@ class MapDataManager(DataManager):
         else:
             self.data = get_data_container(max_size)
         self.data_path = data_path
+        self.init()
 
     def init(self, **kwargs):
         try:
@@ -106,11 +108,6 @@ class SSDataManager(DataManager):
         self.s = s
         self.v = v
         self.eviction = EvictionManager(s, v, eviction)
-        self.init()
-
-    def init(self, **kwargs):
-        self.s.init(**kwargs)
-        self.v.init(**kwargs)
         self.cur_size = self.s.count()
 
     def _clear(self):

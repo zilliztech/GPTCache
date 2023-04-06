@@ -1,11 +1,11 @@
 import time
 
-from gptcache.core import time_cal, cache, Config, Cache, cache_all, Report
+from gptcache import time_cal, cache, Config, Cache, cache_all, Report
 
 
 def test_time_cal():
     def log_time_func(fname, delta_time):
-        assert fname == "unit_test"
+        assert fname == 'unit_test'
         assert delta_time > 0.1
 
     cache.config = Config(
@@ -16,7 +16,7 @@ def test_time_cal():
     def time_cal_annotation():
         time.sleep(0.2)
 
-    func_name = "test_time_cal"
+    func_name = 'test_time_cal'
 
     def log_time_func(fname, delta_time):
         assert fname == func_name

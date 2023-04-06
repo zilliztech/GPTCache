@@ -2,7 +2,7 @@ import os
 import time
 
 from gptcache.cache.factory import get_data_manager, get_user_data_manager
-from gptcache.core import cache, Cache, Config
+from gptcache import cache, Cache
 from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 from gptcache.adapter import openai
@@ -14,8 +14,8 @@ def response_text(openai_resp):
 
 def cache_init():
     dir_name, _ = os.path.split(os.path.abspath(__file__))
-    cache.init(data_manager=get_user_data_manager("map"))
-    os.environ["OPENAI_API_KEY"] = "API KEY"
+    cache.init(data_manager=get_user_data_manager('map'))
+    os.environ['OPENAI_API_KEY'] = 'API KEY'
     cache.set_openai_key()
 
 
@@ -32,7 +32,7 @@ def base_request():
             ],
             temperature=0,
         )
-        print("Time consuming: {:.2f}s".format(time.time() - start_time))
+        print('Time consuming: {:.2f}s'.format(time.time() - start_time))
         print(f'Received: {response_text(response)}')
 
 
@@ -42,7 +42,7 @@ def stream_request():
         response = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=[
-                {'role': 'user', 'content': "What's 1+1? Answer in one word."}
+                {'role': 'user', 'content': 'what is 1+1? Answer in one word.'}
             ],
             temperature=0,
             stream=True  # this time, we set stream=True
@@ -60,44 +60,44 @@ def stream_request():
         # print the time delay and text received
         full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
         end_time = time.time()
-        print("Time consuming: {:.2f}s".format(end_time - start_time))
-        print(f"Full conversation received: {full_reply_content}")
+        print('Time consuming: {:.2f}s'.format(end_time - start_time))
+        print(f'Full conversation received: {full_reply_content}')
 
 
 def similar_request():
     onnx = Onnx()
-    data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+    data_manager = get_data_manager('sqlite', 'faiss', dimension=onnx.dimension)
     one_cache = Cache()
     one_cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
                    similarity_evaluation=SearchDistanceEvaluation(),
                    )
 
-    question1 = "what do you think about chatgpt"
-    question2 = "what do you feel like chatgpt"
+    question1 = 'what do you think about chatgpt'
+    question2 = 'what do you feel like chatgpt'
 
     start_time = time.time()
     answer = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model='gpt-3.5-turbo',
         messages=[
-            {"role": "user", "content": question1}
+            {'role': 'user', 'content': question1}
         ],
         cache_obj=one_cache
     )
     end_time = time.time()
-    print("Time consuming: {:.2f}s".format(end_time - start_time))
+    print('Time consuming: {:.2f}s'.format(end_time - start_time))
     print(f'Received: {response_text(answer)}')
 
     start_time = time.time()
     answer = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model='gpt-3.5-turbo',
         messages=[
-            {"role": "user", "content": question2}
+            {'role': 'user', 'content': question2}
         ],
         cache_obj=one_cache
     )
     end_time = time.time()
-    print("Time consuming: {:.2f}s".format(end_time - start_time))
+    print('Time consuming: {:.2f}s'.format(end_time - start_time))
     print(f'Received: {response_text(answer)}')
 
 

@@ -13,7 +13,7 @@ def test_search_distance_evaluation():
     score = evaluation.evaluation(
         {},
         {
-            "search_result": (1, None)
+            'search_result': (1, None)
         }
     )
     assert math.isclose(score, 3.0)
@@ -21,7 +21,7 @@ def test_search_distance_evaluation():
     score = evaluation.evaluation(
         {},
         {
-            "search_result": (-1, None)
+            'search_result': (-1, None)
         }
     )
     assert math.isclose(score, 4.0)
@@ -34,14 +34,14 @@ def test_search_distance_evaluation():
     score = evaluation.evaluation(
         {},
         {
-            "search_result": (5, None)
+            'search_result': (5, None)
         }
     )
     assert math.isclose(score, 5.0)
     score = evaluation.evaluation(
         {},
         {
-            "search_result": (20, None)
+            'search_result': (20, None)
         }
     )
     assert math.isclose(score, 10.0)

@@ -3,25 +3,26 @@ import_huggingface()
 import_onnxruntime()
 import_huggingface_hub()
 import numpy as np
-import os
 from transformers import AutoTokenizer, AutoConfig
-from pathlib import Path
 from huggingface_hub import hf_hub_download
 import onnxruntime
 
-class Onnx:
+from .base import BaseEmbedding
+
+
+class Onnx(BaseEmbedding):
     """Generate text embedding for given text using ONNX Model.
 
     Example:
         .. code-block:: python
         
             from gptcache.embedding import Onnx
-            
-            test_sentence = "Hello, world." 
-            encoder = Onnx(model="GPTCache/paraphrase-albert-onnx")
+
+            test_sentence = 'Hello, world.'
+            encoder = Onnx(model='GPTCache/paraphrase-albert-onnx')
             embed = encoder.to_embeddings(test_sentence)
     """
-    def __init__(self, api_key, model= "GPTCache/paraphrase-albert-onnx", **kwargs):
+    def __init__(self, api_key, model= 'GPTCache/paraphrase-albert-onnx', **kwargs):
         tokenizer_name = 'sentence-transformers/paraphrase-albert-small-v2'
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
         self.model = model

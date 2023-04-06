@@ -16,8 +16,8 @@ class TestLog:
         self.log.setLevel(logging.DEBUG)
 
         try:
-            formatter = logging.Formatter("[%(asctime)s - %(levelname)s - %(name)s]: "
-                                          "%(message)s (%(filename)s:%(lineno)s)")
+            formatter = logging.Formatter('[%(asctime)s - %(levelname)s - %(name)s]: '
+                                          '%(message)s (%(filename)s:%(lineno)s)')
             dh = logging.FileHandler(self.log_debug)
             dh.setLevel(logging.DEBUG)
             dh.setFormatter(formatter)
@@ -33,7 +33,7 @@ class TestLog:
             eh.setFormatter(formatter)
             self.log.addHandler(eh)
 
-            if self.log_worker != "":
+            if self.log_worker != '':
                 wh = logging.FileHandler(self.log_worker)
                 wh.setLevel(logging.DEBUG)
                 wh.setFormatter(formatter)
@@ -44,7 +44,7 @@ class TestLog:
             ch.setFormatter(formatter)
 
         except Exception as e:
-            print("Can not use %s or %s or %s to log. error : %s" % (log_debug, log_file, log_err, str(e)))
+            print('Can not use %s or %s or %s to log. error : %s' % (log_debug, log_file, log_err, str(e)))
 
 
 """All modules share this unified log"""

@@ -5,9 +5,7 @@ import_onnxruntime()
 import_huggingface_hub()
 import_huggingface()
 import numpy as np
-import os
 from transformers import AutoTokenizer
-from pathlib import Path
 from huggingface_hub import hf_hub_download
 from typing import List
 import onnxruntime
@@ -32,10 +30,10 @@ class OnnxModelEvaluation(SimilarityEvaluation):
             evaluation = OnnxModelEvaluation()
             score = evaluation.evaluation(
                 {
-                    "question": "What is the color of sky?"
+                    'question': 'What is the color of sky?'
                 },
                 {
-                    "question": "hello"
+                    'question': 'hello'
                 }
             )
     """
@@ -57,8 +55,8 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         :return: evaluation score.
         """
         try:
-            src_question = src_dict["question"]
-            cache_question = cache_dict["question"]
+            src_question = src_dict['question']
+            cache_question = cache_dict['question']
             if src_question == cache_question:
                 return 1
             return self.inference(src_question, [cache_question])
@@ -82,9 +80,9 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         :return: probability score indcates how much is reference similar to candidates. 
         """
         n_candidates= len(candidates)
-        inference_texts = [{'text_a': reference, 'text_b': candidate } for candidate in  candidates ]
+        inference_texts = [{'text_a': reference, 'text_b': candidate } for candidate in candidates]
         batch_encoding_list = [self.tokenizer.encode_plus(text['text_a'], text['text_b'], padding='longest') for text in inference_texts]
- 
+
         input_ids_list = [np.array(encode.input_ids) for encode in batch_encoding_list] 
         attention_mask_list = [np.array(encode.attention_mask) for encode in batch_encoding_list] 
         token_type_ids_list = [np.array(encode.token_type_ids) for encode in batch_encoding_list]
@@ -97,5 +95,5 @@ class OnnxModelEvaluation(SimilarityEvaluation):
                       'attention_mask': padded_attention_mask.reshape(n_candidates,-1),
                       'token_type_ids': padded_token_type_ids.reshape(n_candidates,-1)}
         ort_outputs = self.ort_session.run(None, ort_inputs)
-        scores = ort_outputs[0][:,1]
+        scores = ort_outputs[0][:, 1]
         return scores

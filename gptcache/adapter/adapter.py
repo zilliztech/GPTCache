@@ -1,27 +1,26 @@
 import logging
-import copy
-from ..core import cache, time_cal
-from ..utils.error import NotInitError
+from gptcache import cache, time_cal
+from gptcache.utils.error import NotInitError
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
-    chat_cache = kwargs.pop("cache_obj", cache)
+    chat_cache = kwargs.pop('cache_obj', cache)
     if not chat_cache.has_init:
         raise NotInitError()
     cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
-    context = kwargs.pop("cache_context", {})
+    context = kwargs.pop('cache_context', {})
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
-    cache_skip = kwargs.pop("cache_skip", False)
+    cache_skip = kwargs.pop('cache_skip', False)
     pre_embedding_data = chat_cache.pre_embedding_func(kwargs,
-                                                       extra_param=context.get("pre_embedding_func", None))
+                                                       extra_param=context.get('pre_embedding_func', None))
     if cache_enable and not cache_skip:
         embedding_data = time_cal(chat_cache.embedding_func,
-                                  func_name="embedding",
+                                  func_name='embedding',
                                   report_func=chat_cache.report.embedding,
-                                  )(pre_embedding_data, extra_param=context.get("embedding_func", None))
+                                  )(pre_embedding_data, extra_param=context.get('embedding_func', None))
         cache_data_list = time_cal(chat_cache.data_manager.search,
-                                   func_name="search",
+                                   func_name='search',
                                    report_func=chat_cache.report.search,
                                    )(embedding_data, extra_param=context.get('search_func', None))
         if cache_data_list is None:
@@ -37,12 +36,12 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 continue
             cache_question, cache_answer = ret
             rank = chat_cache.similarity_evaluation.evaluation({
-                    "question": pre_embedding_data,
-                    "embedding": embedding_data,
+                    'question': pre_embedding_data,
+                    'embedding': embedding_data,
                 }, {
-                    "question": cache_question,
-                    "answer": cache_answer,
-                    "search_result": cache_data,
+                    'question': cache_question,
+                    'answer': cache_answer,
+                    'search_result': cache_data,
                 }, extra_param=context.get('evaluation_func', None))
             if rank_threshold <= rank:
                 cache_answers.append((rank, cache_answer))
@@ -54,9 +53,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
 
     next_cache = chat_cache.next_cache
     if next_cache:
-        kwargs["cache_obj"] = next_cache
-        kwargs["cache_context"] = context
-        kwargs["cache_skip"] = cache_skip
+        kwargs['cache_obj'] = next_cache
+        kwargs['cache_context'] = context
+        kwargs['cache_skip'] = cache_skip
         llm_data = adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
     else:
         llm_data = llm_handler(*args, **kwargs)
@@ -71,5 +70,5 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
 
             llm_data = update_cache_callback(llm_data, update_cache_func)
         except Exception as e:
-            logging.warning(f"failed to save the data to cache, error:{e}")
+            logging.warning(f'failed to save the data to cache, error:{e}')
     return llm_data

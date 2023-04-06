@@ -35,7 +35,7 @@ class SearchDistanceEvaluation(SimilarityEvaluation):
 
         :return: evaluation score.
         """
-        distance, _ = cache_dict["search_result"]
+        distance, _ = cache_dict['search_result']
         if distance < 0:
             distance = 0
         elif distance > self.max_distance:

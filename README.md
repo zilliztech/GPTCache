@@ -127,7 +127,7 @@ print("Cache loading.....")
 
 # To use GPTcache, that's all you need
 # -------------------------------------------------
-from gptcache.core import cache
+from gptcache import cache
 from gptcache.adapter import openai
 
 cache.init()
@@ -162,7 +162,7 @@ import time
 def response_text(openai_resp):
     return openai_resp['choices'][0]['message']['content']
 
-from gptcache.core import cache
+from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
 from gptcache.cache.factory import get_data_manager
@@ -207,7 +207,7 @@ for question in questions:
 To use GPTCache exclusively, only the following lines of code are required, and there is no need to modify any existing code.
 
 ```python
-from gptcache.core import cache
+from gptcache import cache
 from gptcache.adapter import openai
 
 cache.init()

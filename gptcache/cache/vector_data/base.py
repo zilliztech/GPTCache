@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 from enum import Enum
 
 
@@ -9,10 +8,6 @@ class ClearStrategy(Enum):
 
 
 class VectorBase(ABC):
-
-    def init(self, **kwargs):
-        pass
-
     @abstractmethod
     def add(self, key: str, data: 'ndarray'):
         pass
@@ -23,7 +18,7 @@ class VectorBase(ABC):
 
     @abstractmethod
     def clear_strategy(self):
-        pass    
+        pass
 
     def rebuild(self) -> bool:
         raise NotImplementedError

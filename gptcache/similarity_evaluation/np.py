@@ -18,10 +18,10 @@ class NumpyNormEvaluation(SimilarityEvaluation):
             evaluation = NumpyNormEvaluation()
             score = evaluation.evaluation(
                 {
-                    "embedding": np.array([-0.5, -0.5])
+                    'embedding': np.array([-0.5, -0.5])
                 },
                 {
-                    "search_result": (0, np.array([1, 1]))
+                    'search_result': (0, np.array([1, 1]))
                 }
             )
     """
@@ -51,8 +51,8 @@ class NumpyNormEvaluation(SimilarityEvaluation):
 
         :return: evaluation score.
         """
-        src_embedding = self.normalize(src_dict["embedding"]) if self.enable_normal else src_dict["embedding"]
-        _, cache_embedding = cache_dict["search_result"]
+        src_embedding = self.normalize(src_dict['embedding']) if self.enable_normal else src_dict['embedding']
+        _, cache_embedding = cache_dict['search_result']
         cache_embedding = self.normalize(cache_embedding) if self.enable_normal \
             else cache_embedding
         return np.linalg.norm(src_embedding - cache_embedding)

@@ -8,37 +8,49 @@ class CacheStorage(metaclass=ABCMeta):
     BaseStorage for scalar data.
     """
     @abstractmethod
-    def init(self, **kwargs): pass
+    def create(self):
+        pass
 
     @abstractmethod
-    def create(self, **kwargs): pass
+    def insert(self, key, data, reply, embedding_data: np.ndarray = None):
+        pass
 
     @abstractmethod
-    def insert(self, key, data, reply, embedding_data: np.ndarray = None): pass
+    def get_data_by_id(self, key):
+        pass
 
     @abstractmethod
-    def get_data_by_id(self, key): pass
+    def get_embedding_data(self, offset, size):
+        pass
 
     @abstractmethod
-    def get_embedding_data(self, limit, offset): pass
+    def remove_by_state(self):
+        pass
 
     @abstractmethod
-    def remove_by_state(self): pass
+    def update_access_time(self, key):
+        pass
 
     @abstractmethod
-    def update_access_time(self, keys): pass
+    def update_state(self, keys):
+        pass
 
     @abstractmethod
-    def update_state(self, keys): pass
+    def count(self):
+        pass
 
     @abstractmethod
-    def get_old_access(self, count): pass
+    def get_old_access(self, count):
+        pass
 
     @abstractmethod
-    def get_old_create(self, count): pass
+    def get_old_create(self, count):
+        pass
 
     @abstractmethod
-    def count(self): pass
+    def count(self):
+        pass
 
     @abstractmethod
-    def close(self): pass
+    def close(self):
+        pass

@@ -7,7 +7,7 @@ from common import common_func as cf
 
 from gptcache.adapter import openai
 from gptcache.cache.factory import get_data_manager
-from gptcache.core import cache, Config
+from gptcache import cache, Config
 from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
@@ -20,8 +20,8 @@ class TestSqliteInvalid(Base):
     ******************************************************************
     """
 
-    @pytest.mark.parametrize("threshold", [-1, 2, 2.0, '0.5'])
-    @pytest.mark.tags("L1")
+    @pytest.mark.parametrize('threshold', [-1, 2, 2.0, '0.5'])
+    @pytest.mark.tags('L1')
     def test_invalid_similarity_threshold(self, threshold):
         """
         target: test init: invalid similarity threshold
@@ -29,7 +29,7 @@ class TestSqliteInvalid(Base):
         expected: raise exception and report the error
         """
         onnx = Onnx()
-        data_manager = get_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager('sqlite', 'faiss',
                                             dimension=onnx.dimension, max_size=2000)
         is_exception = False
         try:
@@ -47,7 +47,7 @@ class TestSqliteInvalid(Base):
 
         assert is_exception
 
-    @pytest.mark.tags("L2")
+    @pytest.mark.tags('L2')
     def test_no_openai_key(self):
         """
         target: test no openai key when could not hit in cache
@@ -55,7 +55,7 @@ class TestSqliteInvalid(Base):
         expected: raise exception and report the error
         """
         onnx = Onnx()
-        data_manager = get_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager('sqlite', 'faiss',
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -69,10 +69,10 @@ class TestSqliteInvalid(Base):
         is_exception = False
         try:
             openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model='gpt-3.5-turbo',
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": "what do you feel like chatgpt"}
+                    {'role': 'system', 'content': 'You are a helpful assistant.'},
+                    {'role': 'user', 'content': 'what do you feel like chatgpt'}
                 ],
             )
         except Exception as e:
@@ -90,7 +90,7 @@ class TestSqliteFaiss(Base):
     ******************************************************************
     """
 
-    @pytest.mark.tags("L1")
+    @pytest.mark.tags('L1')
     def test_hit_default(self):
         """
         target: test hit the cache function
@@ -99,7 +99,7 @@ class TestSqliteFaiss(Base):
         """
 
         onnx = Onnx()
-        data_manager = get_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager('sqlite', 'faiss',
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -109,19 +109,19 @@ class TestSqliteFaiss(Base):
                    ),
                    )
 
-        question = "what do you think about chatgpt"
-        answer = "chatgpt is a good application"
+        question = 'what do you think about chatgpt'
+        answer = 'chatgpt is a good application'
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
         openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model='gpt-3.5-turbo',
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "what do you feel like chatgpt"}
+                {'role': 'system', 'content': 'You are a helpful assistant.'},
+                {'role': 'user', 'content': 'what do you feel like chatgpt'}
             ],
         )
 
-    @pytest.mark.tags("L1")
+    @pytest.mark.tags('L1')
     def test_hit(self):
         """
         target: test hit the cache function
@@ -130,7 +130,7 @@ class TestSqliteFaiss(Base):
         """
 
         onnx = Onnx()
-        data_manager = get_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager('sqlite', 'faiss',
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -141,19 +141,19 @@ class TestSqliteFaiss(Base):
                    ),
                    )
 
-        question = "what do you think about chatgpt"
-        answer = "chatgpt is a good application"
+        question = 'what do you think about chatgpt'
+        answer = 'chatgpt is a good application'
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
         openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model='gpt-3.5-turbo',
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "what do you feel like chatgpt"}
+                {'role': 'system', 'content': 'You are a helpful assistant.'},
+                {'role': 'user', 'content': 'what do you feel like chatgpt'}
             ],
         )
 
-    @pytest.mark.tags("L1")
+    @pytest.mark.tags('L1')
     def test_miss(self):
         """
         target: test miss the cache function
@@ -161,7 +161,7 @@ class TestSqliteFaiss(Base):
         expected: raise exception and report the error
         """
         onnx = Onnx()
-        data_manager = get_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager('sqlite', 'faiss',
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -172,17 +172,17 @@ class TestSqliteFaiss(Base):
                    ),
                    )
 
-        question = "what do you think about chatgpt"
-        answer = "chatgpt is a good application"
+        question = 'what do you think about chatgpt'
+        answer = 'chatgpt is a good application'
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
         is_exception = False
         try:
             openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model='gpt-3.5-turbo',
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": "what do you feel like chatgpt"}
+                    {'role': 'system', 'content': 'You are a helpful assistant.'},
+                    {'role': 'user', 'content': 'what do you feel like chatgpt'}
                 ],
             )
         except Exception as e:
@@ -191,7 +191,7 @@ class TestSqliteFaiss(Base):
 
         assert is_exception
 
-    @pytest.mark.tags("L1")
+    @pytest.mark.tags('L1')
     def test_disable_cache(self):
         """
         target: test cache not enabled
@@ -200,7 +200,7 @@ class TestSqliteFaiss(Base):
         """
 
         onnx = Onnx()
-        data_manager = get_data_manager("sqlite", "faiss",
+        data_manager = get_data_manager('sqlite', 'faiss',
                                             dimension=onnx.dimension, max_size=2000)
         cache.init(cache_enable_func=cf.disable_cache,
                    embedding_func=onnx.to_embeddings,
@@ -211,17 +211,17 @@ class TestSqliteFaiss(Base):
                    ),
                    )
 
-        question = "what do you think about chatgpt"
-        answer = "chatgpt is a good application"
+        question = 'what do you think about chatgpt'
+        answer = 'chatgpt is a good application'
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
         is_exception = False
         try:
             openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model='gpt-3.5-turbo',
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": "what do you feel like chatgpt"}
+                    {'role': 'system', 'content': 'You are a helpful assistant.'},
+                    {'role': 'user', 'content': 'what do you feel like chatgpt'}
                 ],
             )
         except Exception as e:

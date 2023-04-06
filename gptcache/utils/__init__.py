@@ -53,7 +53,7 @@ def import_torch():
         prompt_install('torch')
         import torch
 
-def import_huggingface_hub(): 
+def import_huggingface_hub():
     try:
         import huggingface_hub
     except ModuleNotFoundError as e:
