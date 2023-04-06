@@ -142,7 +142,7 @@ class Cache:
         :param pre_embedding_func: a function to preprocess embedding, defaults to ``last_content``
         :param embedding_func: a function to extract embeddings from requests for similarity search, defaults to ``string_embedding``
         :param data_manager: a ``DataManager`` module, defaults to ``get_user_data_manager('map')``
-        :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``AbsoluteEvaluation()``
+        :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``ExactMatchEvaluation()``
         :param post_process_messages_func: a function to post-process messages, defaults to ``first``
         :param config: a module to pass configurations, defaults to ``Config()``
         :param next_cache: customized method for next cache

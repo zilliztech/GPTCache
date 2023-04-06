@@ -11,28 +11,28 @@ The interface for initializing the cache looks like the following:
 
 ```
 class Cache:
-def init(self,
-         cache_enable_func=cache_all,
-         pre_embedding_func=last_content,
-         embedding_func=string_embedding,
-         data_manager: DataManager = get_data_manager("map"),
-         similarity_evaluation=AbsoluteEvaluation(),
-         post_process_messages_func=first,
-         config=Config(),
-         next_cache=None,
-         **kwargs
-         ):
-    self.has_init = True
-    self.cache_enable_func = cache_enable_func
-    self.pre_embedding_func = pre_embedding_func
-    self.embedding_func = embedding_func
-    self.data_manager: DataManager = data_manager
-    self.similarity_evaluation = similarity_evaluation
-    self.post_process_messages_func = post_process_messages_func
-    self.data_manager.init(**kwargs)
-    self.config = config
-    self.next_cache = next_cache
-)
+   def init(self,
+            cache_enable_func=cache_all,
+            pre_embedding_func=last_content,
+            embedding_func=string_embedding,
+            data_manager: DataManager = get_data_manager("map"),
+            similarity_evaluation=ExactMatchEvaluation(),
+            post_process_messages_func=first,
+            config=Config(),
+            next_cache=None,
+            **kwargs
+            ):
+       self.has_init = True
+       self.cache_enable_func = cache_enable_func
+       self.pre_embedding_func = pre_embedding_func
+       self.embedding_func = embedding_func
+       self.data_manager: DataManager = data_manager
+       self.similarity_evaluation = similarity_evaluation
+       self.post_process_messages_func = post_process_messages_func
+       self.data_manager.init(**kwargs)
+       self.config = config
+       self.next_cache = next_cache
+
 ```
 
 Before creating GPTCache, consider the following questions:
@@ -53,7 +53,7 @@ Before creating GPTCache, consider the following questions:
     cache.set_openai_key()
     ```
     
-    Check out more [examples](https://github.com/zilliztech/GPTCache/tree/main/examples/embedding) to see how to use different embedding functions.
+    Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-embedding-function) to see how to use different embedding functions.
     
 2. Where will you cache the data? (`data_manager cache storage`)
     
@@ -67,35 +67,38 @@ Before creating GPTCache, consider the following questions:
     
     GPTCache supports evicting data based on cache count. Users can choose to use either the LRU or FIFO policy. In the future, we plan to support additional cache policies, such as evicting data based on last access time or last write time.
     
-    Here are some example to create data_manager:
-    
+    Here are some examples to create data_manager:
 
-```
-## create user defined data manager
-data_manager = get_user_data_manager('map')
-## create data manager with sqlite and faiss 
-data_manager = get_data_manager('sqlite", "faiss', dimension=128)
-## create data manager with mysql and milvus, max cache size is 100
-data_manager = get_data_manager('mysql', 'milvus', dimension=128, max_size=100)
-## create data manager with mysql and milvus, max cache size is 100, eviction policy is LRU
-data_manager = get_data_manager('postgresql', 'milvus', dimension=128, max_size=100, eviction='LRU') 
-```
+   ```
+   ## create user defined data manager
+   data_manager = get_user_data_manager('map')
+   ## create data manager with sqlite and faiss 
+   data_manager = get_data_manager('sqlite", "faiss', dimension=128)
+   ## create data manager with mysql and milvus, max cache size is 100
+   data_manager = get_data_manager('mysql', 'milvus', dimension=128, max_size=100)
+   ## create data manager with mysql and milvus, max cache size is 100, eviction policy is LRU
+   data_manager = get_data_manager('postgresql', 'milvus', dimension=128, max_size=100, eviction='LRU') 
+   ```
+   
+   Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-data-manager-class) to see how to use different data managers.
 
  5.  How will you determine whether it's a hit or miss? (`evaluation_func`)
 
-The evaluation function helps to determine whether the cached answer is similar or not. It takes three input values: `user request data`, `cached data`, and `user-defined parameters`. GPTCache now supports three types of evaluation: exact match evaluation, embedding distance evaluation and ONNX model evaluation.
+   The evaluation function helps to determine whether the cached answer is similar or not. It takes three input values: `user request data`, `cached data`, and `user-defined parameters`. GPTCache now supports three types of evaluation: exact match evaluation, embedding distance evaluation and ONNX model evaluation.
 
-To enable ONNX evaluation, simply pass EvaluationOnnx to similarity_evaluation. This allows you to run any model that can be served on ONNX. We will support pytorch, tensorRT and the other inference engine in the future.
+   To enable ONNX evaluation, simply pass EvaluationOnnx to similarity_evaluation. This allows you to run any model that can be served on ONNX. We will support pytorch, tensorRT and the other inference engine in the future.
 
-```
-onnx = EmbeddingOnnx()
-data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
-evaluation_onnx = EvaluationOnnx()
-cache.init(embedding_func=onnx.to_embeddings,
-               data_manager=data_manager,
-               similarity_evaluation=evaluation_onnx,
-               )
-```
+   ```
+   onnx = EmbeddingOnnx()
+   data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+   evaluation_onnx = EvaluationOnnx()
+   cache.init(embedding_func=onnx.to_embeddings,
+                  data_manager=data_manager,
+                  similarity_evaluation=evaluation_onnx,
+                  )
+   ```
+   
+   Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-similarity-evaluation-interface) to see how to use different similarity evaluation functions.
 
 Users can also pass in other configuration options , such as:
 

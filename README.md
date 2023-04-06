@@ -121,7 +121,7 @@ def response_text(openai_resp):
 
 print("Cache loading.....")
 
-# To use GPTcache, that's all you need
+# To use GPTCache, that's all you need
 # -------------------------------------------------
 from gptcache import cache
 from gptcache.adapter import openai
@@ -212,6 +212,7 @@ cache.set_openai_key()
 
 More Docs：
 
+- [Usage, how to use GPTCache better](docs/usage.md)
 - [Features, all features currently supported by the cache](docs/feature.md)
 - [Examples, learn better custom caching](examples/README.md)
 
