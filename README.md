@@ -7,6 +7,8 @@ Boost LLM API Speed by 100x ⚡, Slash Costs by 10x 💰
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
 [![Discord](https://dcbadge.vercel.app/api/server/Q8C6WEjSWV?compact=true&style=flat)](https://discord.gg/Q8C6WEjSWV)
 
+GPTCache is a Library for creating semantic cache to store responses from LLM queries
+
 ## 🤠 What is GPT Cache?
 
 ChatGPT and various large language models (LLMs) possess remarkable adaptability, facilitating the creation of numerous applications. However, ChatGPT might exhibit slow response times, especially when dealing with a significant number of requests. Moreover, as your application grows in popularity and encounters higher traffic levels, the expenses related to ChatGPT API calls can become substantial. 
