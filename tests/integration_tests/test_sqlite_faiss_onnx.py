@@ -6,7 +6,7 @@ from utils.util_log import test_log as log
 from common import common_func as cf
 
 from gptcache.adapter import openai
-from gptcache.cache.factory import get_data_manager
+from gptcache.manager.factory import get_data_manager
 from gptcache import cache, Config
 from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation

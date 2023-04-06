@@ -1,6 +1,6 @@
 from gptcache.adapter import openai
 from gptcache import cache
-from gptcache.cache.factory import get_data_manager
+from gptcache.manager.factory import get_data_manager
 from gptcache.embedding import Onnx as EmbeddingOnnx
 from gptcache.similarity_evaluation import Onnx as EvaluationOnnx
 
