@@ -255,7 +255,6 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [Milvus](https://milvus.io/), an open-source vector database for production-ready AI/LLM applicaionts. 
   - [x] Support [Zilliz Cloud](https://cloud.zilliz.com/), a fully-managed cloud vector database based on Milvus.
   - [x] Support [FAISS](https://faiss.ai/), a library for efficient similarity search and clustering of dense vectors.
-  - [ ] Support Pinecone.
   - [ ] Support other vector databases.
 - **Cache Manager**:
 The **Cache Manager** is responsible for controlling the operation of both the **Cache Storage** and **Vector Store**.
