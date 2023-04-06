@@ -1,4 +1,5 @@
 # GPT Cache
+Boost LLM API Speed by 100x and Slash Costs by 10x
 
 [![Release](https://img.shields.io/pypi/v/gptcache?label=Release&color)](https://pypi.org/project/gptcache/)
 [![CI](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
@@ -8,7 +9,7 @@
 
 ## 🤠 What is GPT Cache?
 
-Large Language Models (LLMs) are a promising and transformative technology that have rapidly advanced in recent years. These models are capable of generating natural language text and have numerous applications: including chatbots, language translation, and creative writing. However, as the size of these models increases, so do the costs and performance requirements needed to utilize them effectively. This has led to significant challenges in developing on top of large models such as ChatGPT.
+ChatGPT and various large language models (LLMs) possess remarkable adaptability, facilitating the creation of numerous applications. However, ChatGPT might exhibit slow response times, especially when dealing with a significant number of requests. Moreover, as your application grows in popularity and encounters higher traffic levels, the expenses related to ChatGPT API calls can become substantial. 
 
 To address this issue, we have developed GPT Cache, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
 
