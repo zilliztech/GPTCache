@@ -47,7 +47,7 @@ class TestSqliteInvalid(Base):
 
         assert is_exception
 
-    @pytest.mark.tags("L1")
+    @pytest.mark.tags("L2")
     def test_no_openai_key(self):
         """
         target: test no openai key when could not hit in cache
