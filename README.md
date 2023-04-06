@@ -225,6 +225,7 @@ More Docs：
 - **LLM Adapter**: 
 The LLM Adapter is designed to integrate different LLM models by unifying their APIs and request protocols. GPTCache offers a standardized interface for this purpose, with current support for ChatGPT integration.
   - [x] Support OpenAI ChatGPT API.
+  - [x] Support langchain.
   - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic, and self-hosted models like LLaMa.
 - **Embedding Generator**: 
 This module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
