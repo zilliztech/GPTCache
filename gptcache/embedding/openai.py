@@ -2,11 +2,13 @@ import numpy as np
 import openai
 import os
 
+from .base import BaseEmbedding
 
-class OpenAI:
+
+class OpenAI(BaseEmbedding):
     """Generate text embedding for given text using OpenAI.
 
-    :param model: model name, defaults to "text-embedding-ada-002".
+    :param model: model name, defaults to 'text-embedding-ada-002'.
     :type model: str
     :param api_key: OpenAI API Key. When the parameter is not specified, it will load the key by default if it is available.
     :type api_key: str
@@ -16,16 +18,16 @@ class OpenAI:
 
             from gptcache.embedding import OpenAI
             
-            test_sentence = "Hello, world." 
-            encoder = OpenAI(api_key="your_openai_key")
+            test_sentence = 'Hello, world.' 
+            encoder = OpenAI(api_key='your_openai_key')
             embed = encoder.to_embeddings(test_sentence)
     """
-    def __init__(self, model: str="text-embedding-ada-002", api_key: str=None, **kwargs):
+    def __init__(self, model: str='text-embedding-ada-002', api_key: str=None, **kwargs):
         if not api_key:
             if openai.api_key:
                 api_key = openai.api_key
             else:
-                api_key = os.getenv("OPENAI_API_KEY")
+                api_key = os.getenv('OPENAI_API_KEY')
         openai.api_key = api_key
         self.model = model
         if model in self.dim_dict():
@@ -45,7 +47,7 @@ class OpenAI:
             model=self.model,
             input=data
         )
-        return np.array(sentence_embeddings["data"][0]["embedding"]).astype('float32')
+        return np.array(sentence_embeddings['data'][0]['embedding']).astype('float32')
 
     @property
     def dimension(self):
@@ -54,12 +56,12 @@ class OpenAI:
         :return: embedding dimension
         """
         if not self.__dimension:
-            foo_emb = self.to_embeddings("foo")
+            foo_emb = self.to_embeddings('foo')
             self.__dimension = len(foo_emb)
         return self.__dimension
     
     @staticmethod
     def dim_dict():
         return {
-            "text-embedding-ada-002": 1536
+            'text-embedding-ada-002': 1536
         }

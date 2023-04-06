@@ -2,7 +2,7 @@ import os
 import openai
 import time
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 before = time.time()
 response = openai.ChatCompletion.create(
@@ -13,12 +13,12 @@ response = openai.ChatCompletion.create(
     }
   ],
 )
-print("Time Spent =", time.time() - before)
-print(response["choices"])
+print('Time Spent =', time.time() - before)
+print(response['choices'])
 
 ## import gptcache
-print("Cache loading.....")
-from gptcache.core import cache
+print('Cache loading.....')
+from gptcache import cache
 from gptcache.adapter import openai
 
 ## To use GPTCache, that's all you need
@@ -34,10 +34,10 @@ response = openai.ChatCompletion.create(
     }
   ],
 )
-print("Time Spent =", time.time() - before)
+print('Time Spent =', time.time() - before)
 print(response)
 
-if "gptcache" not in response:
+if 'gptcache' not in response:
   response = openai.ChatCompletion.create(
     model='gpt-3.5-turbo',
     messages=[
@@ -46,7 +46,5 @@ if "gptcache" not in response:
        }
     ],
   )
-  print("Time Spent =", time.time() - before)
+  print('Time Spent =', time.time() - before)
   print(response)
-
-

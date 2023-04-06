@@ -13,7 +13,7 @@ def response_text(openai_resp):
 question = 'what‘s chatgpt'
 
 # OpenAI API original usage
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv('OPENAI_API_KEY')
 start_time = time.time()
 response = openai.ChatCompletion.create(
   model='gpt-3.5-turbo',
@@ -25,23 +25,23 @@ response = openai.ChatCompletion.create(
   ],
 )
 print(f'Question: {question}')
-print("Time consuming: {:.2f}s".format(time.time() - start_time))
+print('Time consuming: {:.2f}s'.format(time.time() - start_time))
 print(f'Answer: {response_text(response)}\n')
 
 # GPTCache exact matching usage
-print("GPTCache exact matching example.....")
-print("Cache loading.....")
+print('GPTCache exact matching example.....')
+print('Cache loading.....')
 
 # To use GPTCache, that's all you need
 # -------------------------------------------------
-from gptcache.core import cache
+from gptcache import cache
 from gptcache.adapter import openai
 
 cache.init()
 cache.set_openai_key()
 # -------------------------------------------------
 
-question = "what's github"
+question = 'what is github'
 for _ in range(2):
     start_time = time.time()
     response = openai.ChatCompletion.create(
@@ -54,21 +54,21 @@ for _ in range(2):
       ],
     )
     print(f'Question: {question}')
-    print("Time consuming: {:.2f}s".format(time.time() - start_time))
+    print('Time consuming: {:.2f}s'.format(time.time() - start_time))
     print(f'Answer: {response_text(response)}\n')
 
 # GPTCache similar search usage
-print("GPTCache similar search example.....")
-print("Cache loading.....")
+print('GPTCache similar search example.....')
+print('Cache loading.....')
 
-from gptcache.core import cache
+from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
 from gptcache.cache.factory import get_data_manager
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 onnx = Onnx()
-data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+data_manager = get_data_manager('sqlite', 'faiss', dimension=onnx.dimension)
 cache.init(
     embedding_func=onnx.to_embeddings,
     data_manager=data_manager,
@@ -77,10 +77,10 @@ cache.init(
 cache.set_openai_key()
 
 questions = [
-    "what's github",
-    "can you explain what GitHub is",
-    "can you tell me more about GitHub"
-    "what is the purpose of GitHub"
+    'what is github',
+    'can you explain what GitHub is',
+    'can you tell me more about GitHub'
+    'what is the purpose of GitHub'
 ]
 
 for question in questions:
@@ -96,5 +96,5 @@ for question in questions:
             ],
         )
         print(f'Question: {question}')
-        print("Time consuming: {:.2f}s".format(time.time() - start_time))
+        print('Time consuming: {:.2f}s'.format(time.time() - start_time))
         print(f'Answer: {response_text(response)}\n')

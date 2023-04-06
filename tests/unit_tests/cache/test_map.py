@@ -2,7 +2,7 @@ import os
 
 from gptcache.cache.data_manager import MapDataManager
 
-data_map_path = "data_map.txt"
+data_map_path = 'data_map.txt'
 
 
 def test_map():

@@ -2,22 +2,22 @@ import os
 import time
 
 from gptcache.adapter.adapter import adapt
-from gptcache.core import cache, time_cal
+from gptcache import cache, time_cal
 
-data_map_path = "data_map.txt"
+data_map_path = 'data_map.txt'
 
 
 def test_adapt():
     def llm_handler(*llm_args, **llm_kwargs):
-        a = llm_kwargs.get("a", 0)
-        b = llm_kwargs.get("b", 0)
+        a = llm_kwargs.get('a', 0)
+        b = llm_kwargs.get('b', 0)
         time.sleep(1)
         return a + b
 
     def pre_embedding(data, **kwargs):
-        a = data.get("a", 0)
-        b = data.get("b", 0)
-        return f"{a}+{b}"
+        a = data.get('a', 0)
+        b = data.get('b', 0)
+        return f'{a}+{b}'
 
     def cache_data_convert(cache_data):
         return int(cache_data)

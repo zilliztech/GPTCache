@@ -1,5 +1,5 @@
 from gptcache.adapter import openai
-from gptcache.core import cache
+from gptcache import cache
 from gptcache.cache.factory import get_data_manager
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 import numpy as np
@@ -13,7 +13,7 @@ def mock_embeddings(data, **kwargs):
 
 
 def run():
-    data_manager = get_data_manager("sqlite", "faiss", dimension=d)
+    data_manager = get_data_manager('sqlite', 'faiss', dimension=d)
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                similarity_evaluation=SearchDistanceEvaluation(),
@@ -21,9 +21,9 @@ def run():
     cache.set_openai_key()
 
     answer = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model='gpt-3.5-turbo',
         messages=[
-            {"role": "user", "content": "what's chatgpt"}
+            {'role': 'user', 'content': 'what is chatgpt'}
         ],
     )
     print(answer)

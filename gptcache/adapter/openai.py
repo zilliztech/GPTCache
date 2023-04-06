@@ -12,7 +12,7 @@ class ChatCompletion:
             return openai.ChatCompletion.create(*llm_args, **llm_kwargs)
 
         def cache_data_convert(cache_data):
-            if kwargs.get("stream", False):
+            if kwargs.get('stream', False):
                 return construct_stream_resp_from_cache(cache_data)
             return construct_resp_from_cache(cache_data)
 
@@ -22,7 +22,7 @@ class ChatCompletion:
                 return llm_data
             else:
                 def hook_openai_data(it):
-                    total_answer = ""
+                    total_answer = ''
                     for item in it:
                         total_answer += get_stream_message_from_openai_answer(item)
                         yield item
@@ -35,15 +35,15 @@ class ChatCompletion:
 
 def construct_resp_from_cache(return_message):
     return {
-        "gptcache": True,
-        "choices": [
+        'gptcache': True,
+        'choices': [
             {
-                "message": {
-                    "role": "assistant",
-                    "content": return_message
+                'message': {
+                    'role': 'assistant',
+                    'content': return_message
                 },
-                "finish_reason": "stop",
-                "index": 0
+                'finish_reason': 'stop',
+                'index': 0
             }
         ]
     }
@@ -52,34 +52,34 @@ def construct_resp_from_cache(return_message):
 def construct_stream_resp_from_cache(return_message):
     return [
         {
-            "choices": [
+            'choices': [
                 {
-                    "delta": {
-                        "role": "assistant"
+                    'delta': {
+                        'role': 'assistant'
                     },
-                    "finish_reason": None,
-                    "index": 0
+                    'finish_reason': None,
+                    'index': 0
                 }
             ],
         },
         {
-            "choices": [
+            'choices': [
                 {
-                    "delta": {
-                        "content": return_message
+                    'delta': {
+                        'content': return_message
                     },
-                    "finish_reason": None,
-                    "index": 0
+                    'finish_reason': None,
+                    'index': 0
                 }
             ],
         },
         {
-            "gptcache": True,
-            "choices": [
+            'gptcache': True,
+            'choices': [
                 {
-                  "delta": {},
-                  "finish_reason": "stop",
-                  "index": 0
+                  'delta': {},
+                  'finish_reason': 'stop',
+                  'index': 0
                 }
             ],
         }

@@ -4,11 +4,13 @@ import_sbert()
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
+from .base import BaseEmbedding
 
-class SBERT:
+
+class SBERT(BaseEmbedding):
     """Generate sentence embedding for given text using pretrained models of Sentence Transformers.
 
-    :param model: model name, defaults to "all-MiniLM-L6-v2".
+    :param model: model name, defaults to 'all-MiniLM-L6-v2'.
     :type model: str
 
     Example:
@@ -16,11 +18,11 @@ class SBERT:
         
             from gptcache.embedding import SBERT
             
-            test_sentence = "Hello, world." 
-            encoder = SBERT("paraphrase-albert-small-v2")
+            test_sentence = 'Hello, world.' 
+            encoder = SBERT('paraphrase-albert-small-v2')
             embed = encoder.to_embeddings(test_sentence)
     """
-    def __init__(self, model: str="all-MiniLM-L6-v2"):
+    def __init__(self, model: str='all-MiniLM-L6-v2'):
         self.model = SentenceTransformer(model)
         self.model.eval()
         self.__dimension = None
@@ -48,5 +50,5 @@ class SBERT:
         :return: embedding dimension
         """
         if not self.__dimension:
-            self.__dimension == self.to_embeddings("foo")
+            self.__dimension == self.to_embeddings('foo')
         return self.__dimension

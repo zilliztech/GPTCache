@@ -12,20 +12,20 @@ def test_exact_match_evaluation():
 
     score = evaluation.evaluation(
         {
-            "question": "hello"
+            'question': 'hello'
         },
         {
-            "question": "hello"
+            'question': 'hello'
         }
     )
     assert math.isclose(score, 1.0)
 
     score = evaluation.evaluation(
         {
-            "question": "tello"
+            'question': 'tello'
         },
         {
-            "question": "hello"
+            'question': 'hello'
         }
     )
     assert math.isclose(score, 0.0)

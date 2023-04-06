@@ -5,12 +5,12 @@ class CacheError(Exception):
 
 class NotInitError(CacheError):
     def __init__(self):
-        super().__init__("the cache should be inited before using")
+        super().__init__('the cache should be inited before using')
 
 
 class NotFoundStoreError(CacheError):
     def __init__(self, store_type, current_type_name):
-        super().__init__(f"Unsupported ${store_type}: {current_type_name}")
+        super().__init__(f'Unsupported ${store_type}: {current_type_name}')
 
 
 class ParamError(CacheError):
