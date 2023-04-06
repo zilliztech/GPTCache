@@ -1,275 +1,194 @@
-# Cache Usage
+# GPTCache Quick Start
 
-## Cache init parameter introduction
+GPTCache is easy to understand and can boost your LLM API speed by 100x in just two steps:
 
-```python
-class Config:
-    def __init__(self,
-                 log_time_func=None,
-                 enable_report_time=True,
-                 similarity_threshold=0.5,
-                 similarity_positive=True,
-                 ):
-        self.log_time_func = log_time_func
-        self.enable_report_time = enable_report_time
-        self.similarity_threshold = similarity_threshold
-        self.similarity_positive = similarity_positive
+1. Build your cache, which includes deciding on embedding functions, similarity evaluation functions, where to store the data, and eviction configurations.
+2. Choose your adapter. GPTCache currently supports the OpenAI chatGPT interface and langchain interface. Langchain supports a variety of LLMs, such as Anthropic, Llama-cpp, Huggingface hub, and Cohere.
 
+### Build your **Cache**
+
+The interface for initializing the cache looks like the following:
+
+```
 class Cache:
-    def __init__(self):
-        self.has_init = False
-        self.cache_enable_func = None
-        self.pre_embedding_func = None
-        self.embedding_func = None
-        self.data_manager = None
-        self.evaluation_func = None
-        self.post_process_messages_func = None
-        self.config = None
-        self.report = Report()
-        self.next_cache = None
-
-    def init(self,
-             cache_enable_func=cache_all,
-             pre_embedding_func=last_content,
-             embedding_func=string_embedding,
-             data_manager: DataManager = get_data_manager("map"),
-             evaluation_func=absolute_evaluation,
-             post_process_messages_func=first,
-             config=Config(),
-             next_cache=None,
-             **kwargs
-             ):
-        self.has_init = True
-        self.cache_enable_func = cache_enable_func
-        self.pre_embedding_func = pre_embedding_func
-        self.embedding_func = embedding_func
-        self.data_manager: DataManager = data_manager
-        self.evaluation_func = evaluation_func
-        self.post_process_messages_func = post_process_messages_func
-        self.data_manager.init(**kwargs)
-        self.config = config
-        self.next_cache = next_cache
+def init(self,
+         cache_enable_func=cache_all,
+         pre_embedding_func=last_content,
+         embedding_func=string_embedding,
+         data_manager: DataManager = get_data_manager("map"),
+         similarity_evaluation=AbsoluteEvaluation(),
+         post_process_messages_func=first,
+         config=Config(),
+         next_cache=None,
+         **kwargs
+         ):
+    self.has_init = True
+    self.cache_enable_func = cache_enable_func
+    self.pre_embedding_func = pre_embedding_func
+    self.embedding_func = embedding_func
+    self.data_manager: DataManager = data_manager
+    self.similarity_evaluation = similarity_evaluation
+    self.post_process_messages_func = post_process_messages_func
+    self.data_manager.init(**kwargs)
+    self.config = config
+    self.next_cache = next_cache
+)
 ```
 
-- **cache_enable_func**: determines whether to use the cache. 
+Before creating GPTCache, consider the following questions:
 
-    Among them, `args` and `kwargs` represent the original request parameters. If the function returns True, the cache is enabled.
-
-    You can use this function to ensure that the cache is not enabled when the length of the question is too long, as the likelihood of caching the result is low in such cases.
-
-    ```python
-    def cache_all(*args, **kwargs):
-        return True
-    ```
-
-- **pre_embedding_func**: extracts key information from the request and preprocesses it to ensure that the input information for the encoder module's embedding function is simple and accurate.
-
-    The `data` parameter represents the original request dictionary object, while the `kwargs` parameter is used to obtain user-defined parameters. By using `kwargs.get("pre_embedding_func", {})`, the main purpose is to allow users to pass additional parameters at a certain stage of the process.
-
-    For example, it may extract only the last message in the message array of the OpenAI request body, or the first and last messages in the array.
-
-    ```python
-    def last_content(data, **kwargs):
-        return data.get("messages")[-1]["content"]
-    ```
-
-    ```python
-    def all_content(data, **kwargs):
-        s = ""
-        messages = data.get("messages")
-        for i, message in enumerate(messages):
-            if i == len(messages) - 1:
-                s += message["content"]
-            else:
-                s += message["content"] + "\n"
-        return s
-    ```
-
-- **embedding_func**: Embed the text into a dense vector for similarity search.
-
-    The function has two parameters: the preprocessed string and parameters reserved for user customization. To acquire these parameters, a similar method to the one above is used: `kwargs.get("embedding_func", {})`.
-
-    ```python
-    def to_embeddings(data, **kwargs):
-        return data
-    ```
-
-    ```python
-    class Cohere:
-
-        def __init__(self, model: str="large", api_key: str=None, **kwargs):
-            self.co = cohere.Client(api_key)
-            self.model = model
-
-            if model in self.dim_dict():
-                self.__dimension = self.dim_dict()[model]
-            else:
-                self.__dimension = None
+1. How will you generate an embedding for the query? (`embedding_func`)
     
-        def to_embeddings(self, data):
-            if not isinstance(data, list):
-                data = [data]
-            response = self.co.embed(texts=data, model=self.model)
-            embeddings = response.embeddings
-            return np.array(embeddings).astype('float32').squeeze(0)
-
-        @property
-        def dimension(self):
-            if not self.__dimension:
-                foo_emb = self.to_embeddings("foo")
-                self.__dimension = len(foo_emb)
-            return self.__dimension
+    This function embeds text into a dense vector for context similarity search. GPTCache currently supports five methods for embedding context: OpenAI, Cohere, Hugging Face API, ONNX model serving, and SentenceTransformers.
     
-        @staticmethod
-        def dim_dict():
-            return {
-                "large": 4096,
-                "small": 1024
-            }
-    ```
-
-    Note that if you intend to use the model, it should be packaged with a class. The model will be loaded when the object is created to avoid unnecessary loading when not in use. This also ensures that the model is not loaded multiple times during program execution.
-
-- **data_manager**: which includes searching, saving, or evicting data.
-
-    Currently, there are three creation methods available, namely `get_data_manager`, `get_ss_data_manager`, and `get_si_data_manager`.
-
-    1. *get_data_manager*, retrieves the corresponding data manager by name. Currently, the following are supported: `map`, `scalar_vector`, and `scalar_vector_index`.
+    For instance, to use ONNX Embeddings, simply initialize your embedding function to `onnx.to_embeddings`.
     
-    ```python
-    # param list
-    # data_path: data persistence path
-    # max_size: maximum amount of cached data, default value: 100
-  
-    data_manager=get_data_manager("map")
-    cache.init(data_manager=data_manager)
     ```
-  
-    ```python
-    # param list
-    # max_size: maximum amount of cached data, default value: 1000
-    # clean_size: the maximum number of caches has been reached, and the number of cache is cleared. default value: 1000 * 0.2
-  
-    data_manager=get_data_manager("scalar_vector", scalar_store=Sqlite(), vector_store=Milvus())
-    cache.init(data_manager=data_manager)
+    data_manager = get_data_manager('sqlite', 'faiss', dimension=onnx.dimension)
+    
+    cache.init(embedding_func=onnx.to_embeddings,
+                   data_manager=data_manager,
+                   similarity_evaluation=SearchDistanceEvaluation(),
+              )
+    cache.set_openai_key()
     ```
     
-    ```python
-    # param list
-    # max_size: maximum amount of cached data, default value: 1000
-    # clean_size: the maximum number of caches has been reached, and the number of cache is cleared. default value: 1000 * 0.2
-  
-    data_manager=get_data_manager("scalar_vector_index", scalar_store=Sqlite(), vector_index=Milvus())
-    cache.init(data_manager=data_manager)
-    ```
-  
-    Note that the latter two methods are primarily intended for users who want to access custom storage methods. The provided example does not include parameters for creating corresponding storage objects. For instance, when creating a vector data object, it is typically necessary to specify its dimension.
+    Check out more [examples](https://github.com/zilliztech/GPTCache/tree/main/examples/embedding) to see how to use different embedding functions.
+    
+2. Where will you cache the data? (`data_manager cache storage`)
+    
+    The cache storage stores all scalar data such as original questions, prompts, answers, and access times. GPTCache supports various cache storage options, such as SQLite, MySQL, or PostgreSQL, and more NoSQL databases will be added in the future.
+    
+3. Where will you store and search vector embeddings? (`data_manager vector storage`)
+    
+    The vector storage stores all the embeddings and searches for the most similar results semantically. GPTCache supports the use of vector search libraries such as FAISS or vector databases such as Milvus, and more vector databases and cloud services will be added in the future.
+    
+4. When will the cache evict?
+    
+    GPTCache supports evicting data based on cache count. Users can choose to use either the LRU or FIFO policy. In the future, we plan to support additional cache policies, such as evicting data based on last access time or last write time.
+    
+    Here are some example to create data_manager:
+    
 
-    2. *get_ss_data_manager*, retrieves the corresponding data manager for scalar and vector databases.
+```
+## create user defined data manager
+data_manager = get_user_data_manager('map')
+## create data manager with sqlite and faiss 
+data_manager = get_data_manager('sqlite", "faiss', dimension=128)
+## create data manager with mysql and milvus, max cache size is 100
+data_manager = get_data_manager('mysql', 'milvus', dimension=128, max_size=100)
+## create data manager with mysql and milvus, max cache size is 100, eviction policy is LRU
+data_manager = get_data_manager('postgresql', 'milvus', dimension=128, max_size=100, eviction='LRU') 
+```
 
-    ```python
-    # common param list
-    # max_size: like above
-    # clean_size: like above
-  
-    # sqlite param list
-    # sqlite_path: sqlite database path
-    # eviction_strategy: cache eviction strategy, Cache elimination strategy, which can be set to `least_accessed_data` and `oldest_created_data`
-  
-    # milvus param list
-    # dimension: vector dimension, indispensable parameter.
-    # top_k: number of search results
-    # Other milvus creation parameters are set through kwargs, like: host, port, user, password, is_https, collection_name
-  
-    data_manager = get_ss_data_manager("sqlite", "milvus", dimension=d)
-    cache.init(data_manager=data_manager)
-    ```
+ 5.  How will you determine whether it's a hit or miss? (`evaluation_func`)
 
-    3. *get_si_data_manager*, retrieves the corresponding data manager for scalar databases and vector index, this will be deprecated.
+The evaluation function helps to determine whether the cached answer is similar or not. It takes three input values: `user request data`, `cached data`, and `user-defined parameters`. GPTCache now supports three types of evaluation: exact match evaluation, embedding distance evaluation and ONNX model evaluation.
 
-    ```python
-    # common param list
-    # max_size: like above
-    # clean_size: like above
-  
-    # sqlite param list
-    # sqlite_path: like above
-    # eviction_strategy: like above
-  
-    # faiss param list
-    # index_path: faiss index path
-    # dimension: vector dimension, indispensable parameter.
-    # top_k: number of search results
-  
-    data_manager = get_si_data_manager("sqlite", "faiss", dimension=d)
-    cache.init(data_manager=data_manager)
-    ```
-  
-- **evaluation_func**: evaluate similarity by judging the quality of cached answers.
+To enable ONNX evaluation, simply pass EvaluationOnnx to similarity_evaluation. This allows you to run any model that can be served on ONNX. We will support pytorch, tensorRT and the other inference engine in the future.
 
-  The function takes three input values, namely `user request data`, `cache data`, and `user-defined data`. The last parameter, by using `kwargs.get("evaluation_func", {})`, is reserved for users and can be used in the same way as `pre_process`.
+```
+onnx = EmbeddingOnnx()
+data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+evaluation_onnx = EvaluationOnnx()
+cache.init(embedding_func=onnx.to_embeddings,
+               data_manager=data_manager,
+               similarity_evaluation=evaluation_onnx,
+               )
+```
 
-  ```python
-  # param
-  rank = chat_cache.evaluation_func({
-              "question": pre_embedding_data,
-              "embedding": embedding_data,
-          }, {
-              "question": cache_question,
-              "answer": cache_answer,
-              "search_result": cache_data,
-          }, extra_param=context.get('evaluation_func', None))
-  ```
-  
-  ```python
-  # search distance
-  def pair_evaluation(src_dict, cache_dict, **kwargs):
-      distance, _ = cache_dict["search_result"]
-      return distance
-  ```
-  
-  ```python
-  class ModelEvaluation:
-      def __init__(self):
-          self.model = initialize_model()
-  
-      # WARNING: the model cannot evaluate text with more than 512 tokens
-      def evaluation(self, src_dict, cache_dict, **kwargs):
-          try:
-              src_question = src_dict["question"]
-              cache_question = cache_dict["question"]
-              return self.model(src_question, [cache_question])
-          except Exception:
-              return 0
-  ```
-  
-  Note that if you intend to use the model, it should be packaged with a class. The model will be loaded when the object is created to avoid unnecessary loading when not in use. This also ensures that the model is not loaded multiple times during program execution.
+Users can also pass in other configuration options , such as:
 
-- **config**: includes cache-related configurations, which currently consist of the following: `log_time_func`, `similarity_threshold`, and `similarity_positive`.
+- `log_time_func`: A function that logs time-consuming operations such as `embedding` and `search`.
+- `similarity_threshold`: The threshold used to determine when embeddings are similar to each other.
 
-  - log_time_func: The function logging time-consuming operations currently detects `embedding` and `search` functions.
-  - similarity_threshold
-  - similarity_positive: When set to `True`, a higher value indicates a higher degree of similarity. When set to `False`, a lower value indicates a higher degree of similarity.
+### **Chose your adaptor**
 
-- **next_cache**: This points to the next cache object, which is useful for implementing multi-level cache functions.
+GPTCache now supports two LLM adapters: OpenAI and Langchain.
 
-  ```python
-  bak_cache = Cache()
-  bak_data_file = dir_name + "/data_map_bak.txt"
-  bak_cache.init(data_manager=get_data_manager("map", data_path=bak_data_file))
-  data_file = dir_name + "/data_map.txt"
-  
-  cache.init(data_manager=get_data_manager("map"),
-             next_cache=bak_cache)
-  ```
+With the OpenAI adapter, you can specify the model you want to use and generate queries as a user role.
 
-## Request cache parameter customization
+```
+cache.init()
+cache.set_openai_key()
 
-- **cache_obj**: customize request cache, use global variable cache by default.
+question = "what's github"
+answer = openai.ChatCompletion.create(
+      model='gpt-3.5-turbo',
+      messages=[
+        {
+            'role': 'user',
+            'content': question
+        }
+      ],
+    )
+print(answer)
+```
 
-```python
+if you want to utilize stream response API in openAI SDK:
+
+```
+from gptcache.cache.factory import get_data_manager, get_user_data_manager
+from gptcache.core import cache, Cache
+from gptcache.adapter import openai
+
+cache.init(data_manager=get_user_data_manager("map"))
+os.environ["OPENAI_API_KEY"] = "API KEY"
+cache.set_openai_key()
+
+response = openai.ChatCompletion.create(
+    model='gpt-3.5-turbo',
+    messages=[
+        {'role': 'user', 'content': "What's 1+1? Answer in one word."}
+    ],
+    temperature=0,
+    stream=True  # this time, we set stream=True
+)
+
+# create variables to collect the stream of chunks
+collected_chunks = []
+collected_messages = []
+# iterate through the stream of events
+for chunk in response:
+    collected_chunks.append(chunk)  # save the event response
+    chunk_message = chunk['choices'][0]['delta']  # extract the message
+    collected_messages.append(chunk_message)  # save the message
+
+full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
+```
+
+If you want to connect with other LLMs, the Langchain Adaptor provides support for a standard interface for all of them.
+
+```
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+
+prompt = PromptTemplate(template=template, input_variables=["question"])
+
+llm = OpenAI()
+
+question = "What NFL team won the Super Bowl in the year Justin Bieber was born?"
+
+llm_cache = Cache()
+llm_cache.init(
+    pre_embedding_func=get_prompt,
+    post_process_messages_func=postnop,
+)
+
+cached_llm = LangChainLLMs(llm)
+answer = cached_llm(question, cache_obj=llm_cache)
+```
+
+We are planning to support other large language models in the future,  any contributions or suggestions would be highly welcomed.
+
+### Other request parameters
+
+**cache_obj**: Customize the request cache. Use this if you want to make the cache a singleton.
+
+```
 onnx = Onnx()
-data_manager = get_si_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
 one_cache = Cache()
 one_cache.init(embedding_func=onnx.to_embeddings,
                data_manager=data_manager,
@@ -291,9 +210,9 @@ openai.ChatCompletion.create(
 )
 ```
 
-- **cache_context**: Custom cache parameters can be passed separately for each step in the caching process.
+**cache_context**: Custom cache functions can be passed separately for each of the request.
 
-```python
+```
 question = "what do you think about chatgpt"
 
 openai.ChatCompletion.create(
@@ -305,15 +224,15 @@ openai.ChatCompletion.create(
       "pre_embedding_func": {},
       "embedding_func": {},
       "search_func": {},
+      "get_scalar_data": {},
       "evaluation_func": {},
-      "save_func": {},
     }
 )
 ```
 
-- **cache_skip**: skip the cache search, but still store the results returned by the LLM model. These stored results can be used to retry when the cached result is unsatisfactory. Additionally, during the startup phase of the cache system, you can avoid performing a cache search altogether and directly save the data, which can then be used for data accumulation.
+**cache_skip**: This option allows you to skip the cache search, but still store the results returned by the LLM model. 
 
-```python
+```
 question = "what do you think about chatgpt"
 
 openai.ChatCompletion.create(
