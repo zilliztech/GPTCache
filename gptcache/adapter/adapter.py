@@ -1,7 +1,10 @@
 import logging
+import numpy as np
 from gptcache import cache, time_cal
 from gptcache.utils.error import NotInitError
 
+def normalize_embedding_function(emb):
+    return emb / np.linalg.norm(emb)
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
     chat_cache = kwargs.pop('cache_obj', cache)
@@ -9,6 +12,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         raise NotInitError()
     cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
     context = kwargs.pop('cache_context', {})
+    normalize_embedding = kwargs.pop('normalize_embedding', True)
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
     cache_skip = kwargs.pop('cache_skip', False)
@@ -19,6 +23,8 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                                   func_name='embedding',
                                   report_func=chat_cache.report.embedding,
                                   )(pre_embedding_data, extra_param=context.get('embedding_func', None))
+        if normalize_embedding is True:
+            embedding_data = normalize_embedding_function(embedding_data)
         cache_data_list = time_cal(chat_cache.data_manager.search,
                                    func_name='search',
                                    report_func=chat_cache.report.search,
