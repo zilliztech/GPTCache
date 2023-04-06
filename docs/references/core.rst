@@ -9,5 +9,5 @@ gptcache.core.cache
 
 gptcache.core.Config
 -------------------------
-.. automodule:: gptcache.core.config
+.. automodule:: gptcache.core.Config
    :members:
