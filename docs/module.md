@@ -13,7 +13,7 @@
     - [ ] Store conversation summary.
     - [ ] Store prompts.
 - **Encoder**: Embed the text into a dense vector for similarity search.
-    - [x]  Use [towhee](https://towhee.io/) with the paraphrase-albert-small-v2 model for English and uer/albert-base-chinese-cluecorpussmall for Chinese.
+    - [x]  Use [ONNX](https://onnx.ai/) with the GPTCache/paraphrase-albert-onnx for English.
     - [x]  Use the OpenAI embedding API.
     - [x]  Keep the text as a string without any changes.
     - [ ]  Use the [cohere](https://docs.cohere.ai/reference/embed) embedding API.
@@ -50,7 +50,7 @@
         - [ ]  More complicated eviction policies
 - **Ranker**: Evaluate similarity by judging the quality of cached answers.
     - [x] Use the search distance, as described in `simple.py#pair_evaluation`.
-    - [x] [towhee](https://towhee.io/) uses the albert_duplicate model for precise comparison between questions and answers. It supports only 512 tokens.
+    - [x] [ONNX](https://onnx.ai/) uses the GPTCache/albert-duplicate-onnx model for precise comparison between questions and answers. It supports only 512 tokens.
     - [x] Exact string comparison, judge the cache request and the original request based on the exact match of characters.
     - [x] For numpy arrays, use `linalg.norm`.
     - [ ] BM25 and other similarity measurements

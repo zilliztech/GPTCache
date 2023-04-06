@@ -10,7 +10,7 @@ cd examples/map
 python map.py
 ```
 
-If the running example includes a model or complex third-party library (like: faiss, towhee), **the first run** may take **some time** as it needs to download the model runtime environment, model data, dependencies, etc. However, the subsequent runs will be significantly faster.
+If the running example includes a model or complex third-party library (like: faiss, onnx), **the first run** may take **some time** as it needs to download the model runtime environment, model data, dependencies, etc. However, the subsequent runs will be significantly faster.
 
 ## [Basic example](map/map.py)
 
@@ -20,11 +20,11 @@ How to use the map to cache data.
 
 How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the faiss to query the vector data.
 
-## [Sqlite + Faiss + Towhee](sqlite_faiss_towhee/sqlite_faiss_towhee.py)
+## [Sqlite + Faiss + ONNX](sqlite_faiss_onnx/sqlite_faiss_onnx.py)
 
-On the basis of the above example, use [towhee](https://towhee.io/) for embedding operation
+On the basis of the above example, use [onnx](https://onnx.ai/) for embedding operation
 
-## [Sqlite + Milvus + Towhee](sqlite_milvus_mock/sqlite_milvus_mock.py)
+## [Sqlite + Milvus + ONNX](sqlite_milvus_mock/sqlite_milvus_mock.py)
 
 How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
 
@@ -52,9 +52,9 @@ How to use the [SQL Server](https://www.microsoft.com/en-us/sql-server/) to stor
 
 How to use the [Oracle](https://www.oracle.com/) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
 
-## [Benchmark](benchmark/benchmark_sqlite_faiss_towhee.py)
+## [Benchmark](benchmark/benchmark_sqlite_faiss_onnx.py)
 
-The benchmark script about the `Sqlite + Faiss + Towhee`
+The benchmark script about the `Sqlite + Faiss + ONNX`
 
 [Test data source](benchmark/mock_data.json): Randomly scrape some information from the webpage (origin), and then let chatgpt produce corresponding data (similar).
 

@@ -89,7 +89,7 @@ refer to the implementation of [MapDataManager, SSDataManager or SIDataManager](
 
 ## Add a embedding function
 
-refer to the implementation of [towhee](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding/towhee.py) or [openai](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding/openai.py).
+refer to the implementation of [onnx](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding/onnx.py) or [openai](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding/openai.py).
 
 1. Add a new python file to [embedding](https://github.com/zilliztech/GPTCache/blob/main/gptcache/embedding) directory
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
@@ -98,7 +98,7 @@ refer to the implementation of [towhee](https://github.com/zilliztech/GPTCache/b
 
 ## Add a similarity evaluation function
 
-refer to the implementation of [pair_evaluation](https://github.com/zilliztech/GPTCache/blob/main/gptcache/similarity_evaluation/simple.py) or [towhee](https://github.com/zilliztech/GPTCache/blob/main/gptcache/similarity_evaluation/towhee.py)
+refer to the implementation of [pair_evaluation](https://github.com/zilliztech/GPTCache/blob/main/gptcache/similarity_evaluation/simple.py) or [onnx](https://github.com/zilliztech/GPTCache/blob/main/gptcache/similarity_evaluation/onnx.py)
 
 1. Make sure the input params, you can learn more about in the [user view](https://github.com/zilliztech/GPTCache/blob/main/gptcache/adapter/openai.py) model
 ```python

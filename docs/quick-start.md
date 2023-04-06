@@ -52,7 +52,7 @@ answer = openai.ChatCompletion.create(
 )
 ```
 
-If you want to experience vector similarity search cache locally, you can use the example [Sqlite + Faiss + Towhee](https://github.com/zilliztech/GPTCache/blob/main/examples/sqlite_faiss_towhee/sqlite_faiss_towhee.py).
+If you want to experience vector similarity search cache locally, you can use the example [Sqlite + Faiss + ONNX](https://github.com/zilliztech/GPTCache/blob/main/examples/sqlite_faiss_onnx/sqlite_faiss_onnx.py).
 
 More Docs：
 - [System Design, how it was constructed](./system.md)
