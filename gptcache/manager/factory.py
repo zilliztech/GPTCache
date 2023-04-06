@@ -2,7 +2,7 @@ from gptcache.utils.error import NotFoundStoreError, ParamError
 from gptcache.utils import import_sql_client
 from .data_manager import DataManager, SSDataManager, MapDataManager
 from .scalar_data import SQLDataBase, SQL_URL
-from .vector_data import Milvus, Faiss, Chromadb
+from .vector_data import Milvus, Faiss
 
 
 def get_user_data_manager(data_manager_name: str, **kwargs) -> DataManager:
@@ -110,8 +110,6 @@ def get_data_manager(cache_store: str, vector_store: str, **kwargs):
         _check_dimension(dimension)
         index_path = kwargs.pop('index_path', 'faiss.index')
         vector = Faiss(index_path, dimension, top_k)
-    elif vector_store == 'chromadb':
-        vector = Chromadb(top_k=top_k, **kwargs)
     else:
         raise NotFoundStoreError('vector store', vector_store)
     return SSDataManager(max_size, clean_size, scalar, vector, eviction)

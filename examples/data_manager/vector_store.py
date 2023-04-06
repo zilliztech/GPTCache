@@ -16,7 +16,6 @@ def run():
     vector_stores = [
         'faiss',
         'milvus',
-        'chromadb',
     ]
     for vector_store in vector_stores:
         data_manager = get_data_manager('sqlite', vector_store, dimension=d)

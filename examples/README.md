@@ -218,7 +218,6 @@ Support vector database
 - Milvus
 - Zilliz Cloud
 - FAISS
-- ChromaDB
 
 > [Example code](https://github.com/zilliztech/GPTCache/blob/main/examples/data_manager/vector_store.py)
 

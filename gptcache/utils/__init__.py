@@ -75,14 +75,6 @@ def import_faiss():
         import faiss
 
 
-def import_chromadb():
-    try:
-        import chromadb
-    except ModuleNotFoundError as e:
-        prompt_install('chromadb')
-        import chromadb
-
-
 def import_sqlalchemy():
     try:
         import sqlalchemy
