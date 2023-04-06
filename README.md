@@ -259,7 +259,7 @@ This module is created to extract embeddings from requests for similarity search
   - [ ] Support [Minio](https://min.io/).
   - [ ] Support [HBase](https://hbase.apache.org/).
   - [ ] Support [ElasticSearch](https://www.elastic.co/).
-  - [ ] Support [zincsearch](https://zinc.dev/).
+  - [ ] Support [Duckdb](https://github.com/duckdb/duckdb).
   - [ ] Support other storages.
 - **Vector Store**:
 The **Vector Store** module helps find the K most similar requests from the input request's extracted embedding. The results can help assess similarity. GPTCache provides a user-friendly interface that supports various vector stores, including Milvus, Zilliz Cloud, and FAISS. More options will be available in the future.
