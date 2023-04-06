@@ -5,7 +5,9 @@
 
 Welcome to GPT Cache!
 =====================================
+
 ----
+
 .. image:: https://dcbadge.vercel.app/api/server/Q8C6WEjSWV?compact=true&style=flat
   :width: 100
   :alt: discord

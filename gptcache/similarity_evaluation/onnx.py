@@ -1,7 +1,9 @@
-from gptcache.utils import import_onnxruntime, import_huggingface_hub
+from gptcache.utils import import_onnxruntime, import_huggingface_hub, import_huggingface
 from .similarity_evaluation import SimilarityEvaluation
+
 import_onnxruntime()
 import_huggingface_hub()
+import_huggingface()
 import numpy as np
 import os
 from transformers import AutoTokenizer

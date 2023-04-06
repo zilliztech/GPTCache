@@ -6,9 +6,5 @@
    :caption: Contents:
 
    core
-   adapter
-   cache
    embedding
-   processor
    similarity_evaluation
-   utils
