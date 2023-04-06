@@ -73,7 +73,7 @@ refer to the implementation of [milvus](https://github.com/zilliztech/GPTCache/b
 
 refer to the implementation of [MapDataManager, SSDataManager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/data_manager.py).
 
-1. Implement the [DataManager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/cache/data_manager.py) interface
+1. Implement the [DataManager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/data_manager.py) interface
 2. Add the new store to the [get_data_manager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/data_manager.py) method
 3. Add a usage example to [example](https://github.com/zilliztech/GPTCache/tree/main/examples/data_manager) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/README.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
