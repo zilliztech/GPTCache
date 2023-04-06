@@ -257,7 +257,6 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [Milvus](https://milvus.io/).
   - [x] Support [Zilliz Cloud](https://cloud.zilliz.com/).
   - [x] Support [FAISS](https://faiss.ai/).
-  - [ ] Support [Qdrant](https://qdrant.tech/)
   - [x] Support [Chroma](https://www.trychroma.com/)
   - [ ] Support [PGVector](https://github.com/pgvector/pgvector)
   - [ ] Support other vector databases
