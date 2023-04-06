@@ -1,10 +1,10 @@
 import math
 
-from gptcache.similarity_evaluation import Onnx
+from gptcache.similarity_evaluation import OnnxModelEvaluation
 
 
 def test_onnx():
-    evaluation = Onnx()
+    evaluation = OnnxModelEvaluation()
 
     range_min, range_max = evaluation.range()
     assert math.isclose(range_min, 0.0)

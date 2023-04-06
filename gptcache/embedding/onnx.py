@@ -15,10 +15,10 @@ class Onnx:
     Example:
         .. code-block:: python
         
-            from gptcache.embedding import onnx
+            from gptcache.embedding import Onnx
             
             test_sentence = "Hello, world." 
-            encoder = onnx(model="GPTCache/paraphrase-albert-onnx")
+            encoder = Onnx(model="GPTCache/paraphrase-albert-onnx")
             embed = encoder.to_embeddings(test_sentence)
     """
     def __init__(self, api_key, model= "GPTCache/paraphrase-albert-onnx", **kwargs):
@@ -32,6 +32,13 @@ class Onnx:
 
     
     def to_embeddings(self, data, **kwargs):
+        """Generate embedding given text input.
+
+        :param data: text in string.
+        :type data: str
+
+        :return: a text embedding in shape of (dim,).
+        """
         encoded_text = self.tokenizer.encode_plus(data, padding='max_length')
         ort_inputs = {'input_ids': np.array(encoded_text['input_ids']).reshape(1,-1), 
                'attention_mask': np.array(encoded_text['attention_mask']).reshape(1,-1),
@@ -50,5 +57,9 @@ class Onnx:
 
     @property
     def dimension(self):
+        """Embedding dimension.
+
+        :return: embedding dimension
+        """
         return self.__dimension
 

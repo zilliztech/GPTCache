@@ -19,7 +19,26 @@ def pad_sequence(input_ids_list, padding_value=0):
         padded_sequences[i, :len(sequence)] = sequence
     return padded_sequences
 
-class Onnx(SimilarityEvaluation):
+class OnnxModelEvaluation(SimilarityEvaluation):
+    """Using ONNX model to evaluate sentences pair similarity.
+
+    :param model: model name of OnnxModelEvaluation. Default is 'GPTCache/albert-duplicate-onnx'.
+    :type model: str 
+
+    Example:
+        .. code-block:: python
+            from gptcache.similarity_evaluation import OnnxModelEvaluation
+            
+            evaluation = OnnxModelEvaluation()
+            score = evaluation.evaluation(
+                {
+                    "question": "What is the color of sky?"
+                },
+                {
+                    "question": "hello"
+                }
+            )
+    """
     def __init__(self, model = 'GPTCache/albert-duplicate-onnx'):
         tokenizer_name = 'albert-base-v2'
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
@@ -29,6 +48,14 @@ class Onnx(SimilarityEvaluation):
 
     # WARNING: the model cannot evaluate text with more than 512 tokens
     def evaluation(self, src_dict, cache_dict, **kwargs):
+        """Evaluate the similarity score of pair.
+        :param src_dict: the query dictionary to evaluate with cache.
+        :type src_dict: Dict
+        :param cache_dict: the cache dictionary.
+        :type cache_dict: Dict
+
+        :return: evaluation score.
+        """
         try:
             src_question = src_dict["question"]
             cache_question = cache_dict["question"]
@@ -39,25 +66,36 @@ class Onnx(SimilarityEvaluation):
             return 0
 
     def range(self):
+        """Range of similarity score.
+        
+        :return: minimum and maximum of similarity score.
+        """
         return 0.0, 1.0
 
     def inference(self, reference: str, candidates: List[str]) -> np.ndarray:
+        """Inference the ONNX model.
+        :param reference: reference sentence.
+        :type reference: str 
+        :param candidates: candidate sentences.
+        :type candidates: List[str]
+
+        :return: probability score indcates how much is reference similar to candidates. 
+        """
+        n_candidates= len(candidates)
+        inference_texts = [{'text_a': reference, 'text_b': candidate } for candidate in  candidates ]
+        batch_encoding_list = [self.tokenizer.encode_plus(text['text_a'], text['text_b'], padding='longest') for text in inference_texts]
  
-         n_candidates= len(candidates)
-         inference_texts = [{'text_a': reference, 'text_b': candidate } for candidate in  candidates ]
-         batch_encoding_list = [self.tokenizer.encode_plus(text['text_a'], text['text_b'], padding='longest') for text in inference_texts]
+        input_ids_list = [np.array(encode.input_ids) for encode in batch_encoding_list] 
+        attention_mask_list = [np.array(encode.attention_mask) for encode in batch_encoding_list] 
+        token_type_ids_list = [np.array(encode.token_type_ids) for encode in batch_encoding_list]
  
-         input_ids_list = [np.array(encode.input_ids) for encode in batch_encoding_list] 
-         attention_mask_list = [np.array(encode.attention_mask) for encode in batch_encoding_list] 
-         token_type_ids_list = [np.array(encode.token_type_ids) for encode in batch_encoding_list]
+        padded_input_ids = pad_sequence(input_ids_list, padding_value=self.tokenizer.pad_token_id)
+        padded_attention_mask = pad_sequence(attention_mask_list, padding_value=self.tokenizer.pad_token_id)
+        padded_token_type_ids = pad_sequence(token_type_ids_list, padding_value=self.tokenizer.pad_token_id)
  
-         padded_input_ids = pad_sequence(input_ids_list, padding_value=self.tokenizer.pad_token_id)
-         padded_attention_mask = pad_sequence(attention_mask_list, padding_value=self.tokenizer.pad_token_id)
-         padded_token_type_ids = pad_sequence(token_type_ids_list, padding_value=self.tokenizer.pad_token_id)
- 
-         ort_inputs = {'input_ids': padded_input_ids.reshape(n_candidates,-1), 
-                       'attention_mask': padded_attention_mask.reshape(n_candidates,-1),
-                       'token_type_ids': padded_token_type_ids.reshape(n_candidates,-1)}
-         ort_outputs = self.ort_session.run(None, ort_inputs)
-         scores = ort_outputs[0][:,1]
-         return scores
+        ort_inputs = {'input_ids': padded_input_ids.reshape(n_candidates,-1), 
+                      'attention_mask': padded_attention_mask.reshape(n_candidates,-1),
+                      'token_type_ids': padded_token_type_ids.reshape(n_candidates,-1)}
+        ort_outputs = self.ort_session.run(None, ort_inputs)
+        scores = ort_outputs[0][:,1]
+        return scores
