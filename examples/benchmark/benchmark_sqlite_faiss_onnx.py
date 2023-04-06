@@ -5,7 +5,7 @@ import time
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
 from gptcache.cache.factory import get_data_manager
-from gptcache.similarity_evaluation import Onnx as EvaluationOnnx
+from gptcache.similarity_evaluation.onnx import OnnxModelEvaluation 
 from gptcache.embedding import Onnx as EmbeddingOnnx
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
