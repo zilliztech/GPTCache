@@ -6,7 +6,7 @@ TABLE_NAME = 'cache_table'
 TABLE_NAME_SEQ = 'cache_table_sequence'
 
 
-class ScalarStorage(metaclass=ABCMeta):
+class CacheStorage(metaclass=ABCMeta):
     """
     BaseStorage for scalar data.
     """

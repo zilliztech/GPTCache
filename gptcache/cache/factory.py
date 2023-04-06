@@ -49,9 +49,56 @@ def _check_dimension(dimension):
 
 
 # scalar_store + vector_store
-def get_ss_data_manager(scalar_store: str, vector_store: str, **kwargs):
+def get_ss_data_manager(cache_store: str, vector_store: str, **kwargs):
+    """Generate SSDataManager with the cache and vector configuration.
+
+    :param cache_store: the name of the cache storage, it is support "sqlite", "postgresql", "mysql", "mariadb", "sqlserver" and  "oracle" now.
+    :type cache_store: str.
+    :param vector_store: the name of the vector storage, it is support "milvus", "faiss" and "chromadb" now.
+    :type vector_store: str.
+    :param dimension: the dimension of the vector, defaults to 0.
+    :type dimension: int.
+    :param max_size: the max size for the cache, defaults to 1000.
+    :type max_size: int.
+    :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
+    :type clean_size: int.
+    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :type top_k: int.
+    :param sql_url: the url of the sql database for cache, such as "<db_type>+<db_driver>://<username>:<password>@<host>:<port>/<database>",
+                    and the default value is related to the `cache_store` parameter, "sqlite:///./sqlite.db" for "sqlite",
+                    "postgresql+psycopg2://postgres:123456@127.0.0.1:5432/postgres" for "postgresql",
+                    "mysql+pymysql://root:123456@127.0.0.1:3306/mysql" for "mysql",
+                    "mariadb+pymysql://root:123456@127.0.0.1:3307/mysql" for "mariadb",
+                    "mssql+pyodbc://sa:Strongpsw_123@127.0.0.1:1434/msdb?driver=ODBC+Driver+17+for+SQL+Server" for "sqlserver",
+                    "oracle+cx_oracle://oracle:123456@127.0.0.1:1521/?service_name=helowin&encoding=UTF-8&nencoding=UTF-8" for "oracle".
+    :type sql_url: str.
+    :param index_path: the path to Faiss index, defaults to "faiss.index".
+    :type index_path: str.
+    :param collection_name: the name of the collection for Milvus vector database, defaults to "gptcache".
+    :type collection_name: str.
+    :param host: the host for Milvus vector database, defaults to "localhost".
+    :type host: str.
+    :param port: the port for Milvus vector database, defaults to "19530".
+    :type port: str.
+    :param user: the user for Zilliz Cloud, defaults to "".
+    :type user: str.
+    :param password: the password for Zilliz Cloud, defaults to "".
+    :type password: str.
+    :param is_https: whether it is https with Zilliz Cloud, defaults to False.
+    :type is_https: bool.
+
+
+    :return: SSDataManager.
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.cache.factory import get_ss_data_manager
+
+            data_manager = get_ss_data_manager("sqlite", "faiss", dimension=128)
+    """
     max_size, clean_size, dimension, top_k = _get_common_params(**kwargs)
-    scalar = _get_scalar_store(scalar_store, **kwargs)
+    scalar = _get_scalar_store(cache_store, **kwargs)
     if vector_store == "milvus":
         _check_dimension(dimension)
         vector = Milvus(dim=dimension, top_k=top_k, **kwargs)
