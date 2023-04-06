@@ -281,4 +281,4 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
 ## 😆 Contributing
 We are extremely open to contributions, be it through new features, enhanced infrastructure, or improved documentation.
 
-For comprehensive instructions on how to contribute, please refer to [our contribution guide](docs/contributing.md).
+For comprehensive instructions on how to contribute, please refer to our [contribution guide](docs/contributing.md).
