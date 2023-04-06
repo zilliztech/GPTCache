@@ -7,6 +7,13 @@ Boost LLM API Speed by 100x ⚡, Slash Costs by 10x 💰
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
 [![Discord](https://dcbadge.vercel.app/api/server/Q8C6WEjSWV?compact=true&style=flat)](https://discord.gg/Q8C6WEjSWV)
 
+Documentation: https://gptcache.readthedocs.io/en/latest/.
+
+Discord: https://discord.gg/Q8C6WEjSWV.
+
+Twitter: https://twitter.com/zilliz_universe.
+
+
 ## Quick Install
 
 `pip install gptcache`
