@@ -22,8 +22,8 @@ Welcome to GPTCache!
    :width: 100
    :alt: License
    :target: https://opensource.org/license/mit/
-|
 
+|
 Large Language Models (LLMs) are a promising and transformative technology that has rapidly advanced in recent years. These models are capable of generating natural language text and have numerous applications, including chatbots, language translation, and creative writing. However, as the size of these models increases, so do the costs and performance requirements needed to utilize them effectively. This has led to significant challenges in developing on top of large models such as ChatGPT.
 
 To address this issue, we have developed **GPTCache**, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
@@ -31,7 +31,7 @@ To address this issue, we have developed **GPTCache**, a project that focuses on
 - **Quick response to user requests:** the caching system provides faster response times compared to large model inference, resulting in lower latency and faster response to user requests.
 - **Reduced service costs:** most LLM services are currently charged based on the number of tokens. If user requests hit the cache, it can reduce the number of requests and lower service costs.
 
-To learn more details about GPTCache and follow up updates, please visit our `README.md <https://github.com/zilliztech/GPTCache/blob/main/README.md>`_.
+To learn more details about GPTCache and follow the updates, please visit our `README.md <https://github.com/zilliztech/GPTCache/blob/main/README.md>`_.
 
 
 Getting Started
@@ -49,25 +49,35 @@ You can follow instructions to simply install and run an example at local.
    quick-start
 
 
-Overview
+Modules
 ----------
-A good analogy for GptCache is to think of it as a more semantic version of Redis. In GptCache, hits are not limited to exact matches, but rather also include prompts and context similar to previous queries. We believe that the traditional cache design still works for AIGC applications for the following reasons:
 
-- Locality is present everywhere. Like traditional application systems, AIGC applications also face similar hot topics. For instance, ChatGPT itself may be a popular topic among programmers.
-- For purpose-built SaaS services, users tend to ask questions within a specific domain, with both temporal and spatial locality.
-- By utilizing vector similarity search, it is possible to find a similarity relationship between questions and answers at a relatively low cost.
+.. image:: ./GPTCacheStructure.png
 
-We provide `benchmark <https://github.com/zilliztech/GPTCache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py>`_ to illustrate the concept. In semantic caching, there are three key measurement dimensions: false positives, false negatives, and hit latency. With the plugin-style implementation, users can easily tradeoff these three measurements according to their needs.
+You can take a look at modules below to learn more about system design and architecture.
 
-You can take a look at `modules <./module.html>`_ to learn about system design and architecture.
+- `LLM Adapter <modules/llm_adapter.html>`_
+- `Embedding Generator <modules/embedding_generator.html>`_
+- `Cache Storage <modules/cache_storage.html>`_
+- `Vector Store <modules/vector_store>`_
+- `Cache Manager <modules/cache_manager>`_
+- `Similarity Evaluator <modules/similarity_evaluator>`_
 
 .. toctree::
    :maxdepth: 2
-   :caption: Overview
-   :name: overview
+   :caption: Modules
+   :name: modules
    :hidden:
 
-   module
+   modules/llm_adapter
+   modules/embedding_generator
+   modules/cache_storage
+   modules/vector_store
+   modules/cache_manager
+   modules/similarity_evaluator
+
+**Note:**
+Not all combinations of different modules may be compatible with each other. For instance, if we disable the **Embedding Extractor**, the **Vector Store** may not function as intended. We are currently working on implementing a combination sanity check for **GPTCache**.
 
 
 .. Examples
