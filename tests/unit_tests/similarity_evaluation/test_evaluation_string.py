@@ -1,10 +1,10 @@
 import math
 
-from gptcache.similarity_evaluation.string import AbsoluteEvaluation
+from gptcache.similarity_evaluation.string import ExactMatchEvaluation
 
 
-def test_absolute_evaluation():
-    evaluation = AbsoluteEvaluation()
+def test_exact_match_evaluation():
+    evaluation = ExactMatchEvaluation()
 
     range_min, range_max = evaluation.range()
     assert math.isclose(range_min, 0.0)
