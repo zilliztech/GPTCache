@@ -1,0 +1,56 @@
+name: Nightly CI
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    #        ┌───────────── minute (0 - 59)
+    #        │ ┌───────────── hour (0 - 23)
+    #        │ │ ┌───────────── day of the month (1 - 31)
+    #        │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #        │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #        │ │ │ │ │
+    #        │ │ │ │ │
+    #        │ │ │ │ │
+    - cron: "0 22 * * *"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/Nightly_CI_main.yaml'
+
+jobs:
+  nightly-CI-gpt-cache-cli-main:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+          cache: pip
+
+      - name: Install dependency
+        shell: bash
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build and install
+        shell: bash
+        run: |
+          python setup.py install
+
+      - name: Install test dependency
+        shell: bash
+        working-directory: tests
+        run: |
+          pip install -r requirements.txt
+
+      - name: Nightly CI Tests
+        timeout-minutes: 10
+        shell: bash
+        working-directory: tests
+        run: |
+          python3 -m pytest ./ --tags L2
