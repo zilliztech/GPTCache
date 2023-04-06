@@ -27,12 +27,12 @@ def to_embeddings(data, **kwargs):
 
 ```python
 from gptcache.core import cache, Config
-from gptcache.cache.factory import get_data_manager
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 from gptcache.embedding import Onnx
 
 onnx = Onnx()
-data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
 cache.init(embedding_func=onnx.to_embeddings,
            data_manager=data_manager,
            similarity_evaluation=SearchDistanceEvaluation(),
@@ -170,10 +170,10 @@ class Cohere:
 Store all data in a map data structure, using the question as the key.
 
 ```python
-from gptcache.manager.factory import get_user_data_manager
+from gptcache.manager import get_data_manager
 from gptcache import cache
 
-data_manager = get_user_data_manager('map')
+data_manager = get_data_manager()
 cache.init(data_manager=data_manager)
 cache.set_openai_key()
 ```
@@ -184,7 +184,7 @@ The user's question and answer data can be stored in a general database such as 
 
 ```python
 from gptcache import cache
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 import numpy as np
 
@@ -194,7 +194,9 @@ d = 8
 def mock_embeddings(data, **kwargs):
     return np.random.random((d, )).astype('float32')
 
-data_manager = get_data_manager("sqlite", 'faiss', dimension=d)
+cache_base = CacheBase('sqlite')
+vector_base = VectorBase('faiss', dimension=d)
+data_manager = get_data_manager(cache_base, vector_base)
 cache.init(embedding_func=mock_embeddings,
            data_manager=data_manager,
            similarity_evaluation=SearchDistanceEvaluation(),
@@ -210,7 +212,7 @@ Support general database
 - MariaDB.
 - SQL Server.
 - Oracle.
- 
+
 > [Example code](https://github.com/zilliztech/GPTCache/blob/main/examples/data_manager/scalar_store.py)
 
 Support vector database
@@ -224,15 +226,15 @@ Support vector database
 
 **Custom Store**
 
-First, you need to implement two interfaces, namely [`CacheStorage`](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/scalar_data/base.py) and [`VectorBase`](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/vector_data/base.py), and then create the corresponding data manager through the `get_user_data_manager` method.
+First, you need to implement two interfaces, namely [`CacheStorage`](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/scalar_data/base.py) and [`VectorBase`](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/vector_data/base.py), and then create the corresponding data manager through the `get_data_manager` method.
 
 Reference: [CacheStorage sqlalchemy](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/scalar_data/sqlalchemy.py) [VectorBase Faiss](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/vector_data/faiss.py)
 
 ```python
 from gptcache import cache
-from gptcache.manager.factory import get_user_data_manager
+from gptcache.manager import get_data_manager
 
-data_manager=get_user_data_manager("scalar_vector", scalar_store=CustomGeneralStore(), vector_store=CustomVectorStore())
+data_manager=get_data_manager(cache_base=CustomCacheStore(), vector_base=CustomVectorStore())
 cache.init(data_manager=data_manager)
 ```
 
@@ -363,14 +365,13 @@ Reference: [similarity evaluation dir](https://github.com/zilliztech/GPTCache/tr
 
   ```python
   from gptcache import cache, Cache
-  from gptcache.manager.factory import get_data_manager 
+  from gptcache.manager import get_data_manager 
   
   bak_cache = Cache()
   bak_data_file = "data_map_bak.txt"
-  bak_cache.init(data_manager=get_data_manager("map", data_path=bak_data_file))
+  bak_cache.init(data_manager=get_data_manager(data_path=bak_data_file))
   
-  cache.init(data_manager=get_data_manager("map"),
-             next_cache=bak_cache)
+  cache.init(data_manager=get_data_manager(), next_cache=bak_cache)
   ```
   
 ## Request cache parameter customization
@@ -379,7 +380,7 @@ Reference: [similarity evaluation dir](https://github.com/zilliztech/GPTCache/tr
 
 ```python
 onnx = Onnx()
-data_manager = get_si_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
 one_cache = Cache()
 one_cache.init(embedding_func=onnx.to_embeddings,
                data_manager=data_manager,

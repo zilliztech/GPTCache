@@ -38,11 +38,10 @@ class MapDataManager(DataManager):
         self.data_path = data_path
         self.init()
 
-    def init(self, **kwargs):
+    def init(self):
         try:
-            f = open(self.data_path, 'rb')
-            self.data = pickle.load(f)
-            f.close()
+            with open(self.data_path, 'rb') as f:
+                self.data = pickle.load(f)
         except FileNotFoundError:
             # print(f'File <${self.data_path}> is not found.')
             return
@@ -63,9 +62,8 @@ class MapDataManager(DataManager):
 
     def close(self):
         try:
-            f = open(self.data_path, 'wb')
-            pickle.dump(self.data, f)
-            f.close()
+            with open(self.data_path, 'wb') as f:
+                pickle.dump(self.data, f)
         except PermissionError:
             print(f'You don\'t have permission to access this file <${self.data_path}>.')
 
@@ -87,27 +85,27 @@ def normalize(vec):
 class SSDataManager(DataManager):
     """Generate SSDataManage to manager the data.
 
-    :param max_size: the max size for the cache, defaults to 1000.
-    :type max_size: int.
-    :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
-    :type clean_size: int.
     :param s: CacheStorage to manager the scalar data.
     :type s: CacheStorage.
     :param v: VectorBase to manager the vector data.
     :type v:  VectorBase.
+    :param max_size: the max size for the cache, defaults to 1000.
+    :type max_size: int.
+    :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
+    :type clean_size: int.
     :param eviction: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
     :type eviction:  str.
     """
     s: CacheStorage
     v: VectorBase
 
-    def __init__(self, max_size, clean_size, s, v, eviction='LRU'):
+    def __init__(self, s, v, max_size, clean_size, eviction='LRU'):
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size
         self.s = s
         self.v = v
-        self.eviction = EvictionManager(s, v, eviction)
+        self.eviction = EvictionManager(self.s, self.v, eviction)
         self.cur_size = self.s.count()
 
     def _clear(self):
@@ -136,9 +134,9 @@ class SSDataManager(DataManager):
             .. code-block:: python
 
                 import numpy as np
-                from gptcache.manager.factory import get_data_manager
+                from gptcache.manager import get_data_manager, CacheBase, VectorBase
 
-                data_manager = get_data_manager("sqlite", "faiss", dimension=128)
+                data_manager = get_data_manager(CacheBase('sqlite'), VectorBase('faiss', dimension=128))
                 data_manager.save('hello', 'hi', np.random.random((128, )).astype('float32'))
         """
 
@@ -150,9 +148,8 @@ class SSDataManager(DataManager):
         self.v.add(key, embedding_data)
         self.cur_size += 1
 
-    def get_scalar_data(self, search_data, **kwargs):
-        distance, vector_data = search_data
-        key = sha_data(vector_data)
+    def get_scalar_data(self, vector_data, **kwargs):
+        key = sha_data(vector_data[1])
         self.s.update_access_time(key)
         return self.s.get_data_by_id(key)
 

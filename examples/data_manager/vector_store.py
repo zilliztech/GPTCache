@@ -1,6 +1,6 @@
 from gptcache.adapter import openai
 from gptcache import cache
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 import numpy as np
 
@@ -19,7 +19,9 @@ def run():
         'chromadb',
     ]
     for vector_store in vector_stores:
-        data_manager = get_data_manager('sqlite', vector_store, dimension=d)
+        cache_base = CacheBase('sqlite')
+        vector_base = VectorBase(vector_store, dimension=d)
+        data_manager = get_data_manager(cache_base, vector_base)
 
         cache.init(embedding_func=mock_embeddings,
                    data_manager=data_manager,

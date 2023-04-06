@@ -2,7 +2,7 @@ import os
 import unittest
 import numpy as np
 
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
 
 DIM = 8
 
@@ -13,8 +13,9 @@ def mock_embeddings():
 
 class TestEviction(unittest.TestCase):
     def test_eviction_lru(self):
-        url = 'sqlite:///./gptcache0.db'
-        data_manager = get_data_manager('sqlite', 'faiss', dimension=DIM, max_size=10, clean_size=2, eviction='LRU', sql_url=url)
+        cache_base = CacheBase('sqlite', sql_url='sqlite:///./gptcache0.db')
+        vector_base = VectorBase('faiss', dimension=DIM)
+        data_manager = get_data_manager(cache_base, vector_base, max_size=10, clean_size=2, eviction='LRU')
         for i in range(15):
             question = f'foo{i}'
             answer = f'receiver the foo {i}'
@@ -23,8 +24,9 @@ class TestEviction(unittest.TestCase):
         self.assertEqual(cache_count, 9)
 
     def test_eviction_fifo(self):
-        url = 'sqlite:///./gptcache1.db'
-        data_manager = get_data_manager('sqlite', 'faiss', dimension=DIM, max_size=10, clean_size=2, eviction='FIFO', sql_url=url)
+        cache_base = CacheBase('sqlite', sql_url='sqlite:///./gptcache1.db')
+        vector_base = VectorBase('faiss', dimension=DIM)
+        data_manager = get_data_manager(cache_base, vector_base, max_size=10, clean_size=2, eviction='FIFO')
         for i in range(18):
             question = f'foo{i}'
             answer = f'receiver the foo {i}'
@@ -34,8 +36,9 @@ class TestEviction(unittest.TestCase):
         self.assertEqual(cache_count, 10)
 
     # def test_eviction_milvus(self):
-    #     url = 'sqlite:///./gptcache2.db'
-    #     data_manager = get_data_manager('sqlite', 'milvus', dimension=DIM, max_size=10, clean_size=2, eviction='FIFO', sql_url=url)
+    #     cache_base = CacheBase('sqlite', sql_url='sqlite:///./gptcache2.db')
+    #     vector_base = VectorBase('milvus', dimension=DIM, host='172.16.70.4', collection_name='gptcache2')
+    #     data_manager = get_data_manager(cache_base, vector_base, max_size=10, clean_size=2, eviction='LRU')
     #     for i in range(10):
     #         question = f'foo{i}'
     #         answer = f'receiver the foo {i}'

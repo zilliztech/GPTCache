@@ -57,7 +57,7 @@ refer to the implementation of [SQLDataBase](https://github.com/zilliztech/GPTCa
 
 1. Implement the [CacheStorage](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/scalar_data/base.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
-4. Add the new store to the [_get_scalar_store](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/factory.py) method
+4. Add the new store to the [CacheBase](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/scalar_data/manager.py) method
 5. Add a usage example to [example](https://github.com/zilliztech/GPTCache/tree/main/examples/data_manager) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/README.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a vector store type
@@ -66,7 +66,7 @@ refer to the implementation of [milvus](https://github.com/zilliztech/GPTCache/b
 
 1. Implement the [VectorBase](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/vector_data/base.py) interface
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
-3. Add the new store to the [get_data_manager](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/factory.py) method
+3. Add the new store to the [VectorBase](https://github.com/zilliztech/GPTCache/blob/main/gptcache/manager/vector_data/manager.py) method
 4. Add a usage example to [example](https://github.com/zilliztech/GPTCache/tree/main/examples/data_manager) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/README.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
 
 ## Add a new data manager

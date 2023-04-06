@@ -6,11 +6,13 @@ from .base import VectorBase, ClearStrategy
 
 
 class Chromadb(VectorBase):
-    def __init__(self, **kwargs):
-        client_settings = kwargs.get('client_settings', None)
-        persist_directory = kwargs.get('persist_directory', None)
-        collection_name = kwargs.get('collection_name', 'gptcache')
-        self.top_k = kwargs.get('top_k', 1)
+    def __init__(self,
+                 client_settings=None,
+                 persist_directory=None,
+                 collection_name: str = 'gptcache',
+                 top_k: int = 1):
+
+        self.top_k = top_k
 
         if client_settings:
             self._client_settings = client_settings
