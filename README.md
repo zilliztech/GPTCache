@@ -40,13 +40,13 @@ GPTCache employs embedding algorithms to convert queries into embeddings and use
 
 Featuring a modular design, GPTCache makes it easy for users to customize their own semantic cache. The system offers various implementations for each module, and users can even develop their own implementations to suit their specific needs.
 
-In a semantic cache, false positives can occur during cache hits and false negatives during cache misses. GPTCache provides three metrics to evaluate its accuracy and performance:
+In a semantic cache, false positives can occur during cache hits and false negatives during cache misses. GPTCache provides three metrics to evaluate its performance:
 
 - Precision: the ratio of true positives to the total of true positives and false positives.
 - Recall: the ratio of true positives to the total of true positives and false negatives.
 - Latency: the time required for a query to be processed and the corresponding data to be fetched from the cache.
 
-An [example benchmark](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py) is provided for users to get started with GPTCache.
+A [sample benchmark](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py) is included for users to start with assessing the performance of their semantic cache.
 
 ## 😊 Quick Start
 
