@@ -2,9 +2,6 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-TABLE_NAME = 'cache_table'
-TABLE_NAME_SEQ = 'cache_table_sequence'
-
 
 class CacheStorage(metaclass=ABCMeta):
     """
@@ -33,6 +30,12 @@ class CacheStorage(metaclass=ABCMeta):
 
     @abstractmethod
     def update_state(self, keys): pass
+
+    @abstractmethod
+    def get_old_access(self, count): pass
+
+    @abstractmethod
+    def get_old_create(self, count): pass
 
     @abstractmethod
     def count(self): pass

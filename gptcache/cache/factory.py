@@ -27,8 +27,9 @@ def get_user_data_manager(data_manager_name: str, **kwargs) -> DataManager:
 def _get_scalar_store(scalar_store: str, **kwargs):
     if scalar_store in ["sqlite", "postgresql", "mysql", "mariadb", "sqlserver", "oracle"]:
         sql_url = kwargs.pop("sql_url", SQL_URL[scalar_store])
+        table_name = kwargs.pop("table_name", "gptcache")
         import_sql_client(scalar_store)
-        store = SQLDataBase(url=sql_url, db_type=scalar_store)
+        store = SQLDataBase(db_type=scalar_store, url=sql_url, table_name=table_name)
     else:
         raise NotFoundStoreError("scalar store", scalar_store)
     return store
@@ -72,6 +73,8 @@ def get_data_manager(cache_store: str, vector_store: str, **kwargs):
                     "mssql+pyodbc://sa:Strongpsw_123@127.0.0.1:1434/msdb?driver=ODBC+Driver+17+for+SQL+Server" for "sqlserver",
                     "oracle+cx_oracle://oracle:123456@127.0.0.1:1521/?service_name=helowin&encoding=UTF-8&nencoding=UTF-8" for "oracle".
     :type sql_url: str.
+    :param table_name: the table name for sql database, defaults to "gptcache".
+    :type table_name: str.
     :param index_path: the path to Faiss index, defaults to "faiss.index".
     :type index_path: str.
     :param collection_name: the name of the collection for Milvus vector database, defaults to "gptcache".
@@ -86,6 +89,8 @@ def get_data_manager(cache_store: str, vector_store: str, **kwargs):
     :type password: str.
     :param is_https: whether it is https with Zilliz Cloud, defaults to False.
     :type is_https: bool.
+    :param eviction: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
+    :type eviction:  str.
 
 
     :return: SSDataManager.
@@ -98,6 +103,7 @@ def get_data_manager(cache_store: str, vector_store: str, **kwargs):
             data_manager = get_ss_data_manager("sqlite", "faiss", dimension=128)
     """
     max_size, clean_size, dimension, top_k = _get_common_params(**kwargs)
+    eviction = kwargs.pop("eviction", "LRU")
     scalar = _get_scalar_store(cache_store, **kwargs)
     if vector_store == "milvus":
         _check_dimension(dimension)
@@ -110,4 +116,4 @@ def get_data_manager(cache_store: str, vector_store: str, **kwargs):
         vector = Chromadb(top_k=top_k, **kwargs)
     else:
         raise NotFoundStoreError("vector store", vector_store)
-    return SSDataManager(max_size, clean_size, scalar, vector)
+    return SSDataManager(max_size, clean_size, scalar, vector, eviction)
