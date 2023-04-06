@@ -21,7 +21,7 @@ print("Cache loading.....")
 from gptcache.core import cache
 from gptcache.adapter import openai
 
-## To use GPT cache, that's all you need
+## To use GPTCache, that's all you need
 cache.init()
 cache.set_openai_key()
 

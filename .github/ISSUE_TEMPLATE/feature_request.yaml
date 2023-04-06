@@ -1,12 +1,12 @@
 name: 🚀 Feature Request
-description: As a user, I want to request a feature for GPT Cache
+description: As a user, I want to request a feature for GPTCache
 title: "[Feature]:"
 labels: [kind/feature]
 body:
 - type: markdown
   attributes:
     value: |
-      Thanks for taking the time to request a feature for GPT Cache! Please fill the form in English!
+      Thanks for taking the time to request a feature for GPTCache! Please fill the form in English!
 - type: textarea
   attributes:
     label: Is your feature request related to a problem? Please describe.
