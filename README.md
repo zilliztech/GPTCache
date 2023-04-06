@@ -1,5 +1,5 @@
 # GPT Cache
-Boost LLM API Speed by 100x and Slash Costs by 10x
+Boost LLM API Speed by 100x ⚡, Slash Costs by 10x
 
 [![Release](https://img.shields.io/pypi/v/gptcache?label=Release&color)](https://pypi.org/project/gptcache/)
 [![CI](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
