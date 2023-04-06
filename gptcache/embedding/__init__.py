@@ -1,5 +1,5 @@
 
-__all__ = ['OpenAI', 'Huggingface', 'SBERT', 'Cohere', 'Onnx']
+__all__ = ['OpenAI', 'Huggingface', 'SBERT', 'Cohere', 'Onnx', 'FastText']
 
 
 from gptcache.utils.lazy_import import LazyImport
@@ -9,6 +9,7 @@ huggingface = LazyImport('huggingface', globals(), 'gptcache.embedding.huggingfa
 sbert = LazyImport('sbert', globals(), 'gptcache.embedding.sbert')
 onnx = LazyImport('onnx', globals(), 'gptcache.embedding.onnx')
 cohere = LazyImport('cohere', globals(), 'gptcache.embedding.cohere')
+fasttext = LazyImport('fasttext', globals(), 'gptcache.embedding.fasttext')
 
 
 def Cohere(model="large", api_key=None):
@@ -25,3 +26,6 @@ def SBERT(model="all-MiniLM-L6-v2"):
 
 def Onnx(model="GPTCache/paraphrase-albert-onnx"):
     return onnx.Onnx(model)
+
+def FastText(model="large", dim=None):
+    return fasttext.FastText(model, dim)
