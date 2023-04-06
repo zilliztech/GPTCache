@@ -6,5 +6,6 @@
    :caption: Contents:
 
    gptcache
+   manager
    embedding
    similarity_evaluation
