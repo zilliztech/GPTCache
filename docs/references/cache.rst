@@ -1,6 +1,8 @@
 Cache
 ======
 
+.. contents:: Index
+
 gptcache.cache.factory
 -------------------------
 .. automodule:: gptcache.cache.factory

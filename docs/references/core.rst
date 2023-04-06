@@ -1,6 +1,7 @@
 Core
 =====
 
+.. contents:: Index
 
 gptcache.core.cache
 -------------------------

@@ -11,6 +11,7 @@ class SearchDistanceEvaluation(SimilarityEvaluation):
 
     Example:
         .. code-block:: python
+        
             from gptcache.similarity_evaluation import SearchDistanceEvaluation
             
             evaluation = SearchDistanceEvaluation()

@@ -6,12 +6,7 @@
 Welcome to GPTCache!
 =====================================
 
-----
-
-.. image:: https://dcbadge.vercel.app/api/server/Q8C6WEjSWV?compact=true&style=flat
-  :width: 100
-  :alt: discord
-  :target: https://discord.gg/Q8C6WEjSWV
+Boost LLM API Speed by 100x ⚡, Slash Costs by 10x 💰
 
 .. image:: https://img.shields.io/pypi/v/gptcache?label=Release&color
    :width: 100
@@ -23,7 +18,14 @@ Welcome to GPTCache!
    :alt: License
    :target: https://opensource.org/license/mit/
 
-|
+.. image:: https://dcbadge.vercel.app/api/server/Q8C6WEjSWV?compact=true&style=flat
+  :width: 100
+  :alt: discord
+  :target: https://discord.gg/Q8C6WEjSWV
+
+`Discord <https://discord.gg/Q8C6WEjSWV>`_ | `Twitter <https://twitter.com/zilliz_universe>`_
+
+
 Large Language Models (LLMs) are a promising and transformative technology that has rapidly advanced in recent years. These models are capable of generating natural language text and have numerous applications, including chatbots, language translation, and creative writing. However, as the size of these models increases, so do the costs and performance requirements needed to utilize them effectively. This has led to significant challenges in developing on top of large models such as ChatGPT.
 
 To address this issue, we have developed **GPTCache**, a project that focuses on caching responses from language models, also known as a semantic cache. The system offers two major benefits:
