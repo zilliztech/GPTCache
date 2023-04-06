@@ -22,7 +22,7 @@ openai.ChatCompletion.create(
 ```
 
 - Like Lego bricks, custom assemble all modules, including:
-  - Adapter: The user interface to adapt different LLM model requests to the GPT cache protocol
+  - Adapter: The user interface to adapt different LLM model requests to the GPTCache protocol
   - Pre-processor: Extracts the key information from the request and preprocess
   - Context Buffer: Maintains session context
   - Encoder: Embed the text into a dense vector for similarity search

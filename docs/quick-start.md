@@ -2,7 +2,7 @@
 
 **Note**:
 
-- You can quickly try GPT cache and put it into a production environment without heavy development. However, please note that the repository is still under heavy development.
+- You can quickly try GPTCache and put it into a production environment without heavy development. However, please note that the repository is still under heavy development.
 - By default, only a limited number of libraries are installed to support the basic cache functionalities. When you need to use additional features, the related libraries will be **automatically installed**.
 - Make sure that the Python version is **3.8.1 or higher**, check: `python --version`
 - If you encounter issues installing a library due to a low pip version, run: `python -m pip install --upgrade pip`.
@@ -18,7 +18,7 @@ pip install gptcache
 ### dev install
 
 ```bash
-# clone gpt cache repo
+# clone GPTCache repo
 git clone https://github.com/zilliztech/GPTCache.git
 cd GPTCache
 
@@ -74,7 +74,7 @@ print(f'Answer: {response_text(response)}\n')
 
 ```
 
-### OpenAI API + GPT Cache, exact match cache
+### OpenAI API + GPTCache, exact match cache
 
 > If you ask ChatGPT the exact same two questions, the answer to the second question will be obtained from the cache without requesting ChatGPT again.
 
@@ -87,7 +87,7 @@ def response_text(openai_resp):
 
 print("Cache loading.....")
 
-# To use GPT cache, that's all you need
+# To use GPTCache, that's all you need
 # -------------------------------------------------
 from gptcache.core import cache
 from gptcache.adapter import openai
@@ -113,7 +113,7 @@ for _ in range(2):
     print(f'Answer: {response_text(response)}\n')
 ```
 
-### OpenAI API + GPT Cache, similar search cache
+### OpenAI API + GPTCache, similar search cache
 
 > After obtaining an answer from ChatGPT in response to several similar questions, the answers to subsequent questions can be retrieved from the cache without the need to request ChatGPT again.
 

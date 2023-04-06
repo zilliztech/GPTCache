@@ -2,7 +2,7 @@
 
 ## 🧐 System flow
 
-![GPT Cache Flow](GPTCache.png)
+![GPTCache Flow](GPTCache.png)
 
 The core process of the system is shown in the diagram above:
 
@@ -25,9 +25,9 @@ After obtaining the corresponding result list from the cache, the model needs to
 
 ## 🤩 System Structure
 
-![GPT Cache Structure](GPTCacheStructure.png)
+![GPTCache Structure](GPTCacheStructure.png)
 
-- **Adapter**: The user interface to adapt different LLM model requests to the GPT cache protocol, like: OpenAI chatGPT API or Hugging Face Hub, Anthropic, and self-hosted models like LLaMa.
+- **Adapter**: The user interface to adapt different LLM model requests to the GPTCache protocol, like: OpenAI chatGPT API or Hugging Face Hub, Anthropic, and self-hosted models like LLaMa.
 - **Pre-processor**: Extracts the key information from the request and preprocess, like: basic analysis and parse of the request.
 - **Encoder**: Embed the text into a dense vector for similarity search, like: Use [ONNX](https://onnx.ai/) with the GPTCache/paraphrase-albert-onnx model for English text embedding.
 - **Cache manager**: which includes searching, saving, or evicting data. It includes a database of scalar data and a database of vector data. The scalar data is historical question and answer data of the user, that is, historical question data and historical answer data, which is readable. The vector data is an array or others obtained by the process of the Encoder module, which is used for similarity search and is not commonly readable. The Cache Manage module performs a similarity search in the database of the vector data according to the vector data of the user's request, and obtains the result of the similarity search.
