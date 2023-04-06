@@ -32,7 +32,7 @@ How to use the [sqlite](https://www.sqlite.org/index.html) to store the scale da
 
 How to use the [PostgreSQL](https://www.postgresql.org/) to store the scale data and the [Milvus](https://milvus.io/docs) or [Zilliz Cloud](https://cloud.zilliz.com/) to store the vector data.
 
-> Note: you can set with your own **postgresql** with the `sql_url` parameter, such as the pseudocode `get_ss_data_manager("postgresql", "faiss", sql_url="postgresql+psycopg2://<username>:<password>@<host>:<port>/<database>")`
+> Note: you can set with your own **postgresql** with the `sql_url` parameter, such as the pseudocode `get_data_manager("postgresql", "faiss", sql_url="postgresql+psycopg2://<username>:<password>@<host>:<port>/<database>")`
 >
 > And it is same as the **mysql**, **mariadb**, **sql server** and **oracle** database, more details refer to [the engine documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#supported-databases).
 

@@ -1,6 +1,6 @@
 from gptcache.adapter import openai
 from gptcache.core import cache, Config
-from gptcache.cache.factory import get_ss_data_manager
+from gptcache.cache.factory import get_data_manager
 from gptcache.similarity_evaluation.simple import SearchDistanceEvaluation
 import numpy as np
 
@@ -15,7 +15,7 @@ def mock_embeddings(data, **kwargs):
 
 def run():
     # `sql_url` defaults to 'mssql+pyodbc://sa:Strongpsw_123@127.0.0.1:1434/msdb?driver=ODBC+Driver+17+for+SQL+Server'
-    data_manager = get_ss_data_manager("sqlserver", "milvus", dimension=d, max_size=8, clean_size=2)
+    data_manager = get_data_manager("sqlserver", "milvus", dimension=d, max_size=8, clean_size=2)
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                similarity_evaluation=SearchDistanceEvaluation(),
