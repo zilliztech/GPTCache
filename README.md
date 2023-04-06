@@ -32,7 +32,7 @@ To tackle this challenge, we have created GPTCache, a project dedicated to build
 
 ## 🤔 How does it work?
 
-A good analogy for GptCache is to think of it as a more semantic version of Redis. In GptCache, hits are not limited to exact matches, but rather also include prompts and context similar to previous queries. We believe that the traditional cache design still works for AIGC applications due to the following reasons:
+A good analogy for GptCache is to think of it as a more semantic version of Redis. In GPTCache, hits are not limited to exact matches, but rather also include prompts and context similar to previous queries. We believe that the traditional cache design still works for AIGC applications due to the following reasons:
 
 - Locality is present everywhere. Like traditional application systems, AIGC applications also face similar hot topics. For instance, ChatGPT itself may be a popular topic among programmers.
 - For purpose-built SaaS services, users tend to ask questions within a specific domain, with both temporal and spatial locality.
