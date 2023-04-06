@@ -9,7 +9,7 @@ from .cache.factory import get_user_data_manager
 from .processor.post import first
 from .processor.pre import last_content
 from .similarity_evaluation.similarity_evaluation import SimilarityEvaluation
-from .similarity_evaluation.string import AbsoluteEvaluation
+from .similarity_evaluation.string import ExactMatchEvaluation
 from .utils.error import CacheError
 
 
@@ -129,7 +129,7 @@ class Cache:
              pre_embedding_func=last_content,
              embedding_func=string_embedding,
              data_manager: DataManager = get_user_data_manager("map"),
-             similarity_evaluation=AbsoluteEvaluation(),
+             similarity_evaluation=ExactMatchEvaluation(),
              post_process_messages_func=first,
              config=Config(),
              next_cache=None,
