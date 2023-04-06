@@ -5,6 +5,6 @@
    :maxdepth: 1
    :caption: Contents:
 
-   core
+   gptcache
    embedding
    similarity_evaluation
