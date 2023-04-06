@@ -1,11 +1,9 @@
 import subprocess
-import sys
 
 
 def prompt_install(package): # pragma: no cover
     """
-    Function used to prompt user to install a package. If TOWHEE_WORKER env variable is set
-    to True then the package will be automatically installed.
+    Function used to prompt user to install a package.
     """
     try:
         cmd = f"pip install {package}"
