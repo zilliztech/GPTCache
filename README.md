@@ -1,5 +1,5 @@
 # GPTCache : A Library for Creating Semantic Cache to Store Responses from LLM Queries
-Boost LLM API Speed by 100x ⚡, Slash Costs by 10x 💰
+Slash LLM API Costs by 10x 💰, Boost Speed by 100x ⚡ 
 
 [![Release](https://img.shields.io/pypi/v/gptcache?label=Release&color)](https://pypi.org/project/gptcache/)
 [![CI](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
@@ -20,7 +20,7 @@ Twitter: https://twitter.com/zilliz_universe.
 
 ## 🚀 What is GPTCache?
 
-ChatGPT and various large language models (LLMs) boast incredible versatility, enabling the development of a wide range of applications. However, LLM service might exhibit slow response times, especially when dealing with a significant number of requests. Additionally, as your application grows in popularity and encounters higher traffic levels, the expenses related to LLM API calls can become substantial. 
+ChatGPT and various large language models (LLMs) boast incredible versatility, enabling the development of a wide range of applications. However, as your application grows in popularity and encounters higher traffic levels, the expenses related to LLM API calls can become substantial. Additionally, LLM services might exhibit slow response times, especially when dealing with a significant number of requests.
 
 To tackle this challenge, we have created GPTCache, a project dedicated to building a semantic cache for storing LLM responses. This library offers three primary benefits:
 
