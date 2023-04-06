@@ -64,7 +64,7 @@ print('Cache loading.....')
 from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
-from gptcache.cache.factory import get_data_manager
+from gptcache.manager.factory import get_data_manager
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 onnx = Onnx()

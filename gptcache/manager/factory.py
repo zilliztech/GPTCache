@@ -96,9 +96,9 @@ def get_data_manager(cache_store: str, vector_store: str, **kwargs):
     Example:
         .. code-block:: python
 
-            from gptcache.cache.factory import get_ss_data_manager
+            from gptcache.manager.factory import get_data_manager
 
-            data_manager = get_ss_data_manager('sqlite', 'faiss', dimension=128)
+            data_manager = get_data_manager('sqlite', 'faiss', dimension=128)
     """
     max_size, clean_size, dimension, top_k = _get_common_params(**kwargs)
     eviction = kwargs.pop("eviction", "LRU")

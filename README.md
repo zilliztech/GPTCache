@@ -1,5 +1,5 @@
 # GPTCache : A Library for Creating Semantic Cache to Store Responses from LLM Queries
-Boost LLM API Speed by 100x ⚡, Slash Costs by 10x 💰
+Slash LLM API Costs by 10x 💰, Boost Speed by 100x ⚡ 
 
 [![Release](https://img.shields.io/pypi/v/gptcache?label=Release&color)](https://pypi.org/project/gptcache/)
 [![CI](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
@@ -20,15 +20,15 @@ Twitter: https://twitter.com/zilliz_universe.
 
 ## 🚀 What is GPTCache?
 
-ChatGPT and various large language models (LLMs) boast incredible versatility, enabling the development of a wide range of applications. However, ChatGPT might exhibit slow response times, especially when dealing with a significant number of requests. Additionally, as your application grows in popularity and encounters higher traffic levels, the expenses related to ChatGPT API calls can become substantial. 
+ChatGPT and various large language models (LLMs) boast incredible versatility, enabling the development of a wide range of applications. However, as your application grows in popularity and encounters higher traffic levels, the expenses related to LLM API calls can become substantial. Additionally, LLM services might exhibit slow response times, especially when dealing with a significant number of requests.
 
 To tackle this challenge, we have created GPTCache, a project dedicated to building a semantic cache for storing LLM responses. This library offers three primary benefits:
 
-1. **Enhanced performance**: LLMs employ generative AI algorithms to generate responses in real-time, a process that can sometimes be time-consuming. However, when a query is cached, the response time significantly improves, as the result is fetched directly from the cache, eliminating the need to interact with the LLM service. In most situations, GPTCache can also provide superior query throughput compared to standard LLM services.
-2. **Decreased expenses**: Most LLM services [charge fees](https://openai.com/pricing) based on a combination of number of requests and token count. By caching query results, GPTCache reduces both the number of requests and the number of tokens sent to the LLM service, which in turn minimizes the overall cost of using the service. 
+1. **Decreased expenses**: Most LLM services charge fees based on a combination of number of requests and [token count](https://openai.com/pricing). By caching query results, GPTCache reduces both the number of requests and the number of tokens sent to the LLM service, which in turn minimizes the overall cost of using the service. 
+2. **Enhanced performance**: LLMs employ generative AI algorithms to generate responses in real-time, a process that can sometimes be time-consuming. However, when a query is cached, the response time significantly improves, as the result is fetched directly from the cache, eliminating the need to interact with the LLM service. In most situations, GPTCache can also provide superior query throughput compared to standard LLM services.
 3. **Improved scalability and availability**: LLM services frequently enforce [rate limits](https://platform.openai.com/docs/guides/rate-limits), which are constraints that APIs place on the number of times a user or client can access the server within a given timeframe. Hitting a rate limit means that additional requests will be blocked until a certain period has elapsed, leading to a service outage. GPTCache can easily scale to accommodate an increasing volume of of queries, ensuring consistent performance as your application's user base expands.
 
-## 🤔 How does GTPCache work?
+## 🤔 How does it work?
 
 A good analogy for GptCache is to think of it as a more semantic version of Redis. In GptCache, hits are not limited to exact matches, but rather also include prompts and context similar to previous queries. We believe that the traditional cache design still works for AIGC applications due to the following reasons:
 
@@ -165,7 +165,7 @@ def response_text(openai_resp):
 from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
-from gptcache.cache.factory import get_data_manager
+from gptcache.manager.factory import get_data_manager
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 print("Cache loading.....")
@@ -281,4 +281,4 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
 ## 😆 Contributing
 We are extremely open to contributions, be it through new features, enhanced infrastructure, or improved documentation.
 
-For comprehensive instructions on how to contribute, please refer to [our contribution guide](docs/contributing.md).
+For comprehensive instructions on how to contribute, please refer to our [contribution guide](docs/contributing.md).

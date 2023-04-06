@@ -6,7 +6,7 @@ from langchain.llms import OpenAI
 from langchain import PromptTemplate
 
 from gptcache.adapter.langchain_llms import LangChainLLMs
-from gptcache.cache.factory import get_data_manager
+from gptcache.manager.factory import get_data_manager
 from gptcache import Cache
 from gptcache.embedding import Onnx
 from gptcache.processor.pre import get_prompt
