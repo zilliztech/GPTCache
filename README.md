@@ -236,7 +236,7 @@ This module is created to extract embeddings from requests for similarity search
   - [ ] Support [MongoDB](https://www.mongodb.com/).
   - [ ] Support [Redis](https://redis.io/).
   - [ ] Support [Minio](https://min.io/).
-  - [ ] Support [Habse](https://hbase.apache.org//).
+  - [ ] Support [HBase](https://hbase.apache.org/).
   - [ ] Support [ElasticSearch](https://www.elastic.co/)
   - [ ] Support [zincsearch](https://zinc.dev/)
   - [ ] Support other storages
