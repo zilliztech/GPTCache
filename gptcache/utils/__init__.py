@@ -13,132 +13,83 @@ __all__ = [
     "import_fasttext",
 ]
 
+import importlib.util
+from typing import Optional
+
 from gptcache.utils.dependency_control import prompt_install
 
 
-# pylint: disable=W0611
-# pylint: disable=C0415
+
+def _check_library(libname: str, prompt: bool = True, package: Optional[str] = None):
+    is_avail = False
+    if importlib.util.find_spec(libname):
+        is_avail = True
+    if not is_avail and prompt:
+        prompt_install(package if package else libname)
+    return is_avail
+
+
 def import_pymilvus():
-    try:
-        import pymilvus
-    except ModuleNotFoundError:
-        prompt_install("pymilvus")
-        import pymilvus
+    _check_library("pymilvus")
 
 
 def import_sbert():
-    try:
-        import sentence_transformers
-    except ModuleNotFoundError:
-        prompt_install("sentence-transformers")
-        import sentence_transformers
+    _check_library("sentence-transformers")
 
 
 def import_cohere():
-    try:
-        import cohere
-    except ModuleNotFoundError:
-        prompt_install("cohere")
-        import cohere
+    _check_library("cohere")
 
 
 def import_fasttext():
-    try:
-        import fasttext
-    except ModuleNotFoundError:
-        prompt_install("fasttext")
-        import fasttext
+    _check_library("fasttext")
 
 
 def import_huggingface():
-    try:
-        import transformers
-    except ModuleNotFoundError:
-        prompt_install("transformers")
-        import transformers
+    _check_library("transformers")
 
 
 def import_torch():
-    try:
-        import torch
-    except ModuleNotFoundError:
-        prompt_install("torch")
-        import torch
+    _check_library("torch")
 
 
 def import_huggingface_hub():
-    try:
-        import huggingface_hub
-    except ModuleNotFoundError:
-        prompt_install("huggingface-hub")
-        import huggingface_hub
+    _check_library("huggingface_hub", package="huggingface-hub")
 
 
 def import_onnxruntime():
-    try:
-        import onnxruntime
-    except ModuleNotFoundError:
-        prompt_install("onnxruntime")
-        import onnxruntime
+    _check_library("onnxruntime")
 
 
 def import_faiss():
-    try:
-        import faiss
-    except ModuleNotFoundError:
-        prompt_install("faiss-cpu==1.6.5")
-        import faiss
+    _check_library("faiss", package="faiss-cpu==1.6.5")
 
 
 def import_chromadb():
-    try:
-        import chromadb
-    except ModuleNotFoundError:
-        prompt_install("chromadb")
-        import chromadb
+    _check_library("chromadb")
 
 
 def import_sqlalchemy():
-    try:
-        import sqlalchemy
-    except ModuleNotFoundError:
-        prompt_install("sqlalchemy")
-        import sqlalchemy
+    _check_library("sqlalchemy")
 
 
 def import_postgresql():
-    try:
-        import psycopg2
-    except ModuleNotFoundError:
-        prompt_install("psycopg2-binary")
-        import psycopg2
+    _check_library("psycopg2", package="psycopg2-binary")
 
 
 def import_pymysql():
-    try:
-        import pymysql
-    except ModuleNotFoundError:
-        prompt_install("pymysql")
-        import pymysql
+    _check_library("pymysql")
 
 
 # `brew install unixodbc` in mac
 # and install PyODBC driver.
 def import_pyodbc():
-    try:
-        import pyodbc
-    except ModuleNotFoundError:
-        prompt_install("pyodbc")
-        import pyodbc
+    _check_library("pyodbc")
 
 
 # install cx-Oracle driver.
 def import_cxoracle():
-    try:
-        import cx_Oracle
-    except ModuleNotFoundError:
-        prompt_install("cx_Oracle")
-        import cx_Oracle
+    _check_library("cx_Oracle")
 
 
 def import_sql_client(db_name):
