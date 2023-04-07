@@ -2,6 +2,7 @@ pull_request_rules:
   - name: Add needs-dco label when DCO check failed
     conditions:
       - base=main
+      - base=dev
       - -status-success=DCO
     actions:
       label:
@@ -13,6 +14,7 @@ pull_request_rules:
   - name: Add dco-passed label when DCO check passed
     conditions:
       - base=main
+      - base=dev
       - status-success=DCO
     actions:
       label:
@@ -53,6 +55,7 @@ pull_request_rules:
   - name: Test passed for code changed
     conditions:
       - base=main
+      - base=dev
       - "status-success=Build GPTCache PYPI Package"
       - "status-success=integration-test-gpt-cache-cli-main"
       - "status-success=test-gpt-cache-cli-main (map, 3.8)"
@@ -70,6 +73,7 @@ pull_request_rules:
   - name: Test passed for title skip ci
     conditions:
       - base=main
+      - base=dev
       - title~=\[skip ci\]
       - -files~=^(?=.*((\.(sh|py)|Makefile))).*$
     actions:
@@ -80,6 +84,7 @@ pull_request_rules:
   - name: Remove ci-passed label when ut failed for main
     conditions:
       - base=main
+      - base=dev
       - or:
         - "status-success!=Build GPTCache PYPI Package"
         - "status-success!=integration-test-gpt-cache-cli-main"

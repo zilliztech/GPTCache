@@ -2,9 +2,13 @@ name: linkcheck
 
 on:
   push:
-    branches: main
+    branches:
+      - main
+      - dev
   pull_request:
-    branches: main
+    branches:
+      - main
+      - dev
 
 env:
   POETRY_VERSION: "1.3.1"
