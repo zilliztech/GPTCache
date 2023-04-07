@@ -6,6 +6,7 @@ class LazyImport(ModuleType):
     """
     Lazily import a module.
     """
+
     def __init__(self, local_name, parent_module_globals, name):
         self._local_name = local_name
         self._parent_module_globals = parent_module_globals

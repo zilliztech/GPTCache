@@ -1,8 +1,10 @@
-__all__ = ['VectorBase']
+__all__ = ["VectorBase"]
 
 from gptcache.utils.lazy_import import LazyImport
 
-vector_manager = LazyImport('vector_manager', globals(), 'gptcache.manager.vector_data.manager')
+vector_manager = LazyImport(
+    "vector_manager", globals(), "gptcache.manager.vector_data.manager"
+)
 
 
 def VectorBase(name: str, **kwargs):

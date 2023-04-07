@@ -1,16 +1,17 @@
 from typing import Union, Callable
-from .data_manager import SSDataManager, MapDataManager
-from . import CacheBase, VectorBase
+from gptcache.manager.data_manager import SSDataManager, MapDataManager
+from gptcache.manager import CacheBase, VectorBase
 
 
-def get_data_manager(cache_base: Union['CacheBase', str] = None,
-                     vector_base: Union['VectorBase', str] = None,
-                     max_size: int = 1000,
-                     clean_size: int = None,
-                     eviction: str = 'LRU',
-                     data_path: str = 'data_map.txt',
-                     get_data_container: Callable = None,
-                     ):
+def get_data_manager(
+    cache_base: Union["CacheBase", str] = None,
+    vector_base: Union["VectorBase", str] = None,
+    max_size: int = 1000,
+    clean_size: int = None,
+    eviction: str = "LRU",
+    data_path: str = "data_map.txt",
+    get_data_container: Callable = None,
+):
     """Generate SSDataManager(with `cache_base`, `vector_base`, `max_size`, `clean_size` and `eviction`),
        or MAPDataManager(with `data_path`, `max_size` and `get_data_container` params) to manager the data.
 

@@ -1,19 +1,19 @@
-from .similarity_evaluation import SimilarityEvaluation
+from gptcache.similarity_evaluation import SimilarityEvaluation
 
 
 class SearchDistanceEvaluation(SimilarityEvaluation):
     """Using search distance to evaluate sentences pair similarity.
 
-    :param max_distance: the bound of maximum distance. 
+    :param max_distance: the bound of maximum distance.
     :type max_distance: float
     :param positive: if the larger distance indicates more similar of two entities, It is True. Otherwise it is False.
     :type positive: bool
 
     Example:
         .. code-block:: python
-        
+
             from gptcache.similarity_evaluation import SearchDistanceEvaluation
-            
+
             evaluation = SearchDistanceEvaluation()
             score = evaluation.evaluation(
                 {},
@@ -27,7 +27,7 @@ class SearchDistanceEvaluation(SimilarityEvaluation):
         self.max_distance = max_distance
         self.positive = positive
 
-    def evaluation(self, src_dict, cache_dict, **kwargs):
+    def evaluation(self, src_dict, cache_dict, **_):
         """Evaluate the similarity score of pair.
         :param src_dict: the query dictionary to evaluate with cache.
         :type src_dict: Dict
@@ -36,7 +36,7 @@ class SearchDistanceEvaluation(SimilarityEvaluation):
 
         :return: evaluation score.
         """
-        distance, _ = cache_dict['search_result']
+        distance, _ = cache_dict["search_result"]
         if distance < 0:
             distance = 0
         elif distance > self.max_distance:
@@ -47,7 +47,7 @@ class SearchDistanceEvaluation(SimilarityEvaluation):
 
     def range(self):
         """Range of similarity score.
-        
+
         :return: minimum and maximum of similarity score.
         """
         return 0.0, self.max_distance

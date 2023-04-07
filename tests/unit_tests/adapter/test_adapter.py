@@ -4,20 +4,20 @@ import time
 from gptcache.adapter.adapter import adapt
 from gptcache import cache, time_cal, get_data_manager
 
-data_map_path = 'data_map.txt'
+data_map_path = "data_map.txt"
 
 
 def test_adapt():
     def llm_handler(*llm_args, **llm_kwargs):
-        a = llm_kwargs.get('a', 0)
-        b = llm_kwargs.get('b', 0)
+        a = llm_kwargs.get("a", 0)
+        b = llm_kwargs.get("b", 0)
         time.sleep(1)
         return a + b
 
     def pre_embedding(data, **kwargs):
-        a = data.get('a', 0)
-        b = data.get('b', 0)
-        return f'{a}+{b}'
+        a = data.get("a", 0)
+        b = data.get("b", 0)
+        return f"{a}+{b}"
 
     def cache_data_convert(cache_data):
         return int(cache_data)
@@ -27,7 +27,9 @@ def test_adapt():
         return llm_data
 
     def add_llm(*args, **kwargs):
-        return adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
+        return adapt(
+            llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+        )
 
     if os.path.isfile(data_map_path):
         os.remove(data_map_path)
@@ -47,7 +49,12 @@ def test_adapt():
     def delay_embedding(data, **kwargs):
         time.sleep(0.5)
         return data
-    cache.init(pre_embedding_func=pre_embedding, embedding_func=delay_embedding, data_manager=map_manager)
+
+    cache.init(
+        pre_embedding_func=pre_embedding,
+        embedding_func=delay_embedding,
+        data_manager=map_manager,
+    )
     time_cal(add1, report_func=report_func)(cache_skip=True)
 
     def report_func(delta_time):
@@ -68,12 +75,18 @@ def test_adapt():
         assert 0.9 < delta_time < 1.1, delta_time
 
     def add_llm(*args, **kwargs):
-        return adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs)
+        return adapt(
+            llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+        )
 
     def add2(**kwargs):
         res = add_llm(a=1, b=2, **kwargs)
         assert res == 3, res
 
-    cache.init(cache_enable_func=disable_cache, pre_embedding_func=pre_embedding,
-               embedding_func=delay_embedding, data_manager=map_manager)
+    cache.init(
+        cache_enable_func=disable_cache,
+        pre_embedding_func=pre_embedding,
+        embedding_func=delay_embedding,
+        data_manager=map_manager,
+    )
     time_cal(add2, report_func=report_func)()

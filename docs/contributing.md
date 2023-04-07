@@ -37,7 +37,7 @@ def Milvus(**kwargs):
 # add new method to util/__init__.py
 __all__ = ['import_pymilvus']
 
-from .dependency_control import prompt_install
+from gptcache.utils.dependency_control import prompt_install
 
 
 def import_pymilvus():

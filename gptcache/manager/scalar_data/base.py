@@ -7,6 +7,7 @@ class CacheStorage(metaclass=ABCMeta):
     """
     BaseStorage for scalar data.
     """
+
     @abstractmethod
     def create(self):
         pass

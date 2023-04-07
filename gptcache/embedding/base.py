@@ -5,10 +5,12 @@ class BaseEmbedding(metaclass=ABCMeta):
     """
     _Embedding base.
     """
-    @abstractmethod
-    def to_embeddings(self, data):
-        pass
 
     @abstractmethod
-    def dimension(self):
+    def to_embeddings(self, data, **kwargs):
         pass
+
+    @property
+    @abstractmethod
+    def dimension(self) -> int:
+        return 0
