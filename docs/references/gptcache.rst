@@ -3,7 +3,7 @@ GPTCache
 
 .. contents:: Index
 
-gptcache.cache
+gptcache.Cache
 -------------------------
 .. automodule:: gptcache.Cache
    :members:
