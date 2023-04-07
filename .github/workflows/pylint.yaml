@@ -1,4 +1,4 @@
-name: pylint
+name: Pylint
 on:
   pull_request:
     branches:

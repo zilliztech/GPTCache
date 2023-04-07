@@ -3,17 +3,17 @@ import os
 import time
 import openai
 
-from .embedding.string import to_embeddings as string_embedding
-from .manager.data_manager import DataManager
-from .manager.factory import get_data_manager
-from .processor.post import first
-from .processor.pre import last_content
-from .similarity_evaluation.similarity_evaluation import SimilarityEvaluation
-from .similarity_evaluation.exact_match import ExactMatchEvaluation
-from .utils.error import CacheError
+from gptcache.embedding.string import to_embeddings as string_embedding
+from gptcache.manager.data_manager import DataManager
+from gptcache.manager.factory import get_data_manager
+from gptcache.processor.post import first
+from gptcache.processor.pre import last_content
+from gptcache.similarity_evaluation.similarity_evaluation import SimilarityEvaluation
+from gptcache.similarity_evaluation.exact_match import ExactMatchEvaluation
+from gptcache.utils.error import CacheError
 
 
-def cache_all(*args, **kwargs):
+def cache_all(*_, **__):
     return True
 
 
@@ -23,7 +23,9 @@ def time_cal(func, func_name=None, report_func=None):
         res = func(*args, **kwargs)
         delta_time = time.time() - time_start
         if cache.config.log_time_func:
-            cache.config.log_time_func(func.__name__ if func_name is None else func_name, delta_time)
+            cache.config.log_time_func(
+                func.__name__ if func_name is None else func_name, delta_time
+            )
         if report_func is not None:
             report_func(delta_time)
         return res
@@ -46,19 +48,21 @@ class Config:
 
             configs = Config(similarity_threshold=0.6)
     """
-    def __init__(self,
-                 log_time_func=None,
-                 similarity_threshold=0.8,
-                 ):
+
+    def __init__(
+        self,
+        log_time_func=None,
+        similarity_threshold=0.8,
+    ):
         if similarity_threshold < 0 or similarity_threshold > 1:
-            raise CacheError('Invalid the similarity threshold param')
+            raise CacheError("Invalid the similarity threshold param")
         self.log_time_func = log_time_func
         self.similarity_threshold = similarity_threshold
 
 
 class Report:
-    """Get GPTCache report including time and counts for different operations.
-    """
+    """Get GPTCache report including time and counts for different operations."""
+
     def __init__(self):
         self.embedding_all_time = 0
         self.embedding_count = 0
@@ -87,10 +91,20 @@ class Report:
 
         :param delta_time: delta time.
         """
-        return round(self.embedding_all_time / self.embedding_count if self.embedding_count != 0 else 0, 4)
+        return round(
+            self.embedding_all_time / self.embedding_count
+            if self.embedding_count != 0
+            else 0,
+            4,
+        )
 
     def average_search_time(self):
-        return round(self.search_all_time / self.search_count if self.embedding_count != 0 else 0, 4)
+        return round(
+            self.search_all_time / self.search_count
+            if self.embedding_count != 0
+            else 0,
+            4,
+        )
 
     def hint_cache(self):
         self.hint_cache_count += 1
@@ -111,6 +125,7 @@ class Cache:
             cache.init()
             cache.set_openai_key()
     """
+
     similarity_evaluation: SimilarityEvaluation
 
     # it should be called when start the cache system
@@ -125,17 +140,17 @@ class Cache:
         self.report = Report()
         self.next_cache = None
 
-    def init(self,
-             cache_enable_func=cache_all,
-             pre_embedding_func=last_content,
-             embedding_func=string_embedding,
-             data_manager: DataManager = get_data_manager(),
-             similarity_evaluation=ExactMatchEvaluation(),
-             post_process_messages_func=first,
-             config=Config(),
-             next_cache=None,
-             **kwargs
-             ):
+    def init(
+        self,
+        cache_enable_func=cache_all,
+        pre_embedding_func=last_content,
+        embedding_func=string_embedding,
+        data_manager: DataManager = get_data_manager(),
+        similarity_evaluation=ExactMatchEvaluation(),
+        post_process_messages_func=first,
+        config=Config(),
+        next_cache=None,
+    ):
         """Pass parameters to initialize GPTCache.
 
         :param cache_enable_func: a function to enable cache, defaults to ``cache_all``
@@ -161,12 +176,12 @@ class Cache:
         def close():
             try:
                 self.data_manager.close()
-            except Exception as e:
+            except Exception as e:  # pylint: disable=W0703
                 print(e)
 
     @staticmethod
     def set_openai_key():
-        openai.api_key = os.getenv('OPENAI_API_KEY')
+        openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 cache = Cache()

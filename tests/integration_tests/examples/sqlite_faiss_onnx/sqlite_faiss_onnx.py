@@ -11,32 +11,33 @@ from gptcache.embedding import Onnx
 def run():
     onnx = Onnx()
 
-    sqlite_file = 'sqlite.db'
-    faiss_file = 'faiss.index'
+    sqlite_file = "sqlite.db"
+    faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
-    cache_base = CacheBase('sqlite')
-    vector_base = VectorBase('faiss', dimension=onnx.dimension)
+    cache_base = CacheBase("sqlite")
+    vector_base = VectorBase("faiss", dimension=onnx.dimension)
     data_manager = get_data_manager(cache_base, vector_base, max_size=2000)
 
     def log_time_func(func_name, delta_time):
-        print('func `{}` consume time: {:.2f}s'.format(func_name, delta_time))
+        print("func `{}` consume time: {:.2f}s".format(func_name, delta_time))
 
-    cache.init(embedding_func=onnx.to_embeddings,
-               data_manager=data_manager,
-               similarity_evaluation=SearchDistanceEvaluation(),
-               config=Config(
-                       log_time_func=log_time_func,
-                   ),
-               )
+    cache.init(
+        embedding_func=onnx.to_embeddings,
+        data_manager=data_manager,
+        similarity_evaluation=SearchDistanceEvaluation(),
+        config=Config(
+            log_time_func=log_time_func,
+        ),
+    )
 
     if not has_data:
-        question = 'what do you think about chatgpt'
-        answer = 'chatgpt is a good application'
+        question = "what do you think about chatgpt"
+        answer = "chatgpt is a good application"
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
     mock_messages = [
-        {'role': 'system', 'content': 'You are a helpful assistant.'},
-        {'role': 'user', 'content': 'what do you feel like chatgpt'}
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "what do you feel like chatgpt"},
     ]
 
     # mock_messages = [
@@ -46,14 +47,14 @@ def run():
 
     start_time = time.time()
     answer = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
+        model="gpt-3.5-turbo",
         messages=mock_messages,
     )
     end_time = time.time()
-    print('cache hint time consuming: {:.2f}s'.format(end_time - start_time))
+    print("cache hint time consuming: {:.2f}s".format(end_time - start_time))
 
     print(answer)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

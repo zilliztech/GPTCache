@@ -1,20 +1,20 @@
 import numpy as np
 
-from .similarity_evaluation import SimilarityEvaluation
+from gptcache.similarity_evaluation import SimilarityEvaluation
 
 
 class NumpyNormEvaluation(SimilarityEvaluation):
     """Using Numpy norm to evaluate sentences pair similarity.
 
     :param enable_normal: whether to normalize the embedding, defaults to False.
-    :type enable_normal: bool 
+    :type enable_normal: bool
 
     Example:
         .. code-block:: python
 
             from gptcache.similarity_evaluation import NumpyNormEvaluation
             import numpy as np
-            
+
             evaluation = NumpyNormEvaluation()
             score = evaluation.evaluation(
                 {
@@ -32,9 +32,9 @@ class NumpyNormEvaluation(SimilarityEvaluation):
     @staticmethod
     def normalize(vec):
         """Normalize the input vector.
-        
+
         :param vec: numpy vector needs to normalize.
-        :type vec: numpy.array 
+        :type vec: numpy.array
 
         :return: normalized vector.
         """
@@ -42,9 +42,9 @@ class NumpyNormEvaluation(SimilarityEvaluation):
         normalized_v = vec / magnitude
         return normalized_v
 
-    def evaluation(self, src_dict, cache_dict, **kwargs):
+    def evaluation(self, src_dict, cache_dict, **_):
         """Evaluate the similarity score of pair.
-        
+
         :param src_dict: the query dictionary to evaluate with cache.
         :type src_dict: Dict
         :param cache_dict: the cache dictionary.
@@ -52,15 +52,20 @@ class NumpyNormEvaluation(SimilarityEvaluation):
 
         :return: evaluation score.
         """
-        src_embedding = self.normalize(src_dict['embedding']) if self.enable_normal else src_dict['embedding']
-        _, cache_embedding = cache_dict['search_result']
-        cache_embedding = self.normalize(cache_embedding) if self.enable_normal \
-            else cache_embedding
+        src_embedding = (
+            self.normalize(src_dict["embedding"])
+            if self.enable_normal
+            else src_dict["embedding"]
+        )
+        _, cache_embedding = cache_dict["search_result"]
+        cache_embedding = (
+            self.normalize(cache_embedding) if self.enable_normal else cache_embedding
+        )
         return np.linalg.norm(src_embedding - cache_embedding)
 
     def range(self):
         """Range of similarity score.
-        
+
         :return: minimum and maximum of similarity score.
         """
         return 0.0, 2.0

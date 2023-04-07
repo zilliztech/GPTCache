@@ -1,10 +1,10 @@
+import numpy as np
 from gptcache.utils import import_sbert
+from gptcache.embedding.base import BaseEmbedding
+
 import_sbert()
 
-import numpy as np
-from sentence_transformers import SentenceTransformer
-
-from .base import BaseEmbedding
+from sentence_transformers import SentenceTransformer  # pylint: disable=C0413
 
 
 class SBERT(BaseEmbedding):
@@ -15,19 +15,20 @@ class SBERT(BaseEmbedding):
 
     Example:
         .. code-block:: python
-        
+
             from gptcache.embedding import SBERT
-            
-            test_sentence = 'Hello, world.' 
+
+            test_sentence = 'Hello, world.'
             encoder = SBERT('paraphrase-albert-small-v2')
             embed = encoder.to_embeddings(test_sentence)
     """
-    def __init__(self, model: str='all-MiniLM-L6-v2'):
+
+    def __init__(self, model: str = "all-MiniLM-L6-v2"):
         self.model = SentenceTransformer(model)
         self.model.eval()
         self.__dimension = None
 
-    def to_embeddings(self, data, **kwargs):
+    def to_embeddings(self, data, **_):
         """Generate embedding given text input
 
         :param data: text in string.
@@ -41,8 +42,8 @@ class SBERT(BaseEmbedding):
 
         if not self.__dimension:
             self.__dimension = len(emb)
-        return np.array(emb).astype('float32')
-    
+        return np.array(emb).astype("float32")
+
     @property
     def dimension(self):
         """Embedding dimension.
@@ -50,5 +51,5 @@ class SBERT(BaseEmbedding):
         :return: embedding dimension
         """
         if not self.__dimension:
-            self.__dimension == self.to_embeddings('foo')
+            self.__dimension = self.to_embeddings("foo")
         return self.__dimension

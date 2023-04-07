@@ -2,12 +2,12 @@ from gptcache.adapter import openai
 from gptcache import cache
 from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache.embedding import Onnx as EmbeddingOnnx
-from gptcache.similarity_evaluation import Onnx as EvaluationOnnx
+from gptcache.similarity_evaluation import OnnxModelEvaluation
 
 
 def run():
     onnx = EmbeddingOnnx()
-    evaluation_onnx = EvaluationOnnx()
+    evaluation_onnx = OnnxModelEvaluation()
 
     vector_base = VectorBase('faiss', dimension=onnx.dimension)
     data_manager = get_data_manager('sqlite', vector_base)
