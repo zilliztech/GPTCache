@@ -6,7 +6,7 @@ from langchain.llms import OpenAI
 from langchain import PromptTemplate
 
 from gptcache.adapter.langchain_llms import LangChainLLMs
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache import Cache
 from gptcache.embedding import Onnx
 from gptcache.processor.pre import get_prompt
@@ -30,7 +30,9 @@ question = "What NFL team won the Super Bowl in the year Justin Bieber was born?
 
 llm_cache = Cache()
 onnx = Onnx()
-data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+cache_base = CacheBase('sqlite')
+vector_base = VectorBase('faiss', dimension=onnx.dimension)
+data_manager = get_data_manager(cache_base, vector_base, max_size=10, clean_size=2)
 llm_cache.init(
     pre_embedding_func=get_prompt,
     post_process_messages_func=postnop,

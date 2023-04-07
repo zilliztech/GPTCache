@@ -17,27 +17,31 @@ from .base import VectorBase, ClearStrategy
 
 
 class Milvus(VectorBase):
+    SEARCH_PARAM = {
+        'IVF_FLAT': {'metric_type': 'L2', 'params': {'nprobe': 10}},
+        'IVF_SQ8': {'metric_type': 'L2', 'params': {'nprobe': 10}},
+        'IVF_PQ': {'metric_type': 'L2', 'params': {'nprobe': 10}},
+        'HNSW': {'metric_type': 'L2', 'params': {'ef': 10}},
+        'RHNSW_FLAT': {'metric_type': 'L2', 'params': {'ef': 10}},
+        'RHNSW_SQ': {'metric_type': 'L2', 'params': {'ef': 10}},
+        'RHNSW_PQ': {'metric_type': 'L2', 'params': {'ef': 10}},
+        'IVF_HNSW': {'metric_type': 'L2', 'params': {'nprobe': 10, 'ef': 10}},
+        'ANNOY': {'metric_type': 'L2', 'params': {'search_k': 10}},
+        'AUTOINDEX': {'metric_type': 'L2', 'params': {}},
+    }
 
-    def __init__(self, **kwargs):
-        host = kwargs.get('host', 'localhost')
-        port = kwargs.get('port', 19530)
-        user = kwargs.get('user', '')
-        password = kwargs.get('password', '')
-        use_security = kwargs.get('is_https', False)
-
-        self.default_search_params = {
-            'IVF_FLAT': {'metric_type': 'L2', 'params': {'nprobe': 10}},
-            'IVF_SQ8': {'metric_type': 'L2', 'params': {'nprobe': 10}},
-            'IVF_PQ': {'metric_type': 'L2', 'params': {'nprobe': 10}},
-            'HNSW': {'metric_type': 'L2', 'params': {'ef': 10}},
-            'RHNSW_FLAT': {'metric_type': 'L2', 'params': {'ef': 10}},
-            'RHNSW_SQ': {'metric_type': 'L2', 'params': {'ef': 10}},
-            'RHNSW_PQ': {'metric_type': 'L2', 'params': {'ef': 10}},
-            'IVF_HNSW': {'metric_type': 'L2', 'params': {'nprobe': 10, 'ef': 10}},
-            'ANNOY': {'metric_type': 'L2', 'params': {'search_k': 10}},
-            'AUTOINDEX': {'metric_type': 'L2', 'params': {}},
-        }
-
+    def __init__(self,
+                 host: str = 'localhost',
+                 port: str = '19530',
+                 user: str = '',
+                 password: str = '',
+                 secure: bool = False,
+                 collection_name: str = 'gptcache',
+                 dimension: int = 0,
+                 top_k: int = 1,
+                 index_params: dict = None,
+                 search_params: dict = None,
+                 ):
         try:
             i = [
                 connections.get_connection_addr(x[0])
@@ -53,30 +57,23 @@ class Milvus(VectorBase):
                 port=port,
                 user=user,  # type: ignore
                 password=password,  # type: ignore
-                secure=use_security,
+                secure=secure,
             )
-        collection_name = kwargs.get('collection_name', 'gptcache')
-        create_new = kwargs.get('create_new', False)
-        dim = kwargs.get('dim', 0)
-        if dim <= 0:
-            raise ValueError(f'invalid dim param `{dim}` in the Milvus vector store')
-        self.dim = dim
-        self.top_k = kwargs.get('top_k', 1)
-        self.index_params = kwargs.get('index_params', None)
-        self._create_collection(collection_name, create_new)
-
+        if dimension <= 0:
+            raise ValueError(f'invalid `dim` param: {dimension} in the Milvus vector store.')
+        self.dimension = dimension
+        self.top_k = top_k
+        self.index_params = index_params
+        self._create_collection(collection_name)
         self.search_params = (
-                kwargs.get('search_params', None) or self.default_search_params[self.index_params['index_type']]
+                search_params or self.SEARCH_PARAM[self.index_params['index_type']]
         )
 
-    def _create_collection(self, collection_name, create_new):
-        if utility.has_collection(collection_name, using=self.alias) and create_new:
-            utility.drop_collection(collection_name, using=self.alias)
-
-        if utility.has_collection(collection_name, using=self.alias) is False:
+    def _create_collection(self, collection_name):
+        if not utility.has_collection(collection_name, using=self.alias):
             schema = [
                 FieldSchema(name='pk', dtype=DataType.VARCHAR, is_primary=True, auto_id=False, max_length=65535),
-                FieldSchema(name='embedding', dtype=DataType.FLOAT_VECTOR, dim=self.dim),
+                FieldSchema(name='embedding', dtype=DataType.FLOAT_VECTOR, dim=self.dimension),
             ]
             schema = CollectionSchema(schema)
             self.col = Collection(
@@ -91,26 +88,16 @@ class Milvus(VectorBase):
             )
 
         if len(self.col.indexes) == 0:
-            if self.index_params is not None:
+            try:
+                print('Attempting creation of Milvus index')
                 self.col.create_index('embedding', index_params=self.index_params)
-            else:
-                try:
-                    print('Attempting creation of Milvus default index')
-                    i_p = {
-                        'metric_type': 'L2',
-                        'index_type': 'HNSW',
-                        'params': {'M': 8, 'efConstruction': 64},
-                    }
-
-                    self.col.create_index('embedding', index_params=i_p)
-                    self.index_params = i_p
-                    print('Creation of Milvus default index successful')
-                except MilvusException as e:
-                    print('milvus e', e)
-                    print('Attempting creation of default index')
-                    i_p = {'metric_type': 'L2', 'index_type': 'AUTOINDEX', 'params': {}}
-                    self.col.create_index('embedding', index_params=i_p)
-                    self.index_params = i_p
+                print('Creation of Milvus index successful')
+            except MilvusException as e:
+                print('Error with building index: ', e)
+                print('Attempting creation of default index')
+                i_p = {'metric_type': 'L2', 'index_type': 'AUTOINDEX', 'params': {}}
+                self.col.create_index('embedding', index_params=i_p)
+                self.index_params = i_p
         else:
             self.index_params = self.col.indexes[0].to_dict()['index_param']
 
@@ -119,7 +106,7 @@ class Milvus(VectorBase):
     def add(self, key: str, data: np.ndarray):
         entities = [
             [key],
-            data.reshape(1, self.dim)
+            data.reshape(1, self.dimension)
         ]
         self.col.insert(entities)
 

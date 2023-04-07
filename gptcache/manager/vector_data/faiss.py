@@ -32,11 +32,11 @@ class Faiss(VectorBase):
         if self.index.ntotal == 0:
             return None
         np_data = np.array(data).astype('float32').reshape(1, -1)
-        D, I = self.index.search(np_data, self.top_k)
+        dist, ids = self.index.search(np_data, self.top_k)
         distances = []
-        for d in D[:1].reshape(-1):
+        for d in dist[:1].reshape(-1):
             distances.append(d)
-        vector_datas = [self.index.reconstruct(int(i)) for i in I[:1].reshape(-1)]
+        vector_datas = [self.index.reconstruct(int(i)) for i in ids[:1].reshape(-1)]
         return zip(distances, vector_datas)
 
     def clear_strategy(self):
@@ -44,7 +44,7 @@ class Faiss(VectorBase):
 
     def rebuild(self, all_data):
         f = Faiss(self.index_file_path, self.dimension, top_k=self.top_k, skip_file=True)
-        f._mult_add(all_data)
+        f._mult_add(all_data)  # pylint: disable=protected-access
         return f
 
     def close(self):

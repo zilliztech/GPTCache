@@ -15,7 +15,7 @@ class Cache:
             cache_enable_func=cache_all,
             pre_embedding_func=last_content,
             embedding_func=string_embedding,
-            data_manager: DataManager = get_data_manager("map"),
+            data_manager: DataManager = get_data_manager(),
             similarity_evaluation=ExactMatchEvaluation(),
             post_process_messages_func=first,
             config=Config(),
@@ -38,13 +38,13 @@ class Cache:
 Before creating GPTCache, consider the following questions:
 
 1. How will you generate an embedding for the query? (`embedding_func`)
-    
+   
     This function embeds text into a dense vector for context similarity search. GPTCache currently supports five methods for embedding context: OpenAI, Cohere, Hugging Face API, ONNX model serving, and SentenceTransformers.
     
     For instance, to use ONNX Embeddings, simply initialize your embedding function to `onnx.to_embeddings`.
     
     ```
-    data_manager = get_data_manager('sqlite', 'faiss', dimension=onnx.dimension)
+    data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
     
     cache.init(embedding_func=onnx.to_embeddings,
                    data_manager=data_manager,
@@ -56,28 +56,28 @@ Before creating GPTCache, consider the following questions:
     Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-embedding-function) to see how to use different embedding functions.
     
 2. Where will you cache the data? (`data_manager cache storage`)
-    
+   
     The cache storage stores all scalar data such as original questions, prompts, answers, and access times. GPTCache supports various cache storage options, such as SQLite, MySQL, or PostgreSQL, and more NoSQL databases will be added in the future.
     
 3. Where will you store and search vector embeddings? (`data_manager vector storage`)
-    
+   
     The vector storage stores all the embeddings and searches for the most similar results semantically. GPTCache supports the use of vector search libraries such as FAISS or vector databases such as Milvus, and more vector databases and cloud services will be added in the future.
     
 4. When will the cache evict?
-    
+   
     GPTCache supports evicting data based on cache count. Users can choose to use either the LRU or FIFO policy. In the future, we plan to support additional cache policies, such as evicting data based on last access time or last write time.
     
     Here are some examples to create data_manager:
 
    ```
    ## create user defined data manager
-   data_manager = get_user_data_manager('map')
+   data_manager = get_data_manager()
    ## create data manager with sqlite and faiss 
-   data_manager = get_data_manager('sqlite", "faiss', dimension=128)
+   data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=128))
    ## create data manager with mysql and milvus, max cache size is 100
-   data_manager = get_data_manager('mysql', 'milvus', dimension=128, max_size=100)
+   data_manager = get_data_manager(CacheBase("mysql"), VectorBase("milvus", dimension=128), max_size=100)
    ## create data manager with mysql and milvus, max cache size is 100, eviction policy is LRU
-   data_manager = get_data_manager('postgresql', 'milvus', dimension=128, max_size=100, eviction='LRU') 
+   data_manager = get_data_manager(CacheBase("mysql"), VectorBase("milvus", dimension=128), max_size=100, eviction='LRU') 
    ```
    
    Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-data-manager-class) to see how to use different data managers.
@@ -90,14 +90,14 @@ Before creating GPTCache, consider the following questions:
 
    ```
    onnx = EmbeddingOnnx()
-   data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+   data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
    evaluation_onnx = EvaluationOnnx()
    cache.init(embedding_func=onnx.to_embeddings,
                   data_manager=data_manager,
                   similarity_evaluation=evaluation_onnx,
                   )
    ```
-   
+
    Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-similarity-evaluation-interface) to see how to use different similarity evaluation functions.
 
 Users can also pass in other configuration options , such as:
@@ -131,11 +131,11 @@ print(answer)
 if you want to utilize stream response API in openAI SDK:
 
 ```
-from gptcache.cache.factory import get_data_manager, get_user_data_manager
+from gptcache.cache import get_data_manager
 from gptcache.core import cache, Cache
 from gptcache.adapter import openai
 
-cache.init(data_manager=get_user_data_manager("map"))
+cache.init(data_manager=get_data_manager())
 os.environ["OPENAI_API_KEY"] = "API KEY"
 cache.set_openai_key()
 
@@ -191,7 +191,7 @@ We are planning to support other large language models in the future,  any contr
 
 ```
 onnx = Onnx()
-data_manager = get_data_manager("sqlite", "faiss", dimension=onnx.dimension)
+data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
 one_cache = Cache()
 one_cache.init(embedding_func=onnx.to_embeddings,
                data_manager=data_manager,

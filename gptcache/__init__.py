@@ -5,7 +5,7 @@ import openai
 
 from .embedding.string import to_embeddings as string_embedding
 from .manager.data_manager import DataManager
-from .manager.factory import get_user_data_manager
+from .manager.factory import get_data_manager
 from .processor.post import first
 from .processor.pre import last_content
 from .similarity_evaluation.similarity_evaluation import SimilarityEvaluation
@@ -129,7 +129,7 @@ class Cache:
              cache_enable_func=cache_all,
              pre_embedding_func=last_content,
              embedding_func=string_embedding,
-             data_manager: DataManager = get_user_data_manager('map'),
+             data_manager: DataManager = get_data_manager(),
              similarity_evaluation=ExactMatchEvaluation(),
              post_process_messages_func=first,
              config=Config(),
@@ -141,7 +141,7 @@ class Cache:
         :param cache_enable_func: a function to enable cache, defaults to ``cache_all``
         :param pre_embedding_func: a function to preprocess embedding, defaults to ``last_content``
         :param embedding_func: a function to extract embeddings from requests for similarity search, defaults to ``string_embedding``
-        :param data_manager: a ``DataManager`` module, defaults to ``get_user_data_manager('map')``
+        :param data_manager: a ``DataManager`` module, defaults to ``get_data_manager()``
         :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``ExactMatchEvaluation()``
         :param post_process_messages_func: a function to post-process messages, defaults to ``first``
         :param config: a module to pass configurations, defaults to ``Config()``

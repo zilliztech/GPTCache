@@ -48,9 +48,5 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def count(self):
-        pass
-
-    @abstractmethod
     def close(self):
         pass

@@ -2,7 +2,7 @@ import os
 
 from gptcache.adapter import openai
 from gptcache import cache, Config
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager import get_data_manager, VectorBase
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 import numpy as np
 
@@ -18,8 +18,8 @@ def run():
     sqlite_file = 'sqlite.db'
     faiss_file = 'faiss.index'
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
-    data_manager = get_data_manager('sqlite', 'faiss',
-                                       dimension=d, max_size=8, clean_size=2, top_k=3)
+    vector_base = VectorBase('faiss', dimension=d, top_k=3)
+    data_manager = get_data_manager('sqlite', vector_base, max_size=8, clean_size=2)
     cache.init(embedding_func=mock_embeddings,
                data_manager=data_manager,
                similarity_evaluation=SearchDistanceEvaluation(),

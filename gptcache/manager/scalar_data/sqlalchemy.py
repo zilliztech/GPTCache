@@ -60,7 +60,7 @@ class SQLDataBase(CacheStorage):
         self._url = url
         self._model = get_model(table_name, db_type)
         self._engine = create_engine(self._url)
-        Session = sessionmaker(bind=self._engine)
+        Session = sessionmaker(bind=self._engine)  # pylint: disable=invalid-name
         self._session = Session()
         self.create()
 

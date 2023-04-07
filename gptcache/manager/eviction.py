@@ -2,6 +2,9 @@ import numpy as np
 
 
 class EvictionManager:
+    """
+    EvictionManager to manager the eviction policy.
+    """
     MAX_MARK_COUNT = 5000
     MAX_MARK_RATE = 0.1
     BATCH_SIZE = 100000
