@@ -1,3 +1,4 @@
+import time
 from typing import Iterator
 
 import openai
@@ -45,11 +46,19 @@ def construct_resp_from_cache(return_message):
                 'finish_reason': 'stop',
                 'index': 0
             }
-        ]
+        ],
+        'created': int(time.time()),
+        'usage': {
+            'completion_tokens': 0,
+            'prompt_tokens': 0,
+            'total_tokens': 0
+        },
+        'object': 'chat.completion',
     }
 
 
 def construct_stream_resp_from_cache(return_message):
+    created = int(time.time())
     return [
         {
             'choices': [
@@ -61,6 +70,8 @@ def construct_stream_resp_from_cache(return_message):
                     'index': 0
                 }
             ],
+            'created': created,
+            'object': 'chat.completion.chunk'
         },
         {
             'choices': [
@@ -72,6 +83,8 @@ def construct_stream_resp_from_cache(return_message):
                     'index': 0
                 }
             ],
+            'created': created,
+            'object': 'chat.completion.chunk'
         },
         {
             'gptcache': True,
@@ -82,6 +95,8 @@ def construct_stream_resp_from_cache(return_message):
                   'index': 0
                 }
             ],
+            'created': created,
+            'object': 'chat.completion.chunk'
         }
     ]
 
