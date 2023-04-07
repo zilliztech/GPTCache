@@ -3,7 +3,7 @@ import time
 
 from gptcache.adapter import openai
 from gptcache import cache, Config
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 from gptcache.embedding import Onnx
 
@@ -14,8 +14,9 @@ def run():
     sqlite_file = 'sqlite.db'
     faiss_file = 'faiss.index'
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
-    data_manager = get_data_manager('sqlite', 'faiss',
-                                       dimension=onnx.dimension, max_size=2000)
+    cache_base = CacheBase('sqlite')
+    vector_base = VectorBase('faiss', dimension=onnx.dimension)
+    data_manager = get_data_manager(cache_base, vector_base, max_size=2000)
 
     def log_time_func(func_name, delta_time):
         print('func `{}` consume time: {:.2f}s'.format(func_name, delta_time))

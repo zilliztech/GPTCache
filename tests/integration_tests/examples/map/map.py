@@ -1,6 +1,6 @@
 import os
 
-from gptcache.manager.factory import get_user_data_manager
+from gptcache.manager.factory import get_data_manager
 from gptcache.adapter import openai
 from gptcache import cache, Cache
 
@@ -9,13 +9,9 @@ def run():
     dir_name, _ = os.path.split(os.path.abspath(__file__))
     bak_cache = Cache()
     bak_data_file = dir_name + '/data_map_bak.txt'
-    bak_cache.init(data_manager=get_user_data_manager('map',
-                                                 data_path=bak_data_file,
-                                                 max_size=10))
+    bak_cache.init(data_manager=get_data_manager(data_path=bak_data_file, max_size=10))
     data_file = dir_name + '/data_map.txt'
-    cache.init(data_manager=get_user_data_manager('map',
-                                             data_path=data_file,
-                                             max_size=10),
+    cache.init(data_manager=get_data_manager(data_path=data_file, max_size=10),
                next_cache=bak_cache)
 
     cache.set_openai_key()

@@ -1,7 +1,7 @@
 
 import unittest
 import numpy as np
-from gptcache.manager.vector_data import Chromadb
+from gptcache.manager.vector_data.chroma import Chromadb
 
 
 class TestChromadb(unittest.TestCase):

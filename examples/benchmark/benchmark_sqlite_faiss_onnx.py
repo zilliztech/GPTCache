@@ -4,7 +4,7 @@ import time
 
 from gptcache.adapter import openai
 from gptcache import cache, Config
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache.similarity_evaluation.onnx import OnnxModelEvaluation 
 from gptcache.embedding import Onnx as EmbeddingOnnx
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
@@ -47,7 +47,9 @@ def run():
     faiss_file = 'faiss.index'
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
 
-    data_manager = get_data_manager('sqlite', 'faiss', dimension=embedding_onnx.dimension, max_size=100000)
+    cache_base = CacheBase('sqlite')
+    vector_base = VectorBase('faiss', dimension=embedding_onnx.dimension)
+    data_manager = get_data_manager(cache_base, vector_base, max_size=100000)
     cache.init(embedding_func=embedding_onnx.to_embeddings,
                data_manager=data_manager,
                similarity_evaluation=WrapEvaluation(),
