@@ -42,4 +42,4 @@ lint lint_diff:
 	poetry run ruff .
 
 pylint_check:
-	pylint --rcfile=pylint.conf --output-format=colorized gptcache && pylint --rcfile=pylint.conf --output-format=colorized tests.unit_tests
+	pylint --rcfile=pylint.conf --output-format=colorized gptcache
