@@ -2,6 +2,7 @@
 Slash Your LLM API Costs by 10x 💰, Boost Speed by 100x ⚡ 
 
 [![Release](https://img.shields.io/pypi/v/gptcache?label=Release&color)](https://pypi.org/project/gptcache/)
+[![Pylint](https://github.com/zilliztech/gptcache/actions/workflows/pylint.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/pylint.yaml)
 [![CI](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml/badge.svg)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
 [![pip download](https://img.shields.io/pypi/dm/gptcache.svg?color=bright-green)](https://pypi.org/project/gptcache/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
@@ -38,7 +39,7 @@ To tackle this challenge, we have created GPTCache, a project dedicated to build
 
 ```bash
 # clone GPTCache repo
-git clone https://github.com/zilliztech/GPTCache.git
+git clone -b dev https://github.com/zilliztech/GPTCache.git
 cd GPTCache
 
 # install the repo

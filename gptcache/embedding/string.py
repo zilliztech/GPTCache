@@ -1,2 +1,2 @@
-def to_embeddings(data, **kwargs):
+def to_embeddings(data, **_):
     return data

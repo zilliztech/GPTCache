@@ -5,26 +5,22 @@ from gptcache import time_cal, cache, Config, Cache, cache_all, Report
 
 def test_time_cal():
     def log_time_func(fname, delta_time):
-        assert fname == 'unit_test'
+        assert fname == "unit_test"
         assert delta_time > 0.1
 
-    cache.config = Config(
-        log_time_func=log_time_func
-    )
+    cache.config = Config(log_time_func=log_time_func)
 
     @time_cal
     def time_cal_annotation():
         time.sleep(0.2)
 
-    func_name = 'test_time_cal'
+    func_name = "test_time_cal"
 
     def log_time_func(fname, delta_time):
         assert fname == func_name
         assert delta_time > 0.1
 
-    cache.config = Config(
-        log_time_func=log_time_func
-    )
+    cache.config = Config(log_time_func=log_time_func)
 
     def report_func(delta_time):
         assert delta_time > 0.1
@@ -32,7 +28,9 @@ def test_time_cal():
     def time_cal_without_annotation():
         time.sleep(0.2)
 
-    time_cal(time_cal_without_annotation, func_name=func_name, report_func=report_func)()
+    time_cal(
+        time_cal_without_annotation, func_name=func_name, report_func=report_func
+    )()
 
     cache.config = None
 

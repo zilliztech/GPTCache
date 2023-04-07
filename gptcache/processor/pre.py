@@ -1,21 +1,21 @@
-def last_content(data, **kwargs):
-    return data.get('messages')[-1]['content']
+def last_content(data, **_):
+    return data.get("messages")[-1]["content"]
 
 
-def all_content(data, **kwargs):
-    s = ''
-    messages = data.get('messages')
+def all_content(data, **_):
+    s = ""
+    messages = data.get("messages")
     for i, message in enumerate(messages):
         if i == len(messages) - 1:
-            s += message['content']
+            s += message["content"]
         else:
-            s += message['content'] + '\n'
+            s += message["content"] + "\n"
     return s
 
 
-def nop(data, **kwargs):
+def nop(data, **_):
     return data
 
 
-def get_prompt(data, **kwargs):
-    return data.get('prompt')
+def get_prompt(data, **_):
+    return data.get("prompt")

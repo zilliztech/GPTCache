@@ -1,14 +1,23 @@
 from typing import Optional, List
-from .adapter import adapt
+from gptcache.adapter.adapter import adapt
 
 
 class LangChainLLMs:
+    """LangChain LLM Wrapper"""
+
     def __init__(self, llm):
         self._llm = llm
 
     def __call__(self, prompt: str, stop: Optional[List[str]] = None, **kwargs):
         # TODO handle the array result
-        return adapt(self._llm, cache_data_convert, update_cache_callback, prompt=prompt, stop=stop, **kwargs)
+        return adapt(
+            self._llm,
+            cache_data_convert,
+            update_cache_callback,
+            prompt=prompt,
+            stop=stop,
+            **kwargs
+        )
 
 
 def cache_data_convert(cache_data):

@@ -1,8 +1,10 @@
-__all__ = ['CacheBase']
+__all__ = ["CacheBase"]
 
 from gptcache.utils.lazy_import import LazyImport
 
-scalar_manager = LazyImport('scalar_manager', globals(), 'gptcache.manager.scalar_data.manager')
+scalar_manager = LazyImport(
+    "scalar_manager", globals(), "gptcache.manager.scalar_data.manager"
+)
 
 
 def CacheBase(name: str, **kwargs):

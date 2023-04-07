@@ -5,12 +5,14 @@ import cachetools
 import numpy as np
 
 from gptcache.utils.error import CacheError
-from .scalar_data.base import CacheStorage
-from .vector_data.base import VectorBase, ClearStrategy
-from .eviction import EvictionManager
+from gptcache.manager.scalar_data.base import CacheStorage
+from gptcache.manager.vector_data.base import VectorBase, ClearStrategy
+from gptcache.manager.eviction import EvictionManager
 
 
 class DataManager(metaclass=ABCMeta):
+    """DataManager manage the cache data, including save and search"""
+
     @abstractmethod
     def save(self, question, answer, embedding_data, **kwargs):
         pass
@@ -30,6 +32,8 @@ class DataManager(metaclass=ABCMeta):
 
 
 class MapDataManager(DataManager):
+    """MapDataManager, store all data in a map data structure."""
+
     def __init__(self, data_path, max_size, get_data_container=None):
         if get_data_container is None:
             self.data = cachetools.LRUCache(max_size)
@@ -40,13 +44,14 @@ class MapDataManager(DataManager):
 
     def init(self):
         try:
-            with open(self.data_path, 'rb') as f:
+            with open(self.data_path, "rb") as f:
                 self.data = pickle.load(f)
         except FileNotFoundError:
-            # print(f'File <${self.data_path}> is not found.')
             return
         except PermissionError:
-            raise CacheError(f'You don\'t have permission to access this file <${self.data_path}>.')
+            raise CacheError(  # pylint: disable=W0707
+                f"You don't have permission to access this file <${self.data_path}>."
+            )
 
     def save(self, question, answer, embedding_data, **kwargs):
         self.data[embedding_data] = (question, answer)
@@ -62,17 +67,17 @@ class MapDataManager(DataManager):
 
     def close(self):
         try:
-            with open(self.data_path, 'wb') as f:
+            with open(self.data_path, "wb") as f:
                 pickle.dump(self.data, f)
         except PermissionError:
-            print(f'You don\'t have permission to access this file <${self.data_path}>.')
+            print(f"You don't have permission to access this file <${self.data_path}>.")
 
 
 def sha_data(data):
     if isinstance(data, list):
         data = np.array(data)
     m = hashlib.sha1()
-    m.update(data.astype('float32').tobytes())
+    m.update(data.astype("float32").tobytes())
     return m.hexdigest()
 
 
@@ -96,10 +101,11 @@ class SSDataManager(DataManager):
     :param eviction: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
     :type eviction:  str.
     """
+
     s: CacheStorage
     v: VectorBase
 
-    def __init__(self, s, v, max_size, clean_size, eviction='LRU'):
+    def __init__(self, s, v, max_size, clean_size, eviction="LRU"):
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size
@@ -117,7 +123,7 @@ class SSDataManager(DataManager):
         elif self.v.clear_strategy() == ClearStrategy.REBUILD:
             self.eviction.rebuild()
         else:
-            raise RuntimeError('Unknown clear strategy')
+            raise RuntimeError("Unknown clear strategy")
         self.cur_size = self.s.count()
 
     def save(self, question, answer, embedding_data, **kwargs):
@@ -144,7 +150,7 @@ class SSDataManager(DataManager):
             self._clear()
         embedding_data = normalize(embedding_data)
         key = sha_data(embedding_data)
-        self.s.insert(key, question, answer, embedding_data.astype('float32'))
+        self.s.insert(key, question, answer, embedding_data.astype("float32"))
         self.v.add(key, embedding_data)
         self.cur_size += 1
 
