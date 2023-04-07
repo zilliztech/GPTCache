@@ -2,7 +2,7 @@ import os
 import time
 
 from gptcache.adapter.adapter import adapt
-from gptcache import cache, time_cal
+from gptcache import cache, time_cal, get_data_manager
 
 data_map_path = 'data_map.txt'
 
@@ -31,7 +31,8 @@ def test_adapt():
 
     if os.path.isfile(data_map_path):
         os.remove(data_map_path)
-    cache.init(pre_embedding_func=pre_embedding)
+    map_manager = get_data_manager()
+    cache.init(pre_embedding_func=pre_embedding, data_manager=map_manager)
 
     def report_func(delta_time):
         assert 0.9 < delta_time < 1.1, delta_time
@@ -46,7 +47,7 @@ def test_adapt():
     def delay_embedding(data, **kwargs):
         time.sleep(0.5)
         return data
-    cache.init(pre_embedding_func=pre_embedding, embedding_func=delay_embedding)
+    cache.init(pre_embedding_func=pre_embedding, embedding_func=delay_embedding, data_manager=map_manager)
     time_cal(add1, report_func=report_func)(cache_skip=True)
 
     def report_func(delta_time):
@@ -73,5 +74,6 @@ def test_adapt():
         res = add_llm(a=1, b=2, **kwargs)
         assert res == 3, res
 
-    cache.init(cache_enable_func=disable_cache, pre_embedding_func=pre_embedding, embedding_func=delay_embedding)
+    cache.init(cache_enable_func=disable_cache, pre_embedding_func=pre_embedding,
+               embedding_func=delay_embedding, data_manager=map_manager)
     time_cal(add2, report_func=report_func)()
