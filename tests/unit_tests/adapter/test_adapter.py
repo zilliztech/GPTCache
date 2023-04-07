@@ -2,7 +2,7 @@ import os
 import time
 
 from gptcache.adapter.adapter import adapt
-from gptcache import cache, time_cal, get_user_data_manager
+from gptcache import cache, time_cal, get_data_manager
 
 data_map_path = 'data_map.txt'
 
@@ -31,7 +31,7 @@ def test_adapt():
 
     if os.path.isfile(data_map_path):
         os.remove(data_map_path)
-    map_manager = get_user_data_manager("map")
+    map_manager = get_data_manager()
     cache.init(pre_embedding_func=pre_embedding, data_manager=map_manager)
 
     def report_func(delta_time):
