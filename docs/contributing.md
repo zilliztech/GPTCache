@@ -4,6 +4,8 @@ Before contributing to GPTCache, it is recommended to read the [usage doc](https
 
 In the process of contributing, pay attention to **the parameter type**, because there is currently no type restriction added.
 
+> Note that development **MUST** be based on the **`dev`** branch
+
 First check which part you want to contribute:
 - Add a scalar store type
 - Add a vector store type
