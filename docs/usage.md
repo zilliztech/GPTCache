@@ -1,13 +1,13 @@
 # GPTCache Quick Start
 
-GPTCache is easy to understand and can boost your LLM API speed by 100x in just two steps:
+GPTCache is easy to use and can reduce the latency of LLM queries by 100x in just two steps:
 
-1. Build your cache, which includes deciding on embedding functions, similarity evaluation functions, where to store the data, and eviction configurations.
-2. Choose your adapter. GPTCache currently supports the OpenAI chatGPT interface and langchain interface. Langchain supports a variety of LLMs, such as Anthropic, Llama-cpp, Huggingface hub, and Cohere.
+1. __Build your cache.__ In particular, you'll need to decide on an embedding function, similarity evaluation function, where to store your data, and the eviction policy.
+2. __Choose your LLM.__ GPTCache currently supports OpenAI's ChatGPT (GPT3.5-turbo) and langchain. Langchain supports a variety of LLMs, such as Anthropic, Huggingface, and Cohere models.
 
 ### Build your **Cache**
 
-The interface for initializing the cache looks like the following:
+The default interface for `Cache` is as follows:
 
 ```
 class Cache:
@@ -35,39 +35,36 @@ class Cache:
 
 ```
 
-Before creating GPTCache, consider the following questions:
+Before creating a GPTCache, consider the following questions:
 
-1. How will you generate an embedding for the query? (`embedding_func`)
+1. How will you generate embeddings for queries? (`embedding_func`)
    
-    This function embeds text into a dense vector for context similarity search. GPTCache currently supports five methods for embedding context: OpenAI, Cohere, Hugging Face API, ONNX model serving, and SentenceTransformers.
+    This function embeds text into a dense vector for context similarity search. GPTCache currently supports five methods for embedding context: OpenAI, Cohere, Huggingface, ONNX, and SentenceTransformers. We also provide a default string embedding method which serves as simple passthrough.
     
-    For instance, to use ONNX Embeddings, simply initialize your embedding function to `onnx.to_embeddings`.
+    For example, to use ONNX Embeddings, simply initialize your embedding function as `onnx.to_embeddings`.
     
     ```
     data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
     
-    cache.init(embedding_func=onnx.to_embeddings,
-                   data_manager=data_manager,
-                   similarity_evaluation=SearchDistanceEvaluation(),
-              )
+    cache.init(
+        embedding_func=onnx.to_embeddings,
+        data_manager=data_manager,
+        similarity_evaluation=SearchDistanceEvaluation(),
+    )
     cache.set_openai_key()
     ```
     
     Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-embedding-function) to see how to use different embedding functions.
     
-2. Where will you cache the data? (`data_manager cache storage`)
+2. Where will you cache the data? (`data_manager` cache storage)
    
-    The cache storage stores all scalar data such as original questions, prompts, answers, and access times. GPTCache supports various cache storage options, such as SQLite, MySQL, or PostgreSQL, and more NoSQL databases will be added in the future.
+    The cache storage stores all scalar data such as original questions, prompts, answers, and access times. GPTCache supports a number of cache storage options, such as SQLite, MySQL, and PostgreSQL. More NoSQL databases will be added in the future.
     
-3. Where will you store and search vector embeddings? (`data_manager vector storage`)
+3. Where will you store and search vector embeddings? (`data_manager` vector storage)
    
-    The vector storage stores all the embeddings and searches for the most similar results semantically. GPTCache supports the use of vector search libraries such as FAISS or vector databases such as Milvus, and more vector databases and cloud services will be added in the future.
-    
-4. When will the cache evict?
-   
-    GPTCache supports evicting data based on cache count. Users can choose to use either the LRU or FIFO policy. In the future, we plan to support additional cache policies, such as evicting data based on last access time or last write time.
-    
-    Here are some examples to create data_manager:
+    The vector storage component stores and searches across all embeddings to find the most similar results semantically. GPTCache supports the use of vector search libraries such as FAISS or vector databases such as Milvus. More vector databases and cloud services will be added in the future.
+
+    Here are some examples:
 
    ```
    ## create user defined data manager
@@ -82,32 +79,37 @@ Before creating GPTCache, consider the following questions:
    
    Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-data-manager-class) to see how to use different data managers.
 
- 5.  How will you determine whether it's a hit or miss? (`evaluation_func`)
+4. What is the eviction policy?
+   
+    GPTCache supports evicting data based on cache count. You can choose to use either the LRU or FIFO policy. In the future, we plan to support additional cache policies, such as evicting data based on last access time or last write time.
 
-   The evaluation function helps to determine whether the cached answer is similar or not. It takes three input values: `user request data`, `cached data`, and `user-defined parameters`. GPTCache now supports three types of evaluation: exact match evaluation, embedding distance evaluation and ONNX model evaluation.
+5. How will you determine cache hits versus misses? (`evaluation_func`)
 
-   To enable ONNX evaluation, simply pass EvaluationOnnx to similarity_evaluation. This allows you to run any model that can be served on ONNX. We will support pytorch, tensorRT and the other inference engine in the future.
+   The evaluation function helps to determine whether the cached answer matches the input query. It takes three input values: `user request data`, `cached data`, and `user-defined parameters`. GPTCache currently supports three types of evaluation functions: exact match evaluation, embedding distance evaluation and ONNX model evaluation.
+
+   To enable ONNX evaluation, simply pass `EvaluationOnnx` to `similarity_evaluation`. This allows you to run any model that can be served on ONNX. We will support Pytorch, TensorRT and the other inference engines in the future.
 
    ```
    onnx = EmbeddingOnnx()
    data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
    evaluation_onnx = EvaluationOnnx()
-   cache.init(embedding_func=onnx.to_embeddings,
-                  data_manager=data_manager,
-                  similarity_evaluation=evaluation_onnx,
-                  )
+   cache.init(
+       embedding_func=onnx.to_embeddings,
+       data_manager=data_manager,
+       similarity_evaluation=evaluation_onnx,
+   )
    ```
 
-   Check out more [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-similarity-evaluation-interface) to see how to use different similarity evaluation functions.
+   Check out our [examples](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-similarity-evaluation-interface) page to see how to use different similarity evaluation functions.
 
-Users can also pass in other configuration options , such as:
+Users can also pass in other configuration options, such as:
 
 - `log_time_func`: A function that logs time-consuming operations such as `embedding` and `search`.
 - `similarity_threshold`: The threshold used to determine when embeddings are similar to each other.
 
-### **Chose your adaptor**
+### **Chose your adapter**
 
-GPTCache now supports two LLM adapters: OpenAI and Langchain.
+GPTCache currently supports two LLM adapters: OpenAI and Langchain.
 
 With the OpenAI adapter, you can specify the model you want to use and generate queries as a user role.
 
@@ -128,7 +130,7 @@ answer = openai.ChatCompletion.create(
 print(answer)
 ```
 
-if you want to utilize stream response API in openAI SDK:
+Here's an example that utilizes OpenAI's stream response API:
 
 ```
 from gptcache.cache import get_data_manager
@@ -160,7 +162,7 @@ for chunk in response:
 full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
 ```
 
-If you want to connect with other LLMs, the Langchain Adaptor provides support for a standard interface for all of them.
+If you want to use other LLMs, the Langchain adapter provides support a standard interface to connect with Langchain-supported LLMs.
 
 ```
 template = """Question: {question}
@@ -183,7 +185,7 @@ cached_llm = LangChainLLMs(llm)
 answer = cached_llm(question, cache_obj=llm_cache)
 ```
 
-We are planning to support other large language models in the future,  any contributions or suggestions would be highly welcomed.
+We plan to support other models soon, so any contributions or suggestions are welcome.
 
 ### Other request parameters
 
