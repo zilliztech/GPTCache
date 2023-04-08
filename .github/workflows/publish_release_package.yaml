@@ -23,8 +23,7 @@ on:
       #   type: boolean
 
 jobs:
-  build-n-publish:
-    name: Build and Publish GPTCache to PyPI
+  build-and-publish-release:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
