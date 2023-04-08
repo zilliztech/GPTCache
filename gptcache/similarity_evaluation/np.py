@@ -1,3 +1,5 @@
+from typing import Dict, Tuple
+
 import numpy as np
 
 from gptcache.similarity_evaluation import SimilarityEvaluation
@@ -26,11 +28,11 @@ class NumpyNormEvaluation(SimilarityEvaluation):
             )
     """
 
-    def __init__(self, enable_normal: bool = False):
+    def __init__(self, enable_normal: bool = True):
         self.enable_normal = enable_normal
 
     @staticmethod
-    def normalize(vec):
+    def normalize(vec: np.ndarray):
         """Normalize the input vector.
 
         :param vec: numpy vector needs to normalize.
@@ -42,7 +44,7 @@ class NumpyNormEvaluation(SimilarityEvaluation):
         normalized_v = vec / magnitude
         return normalized_v
 
-    def evaluation(self, src_dict, cache_dict, **_):
+    def evaluation(self, src_dict: Dict, cache_dict: Dict, **_) -> float:
         """Evaluate the similarity score of pair.
 
         :param src_dict: the query dictionary to evaluate with cache.
@@ -63,7 +65,7 @@ class NumpyNormEvaluation(SimilarityEvaluation):
         )
         return np.linalg.norm(src_embedding - cache_embedding)
 
-    def range(self):
+    def range(self) -> Tuple[int]:
         """Range of similarity score.
 
         :return: minimum and maximum of similarity score.
