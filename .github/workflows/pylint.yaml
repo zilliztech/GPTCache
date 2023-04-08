@@ -12,7 +12,7 @@ on:
       - '!**.md'
       - '.github/workflows/**'
 jobs:
-  run:
+  pylint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3.0.0

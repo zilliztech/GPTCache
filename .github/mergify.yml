@@ -59,10 +59,11 @@ pull_request_rules:
       - or:
         - base=main
         - base=dev
-      - "status-success=Build GPTCache PYPI Package"
+      - "status-success=pylint"
+      - "status-success=build-pypi"
       - "status-success=integration-test-gpt-cache-cli-main"
-      - "status-success=test-gpt-cache-cli-main (map, 3.8)"
       - "status-success=unit-test-main"
+      - "status-success=test-gpt-cache-cli-main (map, 3.8)"
       - "status-success=test-gpt-cache-cli-main (map, 3.9)"
       - "status-success=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.8)"
       - "status-success=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.9)"
@@ -91,10 +92,11 @@ pull_request_rules:
         - base=main
         - base=dev
       - or:
-        - "status-success!=Build GPTCache PYPI Package"
+        - "status-success!=pylint"
+        - "status-success!=build-pypi"
         - "status-success!=integration-test-gpt-cache-cli-main"
-        - "status-success!=test-gpt-cache-cli-main (map, 3.8)"
         - "status-success!=unit-test-main"
+        - "status-success!=test-gpt-cache-cli-main (map, 3.8)"
         - "status-success!=test-gpt-cache-cli-main (map, 3.9)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.8)"
         - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.9)"
