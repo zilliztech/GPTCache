@@ -62,6 +62,10 @@ def test_adapt():
 
     time_cal(add1, report_func=report_func)()
 
+    time_cal(add1, report_func=report_func)(cache_factor=0)
+
+    time_cal(add1, report_func=report_func)(cache_factor=10)
+
     # test cache_enable_func
     def update_cache_callback(llm_data, update_cache_func):
         time.sleep(0.5)
