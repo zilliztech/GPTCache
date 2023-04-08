@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List, Tuple
 import numpy as np
 from gptcache.utils import (
     import_onnxruntime,
@@ -16,7 +16,7 @@ from huggingface_hub import hf_hub_download  # pylint: disable=C0413
 import onnxruntime  # pylint: disable=C0413
 
 
-def pad_sequence(input_ids_list, padding_value=0):
+def pad_sequence(input_ids_list: List[np.ndarray], padding_value: int = 0):
     max_len = max(len(sequence) for sequence in input_ids_list)
     padded_sequences = np.full((len(input_ids_list), max_len), padding_value)
     for i, sequence in enumerate(input_ids_list):
@@ -46,7 +46,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
             )
     """
 
-    def __init__(self, model="GPTCache/albert-duplicate-onnx"):
+    def __init__(self, model: str = "GPTCache/albert-duplicate-onnx"):
         tokenizer_name = "albert-base-v2"
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
         self.model = model
@@ -54,7 +54,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         self.ort_session = onnxruntime.InferenceSession(onnx_model_path)
 
     # WARNING: the model cannot evaluate text with more than 512 tokens
-    def evaluation(self, src_dict, cache_dict, **_):
+    def evaluation(self, src_dict: Dict, cache_dict: Dict, **_):
         """Evaluate the similarity score of pair.
 
         :param src_dict: the query dictionary to evaluate with cache.
@@ -73,7 +73,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         except Exception:  # pylint: disable=W0703
             return 0
 
-    def range(self):
+    def range(self) -> Tuple[int]:
         """Range of similarity score.
 
         :return: minimum and maximum of similarity score.
