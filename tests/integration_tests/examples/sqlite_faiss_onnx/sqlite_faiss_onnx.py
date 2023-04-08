@@ -27,6 +27,7 @@ def run():
         similarity_evaluation=SearchDistanceEvaluation(),
         config=Config(
             log_time_func=log_time_func,
+            similarity_threshold=0.9
         ),
     )
 
@@ -36,14 +37,9 @@ def run():
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
     mock_messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "what do you feel like chatgpt"},
+        {'role': 'system', 'content': 'You are a helpful assistant.'},
+        {'role': 'user', 'content': 'what do you think chatgpt'}
     ]
-
-    # mock_messages = [
-    #     {'role': 'system', 'content': 'You are a helpful assistant.'},
-    #     {'role': 'user', 'content': 'what do you think chatgpt'}
-    # ]
 
     start_time = time.time()
     answer = openai.ChatCompletion.create(
@@ -52,9 +48,46 @@ def run():
     )
     end_time = time.time()
     print("cache hint time consuming: {:.2f}s".format(end_time - start_time))
-
     print(answer)
 
+    is_exception = False
+    try:
+        openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=mock_messages,
+            cache_factor=100,
+        )
+    except Exception:
+        is_exception = True
+
+    assert is_exception
+
+    mock_messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "what do you feel like chatgpt"},
+    ]
+    is_exception = False
+    try:
+        openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=mock_messages,
+        )
+    except Exception:
+        is_exception = True
+
+    assert is_exception
+
+    is_exception = False
+    try:
+        openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=mock_messages,
+            cache_factor=0.5,
+        )
+    except Exception:
+        is_exception = True
+
+    assert not is_exception
 
 if __name__ == "__main__":
     run()
