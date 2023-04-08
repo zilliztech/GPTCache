@@ -12,6 +12,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
     cache_skip = kwargs.pop("cache_skip", False)
+    cache_factor = kwargs.pop("cache_factor", 1.0)
     pre_embedding_data = chat_cache.pre_embedding_func(
         kwargs, extra_param=context.get("pre_embedding_func", None)
     )
@@ -31,7 +32,14 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         cache_answers = []
         similarity_threshold = chat_cache.config.similarity_threshold
         min_rank, max_rank = chat_cache.similarity_evaluation.range()
-        rank_threshold = (max_rank - min_rank) * similarity_threshold
+        rank_threshold = (max_rank - min_rank) * similarity_threshold * cache_factor
+        rank_threshold = (
+            max_rank
+            if rank_threshold > max_rank
+            else min_rank
+            if rank_threshold < min_rank
+            else rank_threshold
+        )
         for cache_data in cache_data_list:
             ret = chat_cache.data_manager.get_scalar_data(
                 cache_data, extra_param=context.get("get_scalar_data", None)
@@ -66,6 +74,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         kwargs["cache_obj"] = next_cache
         kwargs["cache_context"] = context
         kwargs["cache_skip"] = cache_skip
+        kwargs["cache_factor"] = cache_factor
         llm_data = adapt(
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
