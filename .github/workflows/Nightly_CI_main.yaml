@@ -15,6 +15,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
     paths:
       - '.github/workflows/Nightly_CI_main.yaml'
 

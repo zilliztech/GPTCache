@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
     paths:
       - 'examples/**'
       - 'gptcache/**'
@@ -11,8 +12,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  build-n-publish:
-    name: Build GPTCache PYPI Package
+  build-pypi:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
