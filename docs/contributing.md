@@ -1,4 +1,4 @@
-# 😆 Contributing to GPTCache
+# 😍 Contributing to GPTCache
 
 Before contributing to GPTCache, it is recommended to read the [usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md).
 
