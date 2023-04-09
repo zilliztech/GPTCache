@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 import numpy as np
 from gptcache.utils import (
     import_onnxruntime,
@@ -54,7 +54,9 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         self.ort_session = onnxruntime.InferenceSession(onnx_model_path)
 
     # WARNING: the model cannot evaluate text with more than 512 tokens
-    def evaluation(self, src_dict: Dict, cache_dict: Dict, **_):
+    def evaluation(
+        self, src_dict: Dict[str, Any], cache_dict: Dict[str, Any], **_
+    ) -> float:
         """Evaluate the similarity score of pair.
 
         :param src_dict: the query dictionary to evaluate with cache.
@@ -73,7 +75,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         except Exception:  # pylint: disable=W0703
             return 0
 
-    def range(self) -> Tuple[int]:
+    def range(self) -> Tuple[float, float]:
         """Range of similarity score.
 
         :return: minimum and maximum of similarity score.
