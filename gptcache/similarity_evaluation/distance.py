@@ -1,3 +1,5 @@
+from typing import Tuple, Dict, Any
+
 from gptcache.similarity_evaluation import SimilarityEvaluation
 
 
@@ -27,7 +29,9 @@ class SearchDistanceEvaluation(SimilarityEvaluation):
         self.max_distance = max_distance
         self.positive = positive
 
-    def evaluation(self, src_dict, cache_dict, **_):
+    def evaluation(
+        self, src_dict: Dict[str, Any], cache_dict: Dict[str, Any], **_
+    ) -> float:
         """Evaluate the similarity score of pair.
         :param src_dict: the query dictionary to evaluate with cache.
         :type src_dict: Dict
@@ -45,7 +49,7 @@ class SearchDistanceEvaluation(SimilarityEvaluation):
             return distance
         return self.max_distance - distance
 
-    def range(self):
+    def range(self) -> Tuple[float, float]:
         """Range of similarity score.
 
         :return: minimum and maximum of similarity score.

@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any
 
 import numpy as np
 
@@ -44,7 +44,9 @@ class NumpyNormEvaluation(SimilarityEvaluation):
         normalized_v = vec / magnitude
         return normalized_v
 
-    def evaluation(self, src_dict: Dict, cache_dict: Dict, **_) -> float:
+    def evaluation(
+        self, src_dict: Dict[str, Any], cache_dict: Dict[str, Any], **_
+    ) -> float:
         """Evaluate the similarity score of pair.
 
         :param src_dict: the query dictionary to evaluate with cache.
@@ -65,7 +67,7 @@ class NumpyNormEvaluation(SimilarityEvaluation):
         )
         return np.linalg.norm(src_embedding - cache_embedding)
 
-    def range(self) -> Tuple[int]:
+    def range(self) -> Tuple[float, float]:
         """Range of similarity score.
 
         :return: minimum and maximum of similarity score.
