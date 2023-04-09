@@ -1,5 +1,15 @@
 name: Build dev package
 on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/**'
   pull_request:
     branches:
       - main
@@ -10,6 +20,7 @@ on:
       - 'tests/**'
       - '!**.md'
       - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   build-pypi:
