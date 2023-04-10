@@ -5,7 +5,7 @@ from gptcache.adapter import openai
 from gptcache import cache, Cache
 
 
-def run():
+def test_map():
     dir_name, _ = os.path.split(os.path.abspath(__file__))
     bak_cache = Cache()
     bak_data_file = dir_name + "/data_map_bak.txt"
@@ -42,5 +42,5 @@ def run():
     print(answer)
 
 
-if __name__ == "__main__":
-    run()
+# if __name__ == "__main__":
+#     run()

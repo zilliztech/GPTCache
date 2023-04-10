@@ -56,6 +56,6 @@ jobs:
       - name: Unit Tests
         timeout-minutes: 10
         shell: bash
-        working-directory: tests/unit_tests
+        working-directory: tests
         run: |
           python3 -m pytest ./
