@@ -14,7 +14,7 @@ def mock_embeddings(data, **kwargs):  # pylint: disable=W0613
     return np.random.random((d,)).astype("float32")
 
 
-def run():
+def test_sqlite_faiss():
     sqlite_file = "sqlite.db"
     faiss_file = "faiss.index"
     has_data = os.path.isfile(sqlite_file) and os.path.isfile(faiss_file)
@@ -44,7 +44,3 @@ def run():
         messages=mock_messages,
     )
     print(answer)
-
-
-if __name__ == "__main__":
-    run()

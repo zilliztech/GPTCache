@@ -8,7 +8,7 @@ from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 from gptcache.embedding import Onnx
 
 
-def run():
+def test_sqlite_faiss_onnx():
     onnx = Onnx()
 
     sqlite_file = "sqlite.db"
@@ -88,6 +88,3 @@ def run():
         is_exception = True
 
     assert not is_exception
-
-if __name__ == "__main__":
-    run()
