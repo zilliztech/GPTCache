@@ -14,11 +14,6 @@ def test_adapt():
         time.sleep(1)
         return a + b
 
-    def pre_embedding(data, **kwargs):
-        a = data.get("a", 0)
-        b = data.get("b", 0)
-        return f"{a}+{b}"
-
     def cache_data_convert(cache_data):
         return int(cache_data)
 
@@ -30,6 +25,11 @@ def test_adapt():
         return adapt(
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
+
+    def pre_embedding(data, **kwargs):
+        a = data.get("a", 0)
+        b = data.get("b", 0)
+        return f"{a}+{b}"
 
     if os.path.isfile(data_map_path):
         os.remove(data_map_path)
@@ -43,6 +43,8 @@ def test_adapt():
         res = add_llm(a=1, b=2, **kwargs)
         assert res == 3, res
 
+    # pre_embedding -> embedding -> handle
+    # 0 + 0 + 1.0
     time_cal(add1, report_func=report_func)()
 
     # test cache_skip param
@@ -55,6 +57,12 @@ def test_adapt():
         embedding_func=delay_embedding,
         data_manager=map_manager,
     )
+
+    def report_func(delta_time):
+        assert 1.4 < delta_time < 1.6, delta_time
+
+    # pre_embedding -> embedding -> handle
+    # 0 + 0.5 + 1.0
     time_cal(add1, report_func=report_func)(cache_skip=True)
 
     def report_func(delta_time):

@@ -16,12 +16,13 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     pre_embedding_data = chat_cache.pre_embedding_func(
         kwargs, extra_param=context.get("pre_embedding_func", None)
     )
-    if cache_enable and not cache_skip:
+    if cache_enable:
         embedding_data = time_cal(
             chat_cache.embedding_func,
             func_name="embedding",
             report_func=chat_cache.report.embedding,
         )(pre_embedding_data, extra_param=context.get("embedding_func", None))
+    if cache_enable and not cache_skip:
         cache_data_list = time_cal(
             chat_cache.data_manager.search,
             func_name="search",
