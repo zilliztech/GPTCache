@@ -28,14 +28,14 @@ def get_model(table_name, db_type):
         __tablename__ = table_name
         __table_args__ = {"extend_existing": True}
 
-        uid = Column(Integer, primary_key=True, autoincrement=True)
-        id = Column(String(500), nullable=False)
+        id = Column(Integer, primary_key=True, autoincrement=True)
         data = Column(String(1000), nullable=False)
         reply = Column(String(1000), nullable=False)
         create_on = Column(DateTime, default=datetime.now)
         last_access = Column(DateTime, default=datetime.now)
         embedding_data = Column(LargeBinary, nullable=True)
         state = Column(Integer, default=0)
+        type = Column(Integer, default=0)
 
     class CacheTableSequence(Base):
         """
@@ -45,16 +45,16 @@ def get_model(table_name, db_type):
         __tablename__ = table_name
         __table_args__ = {"extend_existing": True}
 
-        uid = Column(
+        id = Column(
             Integer, Sequence("id_seq", start=1), primary_key=True, autoincrement=True
         )
-        id = Column(String(500), nullable=False)
         data = Column(String(1000), nullable=False)
         reply = Column(String(1000), nullable=False)
         create_on = Column(DateTime, default=datetime.now)
         last_access = Column(DateTime, default=datetime.now)
         embedding_data = Column(LargeBinary, nullable=True)
         state = Column(Integer, default=0)
+        type = Column(Integer, default=0)
 
     if db_type == "oracle":
         return CacheTableSequence
@@ -83,13 +83,15 @@ class SQLDataBase(CacheStorage):
     def create(self):
         self._model.__table__.create(bind=self._engine, checkfirst=True)
 
-    def insert(self, key, data, reply, embedding_data: np.ndarray = None):
-        embedding_data = embedding_data.tobytes()
-        model_obj = self._model(
-            id=key, data=data, reply=reply, embedding_data=embedding_data
-        )
+    def insert(self, data, reply, embedding_data: np.ndarray = None):
+        if embedding_data is None:
+            model_obj = self._model(data=data, reply=reply)
+        else:
+            embedding_data = embedding_data.tobytes()
+            model_obj = self._model(data=data, reply=reply, embedding_data=embedding_data)
         self._session.add(model_obj)
         self._session.commit()
+        return model_obj.id
 
     def get_data_by_id(self, key):
         res = (
@@ -108,8 +110,8 @@ class SQLDataBase(CacheStorage):
 
     def get_embedding_data(self, offset, size):
         res = (
-            self._session.query(self._model.embedding_data)
-            .order_by(self._model.uid.asc())
+            self._session.query(self._model.id, self._model.embedding_data)
+            .order_by(self._model.id.asc())
             .limit(size)
             .offset(offset)
             .all()

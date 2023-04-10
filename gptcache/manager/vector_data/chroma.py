@@ -40,9 +40,9 @@ class Chromadb(VectorBase):
         results = self._collection.query(
             query_embeddings=[data],
             n_results=self.top_k,
-            include=["distances", "embeddings"],
+            include=["distances"],
         )
-        return list(zip(results["distances"][0], results["embeddings"][0]))
+        return list(zip(results["distances"][0], results["ids"][0]))
 
     def clear_strategy(self):
         return ClearStrategy.DELETE

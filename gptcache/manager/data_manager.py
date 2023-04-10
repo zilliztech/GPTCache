@@ -1,4 +1,3 @@
-import hashlib
 from abc import abstractmethod, ABCMeta
 import pickle
 import cachetools
@@ -19,7 +18,7 @@ class DataManager(metaclass=ABCMeta):
 
     # should return the tuple, (question, answer)
     @abstractmethod
-    def get_scalar_data(self, vector_data, **kwargs):
+    def get_scalar_data(self, res_data, **kwargs):
         pass
 
     @abstractmethod
@@ -56,8 +55,8 @@ class MapDataManager(DataManager):
     def save(self, question, answer, embedding_data, **kwargs):
         self.data[embedding_data] = (question, answer)
 
-    def get_scalar_data(self, vector_data, **kwargs):
-        return vector_data
+    def get_scalar_data(self, res_data, **kwargs):
+        return res_data
 
     def search(self, embedding_data, **kwargs):
         try:
@@ -71,14 +70,6 @@ class MapDataManager(DataManager):
                 pickle.dump(self.data, f)
         except PermissionError:
             print(f"You don't have permission to access this file <${self.data_path}>.")
-
-
-def sha_data(data):
-    if isinstance(data, list):
-        data = np.array(data)
-    m = hashlib.sha1()
-    m.update(data.astype("float32").tobytes())
-    return m.hexdigest()
 
 
 def normalize(vec):
@@ -149,15 +140,15 @@ class SSDataManager(DataManager):
         if self.cur_size >= self.max_size:
             self._clear()
         embedding_data = normalize(embedding_data)
-        key = sha_data(embedding_data)
-        self.s.insert(key, question, answer, embedding_data.astype("float32"))
+        if self.v.clear_strategy() == ClearStrategy.DELETE:
+            key = self.s.insert(question, answer)
+        elif self.v.clear_strategy() == ClearStrategy.REBUILD:
+            key = self.s.insert(question, answer, embedding_data.astype("float32"))
         self.v.add(key, embedding_data)
         self.cur_size += 1
 
-    def get_scalar_data(self, vector_data, **kwargs):
-        key = sha_data(vector_data[1])
-        self.s.update_access_time(key)
-        return self.s.get_data_by_id(key)
+    def get_scalar_data(self, res_data, **kwargs):
+        return self.s.get_data_by_id(res_data[1])
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)
