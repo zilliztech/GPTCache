@@ -61,14 +61,7 @@ pull_request_rules:
         - base=dev
       - "status-success=pylint"
       - "status-success=build-pypi"
-      - "status-success=integration-test-gpt-cache-cli-main"
       - "status-success=unit-test-main"
-      - "status-success=test-gpt-cache-cli-main (map, 3.8)"
-      - "status-success=test-gpt-cache-cli-main (map, 3.9)"
-      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.8)"
-      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.9)"
-      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.8)"
-      - "status-success=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.9)"
     actions:
       label:
         add:
@@ -86,6 +79,17 @@ pull_request_rules:
         add:
           - ci-passed
 
+  - name: Test passed for markdown file
+      conditions:
+          - or:
+            - base=main
+            - base=dev
+          - files=^.*\.md$
+      actions:
+        label:
+          add:
+            - ci-passed
+
   - name: Remove ci-passed label when ut failed for main
     conditions:
       - or:
@@ -94,14 +98,7 @@ pull_request_rules:
       - or:
         - "status-success!=pylint"
         - "status-success!=build-pypi"
-        - "status-success!=integration-test-gpt-cache-cli-main"
         - "status-success!=unit-test-main"
-        - "status-success!=test-gpt-cache-cli-main (map, 3.8)"
-        - "status-success!=test-gpt-cache-cli-main (map, 3.9)"
-        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.8)"
-        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_mock, 3.9)"
-        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.8)"
-        - "status-success!=test-gpt-cache-cli-main (sqlite_faiss_onnx, 3.9)"
       - files~=^(?=.*((\.(sh|py)|Makefile))).*$
     actions:
       label:

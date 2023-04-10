@@ -3,7 +3,7 @@ Slash Your LLM API Costs by 10x 💰, Boost Speed by 100x ⚡
 
 [![Release](https://img.shields.io/pypi/v/gptcache?label=Release&color&logo=Python)](https://pypi.org/project/gptcache/)
 [![Pylint](https://img.shields.io/github/actions/workflow/status/zilliztech/GPTCache/pylint.yaml?label=Pylint&logo=Github)](https://github.com/zilliztech/gptcache/actions/workflows/pylint.yaml)
-[![CI](https://img.shields.io/github/actions/workflow/status/zilliztech/GPTCache/CI_main.yaml?label=Test&logo=Github)](https://github.com/zilliztech/gptcache/actions/workflows/CI_main.yaml)
+[![CI](https://img.shields.io/github/actions/workflow/status/zilliztech/GPTCache/unit_test_main.yaml?label=Test&logo=Github)](https://github.com/zilliztech/gptcache/actions/workflows/unit_test_main.yaml)
 [![pip download](https://img.shields.io/pypi/dm/gptcache.svg?color=bright-green&logo=Pypi)](https://pypi.org/project/gptcache/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit/)
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/zilliz_universe.svg?style=social&label=Follow%20%40Zilliz)](https://twitter.com/zilliz_universe)
