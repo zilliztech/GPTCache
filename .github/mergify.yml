@@ -80,15 +80,15 @@ pull_request_rules:
           - ci-passed
 
   - name: Test passed for markdown file
-      conditions:
-          - or:
-            - base=main
-            - base=dev
-          - files=^.*\.md$
-      actions:
-        label:
-          add:
-            - ci-passed
+    conditions:
+      - or:
+        - base=main
+        - base=dev
+      - files=^.*\.md$
+    actions:
+      label:
+        add:
+          - ci-passed
 
   - name: Remove ci-passed label when ut failed for main
     conditions:
