@@ -2,6 +2,7 @@ __all__ = [
     "import_pymilvus",
     "import_huggingface_hub",
     "import_faiss",
+    "import_hnswlib",
     "import_chromadb",
     "import_sqlalchemy",
     "import_sql_client",
@@ -63,6 +64,10 @@ def import_onnxruntime():
 
 def import_faiss():
     _check_library("faiss", package="faiss-cpu==1.6.5")
+
+
+def import_hnswlib():
+    _check_library("hnswlib")
 
 
 def import_chromadb():

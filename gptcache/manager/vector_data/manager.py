@@ -86,6 +86,17 @@ class VectorBase:
                 collection_name=collection_name,
                 top_k=top_k,
             )
+        elif name == "hnswlib":
+            from gptcache.manager.vector_data.hnswlib_store import Hnswlib
+
+            dimension = kwargs.get("dimension", DIMENSION)
+            index_path = kwargs.pop("index_path", "./hnswlib_index.bin")
+            max_elements = kwargs.pop("max_elements", 100000)
+            VectorBase.check_dimension(dimension)
+            vector_base = Hnswlib(
+                index_file_path=index_path, dimension=dimension,
+                top_k=top_k, max_elements=max_elements
+            )
         else:
             raise NotFoundStoreError("vector store", name)
         return vector_base
