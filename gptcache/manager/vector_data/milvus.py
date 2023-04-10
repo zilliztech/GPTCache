@@ -79,11 +79,10 @@ class Milvus(VectorBase):
         if not utility.has_collection(collection_name, using=self.alias):
             schema = [
                 FieldSchema(
-                    name="pk",
-                    dtype=DataType.VARCHAR,
+                    name="id",
+                    dtype=DataType.INT64,
                     is_primary=True,
                     auto_id=False,
-                    max_length=65535,
                 ),
                 FieldSchema(
                     name="embedding", dtype=DataType.FLOAT_VECTOR, dim=self.dimension
@@ -97,6 +96,7 @@ class Milvus(VectorBase):
                 using=self.alias,
             )
         else:
+            print(f"There already has {collection_name} collection, will using it directly.")
             self.col = Collection(
                 collection_name, consistency_level="Strong", using=self.alias
             )
@@ -127,30 +127,15 @@ class Milvus(VectorBase):
             anns_field="embedding",
             param=self.search_params,
             limit=self.top_k,
-            output_fields=["pk"],
         )
-        pks = {}
-        for hit in search_result[0]:
-            pks[hit.entity.get("pk")] = hit.score
-
-        query_pks = ",".join(["'" + x + "'" for x in pks])
-        query_result = self.col.query(
-            expr=f"pk in [{query_pks}]", output_fields=["pk", "embedding"]
-        )
-
-        search_tuples = []
-        for query_row in query_result:
-            search_tuples.append(
-                (pks[query_row["pk"]], np.array(query_row["embedding"]))
-            )
-        return search_tuples
+        return zip(search_result[0].distances, search_result[0].ids)
 
     def clear_strategy(self):
         return ClearStrategy.DELETE
 
     def delete(self, ids):
-        pks = ",".join(["'" + x + "'" for x in ids])
-        self.col.delete(f"pk in [{pks}]")
+        del_ids = ",".join([str(x) for x in ids])
+        self.col.delete(f"id in [{del_ids}]")
 
     def close(self):
         self.col.flush(_async=True)

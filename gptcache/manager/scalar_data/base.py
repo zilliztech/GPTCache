@@ -13,7 +13,7 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def insert(self, key, data, reply, embedding_data: np.ndarray = None):
+    def insert(self, data, reply, embedding_data: np.ndarray = None):
         pass
 
     @abstractmethod
