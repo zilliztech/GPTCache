@@ -63,7 +63,7 @@ def import_onnxruntime():
 
 
 def import_faiss():
-    _check_library("faiss", package="faiss-cpu==1.6.5")
+    _check_library("faiss", package="faiss-cpu")
 
 
 def import_hnswlib():
