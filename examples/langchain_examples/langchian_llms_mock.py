@@ -5,7 +5,6 @@ from langchain.llms import OpenAI
 
 from gptcache.adapter.langchain_llms import LangChainLLMs
 from gptcache import cache, Cache
-from gptcache.processor.post import nop as postnop
 from gptcache.processor.pre import get_prompt
 
 
@@ -15,7 +14,6 @@ def run():
     llm_cache = Cache()
     llm_cache.init(
         pre_embedding_func=get_prompt,
-        post_process_messages_func=postnop,
     )
 
     if not has_data:

@@ -5,14 +5,12 @@ from langchain.llms import OpenAI
 
 from gptcache.adapter.langchain_llms import LangChainLLMs
 from gptcache import cache
-from gptcache.processor.post import nop as postnop
 from gptcache.processor.pre import get_prompt
 
 
 def run():
     cache.init(
         pre_embedding_func=get_prompt,
-        post_process_messages_func=postnop,
     )
 
     question = 'what is chatgpt'

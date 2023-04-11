@@ -55,7 +55,7 @@ class Config:
         similarity_threshold=0.8,
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
-            raise CacheError("Invalid the similarity threshold param")
+            raise CacheError("Invalid the similarity threshold param, reasonable range: 0-1")
         self.log_time_func = log_time_func
         self.similarity_threshold = similarity_threshold
 

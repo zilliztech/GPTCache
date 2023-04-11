@@ -1,12 +1,14 @@
 # 😍 Contributing to GPTCache
 
-Before contributing to GPTCache, it is recommended to read the [usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md).
+Before contributing to GPTCache, it is recommended to read the [usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md) [example-doc](https://github.com/zilliztech/GPTCache/blob/main/examples/README.md).
+These two articles will introduce how to use GPTCache and the meaning of parameters of related functions.
 
 In the process of contributing, pay attention to **the parameter type**, because there is currently no type restriction added.
 
 > Note that development **MUST** be based on the **`dev`** branch
 
 First check which part you want to contribute:
+- Add a method to pre-process the llm request
 - Add a scalar store type
 - Add a vector store type
 - Add a new data manager
@@ -51,6 +53,33 @@ def import_pymilvus():
 # 2.2 use the import method in your file
 from gptcache.util import import_pymilvus
 import_pymilvus()
+```
+
+## Add a method to pre-process the llm request
+
+refer to the implementation of [Pre](https://github.com/zilliztech/GPTCache/blob/main/gptcache/processor/pre.py).
+
+1. Make sure the input params, the `data` represents the original request dictionary object
+2. Implement the post method
+3. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/README.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
+
+```python
+# The origin openai request
+import openai
+
+openai.ChatCompletion.create(
+  model="gpt-3.5-turbo",
+  messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Who won the world series in 2020?"},
+        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+        {"role": "user", "content": "Where was it played?"}
+    ]
+)
+
+# This is the pre-process function of openai request, which is to get the last message
+def last_content(data, **_):
+    return data.get("messages")[-1]["content"]
 ```
 
 ## Add a cache storage type
@@ -117,6 +146,17 @@ refer to the implementation of [first or random_one](https://github.com/zillizte
 2. Make sure the newly added third-party libraries are lazy imported and automatic installation
 3. Implement the post method
 4. Add a usage example to [example](https://github.com/zilliztech/GPTCache/blob/main/examples) directory and add the corresponding content to [example.md](https://github.com/zilliztech/GPTCache/blob/main/examples/README.md) [README.md](https://github.com/zilliztech/GPTCache/blob/main/README.md)
+
+```python
+# Get the most similar one from multiple results
+def first(messages):
+    return messages[0]
+
+
+# Randomly fetch one of many results
+def random_one(messages):
+    return random.choice(messages)
+```
 
 # Add a new process in handling chatgpt requests
 
