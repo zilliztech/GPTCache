@@ -25,9 +25,7 @@ on:
 
 jobs:
   codecov:
-    run:
-      runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - name: Generate coverage report
