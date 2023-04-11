@@ -106,3 +106,11 @@ def import_sql_client(db_name):
         import_pyodbc()
     elif db_name == "oracle":
         import_cxoracle()
+
+
+def import_pydantic():
+    _check_library("pydantic")
+
+
+def import_langchain():
+    _check_library("langchain")
