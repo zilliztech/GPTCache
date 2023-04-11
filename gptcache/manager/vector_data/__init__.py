@@ -34,5 +34,10 @@ def VectorBase(name: str, **kwargs):
     :type index_params: dict
     :param collection_name: the name of the collection for Milvus vector database, defaults to 'gptcache'.
     :type collection_name: str.
+
+    :param index_path: the path to hnswlib index, defaults to 'hnswlib_index.bin'.
+    :type index_path: str.
+    :param max_elements: max_elements of hnswlib, defaults 100000.
+    :type max_elements: int.
     """
     return vector_manager.VectorBase.get(name, **kwargs)
