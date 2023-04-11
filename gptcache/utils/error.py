@@ -16,3 +16,9 @@ class NotFoundStoreError(CacheError):
 
 class ParamError(CacheError):
     """Raise when receiving an invalid param."""
+
+
+class PipInstallError(CacheError):
+    """Raise when failed to install package."""
+    def __init__(self, package):
+        super().__init__(f"Ran into error installing {package}.")
