@@ -4,7 +4,7 @@ import time
 import openai
 
 from gptcache.embedding.string import to_embeddings as string_embedding
-from gptcache.manager.data_manager import DataManager
+from gptcache.manager.data_manager import DataManager, DataManagerType
 from gptcache.manager.factory import get_data_manager
 from gptcache.processor.post import first
 from gptcache.processor.pre import last_content
@@ -154,20 +154,30 @@ class Cache:
         """Pass parameters to initialize GPTCache.
 
         :param cache_enable_func: a function to enable cache, defaults to ``cache_all``
+        :type cache_enable_func: Callable
         :param pre_embedding_func: a function to preprocess embedding, defaults to ``last_content``
-        :param embedding_func: a function to extract embeddings from requests for similarity search, defaults to ``string_embedding``
+        :type pre_embedding_func: Callable
         :param data_manager: a ``DataManager`` module, defaults to ``get_data_manager()``
-        :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``ExactMatchEvaluation()``
+        :type data_manager: DataManager
+        :param embedding_func: a function to extract embeddings from requests for similarity search, defaults to ``string_embedding``,
+                               and will auto set to ``string_embedding`` if data_manager.type is ``DataManagerType.Map``
+        :type embedding_func: Callable
+        :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``ExactMatchEvaluation()``,
+                                      and will auto set to ``ExactMatchEvaluation()`` if data_manager.type is ``DataManagerType.Map``
+        :type similarity_evaluation: SimilarityEvaluation
         :param post_process_messages_func: a function to post-process messages, defaults to ``first``
+        :type post_process_messages_func: Callable
         :param config: a module to pass configurations, defaults to ``Config()``
+        :type config: Config
         :param next_cache: customized method for next cache
+        :type next_cache: Cache
         """
         self.has_init = True
         self.cache_enable_func = cache_enable_func
         self.pre_embedding_func = pre_embedding_func
-        self.embedding_func = embedding_func
+        self.embedding_func = string_embedding if data_manager.type == DataManagerType.MAP else embedding_func
         self.data_manager: DataManager = data_manager
-        self.similarity_evaluation = similarity_evaluation
+        self.similarity_evaluation = ExactMatchEvaluation() if data_manager.type == DataManagerType.MAP else similarity_evaluation
         self.post_process_messages_func = post_process_messages_func
         self.config = config
         self.next_cache = next_cache

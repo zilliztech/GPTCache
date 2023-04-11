@@ -2,11 +2,17 @@ from abc import abstractmethod, ABCMeta
 import pickle
 import cachetools
 import numpy as np
+from enum import Enum
 
 from gptcache.utils.error import CacheError
 from gptcache.manager.scalar_data.base import CacheStorage
 from gptcache.manager.vector_data.base import VectorBase, ClearStrategy
 from gptcache.manager.eviction import EvictionManager
+
+
+class DataManagerType(Enum):
+    MAP = "map"
+    STORAGE = "Storage"
 
 
 class DataManager(metaclass=ABCMeta):
@@ -27,6 +33,11 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def close(self):
+        pass
+
+    @property
+    @abstractmethod
+    def type(self):
         pass
 
 
@@ -53,12 +64,14 @@ class MapDataManager(DataManager):
             )
 
     def save(self, question, answer, embedding_data, **kwargs):
+        embedding_data = str(embedding_data)
         self.data[embedding_data] = (question, answer)
 
     def get_scalar_data(self, res_data, **kwargs):
         return res_data
 
     def search(self, embedding_data, **kwargs):
+        embedding_data = str(embedding_data)
         try:
             return [self.data[embedding_data]]
         except KeyError:
@@ -70,6 +83,10 @@ class MapDataManager(DataManager):
                 pickle.dump(self.data, f)
         except PermissionError:
             print(f"You don't have permission to access this file <${self.data_path}>.")
+
+    @property
+    def type(self):
+        return DataManagerType.MAP
 
 
 def normalize(vec):
@@ -157,3 +174,7 @@ class SSDataManager(DataManager):
     def close(self):
         self.s.close()
         self.v.close()
+
+    @property
+    def type(self):
+        return DataManagerType.STORAGE

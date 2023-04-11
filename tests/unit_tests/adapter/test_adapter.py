@@ -43,7 +43,7 @@ def test_adapt():
         res = add_llm(a=1, b=2, **kwargs)
         assert res == 3, res
 
-    # pre_embedding -> embedding -> handle
+    # pre_embedding -> (0)embedding -> handle
     # 0 + 0 + 1.0
     time_cal(add1, report_func=report_func)()
 
@@ -59,7 +59,7 @@ def test_adapt():
     )
 
     def report_func(delta_time):
-        assert 1.4 < delta_time < 1.6, delta_time
+        assert 1 < delta_time < 1.4, delta_time
 
     # pre_embedding -> embedding -> handle
     # 0 + 0.5 + 1.0
