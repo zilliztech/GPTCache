@@ -1,8 +1,14 @@
 from typing import Optional, List, Any
-from pydantic import BaseModel
-from langchain.llms.base import LLM
 
 from gptcache.adapter.adapter import adapt
+from gptcache.utils import import_pydantic, import_langchain
+
+import_pydantic()
+import_langchain()
+
+# pylint: disable=C0413
+from pydantic import BaseModel
+from langchain.llms.base import LLM
 
 
 class LangChainLLMs(LLM, BaseModel):
