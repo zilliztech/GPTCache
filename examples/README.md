@@ -1,10 +1,10 @@
 # Example
 
-- [How to set the `embedding` function](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-embedding-function)
-- [How to set the `data manager` class](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-data-manager-class)
-- [How to set the `similarity evaluation` interface](https://github.com/zilliztech/gpt-cache/tree/main/examples#How-to-set-the-similarity-evaluation-interface)
-- [Other cache init params](https://github.com/zilliztech/gpt-cache/tree/main/examples#Other-cache-init-params)
-- [Benchmark](https://github.com/zilliztech/gpt-cache/tree/main/examples#Benchmark)
+- [How to set the `embedding` function](#How-to-set-the-embedding-function)
+- [How to set the `data manager` class](#How-to-set-the-data-manager-class)
+- [How to set the `similarity evaluation` interface](#How-to-set-the-similarity-evaluation-interface)
+- [Other cache init params](#Other-cache-init-params)
+- [Benchmark](#Benchmark)
 
 ## How to set the `embedding` function
 
