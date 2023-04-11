@@ -1,15 +1,27 @@
 name: codecov
-on: 
+
+on:
   push:
     branches:
       - main
+      - dev
     paths:
-      - .github/workflows/codecov.yaml
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/**'
   pull_request:
     branches:
       - main
+      - dev
     paths:
-      - .github/workflows/codecov.yaml
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   run:
