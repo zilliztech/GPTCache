@@ -1,0 +1,38 @@
+name: codecov
+on: 
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/codecov.yaml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/codecov.yaml
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+  steps:
+    # - name: work around permission
+    #   run: |
+    #     git config --global --add safe.directory /__w/towhee/towhee
+    #     rm -rf .git/hooks/post-checkout
+    - uses: actions/checkout@master
+    - name: Generate coverage report
+      run: |
+        rm -rf ./coverage.xml
+        pip install coverage codecov pytest pytest-xdist
+        # pip install -r requirements.txt
+        coverage run --source=gptcache  -m pytest ./tests/unit_tests
+        # coverage erase
+        # coverage run -m pytest
+        # coverage html
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3.1.0
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./htmlcov/index.html
+        fail_ci_if_error: true
