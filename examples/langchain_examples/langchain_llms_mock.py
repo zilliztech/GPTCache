@@ -7,6 +7,9 @@ from gptcache.adapter.langchain_llms import LangChainLLMs
 from gptcache import cache, Cache
 from gptcache.processor.pre import get_prompt
 
+OpenAI.api_key = os.getenv("OPENAI_API_KEY")
+Cohere.cohere_api_key = os.getenv("COHERE_API_KEY")
+
 
 def run():
     data_file = "data_map.txt"
@@ -24,18 +27,16 @@ def run():
 
     question = "foo0"
 
-    os.environ["OPENAI_API_KEY"] = "API"
     langchain_openai = OpenAI(model_name="text-ada-001")
-    llm = LangChainLLMs(langchain_openai)
+    llm = LangChainLLMs(llm=langchain_openai)
     answer = llm(question, cache_obj=llm_cache)
     print(answer)
     answer = llm(question, cache_obj=llm_cache)
     print(answer)
 
     # TODO install cohere auto
-    os.environ["COHERE_API_KEY"] = "API_KEY"
     langchain_cohere = Cohere()
-    llm = LangChainLLMs(langchain_cohere)
+    llm = LangChainLLMs(llm=langchain_cohere)
     answer = llm(question, cache_obj=llm_cache)
     print(answer)
 
