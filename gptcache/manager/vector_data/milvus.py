@@ -121,7 +121,9 @@ class Milvus(VectorBase):
         entities = [[key], data.reshape(1, self.dimension)]
         self.col.insert(entities)
 
-    def search(self, data: np.ndarray):
+    def search(self, data: np.ndarray, top_k: int = -1):
+        if top_k == -1:
+            top_k = self.top_k
         search_result = self.col.search(
             data=data.reshape(1, -1).tolist(),
             anns_field="embedding",

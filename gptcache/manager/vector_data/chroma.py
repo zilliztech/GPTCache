@@ -33,13 +33,14 @@ class Chromadb(VectorBase):
     def add(self, key, data):
         self._collection.add(embeddings=[data], ids=[key])
 
-    def search(self, data):
+    def search(self, data, top_k: int = -1):
         if self._collection.count() == 0:
             return []
-
+        if top_k == -1:
+            top_k = self.top_k
         results = self._collection.query(
             query_embeddings=[data],
-            n_results=self.top_k,
+            n_results=top_k,
             include=["distances"],
         )
         return list(zip(results["distances"][0], results["ids"][0]))

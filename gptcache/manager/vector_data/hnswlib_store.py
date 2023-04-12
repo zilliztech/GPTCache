@@ -32,9 +32,11 @@ class Hnswlib(VectorBase):
         np_data = np.array(data).astype("float32")
         self._index.add_items(np_data, np.asarray(keys))
 
-    def search(self, data: "ndarray"):
+    def search(self, data: "ndarray", top_k: int = -1):
         np_data = np.array(data).astype("float32").reshape(1, -1)
-        ids, dist = self._index.knn_query(data=np_data, k=self._top_k)
+        if top_k == -1:
+            top_k = self._top_k
+        ids, dist = self._index.knn_query(data=np_data, k=top_k)
         return list(zip(dist[0], ids[0]))
 
     def clear_strategy(self):
