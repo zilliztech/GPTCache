@@ -85,7 +85,7 @@ class MapDataManager(DataManager):
             with open(self.data_path, "wb") as f:
                 pickle.dump(self.data, f)
         except PermissionError:
-            print(f"You don't have permission to access this file <${self.data_path}>.")
+            print(f"You don't have permission to access this file <{self.data_path}>.")
 
 
 def normalize(vec):

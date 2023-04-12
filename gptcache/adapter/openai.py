@@ -4,6 +4,7 @@ from typing import Iterator
 import openai
 
 from gptcache.adapter.adapter import adapt
+from gptcache.utils.response import get_message_from_openai_answer, get_stream_message_from_openai_answer
 
 
 class ChatCompletion:
@@ -83,11 +84,3 @@ def construct_stream_resp_from_cache(return_message):
             "object": "chat.completion.chunk",
         },
     ]
-
-
-def get_message_from_openai_answer(openai_data):
-    return openai_data["choices"][0]["message"]["content"]
-
-
-def get_stream_message_from_openai_answer(openai_data):
-    return openai_data["choices"][0]["delta"].get("content", "")
