@@ -27,12 +27,5 @@ class VectorBase(ABC):
         pass
 
     @abstractmethod
-    def rebuild(self, ids) -> bool:
-        raise NotImplementedError
-
     def delete(self, ids) -> bool:
-        pass
-
-    @abstractmethod
-    def close(self):
         pass

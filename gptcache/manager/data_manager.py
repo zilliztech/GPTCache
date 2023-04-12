@@ -5,7 +5,7 @@ from typing import List, Any
 import cachetools
 import numpy as np
 
-from gptcache.utils.error import CacheError, NotFoundStrategyError, ParamError
+from gptcache.utils.error import CacheError, ParamError
 from gptcache.manager.scalar_data.base import CacheStorage, CacheData
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.manager.eviction import EvictionManager

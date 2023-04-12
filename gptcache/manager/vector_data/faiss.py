@@ -9,7 +9,6 @@ from gptcache.utils import import_faiss
 import_faiss()
 
 import faiss  # pylint: disable=C0413
-from faiss import Index  # pylint: disable=C0413
 
 
 class Faiss(VectorBase):
@@ -43,9 +42,6 @@ class Faiss(VectorBase):
     def delete(self, ids):
         ids_to_remove = np.array(ids)
         self._index.remove_ids(faiss.IDSelectorBatch(ids_to_remove.size, faiss.swig_ptr(ids_to_remove)))
-
-    def rebuild(self, ids=None):
-        return True
 
     def close(self):
         faiss.write_index(self._index, self._index_file_path)
