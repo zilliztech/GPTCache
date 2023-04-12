@@ -12,8 +12,21 @@
 
 import os
 import sys
+from m2r2 import parse_from_file
+
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('_exts'))
+from _exts.docgen import DocGen
+from _exts.indexCon import IndexCon
+
+# -- Preactions --------------------------------------------------------------
+
+# Prepare docs
+docgen = DocGen(output_dir='references')
+docgen.generate('gptcache')
+
+IndexCon('../README.md', 'index.rst')
 
 
 # -- Project information -----------------------------------------------------
@@ -45,6 +58,7 @@ extensions = [
     'sphinxcontrib.autodoc_pydantic',
     'sphinx_copybutton',
     'sphinx_panels',
+    'sphinx_toolbox.collapse'
 ]
 
 
@@ -56,7 +70,7 @@ myst_enable_extensions = [
     "html_image",
     "colon_fence",
     "smartquotes",
-    "replacements",
+    "replacements"
 ]
 
 autodoc_pydantic_model_show_json = False
