@@ -20,7 +20,7 @@ class TestSqliteInvalid(Base):
     ******************************************************************
     """
 
-    @pytest.mark.parametrize("threshold", [-1, 2, 2.0, "0.5"])
+    @pytest.mark.parametrize("threshold", [-1, 2, 2.0, 1000, "0.5"])
     @pytest.mark.tags("L1")
     def test_invalid_similarity_threshold(self, threshold):
         """

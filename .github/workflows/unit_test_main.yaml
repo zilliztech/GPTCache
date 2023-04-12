@@ -68,30 +68,9 @@ jobs:
           coverage run --source=gptcache  -m pytest ./tests
           coverage xml
 
-      - name: Upload code coverage results
-        uses: actions/upload-artifact@v3
-        with:
-          name: code-coverage-result
-          path: |
-            coverage.xml
-
-  codecov:
-    name: Code coverage
-    needs: unit-test-main
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download code coverage results
-        uses: actions/download-artifact@v3.0.1
-        with:
-          name: code-coverage-result
-
-      - name: Display structure of code coverage results
-        run: |
-          ls -lah
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: true

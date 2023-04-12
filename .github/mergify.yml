@@ -62,6 +62,8 @@ pull_request_rules:
       - "status-success=pylint"
       - "status-success=build-pypi"
       - "status-success=unit-test-main"
+      - "status-success=codecov/patch"
+      - "status-success=codecov/project"
     actions:
       label:
         add:
