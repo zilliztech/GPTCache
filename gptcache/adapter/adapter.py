@@ -14,7 +14,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     cache_skip = kwargs.pop("cache_skip", False)
     cache_factor = kwargs.pop("cache_factor", 1.0)
     pre_embedding_data = chat_cache.pre_embedding_func(
-        kwargs, extra_param=context.get("pre_embedding_func", None)
+        kwargs,
+        extra_param=context.get("pre_embedding_func", None),
+        prompts=chat_cache.config.prompts,
     )
     if cache_enable:
         embedding_data = time_cal(

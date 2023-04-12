@@ -1,7 +1,7 @@
 import atexit
 import os
 import time
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Callable
 
 import openai
 
@@ -52,9 +52,10 @@ class Config:
     """
 
     def __init__(
-        self,
-        log_time_func=None,
-        similarity_threshold=0.8,
+            self,
+            log_time_func: Optional[Callable[[str, float], None]] = None,
+            similarity_threshold: float = 0.8,
+            prompts: Optional[List[str]] = None
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError(
@@ -62,6 +63,7 @@ class Config:
             )
         self.log_time_func = log_time_func
         self.similarity_threshold = similarity_threshold
+        self.prompts = prompts
 
 
 class Report:
@@ -145,15 +147,15 @@ class Cache:
         self.next_cache = None
 
     def init(
-        self,
-        cache_enable_func=cache_all,
-        pre_embedding_func=last_content,
-        embedding_func=string_embedding,
-        data_manager: DataManager = get_data_manager(),
-        similarity_evaluation=ExactMatchEvaluation(),
-        post_process_messages_func=first,
-        config=Config(),
-        next_cache=None,
+            self,
+            cache_enable_func=cache_all,
+            pre_embedding_func=last_content,
+            embedding_func=string_embedding,
+            data_manager: DataManager = get_data_manager(),
+            similarity_evaluation=ExactMatchEvaluation(),
+            post_process_messages_func=first,
+            config=Config(),
+            next_cache=None,
     ):
         """Pass parameters to initialize GPTCache.
 
