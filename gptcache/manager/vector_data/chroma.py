@@ -1,4 +1,6 @@
-from gptcache.manager.vector_data.base import VectorBase, ClearStrategy
+from typing import List
+
+from gptcache.manager.vector_data.base import VectorBase, ClearStrategy, VectorData
 from gptcache.utils import import_chromadb
 
 import_chromadb()
@@ -30,8 +32,9 @@ class Chromadb(VectorBase):
         self._persist_directory = persist_directory
         self._collection = self._client.get_or_create_collection(name=collection_name)
 
-    def add(self, key, data):
-        self._collection.add(embeddings=[data], ids=[key])
+    def mul_add(self, datas: List[VectorData]):
+        data_array, id_array = map(list, zip(*((data.data, str(data.id)) for data in datas)))
+        self._collection.add(embeddings=data_array, ids=id_array)
 
     def search(self, data):
         if self._collection.count() == 0:

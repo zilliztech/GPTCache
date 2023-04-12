@@ -23,23 +23,8 @@ create_conda_env:
 remove_conda_env:
 	@bash ./scripts/manage_conda_env.sh remove
 
-docs_build:
-	cd docs && poetry run make html
-
-docs_clean:
-	cd docs && poetry run make clean
-
-docs_linkcheck:
-	poetry run linkchecker docs/_build/html/index.html
-
-PYTHON_FILES=.
-lint: PYTHON_FILES=.
-lint_diff: PYTHON_FILES=$(shell git diff --name-only --diff-filter=d master | grep -E '\.py$$')
-
-lint lint_diff:
-	poetry run mypy $(PYTHON_FILES)
-	poetry run black $(PYTHON_FILES) --check
-	poetry run ruff .
-
 pylint_check:
 	pylint --rcfile=pylint.conf --output-format=colorized gptcache
+
+pytest:
+	pytest tests/

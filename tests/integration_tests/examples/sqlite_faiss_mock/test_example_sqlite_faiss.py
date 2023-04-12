@@ -34,10 +34,9 @@ def test_sqlite_faiss():
         {"role": "user", "content": "foo"},
     ]
     if not has_data:
-        for i in range(10):
-            question = f"foo{i}"
-            answer = f"receiver the foo {i}"
-            cache.data_manager.save(question, answer, cache.embedding_func(question))
+        cache.import_data(
+            [f"foo{i}" for i in range(10)], [f"receiver the foo {i}" for i in range(10)]
+        )
 
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
