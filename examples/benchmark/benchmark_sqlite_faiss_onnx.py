@@ -65,12 +65,8 @@ def run():
 
     if not has_data:
         print('insert data')
-        id_origin = {}
-        for pair in mock_data:
-            question = pair['origin']
-            answer = pair['id']
-            id_origin[answer] = question
-            cache.data_manager.save(question, answer, cache.embedding_func(question))
+        questions, answers = zip(*((pair['origin'], pair['id']) for pair in mock_data))
+        cache.import_data(questions=questions, answers=answers)
         print('end insert data')
 
     all_time = 0.0

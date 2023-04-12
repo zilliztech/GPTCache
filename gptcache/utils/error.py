@@ -5,7 +5,7 @@ class CacheError(Exception):
 class NotInitError(CacheError):
     """Raise when the cache has been used before it's inited"""
     def __init__(self):
-        super().__init__("the cache should be inited before using")
+        super().__init__("The cache should be inited before using")
 
 
 class NotFoundStoreError(CacheError):
@@ -22,3 +22,8 @@ class PipInstallError(CacheError):
     """Raise when failed to install package."""
     def __init__(self, package):
         super().__init__(f"Ran into error installing {package}.")
+
+
+class NotFoundStrategyError(CacheError):
+    def __init__(self, strategy):
+        super().__init__(f"Unsupported vector store strategy, {strategy}.")

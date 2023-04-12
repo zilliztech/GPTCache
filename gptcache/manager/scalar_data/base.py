@@ -1,6 +1,15 @@
 from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass
+from typing import Optional, Any, List
 
 import numpy as np
+
+
+@dataclass
+class CacheData:
+    question: Any
+    answer: Any
+    embedding_data: Optional[np.ndarray] = None
 
 
 class CacheStorage(metaclass=ABCMeta):
@@ -13,7 +22,7 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def insert(self, data, reply, embedding_data: np.ndarray = None):
+    def batch_insert(self, datas: List[CacheData]):
         pass
 
     @abstractmethod

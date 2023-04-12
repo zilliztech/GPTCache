@@ -23,24 +23,17 @@ def test_map():
     ]
 
     if not os.path.isfile(bak_data_file):
-        for i in range(10):
-            question = f"foo{i}"
-            answer = f"receiver the foo {i}"
-            cache.data_manager.save(question, answer, cache.embedding_func(question))
+        cache.import_data(
+            [f"foo{i}" for i in range(10)], [f"receiver the foo {i}" for i in range(10)]
+        )
     if not os.path.isfile(data_file):
-        for i in range(10, 20):
-            question = f"foo{i}"
-            answer = f"receiver the foo {i}"
-            bak_cache.data_manager.save(
-                question, answer, bak_cache.embedding_func(question)
-            )
+        bak_cache.import_data(
+            [f"foo{i}" for i in range(10, 20)],
+            [f"receiver the foo {i}" for i in range(10, 20)],
+        )
 
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,
     )
     print(answer)
-
-
-# if __name__ == "__main__":
-#     run()

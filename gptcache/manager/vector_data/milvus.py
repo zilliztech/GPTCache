@@ -1,8 +1,9 @@
+from typing import List
 from uuid import uuid4
 import numpy as np
 
 from gptcache.utils import import_pymilvus
-from gptcache.manager.vector_data.base import VectorBase, ClearStrategy
+from gptcache.manager.vector_data.base import VectorBase, ClearStrategy, VectorData
 
 import_pymilvus()
 
@@ -117,8 +118,10 @@ class Milvus(VectorBase):
 
         self.col.load()
 
-    def add(self, key: str, data: np.ndarray):
-        entities = [[key], data.reshape(1, self.dimension)]
+    def mul_add(self, datas: List[VectorData]):
+        data_array, id_array = map(list, zip(*((data.data, data.id) for data in datas)))
+        np_data = np.array(data_array).astype("float32")
+        entities = [id_array, np_data]
         self.col.insert(entities)
 
     def search(self, data: np.ndarray):
