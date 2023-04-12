@@ -5,9 +5,9 @@ from typing import List, Any
 import cachetools
 import numpy as np
 
-from gptcache.utils.error import CacheError, NotFoundStrategyError, ParamError
+from gptcache.utils.error import CacheError, ParamError
 from gptcache.manager.scalar_data.base import CacheStorage, CacheData
-from gptcache.manager.vector_data.base import VectorBase, ClearStrategy, VectorData
+from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.manager.eviction import EvictionManager
 
 
@@ -123,14 +123,8 @@ class SSDataManager(DataManager):
 
     def _clear(self):
         self.eviction.soft_evict(self.clean_size)
-        if not self.eviction.check_evict():
-            pass
-        elif self.v.clear_strategy() == ClearStrategy.DELETE:
+        if self.eviction.check_evict():
             self.eviction.delete()
-        elif self.v.clear_strategy() == ClearStrategy.REBUILD:
-            self.eviction.rebuild()
-        else:
-            raise RuntimeError("Unknown clear strategy")
         self.cur_size = self.s.count()
 
     def save(self, question, answer, embedding_data, **kwargs):
@@ -168,18 +162,13 @@ class SSDataManager(DataManager):
             normalize(embedding_data) for embedding_data in embedding_datas
         ]
         for i, embedding_data in enumerate(embedding_datas):
-            if self.v.clear_strategy() == ClearStrategy.DELETE:
-                cache_datas.append(CacheData(question=questions[i], answer=answers[i]))
-            elif self.v.clear_strategy() == ClearStrategy.REBUILD:
-                cache_datas.append(
-                    CacheData(
-                        question=questions[i],
-                        answer=answers[i],
-                        embedding_data=embedding_data.astype("float32"),
-                    )
+            cache_datas.append(
+                CacheData(
+                    question=questions[i],
+                    answer=answers[i],
+                    embedding_data=embedding_data.astype("float32"),
                 )
-            else:
-                raise NotFoundStrategyError(self.v.clear_strategy())
+            )
         ids = self.s.batch_insert(cache_datas)
         self.v.mul_add(
             [

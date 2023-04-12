@@ -34,6 +34,10 @@ def VectorBase(name: str, **kwargs):
     :type index_params: dict
     :param collection_name: the name of the collection for Milvus vector database, defaults to 'gptcache'.
     :type collection_name: str.
+    :param local_mode: if true, will start a local mivlus server.
+    :type local_mode: bool.
+    :param local_data: required when local_mode is True.
+    :type local_data: str.
 
     :param index_path: the path to hnswlib index, defaults to 'hnswlib_index.bin'.
     :type index_path: str.

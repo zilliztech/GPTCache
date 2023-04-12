@@ -1,14 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
 from typing import List
 
 import numpy as np
-
-
-class ClearStrategy(Enum):
-    REBUILD = 0
-    DELETE = 1
 
 
 @dataclass
@@ -29,15 +23,13 @@ class VectorBase(ABC):
         pass
 
     @abstractmethod
-    def clear_strategy(self):
+    def rebuild(self, ids=None) -> bool:
         pass
 
-    def rebuild(self, all_data, keys) -> bool:
-        raise NotImplementedError
-
+    @abstractmethod
     def delete(self, ids) -> bool:
-        raise NotImplementedError
+        pass
 
     @abstractmethod
-    def close(self):
+    def close(self) -> bool:
         pass
