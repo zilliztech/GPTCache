@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from gptcache.manager.vector_data.base import VectorBase, ClearStrategy
+from gptcache.manager.vector_data.base import VectorBase
 from gptcache.utils import import_faiss
 
 import_faiss()
@@ -15,41 +15,41 @@ class Faiss(VectorBase):
 
     index: Index
 
-    def __init__(self, index_file_path, dimension, top_k, skip_file=False):
-        self.index_file_path = index_file_path
-        self.dimension = dimension
-        self.index = faiss.index_factory(self.dimension, "IDMap,Flat", faiss.METRIC_L2)
-        self.top_k = top_k
-        if os.path.isfile(index_file_path) and not skip_file:
-            self.index = faiss.read_index(index_file_path)
+    def __init__(self, index_file_path, dimension, top_k):
+        self._index_file_path = index_file_path
+        self._dimension = dimension
+        self._index = faiss.index_factory(self._dimension, "IDMap,Flat", faiss.METRIC_L2)
+        self._top_k = top_k
+        if os.path.isfile(index_file_path):
+            self._index = faiss.read_index(index_file_path)
 
     def add(self, key: int, data: "ndarray"):
         np_data = np.array(data).astype("float32").reshape(1, -1)
         ids = np.array([key])
-        self.index.add_with_ids(np_data, ids)
+        self._index.add_with_ids(np_data, ids)
 
-    def _mult_add(self, datas, keys):
-        np_data = np.array(datas).astype("float32")
+    def _mult_add(self, data, keys):
+        np_data = np.array(data).astype("float32")
         ids = np.array(keys).astype(np.int64)
-        self.index.add_with_ids(np_data, ids)
+        self._index.add_with_ids(np_data, ids)
 
     def search(self, data: "ndarray"):
-        if self.index.ntotal == 0:
+        if self._index.ntotal == 0:
             return None
         np_data = np.array(data).astype("float32").reshape(1, -1)
-        dist, ids = self.index.search(np_data, self.top_k)
+        dist, ids = self._index.search(np_data, self._top_k)
         ids = [int(i) for i in ids[0]]
-        return zip(dist[0], ids)
+        return list(zip(dist[0], ids))
 
-    def clear_strategy(self):
-        return ClearStrategy.REBUILD
+    def rebuild(self, ids=None):
+        return True
 
-    def rebuild(self, all_data, keys):
-        f = Faiss(
-            self.index_file_path, self.dimension, top_k=self.top_k, skip_file=True
-        )
-        f._mult_add(all_data, keys)  # pylint: disable=protected-access
-        return f
+    def delete(self, ids):
+        ids_to_remove = np.array(ids)
+        self._index.remove_ids(faiss.IDSelectorBatch(ids_to_remove.size, faiss.swig_ptr(ids_to_remove)))
 
     def close(self):
-        faiss.write_index(self.index, self.index_file_path)
+        faiss.write_index(self._index, self._index_file_path)
+
+    def count(self):
+        return self._index.ntotal

@@ -1,4 +1,4 @@
-from gptcache.manager.vector_data.base import VectorBase, ClearStrategy
+from gptcache.manager.vector_data.base import VectorBase
 from gptcache.utils import import_chromadb
 
 import_chromadb()
@@ -44,11 +44,11 @@ class Chromadb(VectorBase):
         )
         return list(zip(results["distances"][0], results["ids"][0]))
 
-    def clear_strategy(self):
-        return ClearStrategy.DELETE
-
     def delete(self, ids):
         self._collection.delete(ids)
+
+    def rebuild(self, ids=None):  # pylint: disable=unused-argument
+        return True
 
     def close(self):
         return True

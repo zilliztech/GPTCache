@@ -5,7 +5,7 @@ import numpy as np
 
 from gptcache.utils.error import CacheError
 from gptcache.manager.scalar_data.base import CacheStorage
-from gptcache.manager.vector_data.base import VectorBase, ClearStrategy
+from gptcache.manager.vector_data.base import VectorBase
 from gptcache.manager.eviction import EvictionManager
 
 
@@ -107,14 +107,8 @@ class SSDataManager(DataManager):
 
     def _clear(self):
         self.eviction.soft_evict(self.clean_size)
-        if not self.eviction.check_evict():
-            pass
-        elif self.v.clear_strategy() == ClearStrategy.DELETE:
+        if self.eviction.check_evict():
             self.eviction.delete()
-        elif self.v.clear_strategy() == ClearStrategy.REBUILD:
-            self.eviction.rebuild()
-        else:
-            raise RuntimeError("Unknown clear strategy")
         self.cur_size = self.s.count()
 
     def save(self, question, answer, embedding_data, **kwargs):
@@ -140,10 +134,7 @@ class SSDataManager(DataManager):
         if self.cur_size >= self.max_size:
             self._clear()
         embedding_data = normalize(embedding_data)
-        if self.v.clear_strategy() == ClearStrategy.DELETE:
-            key = self.s.insert(question, answer)
-        elif self.v.clear_strategy() == ClearStrategy.REBUILD:
-            key = self.s.insert(question, answer, embedding_data.astype("float32"))
+        key = self.s.insert(question, answer, embedding_data.astype("float32"))
         self.v.add(key, embedding_data)
         self.cur_size += 1
 

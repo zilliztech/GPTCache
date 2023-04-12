@@ -1,10 +1,4 @@
 from abc import ABC, abstractmethod
-from enum import Enum
-
-
-class ClearStrategy(Enum):
-    REBUILD = 0
-    DELETE = 1
 
 
 class VectorBase(ABC):
@@ -19,14 +13,12 @@ class VectorBase(ABC):
         pass
 
     @abstractmethod
-    def clear_strategy(self):
+    def rebuild(self, ids=None) -> bool:
         pass
 
-    def rebuild(self) -> bool:
-        raise NotImplementedError
-
+    @abstractmethod
     def delete(self, ids) -> bool:
-        raise NotImplementedError
+        pass
 
     @abstractmethod
     def close(self):
