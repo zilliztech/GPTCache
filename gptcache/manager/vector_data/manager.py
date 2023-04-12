@@ -53,6 +53,8 @@ class VectorBase:
             collection_name = kwargs.get("collection_name", COLLECTION_NAME)
             index_params = kwargs.get("index_params", MILVUS_INDEX_PARAMS)
             search_params = kwargs.get("search_params", None)
+            local_mode = kwargs.get("local_mode", False)
+            local_data = kwargs.get("local_data", "./milvus_data")
             vector_base = Milvus(
                 host=host,
                 port=port,
@@ -64,6 +66,8 @@ class VectorBase:
                 top_k=top_k,
                 index_params=index_params,
                 search_params=search_params,
+                local_mode=local_mode,
+                local_data=local_data
             )
         elif name == "faiss":
             from gptcache.manager.vector_data.faiss import Faiss

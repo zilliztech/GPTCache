@@ -1,5 +1,6 @@
 __all__ = [
     "import_pymilvus",
+    "import_milvus_lite",
     "import_huggingface_hub",
     "import_faiss",
     "import_hnswlib",
@@ -32,6 +33,10 @@ def _check_library(libname: str, prompt: bool = True, package: Optional[str] = N
 
 def import_pymilvus():
     _check_library("pymilvus")
+
+
+def import_milvus_lite():
+    _check_library("milvus")
 
 
 def import_sbert():
