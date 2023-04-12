@@ -6,6 +6,7 @@ __all__ = [
     "NumpyNormEvaluation",
     "SearchDistanceEvaluation",
     "ExactMatchEvaluation",
+    "KReciprocalEvaluation"
 ]
 
 from gptcache.utils.lazy_import import LazyImport
@@ -16,6 +17,10 @@ distance = LazyImport("simple", globals(), "gptcache.similarity_evaluation.dista
 exact_match = LazyImport(
     "exact_match", globals(), "gptcache.similarity_evaluation.exact_match"
 )
+kreciprocal = LazyImport(
+    "kreciprocal", globals(), "gptcache.similarity_evaluation.kreciprocal"
+)
+
 
 
 def OnnxModelEvaluation(model="GPTCache/albert-duplicate-onnx"):
@@ -32,3 +37,7 @@ def SearchDistanceEvaluation(max_distance=4.0, positive=False):
 
 def ExactMatchEvaluation():
     return exact_match.ExactMatchEvaluation()
+
+def KReciprocalEvaluation(vectordb, top_k=3, max_distance=4.0, positive=False):
+    return kreciprocal.KReciprocalEvaluation(vectordb, top_k, max_distance, positive)
+

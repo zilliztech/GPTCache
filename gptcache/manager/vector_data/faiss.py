@@ -28,11 +28,13 @@ class Faiss(VectorBase):
         ids = np.array(id_array)
         self._index.add_with_ids(np_data, ids)
 
-    def search(self, data: np.ndarray):
+    def search(self, data: np.ndarray, top_k = -1):
         if self._index.ntotal == 0:
             return None
+        if top_k == -1:
+            top_k = self._top_k
         np_data = np.array(data).astype("float32").reshape(1, -1)
-        dist, ids = self._index.search(np_data, self._top_k)
+        dist, ids = self._index.search(np_data, top_k)
         ids = [int(i) for i in ids[0]]
         return list(zip(dist[0], ids))
 
