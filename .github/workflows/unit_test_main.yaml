@@ -44,6 +44,7 @@ jobs:
 
       - name: Build and install
         shell: bash
+        timeout-minutes: 10
         run: |
           python setup.py install
 
@@ -63,7 +64,6 @@ jobs:
       - name: Generate coverage report
         run: |
           rm -rf ./coverage.xml
-          pip install coverage codecov pytest pytest-cov
           coverage erase
           coverage run --source=gptcache  -m pytest ./tests
           coverage xml
