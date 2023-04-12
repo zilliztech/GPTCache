@@ -5,7 +5,6 @@
    :maxdepth: 1
    :caption: Contents:
 
-   gptcache
-   manager
-   embedding
-   similarity_evaluation
+{% for module in modules %}
+   {{ module[0] }} 
+{%- endfor -%}
