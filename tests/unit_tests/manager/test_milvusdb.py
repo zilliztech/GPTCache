@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 
 from gptcache.manager.vector_data.milvus import Milvus
 from gptcache.manager.vector_data import VectorBase
+from gptcache.manager.vector_data.base import VectorData
 
 
 class TestMilvusDB(unittest.TestCase):
@@ -16,10 +17,9 @@ class TestMilvusDB(unittest.TestCase):
             db = Milvus(top_k=top_k, dimension=dim, port='10086', local_mode=True, local_data=str(root),
                         index_params={"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 128}})
             data = np.random.randn(size, dim).astype(np.float32)
-            for i in range(size):
-                db.add(i, data[i])
+            db.mul_add([VectorData(id=i, data=v) for v, i in zip(data, range(size))])
             self.assertEqual(len(db.search(data[0])), top_k)
-            db.add(size, data[0])
+            db.mul_add([VectorData(id=size, data=data[0])])
             ret = db.search(data[0])
             self.assertIn(ret[0][1], [0, size])
             self.assertIn(ret[1][1], [0, size])

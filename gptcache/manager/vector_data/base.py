@@ -1,15 +1,25 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import List
+
+import numpy as np
+
+
+@dataclass
+class VectorData:
+    id: int
+    data: np.ndarray
 
 
 class VectorBase(ABC):
     """VectorBase: base vector store interface"""
 
     @abstractmethod
-    def add(self, key: str, data: "ndarray"):
+    def mul_add(self, datas: List[VectorData]):
         pass
 
     @abstractmethod
-    def search(self, data: "ndarray"):
+    def search(self, data: np.ndarray):
         pass
 
     @abstractmethod
@@ -17,6 +27,9 @@ class VectorBase(ABC):
         pass
 
     @abstractmethod
+    def rebuild(self, ids) -> bool:
+        raise NotImplementedError
+
     def delete(self, ids) -> bool:
         pass
 

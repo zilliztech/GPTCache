@@ -7,6 +7,7 @@ from pathlib import Path
 from gptcache.manager.vector_data.faiss import Faiss
 from gptcache.manager.vector_data.hnswlib_store import Hnswlib
 from gptcache.manager.vector_data import VectorBase
+from gptcache.manager.vector_data.base import VectorData
 
 
 class TestLocalIndex(unittest.TestCase):
@@ -39,9 +40,9 @@ class TestLocalIndex(unittest.TestCase):
             top_k = 10
             index = vector_class(index_path, dim, top_k)
             data = np.random.randn(size, dim).astype(np.float32)
-            index._mult_add(data, list(range(size)))
+            index.mul_add([VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))])
             self.assertEqual(len(index.search(data[0])), top_k)
-            index.add(size, data[0])
+            index.mul_add([VectorData(id=size, data=data[0])])
             ret = index.search(data[0])
             self.assertIn(ret[0][1], [0, size])
             self.assertIn(ret[1][1], [0, size])
@@ -54,7 +55,7 @@ class TestLocalIndex(unittest.TestCase):
             top_k = 10
             index = vector_class(index_path, dim, top_k)
             data = np.random.randn(size, dim).astype(np.float32)
-            index._mult_add(data, list(range(size)))
+            index.mul_add([VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))])
             index.delete([0, 1, 2])
             index.rebuild(list(range(3, size)))
             self.assertNotEqual(index.search(data[0])[0], 0)
@@ -67,12 +68,12 @@ class TestLocalIndex(unittest.TestCase):
             top_k = 10
             index = vector_class(index_path, dim, top_k)
             data = np.random.randn(size, dim).astype(np.float32)
-            index._mult_add(data, list(range(size)))
+            index.mul_add([VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))])
             index.close()
 
             new_index = vector_class(index_path, dim, top_k)
             self.assertEqual(len(new_index.search(data[0])), top_k)
-            new_index.add(size, data[0])
+            new_index.mul_add([VectorData(id=size, data=data[0])])            
             ret = new_index.search(data[0])
             self.assertIn(ret[0][1], [0, size])
             self.assertIn(ret[1][1], [0, size])
@@ -85,7 +86,7 @@ class TestLocalIndex(unittest.TestCase):
             top_k = 10
             index = vector_class(index_path, dim, top_k)
             data = np.random.randn(size, dim).astype(np.float32)
-            index._mult_add(data, list(range(size)))
+            index.mul_add([VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))])
             self.assertEqual(len(index.search(data[0])), top_k)
             index.delete([0, 1, 2, 3])
             self.assertNotEqual(index.search(data[0])[0][1], 0)
@@ -95,6 +96,5 @@ class TestLocalIndex(unittest.TestCase):
     def _internal_test_create_from_vector_base(self, **kwargs):
         index = VectorBase(**kwargs)
         data = np.random.randn(100, 512).astype(np.float32)
-        for i in range(100):
-            index.add(i, data[i])
+        index.mul_add([VectorData(id=i, data=v) for v, i in zip(data, range(100))])
         self.assertEqual(index.search(data[0])[0][1], 0)

@@ -25,20 +25,17 @@ def test_sqlite_faiss_onnx():
         embedding_func=onnx.to_embeddings,
         data_manager=data_manager,
         similarity_evaluation=SearchDistanceEvaluation(),
-        config=Config(
-            log_time_func=log_time_func,
-            similarity_threshold=0.9
-        ),
+        config=Config(log_time_func=log_time_func, similarity_threshold=0.9),
     )
 
     if not has_data:
         question = "what do you think about chatgpt"
         answer = "chatgpt is a good application"
-        cache.data_manager.save(question, answer, cache.embedding_func(question))
+        cache.import_data([question], [answer])
 
     mock_messages = [
-        {'role': 'system', 'content': 'You are a helpful assistant.'},
-        {'role': 'user', 'content': 'what do you think chatgpt'}
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "what do you think chatgpt"},
     ]
 
     start_time = time.time()

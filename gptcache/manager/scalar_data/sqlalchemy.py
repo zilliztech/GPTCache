@@ -1,8 +1,9 @@
-import numpy as np
+from typing import List
+
 from datetime import datetime
 
 from gptcache.utils import import_sqlalchemy
-from gptcache.manager.scalar_data.base import CacheStorage
+from gptcache.manager.scalar_data.base import CacheStorage, CacheData
 
 import_sqlalchemy()
 
@@ -29,8 +30,8 @@ def get_model(table_name, db_type):
         __table_args__ = {"extend_existing": True}
 
         id = Column(Integer, primary_key=True, autoincrement=True)
-        data = Column(String(1000), nullable=False)
-        reply = Column(String(1000), nullable=False)
+        question = Column(String(1000), nullable=False)
+        answer = Column(String(1000), nullable=False)
         create_on = Column(DateTime, default=datetime.now)
         last_access = Column(DateTime, default=datetime.now)
         embedding_data = Column(LargeBinary, nullable=True)
@@ -48,8 +49,8 @@ def get_model(table_name, db_type):
         id = Column(
             Integer, Sequence("id_seq", start=1), primary_key=True, autoincrement=True
         )
-        data = Column(String(1000), nullable=False)
-        reply = Column(String(1000), nullable=False)
+        question = Column(String(1000), nullable=False)
+        answer = Column(String(1000), nullable=False)
         create_on = Column(DateTime, default=datetime.now)
         last_access = Column(DateTime, default=datetime.now)
         embedding_data = Column(LargeBinary, nullable=True)
@@ -68,10 +69,10 @@ class SQLDataBase(CacheStorage):
     """
 
     def __init__(
-            self,
-            db_type: str = "sqlite",
-            url: str = "sqlite:///./sqlite.db",
-            table_name: str = "gptcache",
+        self,
+        db_type: str = "sqlite",
+        url: str = "sqlite:///./sqlite.db",
+        table_name: str = "gptcache",
     ):
         self._url = url
         self._model = get_model(table_name, db_type)
@@ -83,19 +84,25 @@ class SQLDataBase(CacheStorage):
     def create(self):
         self._model.__table__.create(bind=self._engine, checkfirst=True)
 
-    def insert(self, data, reply, embedding_data: np.ndarray = None):
-        if embedding_data is None:
-            model_obj = self._model(data=data, reply=reply)
-        else:
-            embedding_data = embedding_data.tobytes()
-            model_obj = self._model(data=data, reply=reply, embedding_data=embedding_data)
-        self._session.add(model_obj)
+    def batch_insert(self, datas: List[CacheData]):
+        model_objs = []
+        for data in datas:
+            model_obj = self._model(
+                question=data.question,
+                answer=data.answer,
+                embedding_data=data.embedding_data.tobytes()
+                if data.embedding_data is not None
+                else None,
+            )
+            model_objs.append(model_obj)
+
+        self._session.add_all(model_objs)
         self._session.commit()
-        return model_obj.id
+        return [model_obj.id for model_obj in model_objs]
 
     def get_data_by_id(self, key):
         res = (
-            self._session.query(self._model.data, self._model.reply)
+            self._session.query(self._model.question, self._model.answer)
             .filter(self._model.id == key)
             .filter(self._model.state == 0)
             .first()
