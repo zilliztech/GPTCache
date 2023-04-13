@@ -1,6 +1,6 @@
 import math
 
-from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
+from gptcache.similarity_evaluation import SearchDistanceEvaluation
 
 
 def test_search_distance_evaluation():

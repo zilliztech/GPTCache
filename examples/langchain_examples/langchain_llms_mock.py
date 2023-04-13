@@ -29,15 +29,15 @@ def run():
 
     langchain_openai = OpenAI(model_name="text-ada-001")
     llm = LangChainLLMs(llm=langchain_openai)
-    answer = llm(question, cache_obj=llm_cache)
+    answer = llm(prompt=question, cache_obj=llm_cache)
     print(answer)
-    answer = llm(question, cache_obj=llm_cache)
+    answer = llm(prompt=question, cache_obj=llm_cache)
     print(answer)
 
     # TODO install cohere auto
     langchain_cohere = Cohere()
     llm = LangChainLLMs(llm=langchain_cohere)
-    answer = llm(question, cache_obj=llm_cache)
+    answer = llm(prompt=question, cache_obj=llm_cache)
     print(answer)
 
 

@@ -38,6 +38,7 @@ def SearchDistanceEvaluation(max_distance=4.0, positive=False):
 def ExactMatchEvaluation():
     return exact_match.ExactMatchEvaluation()
 
+
 def KReciprocalEvaluation(vectordb, top_k=3, max_distance=4.0, positive=False):
     return kreciprocal.KReciprocalEvaluation(vectordb, top_k, max_distance, positive)
 

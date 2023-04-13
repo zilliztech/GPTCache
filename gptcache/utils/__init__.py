@@ -1,25 +1,26 @@
 __all__ = [
     "import_pymilvus",
     "import_milvus_lite",
+    "import_sbert",
+    "import_cohere",
+    "import_fasttext",
+    "import_huggingface",
+    "import_torch",
     "import_huggingface_hub",
+    "import_onnxruntime",
     "import_faiss",
     "import_hnswlib",
     "import_chromadb",
     "import_sqlalchemy",
     "import_sql_client",
-    "import_huggingface",
-    "import_torch",
-    "import_sbert",
-    "import_onnxruntime",
-    "import_cohere",
-    "import_fasttext",
+    "import_pydantic",
+    "import_langchain",
 ]
 
 import importlib.util
 from typing import Optional
 
 from gptcache.utils.dependency_control import prompt_install
-
 
 
 def _check_library(libname: str, prompt: bool = True, package: Optional[str] = None):
