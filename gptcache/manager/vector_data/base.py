@@ -19,7 +19,7 @@ class VectorBase(ABC):
         pass
 
     @abstractmethod
-    def search(self, data: np.ndarray):
+    def search(self, data: np.ndarray, top_k: int):
         pass
 
     @abstractmethod

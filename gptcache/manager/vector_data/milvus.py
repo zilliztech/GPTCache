@@ -144,12 +144,14 @@ class Milvus(VectorBase):
         entities = [id_array, np_data]
         self.col.insert(entities)
 
-    def search(self, data: np.ndarray):
+    def search(self, data: np.ndarray, top_k: int = -1):
+        if top_k == -1:
+            top_k = self.top_k
         search_result = self.col.search(
             data=data.reshape(1, -1).tolist(),
             anns_field="embedding",
             param=self.search_params,
-            limit=self.top_k,
+            limit=top_k,
         )
         return list(zip(search_result[0].distances, search_result[0].ids))
 

@@ -36,9 +36,11 @@ class Hnswlib(VectorBase):
         ids = np.array(id_array)
         self._index.add_items(np_data, ids)
 
-    def search(self, data: np.ndarray):
+    def search(self, data: np.ndarray, top_k: int = -1):
         np_data = np.array(data).astype("float32").reshape(1, -1)
-        ids, dist = self._index.knn_query(data=np_data, k=self._top_k)
+        if top_k == -1:
+            top_k = self._top_k
+        ids, dist = self._index.knn_query(data=np_data, k=top_k)
         return list(zip(dist[0], ids[0]))
 
     def rebuild(self, ids):
