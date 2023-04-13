@@ -31,5 +31,5 @@ def Onnx(model="GPTCache/paraphrase-albert-onnx"):
     return onnx.Onnx(model)
 
 
-def FastText(model="large", dim=None):
+def FastText(model="en", dim=None):
     return fasttext.FastText(model, dim)

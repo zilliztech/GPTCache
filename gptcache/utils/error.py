@@ -22,8 +22,3 @@ class PipInstallError(CacheError):
     """Raise when failed to install package."""
     def __init__(self, package):
         super().__init__(f"Ran into error installing {package}.")
-
-
-class NotFoundStrategyError(CacheError):
-    def __init__(self, strategy):
-        super().__init__(f"Unsupported vector store strategy, {strategy}.")

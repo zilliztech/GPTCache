@@ -3,8 +3,8 @@ import numpy as np
 from gptcache.utils import import_huggingface, import_torch
 from gptcache.embedding.base import BaseEmbedding
 
-import_huggingface()
 import_torch()
+import_huggingface()
 
 import torch  # pylint: disable=C0413
 from transformers import AutoTokenizer, AutoModel  # pylint: disable=C0413

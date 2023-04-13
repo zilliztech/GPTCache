@@ -1,8 +1,8 @@
 import os
 import time
-
+from gptcache.utils.error import NotInitError
 from gptcache.adapter.adapter import adapt
-from gptcache import cache, time_cal, get_data_manager
+from gptcache import cache, time_cal, get_data_manager, Cache
 
 data_map_path = "data_map.txt"
 
@@ -102,3 +102,14 @@ def test_adapt():
         data_manager=map_manager,
     )
     time_cal(add2, report_func=report_func)()
+
+
+def test_not_init_cache():
+    foo_cache = Cache()
+    is_exception = False
+    try:
+        adapt(None, None, None, cache_obj=foo_cache)
+    except NotInitError:
+        is_exception = True
+
+    assert is_exception

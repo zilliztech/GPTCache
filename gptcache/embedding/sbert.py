@@ -51,5 +51,5 @@ class SBERT(BaseEmbedding):
         :return: embedding dimension
         """
         if not self.__dimension:
-            self.__dimension = self.to_embeddings("foo")
+            self.__dimension = len(self.to_embeddings("foo"))
         return self.__dimension

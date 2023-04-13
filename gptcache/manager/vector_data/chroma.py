@@ -1,8 +1,9 @@
 from typing import List
 
 from gptcache.manager.vector_data.base import VectorBase, VectorData
-from gptcache.utils import import_chromadb
+from gptcache.utils import import_chromadb, import_torch
 
+import_torch()
 import_chromadb()
 
 import chromadb  # pylint: disable=C0413

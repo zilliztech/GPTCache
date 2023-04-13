@@ -1,6 +1,6 @@
 import math
 
-from gptcache.similarity_evaluation.exact_match import ExactMatchEvaluation
+from gptcache.similarity_evaluation import ExactMatchEvaluation
 
 
 def test_exact_match_evaluation():

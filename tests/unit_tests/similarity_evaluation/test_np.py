@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from gptcache.similarity_evaluation.np import NumpyNormEvaluation
+from gptcache.similarity_evaluation import NumpyNormEvaluation
 
 
 def test_norm():
