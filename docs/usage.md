@@ -9,7 +9,7 @@ GPTCache is easy to use and can reduce the latency of LLM queries by 100x in jus
 
 The default interface for `Cache` is as follows:
 
-```
+```python
 class Cache:
    def init(self,
             cache_enable_func=cache_all,
@@ -43,7 +43,7 @@ Before creating a GPTCache, consider the following questions:
     
     For example, to use ONNX Embeddings, simply initialize your embedding function as `onnx.to_embeddings`.
     
-    ```
+    ```python
     data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
     
     cache.init(
@@ -66,7 +66,7 @@ Before creating a GPTCache, consider the following questions:
 
     Here are some examples:
 
-   ```
+   ```python
    ## create user defined data manager
    data_manager = get_data_manager()
    ## create data manager with sqlite and faiss 
@@ -89,7 +89,7 @@ Before creating a GPTCache, consider the following questions:
 
    To enable ONNX evaluation, simply pass `EvaluationOnnx` to `similarity_evaluation`. This allows you to run any model that can be served on ONNX. We will support Pytorch, TensorRT and the other inference engines in the future.
 
-   ```
+   ```python
    onnx = EmbeddingOnnx()
    data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
    evaluation_onnx = EvaluationOnnx()
@@ -113,7 +113,7 @@ GPTCache currently supports two LLM adapters: OpenAI and Langchain.
 
 With the OpenAI adapter, you can specify the model you want to use and generate queries as a user role.
 
-```
+```python
 cache.init()
 cache.set_openai_key()
 
@@ -132,7 +132,7 @@ print(answer)
 
 Here's an example that utilizes OpenAI's stream response API:
 
-```
+```python
 from gptcache.cache import get_data_manager
 from gptcache.core import cache, Cache
 from gptcache.adapter import openai
@@ -164,7 +164,7 @@ full_reply_content = ''.join([m.get('content', '') for m in collected_messages])
 
 If you want to use other LLMs, the Langchain adapter provides support a standard interface to connect with Langchain-supported LLMs.
 
-```
+```python
 template = """Question: {question}
 
 Answer: Let's think step by step."""
@@ -191,7 +191,7 @@ We plan to support other models soon, so any contributions or suggestions are we
 
 **cache_obj**: Customize the request cache. Use this if you want to make the cache a singleton.
 
-```
+```python
 onnx = Onnx()
 data_manager = get_data_manager(CacheBase("sqlite"), VectorBase("faiss", dimension=onnx.dimension))
 one_cache = Cache()
@@ -217,7 +217,7 @@ openai.ChatCompletion.create(
 
 **cache_context**: Custom cache functions can be passed separately for each of the request.
 
-```
+```python
 question = "what do you think about chatgpt"
 
 openai.ChatCompletion.create(
@@ -237,7 +237,7 @@ openai.ChatCompletion.create(
 
 **cache_skip**: This option allows you to skip the cache search, but still store the results returned by the LLM model. 
 
-```
+```python
 question = "what do you think about chatgpt"
 
 openai.ChatCompletion.create(
