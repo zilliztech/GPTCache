@@ -5,7 +5,7 @@ import time
 from langchain.llms import OpenAI
 from langchain import PromptTemplate
 
-from gptcache.adapter.langchain_llms import LangChainLLMs
+from gptcache.adapter.langchain_models import LangChainLLMs
 from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache import Cache
 from gptcache.embedding import Onnx

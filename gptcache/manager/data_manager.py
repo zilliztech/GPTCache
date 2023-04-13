@@ -29,6 +29,9 @@ class DataManager(metaclass=ABCMeta):
     def get_scalar_data(self, res_data, **kwargs):
         pass
 
+    def update_access_time(self, res_data, **kwargs):
+        pass
+
     @abstractmethod
     def search(self, embedding_data, **kwargs):
         pass
@@ -180,6 +183,9 @@ class SSDataManager(DataManager):
 
     def get_scalar_data(self, res_data, **kwargs):
         return self.s.get_data_by_id(res_data[1])
+
+    def update_access_time(self, res_data, **kwargs):
+        return self.s.update_access_time(res_data[1])
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)

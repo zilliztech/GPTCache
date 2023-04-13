@@ -3,7 +3,7 @@ import os
 from langchain import Cohere
 from langchain.llms import OpenAI
 
-from gptcache.adapter.langchain_llms import LangChainLLMs
+from gptcache.adapter.langchain_models import LangChainLLMs
 from gptcache import cache, Cache
 from gptcache.processor.pre import get_prompt
 
