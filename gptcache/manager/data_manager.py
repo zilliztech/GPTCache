@@ -61,7 +61,7 @@ class MapDataManager(DataManager):
             )
 
     def save(self, question, answer, embedding_data, **kwargs):
-        self.data[embedding_data] = (question, answer)
+        self.data[embedding_data] = (question, answer, embedding_data)
 
     def import_data(
         self, questions: List[Any], answers: List[Any], embedding_datas: List[Any]
@@ -69,7 +69,7 @@ class MapDataManager(DataManager):
         if len(questions) != len(answers) or len(questions) != len(embedding_datas):
             raise ParamError("Make sure that all parameters have the same length")
         for i, embedding_data in enumerate(embedding_datas):
-            self.data[embedding_data] = (questions[i], answers[i])
+            self.data[embedding_data] = (questions[i], answers[i], embedding_datas[i])
 
     def get_scalar_data(self, res_data, **kwargs):
         return res_data
