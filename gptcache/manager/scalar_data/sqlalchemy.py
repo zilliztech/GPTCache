@@ -102,7 +102,7 @@ class SQLDataBase(CacheStorage):
 
     def get_data_by_id(self, key):
         res = (
-            self._session.query(self._model.question, self._model.answer)
+            self._session.query(self._model.question, self._model.answer, self._model.embedding_data)
             .filter(self._model.id == key)
             .filter(self._model.state == 0)
             .first()

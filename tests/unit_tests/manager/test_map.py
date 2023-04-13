@@ -14,7 +14,8 @@ def test_map():
     for i in range(4):
         data_manager.save(chr(ord(a) + i), str(i), chr(ord(a) + i))
     assert len(data_manager.search("a")) == 0
-    question, answer = data_manager.search("b")[0]
+    question, answer, emb = data_manager.search("b")[0]
     assert question == "b", question
     assert answer == "1", answer
+    assert emb == "b", emb
     data_manager.close()

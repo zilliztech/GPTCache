@@ -49,7 +49,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             )
             if ret is None:
                 continue
-            cache_question, cache_answer = ret
+            cache_question, cache_answer, cache_embedding = ret
             rank = chat_cache.similarity_evaluation.evaluation(
                 {
                     "question": pre_embedding_data,
@@ -59,6 +59,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     "question": cache_question,
                     "answer": cache_answer,
                     "search_result": cache_data,
+                    "embedding": cache_embedding
                 },
                 extra_param=context.get("evaluation_func", None),
             )
