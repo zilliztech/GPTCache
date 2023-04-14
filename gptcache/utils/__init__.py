@@ -15,6 +15,7 @@ __all__ = [
     "import_sql_client",
     "import_pydantic",
     "import_langchain",
+    "import_pillow"
 ]
 
 import importlib.util
@@ -120,3 +121,7 @@ def import_pydantic():
 
 def import_langchain():
     _check_library("langchain")
+
+
+def import_pillow():
+    _check_library("pillow")
