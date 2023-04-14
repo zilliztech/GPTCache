@@ -22,6 +22,19 @@
 
 .. toctree::
    :maxdepth: 1
+   :caption: Bootcamp
+   :name: bootcamp
+   :hidden:
+
+   bootcamp/langchain/qa_generation
+   bootcamp/langchain/question_answering
+   bootcamp/langchain/sqlite
+   bootcamp/openai/chat
+   bootcamp/openai/language_translate
+   bootcamp/openai/sql_translate
+
+.. toctree::
+   :maxdepth: 1
    :caption: References
    :name: references
    :hidden:
