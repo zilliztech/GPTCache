@@ -20,7 +20,32 @@ from pymilvus import (  # pylint: disable=C0413
 
 
 class Milvus(VectorBase):
-    """vector store: Milvus"""
+    """vector store: Milvus
+
+    :param host: the host for Milvus vector database, defaults to 'localhost'.
+    :type host: str
+    :param port: the port for Milvus vector database, defaults to '19530'.
+    :type port: str
+    :param user: the user for Zilliz Cloud, defaults to "".
+    :type user: str
+    :param password: the password for Zilliz Cloud, defaults to "".
+    :type password: str
+    :param secure: whether it is https with Zilliz Cloud, defaults to False.
+    :type secures: bool
+    :param collection_name: the name of the collection for Milvus vector database, defaults to 'gptcache'.
+    :type collection_name: str
+    :param dimension: the dimension of the vector, defaults to 0.
+    :type dimension: int
+    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :type top_k: int
+    :param index_params: the index parameters for Milvus, defaults to the HNSW index: {'metric_type': 'L2', 'index_type': 'HNSW', 'params': {'M':
+                         8, 'efConstruction': 64}}.
+    :type index_params: dict
+    :param local_mode: if true, will start a local milvus server.
+    :type local_mode: bool
+    :param local_data: required when local_mode is True.
+    :type local_data: str
+    """
 
     SEARCH_PARAM = {
         "IVF_FLAT": {"metric_type": "L2", "params": {"nprobe": 10}},
