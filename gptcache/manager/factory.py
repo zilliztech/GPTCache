@@ -12,8 +12,8 @@ def get_data_manager(
     data_path: str = "data_map.txt",
     get_data_container: Callable = None,
 ):
-    """Generate :class:`SSDataManager`(with `cache_base`, `vector_base`, `max_size`, `clean_size` and `eviction`),
-       or :class:`MAPDataManager`(with `data_path`, `max_size` and `get_data_container` params) to manager the data.
+    """Generate `SSDataManager` (with `cache_base`, `vector_base`, `max_size`, `clean_size` and `eviction` params),
+       or `MAPDataManager` (with `data_path`, `max_size` and `get_data_container` params) to manager the data.
 
     :param cache_base: a CacheBase object, or the name of the cache storage, it is support 'sqlite', 'postgresql',
                        'mysql', 'mariadb', 'sqlserver' and  'oracle' now.
