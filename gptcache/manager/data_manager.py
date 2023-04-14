@@ -42,7 +42,22 @@ class DataManager(metaclass=ABCMeta):
 
 
 class MapDataManager(DataManager):
-    """MapDataManager, store all data in a map data structure."""
+    """MapDataManager, store all data in a map data structure.
+
+    :param data_path: the path to save the map data, defaults to 'data_map.txt'.
+    :type data_path:  str
+    :param max_size: the max size for the cache, defaults to 1000.
+    :type max_size: int
+    :param get_data_container: a Callable to get the data container, defaults to None.
+    :type get_data_container:  Callable
+
+
+    Example:
+        .. code-block:: python
+            from gptcache.manager import get_data_manager
+
+            data_manager = get_data_manager("data_map.txt", 1000)
+    """
 
     def __init__(self, data_path, max_size, get_data_container=None):
         if get_data_container is None:
@@ -100,22 +115,22 @@ def normalize(vec):
 class SSDataManager(DataManager):
     """Generate SSDataManage to manager the data.
 
-    :param s: CacheStorage to manager the scalar data.
-    :type s: CacheStorage.
-    :param v: VectorBase to manager the vector data.
-    :type v:  VectorBase.
+    :param s: CacheStorage to manager the scalar data, it can be generated with :meth:`gptcache.manager.CacheBase`.
+    :type s: CacheStorage
+    :param v: VectorBase to manager the vector data, it can be generated with :meth:`gptcache.manager.VectorBase`.
+    :type v:  VectorBase
     :param max_size: the max size for the cache, defaults to 1000.
-    :type max_size: int.
+    :type max_size: int
     :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
-    :type clean_size: int.
+    :type clean_size: int
     :param eviction: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
-    :type eviction:  str.
+    :type eviction:  str
     """
 
     s: CacheStorage
     v: VectorBase
 
-    def __init__(self, s, v, max_size, clean_size, eviction="LRU"):
+    def __init__(self, s: CacheStorage, v: VectorBase, max_size, clean_size, eviction="LRU"):
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size

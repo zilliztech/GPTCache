@@ -10,7 +10,18 @@ import chromadb  # pylint: disable=C0413
 
 
 class Chromadb(VectorBase):
-    """vector store: Chromadb"""
+    """vector store: Chromadb
+
+    :param client_settings: the setting for Chromadb.
+    :type client_settings: Settings
+    :param persist_directory: the directory to persist, defaults to .chromadb/ in the current directory.
+    :type persist_directory: str
+    :param collection_name: the name of the collection in Chromadb, defaults to 'gptcache'.
+    :type collection_name: str
+    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :type top_k: int
+
+    """
 
     def __init__(
         self,

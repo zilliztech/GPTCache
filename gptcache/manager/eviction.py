@@ -4,6 +4,13 @@ import numpy as np
 class EvictionManager:
     """
     EvictionManager to manager the eviction policy.
+
+    :param scalar_storage: CacheStorage to manager the scalar data.
+    :type scalar_storage: :class:`CacheStorage`
+    :param vector_base: VectorBase to manager the vector data.
+    :type vector_base:  :class:`VectorBase`
+    :param policy: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
+    :type policy:  str
     """
 
     MAX_MARK_COUNT = 5000

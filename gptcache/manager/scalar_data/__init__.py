@@ -8,10 +8,11 @@ scalar_manager = LazyImport(
 
 
 def CacheBase(name: str, **kwargs):
-    """Generate specific CacheStorage with the configuration.
+    """Generate specific CacheStorage with the configuration, you can set :class:`SQLDataBase` to manage SQLite, PostgreSQL, MySQL,
+       MariaDB, SQL Server and Oracle.
 
     :param name: the name of the cache storage, it is support 'sqlite', 'postgresql', 'mysql', 'mariadb', 'sqlserver' and  'oracle' now.
-    :type name: str.
+    :type name: str
     :param sql_url: the url of the sql database for cache, such as '<db_type>+<db_driver>://<username>:<password>@<host>:<port>/<database>',
                     and the default value is related to the `cache_store` parameter, 'sqlite:///./sqlite.db' for 'sqlite',
                     'postgresql+psycopg2://postgres:123456@127.0.0.1:5432/postgres' for 'postgresql',
@@ -19,9 +20,9 @@ def CacheBase(name: str, **kwargs):
                     'mariadb+pymysql://root:123456@127.0.0.1:3307/mysql' for 'mariadb',
                     'mssql+pyodbc://sa:Strongpsw_123@127.0.0.1:1434/msdb?driver=ODBC+Driver+17+for+SQL+Server' for 'sqlserver',
                     'oracle+cx_oracle://oracle:123456@127.0.0.1:1521/?service_name=helowin&encoding=UTF-8&nencoding=UTF-8' for 'oracle'.
-    :type sql_url: str.
+    :type sql_url: str
     :param table_name: the table name for sql database, defaults to 'gptcache'.
-    :type table_name: str.
+    :type table_name: str
 
     :return: CacheStorage.
 

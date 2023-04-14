@@ -12,7 +12,15 @@ import faiss  # pylint: disable=C0413
 
 
 class Faiss(VectorBase):
-    """vector store: Faiss"""
+    """vector store: Faiss
+
+    :param index_path: the path to Faiss index, defaults to 'faiss.index'.
+    :type index_path: str
+    :param dimension: the dimension of the vector, defaults to 0.
+    :type dimension: int
+    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :type top_k: int
+    """
 
     def __init__(self, index_file_path, dimension, top_k):
         self._index_file_path = index_file_path
