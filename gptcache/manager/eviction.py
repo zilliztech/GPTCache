@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class EvictionManager:
     """
     EvictionManager to manager the eviction policy.
@@ -33,26 +30,18 @@ class EvictionManager:
         return False
 
     def delete(self):
-        mark_ids = self._scalar_storage.get_ids_by_state(state=-1)
-        mark_ids = [i[0] for i in mark_ids]
-        self._scalar_storage.remove_by_state()
+        mark_ids = self._scalar_storage.get_ids(deleted=True)
+        self._scalar_storage.clear_deleted_data()
         self._vector_base.delete(mark_ids)
 
     def rebuild(self):
-        self._scalar_storage.remove_by_state()
-        count = self._scalar_storage.count()
-        offset = 0
-        while offset < count:
-            res = self._scalar_storage.get_embedding_data(offset, self.BATCH_SIZE)
-            ids = [d[0] for d in res]
-            np_data = [np.frombuffer(d[1], np.float32) for d in res]
-            self._vector_base.rebuild(np_data, ids)
-            offset += self.BATCH_SIZE
+        self._scalar_storage.clear_deleted_data()
+        ids = self._scalar_storage.get_ids(deteted=False)
+        self._vector_base.rebuild(ids)
 
     def soft_evict(self, count):
         if self._policy == "FIFO":
             marked_keys = self._scalar_storage.get_old_create(count)
         else:
             marked_keys = self._scalar_storage.get_old_access(count)
-        marked_keys = [i[0] for i in marked_keys]
-        self._scalar_storage.update_state(marked_keys)
+        self._scalar_storage.mark_deleted(marked_keys)

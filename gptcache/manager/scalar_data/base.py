@@ -1,15 +1,28 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Any, List
+from enum import IntEnum
+from typing import Optional, Any, List, Union
 
 import numpy as np
 
 
+class AnswerType(IntEnum):
+    STR = 0
+    IMAGE_BASE64 = 1
+    IMAGE_URL = 2
+
+
 @dataclass
 class CacheData:
+    """
+    answer_type:
+        0: str
+        1: base64 image
+    """
     question: Any
-    answer: Any
+    answer: Union[Any, List[Any]]
     embedding_data: Optional[np.ndarray] = None
+    answer_type: int = AnswerType.STR
 
 
 class CacheStorage(metaclass=ABCMeta):
@@ -22,7 +35,7 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def batch_insert(self, datas: List[CacheData]):
+    def batch_insert(self, all_data: List[CacheData]):
         pass
 
     @abstractmethod
@@ -30,19 +43,19 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_embedding_data(self, offset, size):
+    def clear_deleted_data(self):
         pass
 
     @abstractmethod
-    def remove_by_state(self):
+    def get_ids(self, deleted=True):
+        pass
+
+    @abstractmethod
+    def mark_deleted(self, keys):
         pass
 
     @abstractmethod
     def update_access_time(self, key):
-        pass
-
-    @abstractmethod
-    def update_state(self, keys):
         pass
 
     @abstractmethod
