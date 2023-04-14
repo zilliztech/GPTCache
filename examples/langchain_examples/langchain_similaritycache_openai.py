@@ -39,12 +39,12 @@ llm_cache.init(
 
 before = time.time()
 cached_llm = LangChainLLMs(llm=llm)
-answer = cached_llm(question, cache_obj=llm_cache)
+answer = cached_llm(prompt=question, cache_obj=llm_cache)
 print(answer)
 print("Read through Time Spent =", time.time() - before)
 
 before = time.time()
 question = "What is the winner Super Bowl in the year Justin Bieber was born?"
-answer = cached_llm(question, cache_obj=llm_cache)
+answer = cached_llm(prompt=question, cache_obj=llm_cache)
 print(answer)
 print("Cache Hit Time Spent =", time.time() - before)

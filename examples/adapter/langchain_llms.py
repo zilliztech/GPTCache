@@ -20,17 +20,17 @@ def run_llm():
         pre_embedding_func=get_prompt,
     )
 
-    question = 'what is chatgpt'
+    question = "what is chatgpt"
 
-    langchain_openai = OpenAI(model_name='text-ada-001')
+    langchain_openai = OpenAI(model_name="text-ada-001")
     llm = LangChainLLMs(llm=langchain_openai)
-    answer = llm(question)
+    answer = llm(prompt=question)
     print(answer)
 
     # TODO install cohere auto
     langchain_cohere = Cohere()
     llm = LangChainLLMs(llm=langchain_cohere)
-    answer = llm(question)
+    answer = llm(prompt=question)
     print(answer)
 
 
@@ -43,13 +43,17 @@ def run_chat_model():
         pre_embedding_func=get_msg,
     )
 
-    # chat=ChatOpenAI(temperature=0)
     chat = LangChainChat(chat=ChatOpenAI(temperature=0))
-
-    answer = chat([HumanMessage(content="Translate this sentence from English to Chinese. I love programming.")])
+    answer = chat(
+        messages=[
+            HumanMessage(
+                content="Translate this sentence from English to Chinese. I love programming."
+            )
+        ]
+    )
     print(answer)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_llm()
     run_chat_model()
