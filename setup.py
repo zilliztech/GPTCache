@@ -17,7 +17,7 @@ def parse_requirements(file_name: str) -> List[str]:
 setuptools.setup(
     name="gptcache",
     packages=find_packages(),
-    version="0.1.10",
+    version="0.1.11",
     author="SimFG",
     author_email="bang.fu@zilliz.com",
     description="GPTCache, a powerful caching library that can be used to speed up and lower the cost of chat "
