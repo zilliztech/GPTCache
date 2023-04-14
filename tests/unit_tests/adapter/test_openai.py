@@ -2,9 +2,11 @@ from unittest.mock import patch
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
+    get_text_from_openai_answer,
 )
 from gptcache.adapter import openai
 from gptcache import cache
+from gptcache.processor.pre import get_prompt
 
 
 def test_stream_openai():
@@ -78,3 +80,36 @@ def test_stream_openai():
     )
     answer_text = get_message_from_openai_answer(response)
     assert answer_text == expect_answer, answer_text
+
+
+def test_completion():
+    cache.init(pre_embedding_func=get_prompt)
+    question = "what is your name?"
+    expect_answer = "gptcache"
+
+    with patch("openai.Completion.create") as mock_create:
+        mock_create.return_value = {
+            "choices": [
+                {"text": expect_answer,
+                 "finish_reason": None,
+                 "index": 0}
+            ],
+            "created": 1677825464,
+            "id": "cmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "text-davinci-003",
+            "object": "text_completion",
+        }
+
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=question
+        )
+        answer_text = get_text_from_openai_answer(response)
+        assert answer_text == expect_answer
+
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=question
+    )
+    answer_text = get_text_from_openai_answer(response)
+    assert answer_text == expect_answer
