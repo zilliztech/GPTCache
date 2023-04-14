@@ -8,8 +8,14 @@ vector_manager = LazyImport(
 
 
 def VectorBase(name: str, **kwargs):
-    """Generate specific VectorBase with the configuration, you can set the configuration for :class:`Milvus`, :class:`Faiss` and :class:`Chromadb`
-       and :class:`Hnswlib`.
+    """Generate specific VectorBase with the configuration. For example, setting for
+       `Milvus` (with , `host`, `port`, `password`, `secure`, `collection_name`, `index_params`, `search_params`, `local_mode`, `local_data` params),
+       `Faiss` (with , `index_path`, `dimension`, `top_k` params),
+       `Chromadb` (with `top_k`, `client_settings`, `persist_directory`, `collection_name` params),
+       `Hnswlib` (with `index_file_path`, `dimension`, `top_k`, `max_elements` params).
+
+    :param name: the name of the vectorbase, it is support 'milvus', 'faiss', 'chromadb', 'hnswlib' now.
+    :type name: str
 
     :param top_k: the umber of the vectors results to return, defaults to 1.
     :type top_k: int
@@ -33,6 +39,8 @@ def VectorBase(name: str, **kwargs):
     :param index_params: the index parameters for Milvus, defaults to the HNSW index: {'metric_type': 'L2', 'index_type': 'HNSW', 'params': {'M':
                          8, 'efConstruction': 64}}.
     :type index_params: dict
+    :param search_params: the index parameters for Milvus, defaults to None.
+    :type search_params: dict
     :param collection_name: the name of the collection for Milvus vector database, defaults to 'gptcache'.
     :type collection_name: str
     :param local_mode: if true, will start a local milvus server.

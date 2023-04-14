@@ -8,8 +8,8 @@ scalar_manager = LazyImport(
 
 
 def CacheBase(name: str, **kwargs):
-    """Generate specific CacheStorage with the configuration, you can set :class:`SQLDataBase` to manage SQLite, PostgreSQL, MySQL,
-       MariaDB, SQL Server and Oracle.
+    """Generate specific CacheStorage with the configuration. For example, setting for
+       `SQLDataBase` (with `name`, `sql_url` and `table_name` params) to manage SQLite, PostgreSQL, MySQL, MariaDB, SQL Server and Oracle.
 
     :param name: the name of the cache storage, it is support 'sqlite', 'postgresql', 'mysql', 'mariadb', 'sqlserver' and  'oracle' now.
     :type name: str
