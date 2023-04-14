@@ -4,7 +4,11 @@ from typing import Iterator
 import openai
 
 from gptcache.adapter.adapter import adapt
-from gptcache.utils.response import get_message_from_openai_answer, get_stream_message_from_openai_answer
+from gptcache.utils.response import (
+    get_stream_message_from_openai_answer,
+    get_message_from_openai_answer,
+    get_text_from_openai_answer,
+)
 
 
 class ChatCompletion:
@@ -84,3 +88,39 @@ def construct_stream_resp_from_cache(return_message):
             "object": "chat.completion.chunk",
         },
     ]
+
+
+class Completion:
+    """Openai Completion Wrapper"""
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        def llm_handler(*llm_args, **llm_kwargs):
+            return openai.Completion.create(*llm_args, **llm_kwargs)
+
+        def cache_data_convert(cache_data):
+            return construct_text_from_cache(cache_data)
+
+        def update_cache_callback(llm_data, update_cache_func):
+            update_cache_func(get_text_from_openai_answer(llm_data))
+            return llm_data
+
+        return adapt(
+            llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+        )
+
+
+def construct_text_from_cache(return_text):
+    return {
+        "gptcache": True,
+        "choices": [
+            {
+                "text": return_text,
+                "finish_reason": "stop",
+                "index": 0,
+            }
+        ],
+        "created": int(time.time()),
+        "usage": {"completion_tokens": 0, "prompt_tokens": 0, "total_tokens": 0},
+        "object": "text_completion",
+    }
