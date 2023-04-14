@@ -27,12 +27,12 @@ class CacheBase:
     @staticmethod
     def get(name, **kwargs):
         if name in ["sqlite", "postgresql", "mysql", "mariadb", "sqlserver", "oracle"]:
-            from gptcache.manager.scalar_data.sqlalchemy import SQLDataBase
+            from gptcache.manager.scalar_data.sql_storage import SQLStorage
 
             sql_url = kwargs.get("sql_url", SQL_URL[name])
             table_name = kwargs.get("table_name", TABLE_NAME)
             import_sql_client(name)
-            cache_base = SQLDataBase(db_type=name, url=sql_url, table_name=table_name)
+            cache_base = SQLStorage(db_type=name, url=sql_url, table_name=table_name)
         else:
             raise NotFoundStoreError("cache store", name)
         return cache_base

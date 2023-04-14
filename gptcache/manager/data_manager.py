@@ -24,7 +24,7 @@ class DataManager(metaclass=ABCMeta):
     ):
         pass
 
-    # should return the tuple, (question, answer)
+    # should return the tuple, (question, answer, embedding)
     @abstractmethod
     def get_scalar_data(self, res_data, **kwargs):
         pass
