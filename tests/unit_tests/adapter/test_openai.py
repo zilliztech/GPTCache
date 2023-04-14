@@ -3,10 +3,25 @@ from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
     get_text_from_openai_answer,
+    get_image_from_openai_b64,
+    get_image_from_path,
+    get_image_from_openai_url
 )
 from gptcache.adapter import openai
 from gptcache import cache
 from gptcache.processor.pre import get_prompt
+
+import os
+import base64
+import requests
+from io import BytesIO
+try:
+    from PIL import Image
+except ModuleNotFoundError:
+    from gptcache.utils.dependency_control import prompt_install
+    prompt_install("pillow")
+    from PIL import Image
+
 
 
 def test_stream_openai():
@@ -113,3 +128,74 @@ def test_completion():
     )
     answer_text = get_text_from_openai_answer(response)
     assert answer_text == expect_answer
+
+
+def test_image_create():
+    cache.init(pre_embedding_func=get_prompt)
+    prompt1 = "test url"# bytes
+    test_url = "https://raw.githubusercontent.com/zilliztech/GPTCache/dev/docs/GPTCache.png"
+    test_response = {
+        "created": 1677825464,
+        "data": [
+            {"url": test_url}
+        ]
+        }
+    prompt2 = "test base64"
+    img_bytes = base64.b64decode(get_image_from_openai_url(test_response))
+    img_file = BytesIO(img_bytes)  # convert image to file-like object
+    img = Image.open(img_file)
+    img = img.resize((256, 256))
+    buffered = BytesIO()
+    img.save(buffered, format="JPEG")
+    expected_img_data = base64.b64encode(buffered.getvalue())
+
+    ###### Return base64 ######
+    with patch("openai.Image.create") as mock_create_b64:
+        mock_create_b64.return_value = {
+            "created": 1677825464,
+            "data": [
+                {'b64_json': expected_img_data}
+        ]
+        } 
+
+        response = openai.Image.create(
+            prompt=prompt1,
+            size="256x256",
+            response_format="b64_json"
+        )
+        img_returned = get_image_from_openai_b64(response)
+        assert img_returned == expected_img_data
+
+    response = openai.Image.create(
+            prompt=prompt1,
+            size="256x256",
+            response_format="b64_json"
+        )
+    img_returned = get_image_from_openai_b64(response)
+    assert img_returned == expected_img_data
+
+    ###### Return url ######
+    with patch("openai.Image.create") as mock_create_url:
+        mock_create_url.return_value = {
+            "created": 1677825464,
+            "data": [
+                {'url': test_url}
+        ]
+        } 
+
+        response = openai.Image.create(
+            prompt=prompt2,
+            size="256x256",
+            response_format="url"
+        )
+        answer_url = response["data"][0]["url"]
+        assert test_url == answer_url
+    
+    response = openai.Image.create(
+            prompt=prompt2,
+            size="256x256",
+            response_format="url"
+        )
+    img_returned = get_image_from_path(response)
+    assert img_returned == expected_img_data
+    os.remove(response["data"][0]["url"])
