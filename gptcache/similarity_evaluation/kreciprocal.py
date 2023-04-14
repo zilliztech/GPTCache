@@ -35,11 +35,11 @@ class KReciprocalEvaluation(SearchDistanceEvaluation):
             score = evaluation.evaluation(
                 {
                     'question': 'question1',
-                    'embedding_data': query
+                    'embedding': query
                 },
                 {
                     'question': 'question2',
-                    'embedding_data': cached_data
+                    'embedding': cached_data
                 }
             )
     """
@@ -49,6 +49,20 @@ class KReciprocalEvaluation(SearchDistanceEvaluation):
         super().__init__(max_distance, positive)
         self.vectordb = vectordb
         self.top_k = top_k
+
+    @staticmethod
+    def normalize(vec: np.ndarray):
+        """Normalize the input vector.
+
+        :param vec: numpy vector needs to normalize.
+        :type vec: numpy.array
+
+        :return: normalized vector.
+        """
+        magnitude = np.linalg.norm(vec)
+        normalized_v = vec / magnitude
+        return normalized_v
+
 
     def evaluation(
         self, src_dict: Dict[str, Any], cache_dict: Dict[str, Any], **_
@@ -66,10 +80,11 @@ class KReciprocalEvaluation(SearchDistanceEvaluation):
         cache_question = cache_dict['question']
         if src_question == cache_question:
             return 1
-        candidates = self.vectordb.search(cache_dict['embedding_data'], self.top_k)
-        euc_dist = euclidean_distance_calculate(src_dict['embedding_data'], cache_dict['embedding_data'])
+        query_emb = self.normalize(src_dict['embedding'])
+        candidates = self.vectordb.search(cache_dict['embedding'], self.top_k + 1)
+        euc_dist = euclidean_distance_calculate(query_emb, cache_dict['embedding'])
         if euc_dist > candidates[-1][0]:
-            euc_dist = 0
+            euc_dist = self.range()[1]
 
         result_dict = {}
         result_dict['search_result'] = (euc_dist, None)
