@@ -197,10 +197,10 @@ More Docs：
 ## 😎 What can this help with?
 GPTCache offers the following primary benefits:
 
-- **Decreased expenses**: Most LLM services charge fees based on a combination of number of requests and [token count](https://openai.com/pricing). By caching query results, GPTCache reduces both the number of requests and the number of tokens sent to the LLM service. This minimizes the overall cost of using the service. 
+- **Decreased expenses**: Most LLM services charge fees based on a combination of number of requests and [token count](https://openai.com/pricing). GPTCache effectively minimizes your expenses by caching query results, which in turn reduces the number of requests and tokens sent to the LLM service. As a result, you can enjoy a more cost-efficient experience when using the service.
 - **Enhanced performance**: LLMs employ generative AI algorithms to generate responses in real-time, a process that can sometimes be time-consuming. However, when a similar query is cached, the response time significantly improves, as the result is fetched directly from the cache, eliminating the need to interact with the LLM service. In most situations, GPTCache can also provide superior query throughput compared to standard LLM services.
+- **Flexible development environment**: While developing LLM applications, a connection to LLM APIs is usually required, and it's essential to thoroughly test your application before deploying it in a production environment. GPTCache offers an interface identical to LLM APIs and supports storing LLM-generated or mocked data. This functionality allows for seamless development and testing of your application without the need to connect to the LLM service.
 - **Improved scalability and availability**: LLM services frequently enforce [rate limits](https://platform.openai.com/docs/guides/rate-limits), which are constraints that APIs place on the number of times a user or client can access the server within a given timeframe. Hitting a rate limit means that additional requests will be blocked until a certain period has elapsed, leading to a service outage. With GPTCache, you can easily scale to accommodate an increasing volume of of queries, ensuring consistent performance as your application's user base expands.
-- **Flexible development environment**: When developing LLM applications, an LLM APIs connection is required to prove concepts. GPTCache offers the same interface as LLM APIs and can store LLM-generated or mocked data. This helps to verify your application's features without connecting to the LLM APIs or even the network.
 
 ## 🤔 How does it work?
 
@@ -212,11 +212,11 @@ GPTCache employs embedding algorithms to convert queries into embeddings and use
 
 Featuring a modular design, GPTCache makes it easy for users to customize their own semantic cache. The system offers various implementations for each module, and users can even develop their own implementations to suit their specific needs.
 
-In a semantic cache, false positives can occur during cache hits and false negatives during cache misses. GPTCache provides three metrics to evaluate its performance:
+In a semantic cache, you may encounter false positives during cache hits and false negatives during cache misses. GPTCache offers three metrics to gauge its performance, which are helpful for developers to optimize their caching systems:
 
-- Precision: the ratio of true positives to the total of true positives and false positives.
-- Recall: the ratio of true positives to the total of true positives and false negatives.
-- Latency: the time required for a query to be processed and the corresponding data to be fetched from the cache.
+- **Hit Ratio**: This metric quantifies the cache's ability to fulfill content requests successfully, compared to the total number of requests it receives. A higher hit ratio indicates a more effective cache.
+- **Latency**: This metric measures the time it takes for a query to be processed and the corresponding data to be retrieved from the cache. Lower latency signifies a more efficient and responsive caching system.
+- **Recall**: This metric represents the proportion of queries served by the cache out of the total number of queries that should have been served by the cache. Higher recall percentages indicate that the cache is effectively serving the appropriate content.
 
 A [sample benchmark](https://github.com/zilliztech/gpt-cache/blob/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py) is included for users to start with assessing the performance of their semantic cache.
 
@@ -261,6 +261,9 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [Milvus Lite](https://github.com/milvus-io/milvus-lite), a lightweight version of Milvus that can be embedded into your Python application.
   - [x] Support [FAISS](https://faiss.ai/), a library for efficient similarity search and clustering of dense vectors.
   - [x] Support [Hnswlib](https://github.com/nmslib/hnswlib), header-only C++/python library for fast approximate nearest neighbors.
+  - [ ] Support qdrant
+  - [ ] Support weaviate
+  - [ ] Support chroma
   - [ ] Support other vector databases.
 - **Cache Manager**:
 The **Cache Manager** is responsible for controlling the operation of both the **Cache Storage** and **Vector Store**.
