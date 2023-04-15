@@ -2,6 +2,7 @@ from typing import Optional, List, Any
 
 from gptcache.adapter.adapter import adapt
 from gptcache.utils import import_pydantic, import_langchain
+from gptcache.manager.scalar_data.base import Answer, AnswerType
 
 import_pydantic()
 import_langchain()
@@ -107,7 +108,7 @@ def cache_data_convert(cache_data):
 
 
 def update_cache_callback(llm_data, update_cache_func):
-    update_cache_func(llm_data)
+    update_cache_func(Answer(llm_data, AnswerType.STR))
     return llm_data
 
 

@@ -10,6 +10,7 @@ import openai
 
 from gptcache import CacheError
 from gptcache.adapter.adapter import adapt
+from gptcache.manager.scalar_data.base import Answer, AnswerType
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
@@ -37,7 +38,7 @@ class ChatCompletion(openai.ChatCompletion):
     @staticmethod
     def update_cache_callback(llm_data, update_cache_func):
         if not isinstance(llm_data, Iterator):
-            update_cache_func(get_message_from_openai_answer(llm_data))
+            update_cache_func(Answer(get_message_from_openai_answer(llm_data)), AnswerType.STR)
             return llm_data
         else:
 
@@ -46,7 +47,7 @@ class ChatCompletion(openai.ChatCompletion):
                 for item in it:
                     total_answer += get_stream_message_from_openai_answer(item)
                     yield item
-                update_cache_func(total_answer)
+                update_cache_func(Answer(total_answer, AnswerType.STR))
 
             return hook_openai_data(llm_data)
 
@@ -85,10 +86,10 @@ class Image(openai.Image):
 
         def update_cache_callback(llm_data, update_cache_func):
             if kwargs["response_format"] == "b64_json":
-                update_cache_func(get_image_from_openai_b64(llm_data))
+                update_cache_func(Answer(get_image_from_openai_b64(llm_data), AnswerType.IMAGE_BASE64))
                 return llm_data
             elif kwargs["response_format"] == "url":
-                update_cache_func(get_image_from_openai_url(llm_data))
+                update_cache_func(Answer(get_image_from_openai_url(llm_data), AnswerType.IMAGE_URL))
                 return llm_data
 
         return adapt(

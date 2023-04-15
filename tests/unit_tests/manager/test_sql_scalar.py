@@ -18,11 +18,17 @@ class TestSQLStore(unittest.TestCase):
                 data.append(CacheData('question_' + str(i), ['answer_' + str(i)] * i, np.random.rand(5)))
 
             db.batch_insert(data)
-            self.assertEqual(db.get_data_by_id(1)[:2], ['question_1', 'answer_1'])
-            self.assertEqual(db.get_data_by_id(2)[:2], ['question_2', ['answer_2', 'answer_2']])
-
+            data = db.get_data_by_id(1)
+            self.assertEqual(data.question, 'question_1')
+            self.assertEqual(data.answers[0].answer, 'answer_1')
+            data = db.get_data_by_id(2)
+            self.assertEqual(data.question, 'question_2')
+            self.assertEqual(data.answers[0].answer, 'answer_2')
+            self.assertEqual(data.answers[1].answer, 'answer_2')
             q_id = db.batch_insert([CacheData('question_single', 'answer_singel', np.random.rand(5))])[0]
-            self.assertEqual(db.get_data_by_id(q_id)[:2], ['question_single', 'answer_singel'])
+            data = db.get_data_by_id(q_id)
+            self.assertEqual(data.question, 'question_single')
+            self.assertEqual(data.answers[0].answer, 'answer_singel')
 
             # test deleted
             self.assertEqual(len(db.get_ids(True)), 0)

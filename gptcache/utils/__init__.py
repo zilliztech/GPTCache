@@ -15,7 +15,8 @@ __all__ = [
     "import_sql_client",
     "import_pydantic",
     "import_langchain",
-    "import_pillow"
+    "import_pillow",
+    "import_boto3"
 ]
 
 import importlib.util
@@ -42,7 +43,7 @@ def import_milvus_lite():
 
 
 def import_sbert():
-    _check_library("sentence-transformers")
+    _check_library("sentence_transformers", package="sentence-transformers")
 
 
 def import_cohere():
@@ -124,4 +125,8 @@ def import_langchain():
 
 
 def import_pillow():
-    _check_library("pillow")
+    _check_library("PIL", package="pillow")
+
+
+def import_boto3():
+    _check_library("boto3")
