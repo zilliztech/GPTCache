@@ -1,4 +1,5 @@
 import os
+from tempfile import TemporaryDirectory
 
 from gptcache.manager.factory import get_data_manager
 from gptcache.adapter import openai

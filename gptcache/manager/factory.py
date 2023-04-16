@@ -1,11 +1,12 @@
 from typing import Union, Callable
 from gptcache.manager.data_manager import SSDataManager, MapDataManager
-from gptcache.manager import CacheBase, VectorBase
+from gptcache.manager import CacheBase, VectorBase, ObjectBase
 
 
 def get_data_manager(
     cache_base: Union[CacheBase, str] = None,
     vector_base: Union[VectorBase, str] = None,
+    object_base: Union[ObjectBase, str] = None,
     max_size: int = 1000,
     clean_size: int = None,
     eviction: str = "LRU",
@@ -21,6 +22,8 @@ def get_data_manager(
     :param vector_base: a VectorBase object, or the name of the vector storage, it is support 'milvus', 'faiss' and
                         'chromadb' now.
     :type vector_base: :class:`VectorBase` or str
+    :param object_base: a object storage, supports local path and s3.
+    :type object_base: :class:`ObjectBase` or str
     :param max_size: the max size for the cache, defaults to 1000.
     :type max_size: int
     :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
@@ -48,6 +51,8 @@ def get_data_manager(
     if isinstance(cache_base, str):
         cache_base = CacheBase(name=cache_base)
     if isinstance(vector_base, str):
-        vector_base = VectorBase(name=cache_base)
+        vector_base = VectorBase(name=vector_base)
+    if isinstance(object_base, str):
+        object_base = ObjectBase(name=object_base)
     assert cache_base and vector_base
-    return SSDataManager(cache_base, vector_base, max_size, clean_size, eviction)
+    return SSDataManager(cache_base, vector_base, object_base, max_size, clean_size, eviction)

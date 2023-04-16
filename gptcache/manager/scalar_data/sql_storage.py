@@ -105,13 +105,13 @@ class SQLStorage(CacheStorage):
         )
         session.add(ques_data)
         session.flush()
-        answers = data.answer if isinstance(data.answer, list) else [data.answer]
+        answers = data.answers if isinstance(data.answers, list) else [data.answers]
         all_data = []
         for answer in answers:
             answer_data = self._answer(
                 question_id=ques_data.id,
-                answer=answer,
-                answer_type=data.answer_type
+                answer=answer.answer,
+                answer_type=answer.answer_type
             )
             all_data.append(answer_data)
         session.add_all(all_data)
@@ -125,8 +125,7 @@ class SQLStorage(CacheStorage):
             session.commit()
             return ids
 
-    def get_data_by_id(self, key: int):
-        # return 'question', 'answer', 'embedding'
+    def get_data_by_id(self, key: int) -> CacheData:
         with self.Session() as session:
             qs = (
                 session.query(self._ques.id, self._ques.question, self._ques.embedding_data)
@@ -137,14 +136,12 @@ class SQLStorage(CacheStorage):
             if qs is None:
                 return None
             ans = (
-                session.query(self._answer.answer)
+                session.query(self._answer.answer, self._answer.answer_type)
                 .filter(self._answer.question_id == qs.id)
                 .all()
             )
-            res = list(qs[1:])
-            res_ans = ans[0][0] if len(ans) == 1 else [item[0] for item in ans]
-            res.insert(1, res_ans)
-            return res
+            res_ans = [(item.answer, item.answer_type) for item in ans]
+            return CacheData(question=qs[1], answers=res_ans, embedding_data=qs[2])
 
     def update_access_time(self, key: int):
         with self.Session() as session:

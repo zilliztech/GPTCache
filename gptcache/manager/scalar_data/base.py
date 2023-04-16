@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Optional, Any, List, Union
+from typing import Optional, Any, List
 
 import numpy as np
 
@@ -13,16 +13,40 @@ class AnswerType(IntEnum):
 
 
 @dataclass
-class CacheData:
+class Answer:
     """
     answer_type:
         0: str
         1: base64 image
     """
-    question: Any
-    answer: Union[Any, List[Any]]
-    embedding_data: Optional[np.ndarray] = None
+
+    answer: Any
     answer_type: int = AnswerType.STR
+
+
+@dataclass
+class CacheData:
+    """
+    CacheData
+    """
+
+    question: Any
+    answers: List[Answer]
+    embedding_data: Optional[np.ndarray] = None
+
+    def __init__(self, question, answers, embedding_data = None):
+        self.question = question
+        self.answers = []
+        if isinstance(answers, (str, Answer)):
+            answers = [answers]
+        for data in answers:
+            if isinstance(data, (list, tuple)):
+                self.answers.append(Answer(*data))
+            elif isinstance(data, Answer):
+                self.answers.append(data)
+            else:
+                self.answers.append(Answer(answer=data))
+        self.embedding_data = embedding_data
 
 
 class CacheStorage(metaclass=ABCMeta):

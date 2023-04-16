@@ -1,13 +1,14 @@
 from abc import abstractmethod, ABCMeta
 import pickle
-from typing import List, Any
+from typing import List, Any, Optional, Union
 
 import cachetools
 import numpy as np
 
 from gptcache.utils.error import CacheError, ParamError
-from gptcache.manager.scalar_data.base import CacheStorage, CacheData
+from gptcache.manager.scalar_data.base import CacheStorage, CacheData, AnswerType, Answer
 from gptcache.manager.vector_data.base import VectorBase, VectorData
+from gptcache.manager.object_data.base import ObjectBase
 from gptcache.manager.eviction import EvictionManager
 
 
@@ -24,9 +25,8 @@ class DataManager(metaclass=ABCMeta):
     ):
         pass
 
-    # should return the tuple, (question, answer, embedding)
     @abstractmethod
-    def get_scalar_data(self, res_data, **kwargs):
+    def get_scalar_data(self, res_data, **kwargs) -> CacheData:
         pass
 
     def update_access_time(self, res_data, **kwargs):
@@ -89,8 +89,8 @@ class MapDataManager(DataManager):
         for i, embedding_data in enumerate(embedding_datas):
             self.data[embedding_data] = (questions[i], answers[i], embedding_datas[i])
 
-    def get_scalar_data(self, res_data, **kwargs):
-        return res_data
+    def get_scalar_data(self, res_data, **kwargs) -> CacheData:
+        return CacheData(question=res_data[0], answers=res_data[1])
 
     def search(self, embedding_data, **kwargs):
         try:
@@ -127,15 +127,13 @@ class SSDataManager(DataManager):
     :type eviction:  str
     """
 
-    s: CacheStorage
-    v: VectorBase
-
-    def __init__(self, s: CacheStorage, v: VectorBase, max_size, clean_size, eviction="LRU"):
+    def __init__(self, s: CacheStorage, v: VectorBase, o: Optional[ObjectBase], max_size, clean_size, eviction="LRU"):
         self.max_size = max_size
         self.cur_size = 0
         self.clean_size = clean_size
         self.s = s
         self.v = v
+        self.o = o
         self.eviction = EvictionManager(self.s, self.v, eviction)
         self.cur_size = self.s.count()
 
@@ -145,13 +143,13 @@ class SSDataManager(DataManager):
             self.eviction.delete()
         self.cur_size = self.s.count()
 
-    def save(self, question, answer, embedding_data, **kwargs):
+    def save(self, question, answer, embedding_data , **kwargs):
         """Save the data and vectors to cache and vector storage.
 
         :param question: question data.
         :type question: str
         :param answer: answer data.
-        :type answer: str
+        :type answer: str, Answer or (Any, AnswerType)
         :param embedding_data: vector data.
         :type embedding_data: np.ndarray
 
@@ -167,11 +165,21 @@ class SSDataManager(DataManager):
 
         if self.cur_size >= self.max_size:
             self._clear()
-
         self.import_data([question], [answer], [embedding_data])
 
+    def _process_answer_data(self, answers: Union[Answer, List[Answer]]):
+        if isinstance(answers, Answer):
+            answers = [answers]
+        new_ans = []
+        for ans in answers:
+            if ans.answer_type != AnswerType.STR:
+                new_ans.append(Answer(self.o.put(ans.answer), ans.answer_type))
+            else:
+                new_ans.append(ans)
+        return new_ans
+
     def import_data(
-        self, questions: List[Any], answers: List[Any], embedding_datas: List[Any]
+            self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any]
     ):
         if len(questions) != len(answers) or len(questions) != len(embedding_datas):
             raise ParamError("Make sure that all parameters have the same length")
@@ -180,10 +188,14 @@ class SSDataManager(DataManager):
             normalize(embedding_data) for embedding_data in embedding_datas
         ]
         for i, embedding_data in enumerate(embedding_datas):
+            if self.o is not None:
+                ans = self._process_answer_data(answers[i])
+            else:
+                ans = answers[i]
             cache_datas.append(
                 CacheData(
                     question=questions[i],
-                    answer=answers[i],
+                    answers=ans,
                     embedding_data=embedding_data.astype("float32"),
                 )
             )
@@ -196,8 +208,12 @@ class SSDataManager(DataManager):
         )
         self.cur_size += len(questions)
 
-    def get_scalar_data(self, res_data, **kwargs):
-        return self.s.get_data_by_id(res_data[1])
+    def get_scalar_data(self, res_data, **kwargs) -> CacheData:
+        cache_data = self.s.get_data_by_id(res_data[1])
+        for ans in cache_data.answers:
+            if ans.answer_type != AnswerType.STR:
+                ans.answer = self.o.get(ans.answer)
+        return cache_data
 
     def update_access_time(self, res_data, **kwargs):
         return self.s.update_access_time(res_data[1])

@@ -49,22 +49,21 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             )
             if ret is None:
                 continue
-            cache_question, cache_answer, cache_embedding = ret
             rank = chat_cache.similarity_evaluation.evaluation(
                 {
                     "question": pre_embedding_data,
                     "embedding": embedding_data,
                 },
                 {
-                    "question": cache_question,
-                    "answer": cache_answer,
+                    "question": ret.question,
+                    "answer": ret.answers[0].answer,
                     "search_result": cache_data,
-                    "embedding": cache_embedding
+                    "embedding": ret.embedding_data
                 },
                 extra_param=context.get("evaluation_func", None),
             )
             if rank_threshold <= rank:
-                cache_answers.append((rank, cache_answer))
+                cache_answers.append((rank, ret.answers[0].answer))
                 chat_cache.data_manager.update_access_time(cache_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         if len(cache_answers) != 0:
