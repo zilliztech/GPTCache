@@ -19,6 +19,10 @@ class EvictionManager:
         self._vector_base = vector_base
         self._policy = policy
 
+    @property
+    def policy(self):
+        return self._policy
+
     def check_evict(self):
         mark_count = self._scalar_storage.count(state=-1)
         all_count = self._scalar_storage.count(is_all=True)

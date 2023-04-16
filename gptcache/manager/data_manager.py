@@ -29,7 +29,7 @@ class DataManager(metaclass=ABCMeta):
     def get_scalar_data(self, res_data, **kwargs) -> CacheData:
         pass
 
-    def update_access_time(self, res_data, **kwargs):
+    def hit_cache_callback(self, res_data, **kwargs):
         pass
 
     @abstractmethod
@@ -134,13 +134,13 @@ class SSDataManager(DataManager):
         self.s = s
         self.v = v
         self.o = o
-        self.eviction = EvictionManager(self.s, self.v, eviction)
+        self.eviction_manager = EvictionManager(self.s, self.v, eviction)
         self.cur_size = self.s.count()
 
     def _clear(self):
-        self.eviction.soft_evict(self.clean_size)
-        if self.eviction.check_evict():
-            self.eviction.delete()
+        self.eviction_manager.soft_evict(self.clean_size)
+        if self.eviction_manager.check_evict():
+            self.eviction_manager.delete()
         self.cur_size = self.s.count()
 
     def save(self, question, answer, embedding_data , **kwargs):
@@ -215,8 +215,9 @@ class SSDataManager(DataManager):
                 ans.answer = self.o.get(ans.answer)
         return cache_data
 
-    def update_access_time(self, res_data, **kwargs):
-        return self.s.update_access_time(res_data[1])
+    def hit_cache_callback(self, res_data, **kwargs):
+        if self.eviction_manager.policy == "LRU":
+            self.s.update_access_time(res_data[1])
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)
