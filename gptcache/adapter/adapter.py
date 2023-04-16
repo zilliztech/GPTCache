@@ -64,7 +64,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             )
             if rank_threshold <= rank:
                 cache_answers.append((rank, ret.answers[0].answer))
-                chat_cache.data_manager.update_access_time(cache_data)
+                chat_cache.data_manager.hit_cache_callback(cache_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         if len(cache_answers) != 0:
             return_message = chat_cache.post_process_messages_func(
