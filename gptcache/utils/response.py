@@ -29,3 +29,7 @@ def get_image_from_path(openai_resp):
     with open(img_path, "rb") as f:
         img_data = base64.b64encode(f.read())
     return img_data
+
+
+def get_audio_text_from_openai_answer(openai_resp):
+    return openai_resp["text"]
