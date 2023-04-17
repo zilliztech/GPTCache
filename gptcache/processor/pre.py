@@ -33,3 +33,9 @@ def nop(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
 
 def get_prompt(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
     return data.get("prompt")
+
+
+def get_file_bytes(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
+    res = data.get("file").peek()
+    assert isinstance(res, bytes)
+    return res

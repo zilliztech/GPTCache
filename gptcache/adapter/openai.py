@@ -1,5 +1,5 @@
 import time
-from typing import Iterator
+from typing import Iterator, Any
 
 import base64
 from io import BytesIO
@@ -16,7 +16,8 @@ from gptcache.utils.response import (
     get_message_from_openai_answer,
     get_text_from_openai_answer,
     get_image_from_openai_b64,
-    get_image_from_openai_url
+    get_image_from_openai_url,
+    get_audio_text_from_openai_answer,
 )
 from gptcache.utils import import_pillow
 
@@ -65,6 +66,75 @@ class ChatCompletion(openai.ChatCompletion):
             *args,
             **kwargs
         )
+
+
+class Completion(openai.Completion):
+    """Openai Completion Wrapper"""
+
+    @classmethod
+    def llm_handler(cls, *llm_args, **llm_kwargs):
+        return super().create(*llm_args, **llm_kwargs)
+
+    @staticmethod
+    def cache_data_convert(cache_data):
+        return construct_text_from_cache(cache_data)
+
+    @staticmethod
+    def update_cache_callback(llm_data, update_cache_func):
+        update_cache_func(get_text_from_openai_answer(llm_data))
+        return llm_data
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        return adapt(
+            cls.llm_handler,
+            cls.cache_data_convert,
+            cls.update_cache_callback,
+            *args,
+            **kwargs
+        )
+
+
+class Audio(openai.Audio):
+    """Openai Audio Wrapper"""
+    @classmethod
+    def transcribe(cls, model: str, file: Any, *args, **kwargs):
+        def llm_handler(*llm_args, **llm_kwargs):
+            try:
+                return openai.Audio.transcribe(*llm_args, **llm_kwargs)
+            except Exception as e:
+                raise CacheError("openai error") from e
+
+        def cache_data_convert(cache_data):
+            return construct_audio_text_from_cache(cache_data)
+
+        def update_cache_callback(llm_data, update_cache_func):
+            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), AnswerType.STR))
+            return llm_data
+
+        return adapt(
+            llm_handler, cache_data_convert, update_cache_callback, model=model, file=file, *args, **kwargs
+        )
+
+    @classmethod
+    def translate(cls, model: str, file: bytes, *args, **kwargs):
+        def llm_handler(*llm_args, **llm_kwargs):
+            try:
+                return openai.Audio.translate(*llm_args, **llm_kwargs)
+            except Exception as e:
+                raise CacheError("openai error") from e
+
+        def cache_data_convert(cache_data):
+            return construct_audio_text_from_cache(cache_data)
+
+        def update_cache_callback(llm_data, update_cache_func):
+            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), AnswerType.STR))
+            return llm_data
+
+        return adapt(
+            llm_handler, cache_data_convert, update_cache_callback, model=model, file=file, *args, **kwargs
+        )
+
 
 class Image(openai.Image):
     """Openai Image Wrapper"""
@@ -143,33 +213,6 @@ def construct_stream_resp_from_cache(return_message):
     ]
 
 
-class Completion(openai.Completion):
-    """Openai Completion Wrapper"""
-
-    @classmethod
-    def llm_handler(cls, *llm_args, **llm_kwargs):
-        return super().create(*llm_args, **llm_kwargs)
-
-    @staticmethod
-    def cache_data_convert(cache_data):
-        return construct_text_from_cache(cache_data)
-
-    @staticmethod
-    def update_cache_callback(llm_data, update_cache_func):
-        update_cache_func(get_text_from_openai_answer(llm_data))
-        return llm_data
-
-    @classmethod
-    def create(cls, *args, **kwargs):
-        return adapt(
-            cls.llm_handler,
-            cls.cache_data_convert,
-            cls.update_cache_callback,
-            *args,
-            **kwargs
-        )
-
-
 def construct_text_from_cache(return_text):
     return {
         "gptcache": True,
@@ -214,3 +257,9 @@ def construct_image_create_resp_from_cache(image_data, response_format, size):
             {response_format: image_data}
         ]
         }
+
+
+def construct_audio_text_from_cache(return_text):
+    return {
+        "text": return_text,
+    }

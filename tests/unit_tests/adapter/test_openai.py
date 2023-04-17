@@ -5,15 +5,17 @@ from gptcache.utils.response import (
     get_text_from_openai_answer,
     get_image_from_openai_b64,
     get_image_from_path,
-    get_image_from_openai_url
+    get_image_from_openai_url,
+    get_audio_text_from_openai_answer
 )
 from gptcache.adapter import openai
 from gptcache import cache
-from gptcache.processor.pre import get_prompt
+from gptcache.manager import get_data_manager
+from gptcache.processor.pre import get_prompt, get_file_bytes
 
 import os
 import base64
-import requests
+from urllib.request import urlopen
 from io import BytesIO
 try:
     from PIL import Image
@@ -199,3 +201,58 @@ def test_image_create():
     img_returned = get_image_from_path(response)
     assert img_returned == expected_img_data
     os.remove(response["data"][0]["url"])
+
+
+def test_audio_transcribe():
+    cache.init(pre_embedding_func=get_file_bytes)
+    url = "https://github.com/towhee-io/examples/releases/download/data/blues.00000.mp3"
+    audio_file = urlopen(url)
+    expect_answer = "One bourbon, one scotch and one bill Hey Mr. Bartender, come here I want another drink and I want it now My baby she gone, " \
+                    "she been gone tonight I ain't seen my baby since night of her life One bourbon, one scotch and one bill"
+
+    with patch("openai.Audio.transcribe") as mock_create:
+        mock_create.return_value = {
+            "text": expect_answer
+        }
+
+        response = openai.Audio.transcribe(
+            model="whisper-1",
+            file=audio_file
+        )
+        answer_text = get_audio_text_from_openai_answer(response)
+        assert answer_text == expect_answer
+
+    response = openai.Audio.transcribe(
+        model="whisper-1",
+        file=audio_file
+    )
+    answer_text = get_audio_text_from_openai_answer(response)
+    assert answer_text == expect_answer
+
+
+def test_audio_translate():
+    cache.init(pre_embedding_func=get_file_bytes,
+               data_manager=get_data_manager(data_path="data_map1.txt"))
+    url = "https://github.com/towhee-io/examples/releases/download/data/blues.00000.mp3"
+    audio_file = urlopen(url)
+    expect_answer = "One bourbon, one scotch and one bill Hey Mr. Bartender, come here I want another drink and I want it now My baby she gone, " \
+                    "she been gone tonight I ain't seen my baby since night of her life One bourbon, one scotch and one bill"
+
+    with patch("openai.Audio.translate") as mock_create:
+        mock_create.return_value = {
+            "text": expect_answer
+        }
+
+        response = openai.Audio.translate(
+            model="whisper-1",
+            file=audio_file
+        )
+        answer_text = get_audio_text_from_openai_answer(response)
+        assert answer_text == expect_answer
+
+    response = openai.Audio.translate(
+        model="whisper-1",
+        file=audio_file
+    )
+    answer_text = get_audio_text_from_openai_answer(response)
+    assert answer_text == expect_answer
