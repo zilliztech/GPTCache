@@ -29,7 +29,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             chat_cache.data_manager.search,
             func_name="search",
             report_func=chat_cache.report.search,
-        )(embedding_data, extra_param=context.get("search_func", None))
+        )(
+            embedding_data,
+            extra_param=context.get("search_func", None),
+            top_k=kwargs.pop("top_k", -1),
+        )
         if cache_data_list is None:
             cache_data_list = []
         cache_answers = []
@@ -58,7 +62,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     "question": ret.question,
                     "answer": ret.answers[0].answer,
                     "search_result": cache_data,
-                    "embedding": ret.embedding_data
+                    "embedding": ret.embedding_data,
                 },
                 extra_param=context.get("evaluation_func", None),
             )

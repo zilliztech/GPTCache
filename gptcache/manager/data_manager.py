@@ -222,7 +222,8 @@ class SSDataManager(DataManager):
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)
-        return self.v.search(embedding_data)
+        top_k = kwargs.get("top_k", -1)
+        return self.v.search(data=embedding_data, top_k=top_k)
 
     def close(self):
         self.s.close()
