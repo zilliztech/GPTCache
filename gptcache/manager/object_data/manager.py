@@ -1,4 +1,4 @@
-from gptcache.utils.error import NotFoundStoreError
+from gptcache.utils.error import NotFoundError
 
 
 class ObjectBase:
@@ -22,5 +22,5 @@ class ObjectBase:
                                     kwargs.get("access_key"), kwargs.get("secret_key"),
                                     kwargs.get("endpoint"))
         else:
-            raise NotFoundStoreError("object store", name)
+            raise NotFoundError("object store", name)
         return object_base

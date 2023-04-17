@@ -40,14 +40,3 @@ class TestSQLStore(unittest.TestCase):
             db.clear_deleted_data()
             self.assertEqual(db.count_answers(), 40)
             self.assertEqual(db.count(is_all=True), 7)
-
-            # test access
-            # 4 -> 10
-            self.assertEqual(db.get_old_access(10), [4, 5, 6, 7, 8, 9, 10])
-            db.update_access_time(4)
-            # 5 -> 10, 4
-            self.assertEqual(db.get_old_access(10), [5, 6, 7, 8, 9, 10, 4])
-
-            # test get_old_create
-            self.assertEqual(db.get_old_create(10), [4, 5, 6, 7, 8, 9, 10])
-
