@@ -1,6 +1,7 @@
 import base64
 import requests
 
+
 def get_message_from_openai_answer(openai_resp):
     return openai_resp["choices"][0]["message"]["content"]
 
