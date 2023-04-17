@@ -9,7 +9,7 @@ sbert = LazyImport("sbert", globals(), "gptcache.embedding.sbert")
 onnx = LazyImport("onnx", globals(), "gptcache.embedding.onnx")
 cohere = LazyImport("cohere", globals(), "gptcache.embedding.cohere")
 fasttext = LazyImport("fasttext", globals(), "gptcache.embedding.fasttext")
-
+image = LazyImport("image", globals(), "gptcache.embedding.image")
 
 def Cohere(model="large", api_key=None):
     return cohere.Cohere(model, api_key)
@@ -22,6 +22,8 @@ def OpenAI(model="text-embedding-ada-002", api_key=None):
 def Huggingface(model="sentence-transformers/all-mpnet-base-v2"):
     return huggingface.Huggingface(model)
 
+def Image(model="google/vit-base-patch16-384"):
+    return image.ImageEmbedding(model)
 
 def SBERT(model="all-MiniLM-L6-v2"):
     return sbert.SBERT(model)

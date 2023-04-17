@@ -6,6 +6,7 @@ __all__ = [
     "import_fasttext",
     "import_huggingface",
     "import_torch",
+    "import_torchvision"
     "import_huggingface_hub",
     "import_onnxruntime",
     "import_faiss",
@@ -61,6 +62,8 @@ def import_huggingface():
 def import_torch():
     _check_library("torch")
 
+def import_torchvision():
+    _check_library("torchvision")
 
 def import_huggingface_hub():
     _check_library("huggingface_hub", package="huggingface-hub")
