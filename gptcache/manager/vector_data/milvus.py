@@ -3,6 +3,7 @@ from uuid import uuid4
 import numpy as np
 
 from gptcache.utils import import_pymilvus
+from gptcache.utils.log import gptcache_log
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 
 
@@ -142,19 +143,18 @@ class Milvus(VectorBase):
                 using=self.alias,
             )
         else:
-            print(f"There already has {collection_name} collection, will using it directly.")
+            gptcache_log.warning("The %s collection already exists, and it will be used directly.", collection_name)
             self.col = Collection(
                 collection_name, consistency_level="Strong", using=self.alias
             )
 
         if len(self.col.indexes) == 0:
             try:
-                print("Attempting creation of Milvus index")
+                gptcache_log.info("Attempting creation of Milvus index.")
                 self.col.create_index("embedding", index_params=self.index_params)
-                print("Creation of Milvus index successful")
+                gptcache_log.info("Creation of Milvus index successful.")
             except MilvusException as e:
-                print("Error with building index: ", e)
-                print("Attempting creation of default index")
+                gptcache_log.warning("Error with building index: %s, and attempting creation of default index.", e)
                 i_p = {"metric_type": "L2", "index_type": "AUTOINDEX", "params": {}}
                 self.col.create_index("embedding", index_params=i_p)
                 self.index_params = i_p

@@ -13,6 +13,7 @@ from gptcache.processor.pre import last_content
 from gptcache.similarity_evaluation.similarity_evaluation import SimilarityEvaluation
 from gptcache.similarity_evaluation.exact_match import ExactMatchEvaluation
 from gptcache.utils.error import CacheError
+from gptcache.utils.log import gptcache_log
 
 
 def cache_all(*_, **__):
@@ -183,7 +184,7 @@ class Cache:
             try:
                 self.data_manager.close()
             except Exception as e:  # pylint: disable=W0703
-                print(e)
+                gptcache_log.error(e)
 
     def import_data(self, questions: List[Any], answers: List[Any]) -> None:
         """ Import data to GPTCache

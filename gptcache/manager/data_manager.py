@@ -10,6 +10,7 @@ from gptcache.manager.scalar_data.base import CacheStorage, CacheData, AnswerTyp
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.manager.object_data.base import ObjectBase
 from gptcache.manager.eviction import EvictionManager
+from gptcache.utils.log import gptcache_log
 
 
 class DataManager(metaclass=ABCMeta):
@@ -103,7 +104,7 @@ class MapDataManager(DataManager):
             with open(self.data_path, "wb") as f:
                 pickle.dump(self.data, f)
         except PermissionError:
-            print(f"You don't have permission to access this file <{self.data_path}>.")
+            gptcache_log.error("You don't have permission to access this file %s.", self.data_path)
 
 
 def normalize(vec):
