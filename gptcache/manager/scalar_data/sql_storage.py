@@ -1,7 +1,6 @@
 from typing import List
-
 from datetime import datetime
-
+import numpy as np
 from gptcache.utils import import_sqlalchemy
 from gptcache.manager.scalar_data.base import CacheStorage, CacheData
 
@@ -141,7 +140,7 @@ class SQLStorage(CacheStorage):
                 .all()
             )
             res_ans = [(item.answer, item.answer_type) for item in ans]
-            return CacheData(question=qs[1], answers=res_ans, embedding_data=qs[2])
+            return CacheData(question=qs[1], answers=res_ans, embedding_data=np.frombuffer(qs[2], dtype=np.float32))
 
     def update_access_time(self, key: int):
         with self.Session() as session:
