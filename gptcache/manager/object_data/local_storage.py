@@ -1,11 +1,9 @@
 from typing import Any, List
 import os
-import logging
 import uuid
 from pathlib import Path
 from gptcache.manager.object_data.base import ObjectBase
-
-logger = logging.getLogger()
+from gptcache.utils.log import gptcache_log
 
 
 class LocalObjectStorage(ObjectBase):
@@ -38,5 +36,5 @@ class LocalObjectStorage(ObjectBase):
             try:
                 os.remove(obj)
             except Exception:  # pylint: disable=broad-except
-                logger.warning("Can not find obj: %s", obj)
+                gptcache_log.warning("Can not find obj: %s", obj)
                 pass

@@ -1,16 +1,14 @@
 from typing import Any, List
 import uuid
 import os
-import logging
 
 from gptcache.manager.object_data.base import ObjectBase
 
 from gptcache.utils import import_boto3
+from gptcache.utils.log import gptcache_log
 
 import_boto3()
 import boto3  # pylint: disable=wrong-import-position
-
-logger = logging.getLogger()
 
 
 class S3Storage(ObjectBase):
@@ -36,7 +34,7 @@ class S3Storage(ObjectBase):
         try:
             return self._s3.Bucket(self._bucket).Object(obj).get()["Body"].read()
         except Exception:  # pylint: disable=broad-except
-            logger.error("obj:%s not exist", obj)
+            gptcache_log.error("obj:%s not exist", obj)
             return None
 
     def get_access_link(self, obj: str, expires: int = 3600) -> str:
