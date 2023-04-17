@@ -36,7 +36,7 @@ class Faiss(VectorBase):
         ids = np.array(id_array)
         self._index.add_with_ids(np_data, ids)
 
-    def search(self, data: np.ndarray, top_k = -1):
+    def search(self, data: np.ndarray, top_k: int = -1):
         if self._index.ntotal == 0:
             return None
         if top_k == -1:
