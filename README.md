@@ -10,6 +10,8 @@ Slash Your LLM API Costs by 10x 💰, Boost Speed by 100x ⚡
 
 This project is undergoing swift development, and as such, the API may be subject to change at any time. 
 
+If you're looking for the **most recent** update on GPTCache, please refer to: [release note](https://github.com/zilliztech/GPTCache/blob/main/docs/release_note.md)
+
 ## Quick Install
 
 `pip install gptcache`

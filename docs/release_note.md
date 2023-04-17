@@ -5,6 +5,37 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.13 (2023.4.16)
+
+1. Add openai audio adapter (**experimental**)
+
+```python
+cache.init(pre_embedding_func=get_file_bytes)
+
+openai.Audio.transcribe(
+    model="whisper-1",
+    file=audio_file
+)
+```
+
+2. Improve data eviction implementation
+
+In the future, users will have greater flexibility to customize eviction methods, such as by using Redis or Memcached. Currently, the default caching library is cachetools, which provides an in-memory cache. Other libraries are not currently supported, but may be added in the future.
+
+## v0.1.12 (2023.4.15)
+
+1. The llm request can customize topk search parameters
+
+```python
+openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "user", "content": question},
+    ],
+    top_k=10,
+)
+```
+
 ## v0.1.11 (2023.4.14)
 
 1. Add openai complete adapter
