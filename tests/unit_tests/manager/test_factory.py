@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 
 from gptcache.manager.factory import get_data_manager
 from gptcache.manager import VectorBase, CacheBase, ObjectBase
-from gptcache.manager.scalar_data.base import Answer, AnswerType
+from gptcache.manager.scalar_data.base import Answer, DataType
 
 
 class TestFactory(unittest.TestCase):
@@ -28,21 +28,21 @@ class TestFactory(unittest.TestCase):
             m = get_data_manager(s, v, o)
             m.save("test_question",
                    Answer(b"my test data",
-                          AnswerType.IMAGE_BASE64),
+                          DataType.IMAGE_BASE64),
                    np.random.rand(5)
             )
             res = m.get_scalar_data(m.search(np.random.rand(5))[0])
             self.assertEqual(res.question, "test_question")
             self.assertEqual(res.answers[0].answer, b"my test data")
-            self.assertEqual(res.answers[0].answer_type, AnswerType.IMAGE_BASE64)
+            self.assertEqual(res.answers[0].answer_type, DataType.IMAGE_BASE64)
 
             # test multi answer
             emb = np.random.rand(5)
             m.save("test_question2",
                    [Answer(b"question2_BASE64",
-                           AnswerType.IMAGE_BASE64),
+                           DataType.IMAGE_BASE64),
                     Answer("question2_STR",
-                           AnswerType.STR)
+                           DataType.STR)
                    ],
                    emb
             )
@@ -50,6 +50,6 @@ class TestFactory(unittest.TestCase):
             res = m.get_scalar_data(m.search(emb)[0])
             self.assertEqual(res.question, "test_question2")
             self.assertEqual(res.answers[0].answer, b"question2_BASE64")
-            self.assertEqual(res.answers[0].answer_type, AnswerType.IMAGE_BASE64)
+            self.assertEqual(res.answers[0].answer_type, DataType.IMAGE_BASE64)
             self.assertEqual(res.answers[1].answer, "question2_STR")
-            self.assertEqual(res.answers[1].answer_type, AnswerType.STR)
+            self.assertEqual(res.answers[1].answer_type, DataType.STR)

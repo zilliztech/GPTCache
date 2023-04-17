@@ -4,14 +4,16 @@ from typing import List, Any, Optional, Union
 
 import cachetools
 import numpy as np
+import requests
 
 from gptcache.manager.eviction import EvictionBase
 from gptcache.utils.error import CacheError, ParamError
 from gptcache.manager.scalar_data.base import (
     CacheStorage,
     CacheData,
-    AnswerType,
+    DataType,
     Answer,
+    Question
 )
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.manager.object_data.base import ObjectBase
@@ -171,7 +173,7 @@ class SSDataManager(DataManager):
         :param question: question data.
         :type question: str
         :param answer: answer data.
-        :type answer: str, Answer or (Any, AnswerType)
+        :type answer: str, Answer or (Any, DataType)
         :param embedding_data: vector data.
         :type embedding_data: np.ndarray
 
@@ -192,11 +194,23 @@ class SSDataManager(DataManager):
             answers = [answers]
         new_ans = []
         for ans in answers:
-            if ans.answer_type != AnswerType.STR:
+            if ans.answer_type != DataType.STR:
                 new_ans.append(Answer(self.o.put(ans.answer), ans.answer_type))
             else:
                 new_ans.append(ans)
         return new_ans
+
+    def _process_question_data(self, question: Union[str, Question]):
+        if isinstance(question, Question):
+            if question.deps is None:
+                return question
+
+            for dep in question.deps:
+                if dep.dep_type == DataType.IMAGE_URL:
+                    dep.dep_type.data = self.o.put(requests.get(dep.data).content)
+            return question
+
+        return Question(question)
 
     def import_data(
         self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any]
@@ -212,9 +226,10 @@ class SSDataManager(DataManager):
                 ans = self._process_answer_data(answers[i])
             else:
                 ans = answers[i]
+
             cache_datas.append(
                 CacheData(
-                    question=questions[i],
+                    question=self._process_question_data(questions[i]),
                     answers=ans,
                     embedding_data=embedding_data.astype("float32"),
                 )
@@ -231,7 +246,7 @@ class SSDataManager(DataManager):
     def get_scalar_data(self, res_data, **kwargs) -> CacheData:
         cache_data = self.s.get_data_by_id(res_data[1])
         for ans in cache_data.answers:
-            if ans.answer_type != AnswerType.STR:
+            if ans.answer_type != DataType.STR:
                 ans.answer = self.o.get(ans.answer)
         return cache_data
 

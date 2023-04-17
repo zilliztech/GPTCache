@@ -20,7 +20,7 @@ def test_adapt():
     def cache_data_convert(cache_data):
         return int(cache_data)
 
-    def update_cache_callback(llm_data, update_cache_func):
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):
         update_cache_func(str(llm_data))
         return llm_data
 
@@ -78,7 +78,7 @@ def test_adapt():
     time_cal(add1, report_func=report_func)(cache_factor=10)
 
     # test cache_enable_func
-    def update_cache_callback(llm_data, update_cache_func):
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):
         time.sleep(0.5)
         update_cache_func(str(llm_data))
         return llm_data

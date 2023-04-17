@@ -93,15 +93,17 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     if cache_enable:
         try:
 
-            def update_cache_func(handled_llm_data):
+            def update_cache_func(handled_llm_data, question=None):
+                if question is None:
+                    question = pre_embedding_data
                 chat_cache.data_manager.save(
-                    pre_embedding_data,
+                    question,
                     handled_llm_data,
                     embedding_data,
                     extra_param=context.get("save_func", None),
                 )
 
-            llm_data = update_cache_callback(llm_data, update_cache_func)
+            llm_data = update_cache_callback(llm_data, update_cache_func, *args, **kwargs)
         except Exception as e:  # pylint: disable=W0703
             logging.warning("failed to save the data to cache, error: %s", e)
     return llm_data

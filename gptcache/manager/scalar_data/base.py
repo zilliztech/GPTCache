@@ -1,12 +1,12 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Optional, Any, List
+from typing import Optional, Any, List, Union, Dict
 
 import numpy as np
 
 
-class AnswerType(IntEnum):
+class DataType(IntEnum):
     STR = 0
     IMAGE_BASE64 = 1
     IMAGE_URL = 2
@@ -15,13 +15,49 @@ class AnswerType(IntEnum):
 @dataclass
 class Answer:
     """
-    answer_type:
+    data_type:
         0: str
         1: base64 image
     """
 
     answer: Any
-    answer_type: int = AnswerType.STR
+    answer_type: int = DataType.STR
+
+
+@dataclass
+class QuestionDep:
+    """
+    QuestionDep
+    """
+
+    name: str
+    data: str
+    dep_type: int = DataType.STR
+
+    @classmethod
+    def from_dict(cls, d: Dict):
+        return cls(
+            name=d["name"],
+            data=d["data"],
+            dep_type=d["dep_type"]
+        )
+
+
+@dataclass
+class Question:
+    """
+    Question
+    """
+
+    content: str
+    deps: Optional[List[QuestionDep]] = None
+
+    @classmethod
+    def from_dict(cls, d: Dict):
+        deps = []
+        for dep in d["deps"]:
+            deps.append(QuestionDep.from_dict(dep))
+        return cls(d["content"], deps)
 
 
 @dataclass
@@ -30,7 +66,7 @@ class CacheData:
     CacheData
     """
 
-    question: Any
+    question: Union[str, Question]
     answers: List[Answer]
     embedding_data: Optional[np.ndarray] = None
 

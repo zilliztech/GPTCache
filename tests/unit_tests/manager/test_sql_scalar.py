@@ -4,7 +4,7 @@ import numpy as np
 from tempfile import TemporaryDirectory
 
 from gptcache.manager.scalar_data.sql_storage import SQLStorage
-from gptcache.manager.scalar_data.base import CacheData
+from gptcache.manager.scalar_data.base import CacheData, Question
 
 
 class TestSQLStore(unittest.TestCase):
@@ -40,3 +40,29 @@ class TestSQLStore(unittest.TestCase):
             db.clear_deleted_data()
             self.assertEqual(db.count_answers(), 40)
             self.assertEqual(db.count(is_all=True), 7)
+
+    def test_with_deps(self):
+        with TemporaryDirectory(dir='./') as root:
+            db_path = Path(root) / 'sqlite.db'
+            db = SQLStorage(url="sqlite:///" + str(db_path))
+            db.create()        
+            data_id = db.batch_insert([
+                CacheData(
+                    Question.from_dict({
+                        "content": "test_question",
+                        "deps": [
+                            {"name": "text", "data": "how many people in this picture", "dep_type": 0},
+                            {"name": "image", "data": "object_name", "dep_type": 1}
+                        ]
+                    }),
+                    'test_answer', np.random.rand(5))
+            ])[0]
+
+            ret = db.get_data_by_id(data_id)
+            self.assertEqual(ret.question.content, "test_question")
+            self.assertEqual(ret.question.deps[0].name, "text")
+            self.assertEqual(ret.question.deps[0].data, "how many people in this picture")
+            self.assertEqual(ret.question.deps[0].dep_type, 0)
+            self.assertEqual(ret.question.deps[1].name, "image")
+            self.assertEqual(ret.question.deps[1].data, "object_name")
+            self.assertEqual(ret.question.deps[1].dep_type, 1)
