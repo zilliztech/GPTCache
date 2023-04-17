@@ -1,8 +1,4 @@
-
-import os
 import numpy as np
-
-from PIL import Image
 
 from gptcache.utils import import_huggingface, import_torch, import_torchvision
 from gptcache.embedding.base import BaseEmbedding
@@ -11,7 +7,8 @@ import_torch()
 import_huggingface()
 import_torchvision()
 
-import torchvision.transforms as transforms
+import torch # pylint: disable=C0413
+from torchvision import transforms
 
 from transformers import AutoImageProcessor
 from transformers import ViTModel
@@ -57,10 +54,10 @@ class ImageEmbedding(BaseEmbedding):
         vit_model = ViTModel.from_pretrained(model)
         self.vit_model = vit_model.eval()
         
-        config = AutoConfig.from_pretrained(model)
+        config = self.vit_model.config
         self.__dimension = config.hidden_size
 
-    def to_embeddings(self, image, **__):
+    def to_embeddings(self, data, **__):
         """Generate embedding given text input
 
         :param data: text in string.
@@ -68,10 +65,10 @@ class ImageEmbedding(BaseEmbedding):
 
         :return: a text embedding in shape of (dim,).
         """
-        inputs = self.image_processor(image, return_tensors="pt")
+        inputs = self.image_processor(data, return_tensors="pt")
 
         with torch.no_grad():
-            outputs = model(**inputs)
+            outputs = self.vit_model(**inputs)
 
         last_hidden_states = outputs.last_hidden_state
         features = last_hidden_states[:, 0, :]

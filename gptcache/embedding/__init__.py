@@ -1,4 +1,4 @@
-__all__ = ["OpenAI", "Huggingface", "SBERT", "Cohere", "Onnx", "FastText"]
+__all__ = ["OpenAI", "Huggingface", "Image", "SBERT", "Cohere", "Onnx", "FastText"]
 
 
 from gptcache.utils.lazy_import import LazyImport

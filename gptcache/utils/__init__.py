@@ -6,7 +6,7 @@ __all__ = [
     "import_fasttext",
     "import_huggingface",
     "import_torch",
-    "import_torchvision"
+    "import_torchvision",
     "import_huggingface_hub",
     "import_onnxruntime",
     "import_faiss",
