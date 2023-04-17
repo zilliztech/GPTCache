@@ -39,7 +39,7 @@ class ChatCompletion(openai.ChatCompletion):
     @staticmethod
     def update_cache_callback(llm_data, update_cache_func):
         if not isinstance(llm_data, Iterator):
-            update_cache_func(Answer(get_message_from_openai_answer(llm_data)), AnswerType.STR)
+            update_cache_func(Answer(get_message_from_openai_answer(llm_data), AnswerType.STR))
             return llm_data
         else:
 
