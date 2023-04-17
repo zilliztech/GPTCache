@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 import numpy as np
 from gptcache.utils import import_sqlalchemy
@@ -124,7 +124,7 @@ class SQLStorage(CacheStorage):
             session.commit()
             return ids
 
-    def get_data_by_id(self, key: int) -> CacheData:
+    def get_data_by_id(self, key: int) -> Optional[CacheData]:
         with self.Session() as session:
             qs = (
                 session.query(self._ques.id, self._ques.question, self._ques.embedding_data)
@@ -142,40 +142,11 @@ class SQLStorage(CacheStorage):
             res_ans = [(item.answer, item.answer_type) for item in ans]
             return CacheData(question=qs[1], answers=res_ans, embedding_data=np.frombuffer(qs[2], dtype=np.float32))
 
-    def update_access_time(self, key: int):
-        with self.Session() as session:
-            session.query(self._ques).filter(self._ques.id == key).update(
-                {"last_access": datetime.now()}
-            )
-            session.commit()
-
     def get_ids(self, deleted=True):
         state = -1 if deleted else 0
         with self.Session() as session:
             res = (
                 session.query(self._ques.id).filter(self._ques.deleted == state).all()
-            )
-            return [item.id for item in res]
-
-    def get_old_access(self, count):
-        with self.Session() as session:
-            res = (
-                session.query(self._ques.id)
-                .order_by(self._ques.last_access.asc())
-                .filter(self._ques.deleted == 0)
-                .limit(count)
-                .all()
-            )
-            return [item.id for item in res]
-
-    def get_old_create(self, count):
-        with self.Session() as session:
-            res = (
-                session.query(self._ques.id)
-                .order_by(self._ques.create_on.asc())
-                .filter(self._ques.deleted == 0)
-                .limit(count)
-                .all()
             )
             return [item.id for item in res]
 

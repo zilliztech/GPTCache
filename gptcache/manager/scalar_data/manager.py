@@ -1,5 +1,5 @@
 from gptcache.utils import import_sql_client
-from gptcache.utils.error import NotFoundStoreError
+from gptcache.utils.error import NotFoundError
 
 
 SQL_URL = {
@@ -34,5 +34,5 @@ class CacheBase:
             import_sql_client(name)
             cache_base = SQLStorage(db_type=name, url=sql_url, table_name=table_name)
         else:
-            raise NotFoundStoreError("cache store", name)
+            raise NotFoundError("cache store", name)
         return cache_base

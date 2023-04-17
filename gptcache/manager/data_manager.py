@@ -5,11 +5,17 @@ from typing import List, Any, Optional, Union
 import cachetools
 import numpy as np
 
+from gptcache.manager.eviction import EvictionBase
 from gptcache.utils.error import CacheError, ParamError
-from gptcache.manager.scalar_data.base import CacheStorage, CacheData, AnswerType, Answer
+from gptcache.manager.scalar_data.base import (
+    CacheStorage,
+    CacheData,
+    AnswerType,
+    Answer,
+)
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.manager.object_data.base import ObjectBase
-from gptcache.manager.eviction import EvictionManager
+from gptcache.manager.eviction_manager import EvictionManager
 from gptcache.utils.log import gptcache_log
 
 
@@ -104,7 +110,9 @@ class MapDataManager(DataManager):
             with open(self.data_path, "wb") as f:
                 pickle.dump(self.data, f)
         except PermissionError:
-            gptcache_log.error("You don't have permission to access this file %s.", self.data_path)
+            gptcache_log.error(
+                "You don't have permission to access this file %s.", self.data_path
+            )
 
 
 def normalize(vec):
@@ -128,23 +136,36 @@ class SSDataManager(DataManager):
     :type eviction:  str
     """
 
-    def __init__(self, s: CacheStorage, v: VectorBase, o: Optional[ObjectBase], max_size, clean_size, eviction="LRU"):
+    def __init__(
+        self,
+        s: CacheStorage,
+        v: VectorBase,
+        o: Optional[ObjectBase],
+        max_size,
+        clean_size,
+        policy="LRU",
+    ):
         self.max_size = max_size
-        self.cur_size = 0
         self.clean_size = clean_size
         self.s = s
         self.v = v
         self.o = o
-        self.eviction_manager = EvictionManager(self.s, self.v, eviction)
-        self.cur_size = self.s.count()
+        self.eviction_base = EvictionBase(
+            name="memory",
+            policy=policy,
+            maxsize=max_size,
+            clean_size=clean_size,
+            on_evict=self._clear,
+        )
+        self.eviction_base.put(self.s.get_ids(deleted=False))
+        self.eviction_manager = EvictionManager(self.s, self.v)
 
-    def _clear(self):
-        self.eviction_manager.soft_evict(self.clean_size)
+    def _clear(self, marked_keys):
+        self.eviction_manager.soft_evict(marked_keys)
         if self.eviction_manager.check_evict():
             self.eviction_manager.delete()
-        self.cur_size = self.s.count()
 
-    def save(self, question, answer, embedding_data , **kwargs):
+    def save(self, question, answer, embedding_data, **kwargs):
         """Save the data and vectors to cache and vector storage.
 
         :param question: question data.
@@ -164,8 +185,6 @@ class SSDataManager(DataManager):
                 data_manager.save('hello', 'hi', np.random.random((128, )).astype('float32'))
         """
 
-        if self.cur_size >= self.max_size:
-            self._clear()
         self.import_data([question], [answer], [embedding_data])
 
     def _process_answer_data(self, answers: Union[Answer, List[Answer]]):
@@ -180,7 +199,7 @@ class SSDataManager(DataManager):
         return new_ans
 
     def import_data(
-            self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any]
+        self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any]
     ):
         if len(questions) != len(answers) or len(questions) != len(embedding_datas):
             raise ParamError("Make sure that all parameters have the same length")
@@ -207,7 +226,7 @@ class SSDataManager(DataManager):
                 for i, embedding_data in enumerate(embedding_datas)
             ]
         )
-        self.cur_size += len(questions)
+        self.eviction_base.put(ids)
 
     def get_scalar_data(self, res_data, **kwargs) -> CacheData:
         cache_data = self.s.get_data_by_id(res_data[1])
@@ -217,8 +236,7 @@ class SSDataManager(DataManager):
         return cache_data
 
     def hit_cache_callback(self, res_data, **kwargs):
-        if self.eviction_manager.policy == "LRU":
-            self.s.update_access_time(res_data[1])
+        self.eviction_base.get(res_data[1])
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)

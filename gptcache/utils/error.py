@@ -8,7 +8,7 @@ class NotInitError(CacheError):
         super().__init__("The cache should be inited before using")
 
 
-class NotFoundStoreError(CacheError):
+class NotFoundError(CacheError):
     """Raise when getting an unsupported store."""
     def __init__(self, store_type, current_type_name):
         super().__init__(f"Unsupported ${store_type}: {current_type_name}")

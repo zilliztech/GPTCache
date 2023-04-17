@@ -67,6 +67,10 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def mark_deleted(self, keys):
+        pass
+
+    @abstractmethod
     def clear_deleted_data(self):
         pass
 
@@ -75,23 +79,7 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def mark_deleted(self, keys):
-        pass
-
-    @abstractmethod
-    def update_access_time(self, key):
-        pass
-
-    @abstractmethod
     def count(self):
-        pass
-
-    @abstractmethod
-    def get_old_access(self, count):
-        pass
-
-    @abstractmethod
-    def get_old_create(self, count):
         pass
 
     @abstractmethod
