@@ -1,13 +1,13 @@
 import time
 from typing import Iterator, Any
 
-import base64
-from io import BytesIO
 import os
-
 import openai
 
+import base64
+from io import BytesIO
 
+from gptcache.utils import import_pillow
 from gptcache import CacheError
 from gptcache.adapter.adapter import adapt
 from gptcache.manager.scalar_data.base import Answer, AnswerType
@@ -19,11 +19,6 @@ from gptcache.utils.response import (
     get_image_from_openai_url,
     get_audio_text_from_openai_answer,
 )
-from gptcache.utils import import_pillow
-
-import_pillow()
-
-from PIL import Image as PILImage # pylint: disable=C0413
 
 
 class ChatCompletion(openai.ChatCompletion):
@@ -305,6 +300,9 @@ def construct_text_from_cache(return_text):
 
 
 def construct_image_create_resp_from_cache(image_data, response_format, size):
+    import_pillow()
+    from PIL import Image as PILImage  # pylint: disable=C0415
+
     img_bytes = base64.b64decode((image_data))
     img_file = BytesIO(img_bytes)  # convert image to file-like object
     img = PILImage.open(img_file)
