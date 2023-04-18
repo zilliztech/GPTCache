@@ -59,7 +59,7 @@ def get_msg_func(data, **_):
 
 
 def test_langchain_chats():
-    question = [HumanMessage(content="hello")]
+    question = [HumanMessage(content="test_langchain_chats")]
     msg = "chat models"
     expect_answer = {
         "role": "assistant",

@@ -1,4 +1,4 @@
-from gptcache.processor.post import random_one, first
+from gptcache.processor.post import random_one, first, nop
 
 
 def test_random_one():
@@ -9,3 +9,9 @@ def test_random_one():
 def test_first():
     message = first(["foo", "foo2"])
     assert message == "foo"
+
+
+def test_nop():
+    message = nop(["foo", "foo2"])
+    assert "foo" in message
+    assert "foo2" in message
