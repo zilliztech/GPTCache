@@ -1,6 +1,7 @@
 import logging
-from gptcache import cache, time_cal
+from gptcache import cache
 from gptcache.utils.error import NotInitError
+from gptcache.utils.time import time_cal
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):

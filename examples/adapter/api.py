@@ -1,8 +1,8 @@
 from gptcache.adapter.api import put, get
-from gptcache.manager import CacheBase, VectorBase
+from gptcache.manager import CacheBase, VectorBase, get_data_manager
 from gptcache.processor.pre import get_prompt
 from gptcache.processor.post import nop
-from gptcache import cache, get_data_manager, Config, Cache
+from gptcache import cache, Config, Cache
 from gptcache.embedding import Onnx as EmbeddingOnnx
 from gptcache.similarity_evaluation import SearchDistanceEvaluation
 

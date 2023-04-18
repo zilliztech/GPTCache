@@ -1,8 +1,11 @@
 import os
 import time
+
+from gptcache.manager import get_data_manager
 from gptcache.utils.error import NotInitError
 from gptcache.adapter.adapter import adapt
-from gptcache import cache, time_cal, get_data_manager, Cache
+from gptcache import cache, Cache
+from gptcache.utils.time import time_cal
 
 data_map_path = "data_map.txt"
 
