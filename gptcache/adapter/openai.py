@@ -27,7 +27,28 @@ from PIL import Image as PILImage # pylint: disable=C0413
 
 
 class ChatCompletion(openai.ChatCompletion):
-    """Openai ChatCompletion Wrapper"""
+    """Openai ChatCompletion Wrapper
+
+    Example:
+        .. code-block:: python
+            from gptcache import cache
+            from gptcache.processor.pre import get_prompt
+            # init gptcache
+            cache.init(pre_embedding_func=get_prompt)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run ChatCompletion model with gptcache
+            response = openai.ChatCompletion.create(
+                          model='gpt-3.5-turbo',
+                          messages=[
+                            {
+                                'role': 'user',
+                                'content': "what's github"
+                            }],
+                        )
+            response_content = response['choices'][0]['message']['content']
+    """
 
     @classmethod
     def llm_handler(cls, *llm_args, **llm_kwargs):
@@ -69,7 +90,22 @@ class ChatCompletion(openai.ChatCompletion):
 
 
 class Completion(openai.Completion):
-    """Openai Completion Wrapper"""
+    """Openai Completion Wrapper
+
+    Example:
+        .. code-block:: python
+            from gptcache import cache
+            from gptcache.processor.pre import get_prompt
+            # init gptcache
+            cache.init(pre_embedding_func=get_prompt)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run Completion model with gptcache
+            response = openai.Completion.create(model="text-davinci-003",
+                                                prompt="Hello world.")
+            response_text = response["choices"][0]["text"]
+    """
 
     @classmethod
     def llm_handler(cls, *llm_args, **llm_kwargs):
@@ -96,7 +132,25 @@ class Completion(openai.Completion):
 
 
 class Audio(openai.Audio):
-    """Openai Audio Wrapper"""
+    """Openai Audio Wrapper
+
+    Example:
+        .. code-block:: python
+            from gptcache import cache
+            from gptcache.processor.pre import get_file_bytes
+            # init gptcache
+            cache.init(pre_embedding_func=get_file_bytes)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run audio transcribe model with gptcache
+            audio_file= open("/path/to/audio.mp3", "rb")
+            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+
+            # run audio transcribe model with gptcache
+            audio_file= open("/path/to/audio.mp3", "rb")
+            transcript = openai.Audio.translate("whisper-1", audio_file)
+    """
     @classmethod
     def transcribe(cls, model: str, file: Any, *args, **kwargs):
         def llm_handler(*llm_args, **llm_kwargs):
@@ -117,7 +171,7 @@ class Audio(openai.Audio):
         )
 
     @classmethod
-    def translate(cls, model: str, file: bytes, *args, **kwargs):
+    def translate(cls, model: str, file: Any, *args, **kwargs):
         def llm_handler(*llm_args, **llm_kwargs):
             try:
                 return openai.Audio.translate(*llm_args, **llm_kwargs)
@@ -137,10 +191,31 @@ class Audio(openai.Audio):
 
 
 class Image(openai.Image):
-    """Openai Image Wrapper"""
+    """Openai Image Wrapper
+
+    Example:
+        .. code-block:: python
+            from gptcache import cache
+            from gptcache.processor.pre import get_prompt
+            # init gptcache
+            cache.init(pre_embedding_func=get_prompt)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run image generation model with gptcache
+            response = openai.Image.create(
+              prompt="a white siamese cat",
+              n=1,
+              size="256x256"
+            )
+            response_url = response['data'][0]['url']
+    """
 
     @classmethod
     def create(cls, *args, **kwargs):
+        response_format = kwargs.pop("response_format", "url")
+        size = kwargs.pop("size", "256x256")
+
         def llm_handler(*llm_args, **llm_kwargs):
             try:
                 return openai.Image.create(*llm_args, **llm_kwargs)
@@ -150,20 +225,20 @@ class Image(openai.Image):
         def cache_data_convert(cache_data):
             return construct_image_create_resp_from_cache(
                 image_data=cache_data,
-                response_format=kwargs["response_format"],
-                size=kwargs["size"]
+                response_format=response_format,
+                size=size
                 )
 
         def update_cache_callback(llm_data, update_cache_func):
-            if kwargs["response_format"] == "b64_json":
+            if response_format == "b64_json":
                 update_cache_func(Answer(get_image_from_openai_b64(llm_data), AnswerType.IMAGE_BASE64))
                 return llm_data
-            elif kwargs["response_format"] == "url":
+            elif response_format == "url":
                 update_cache_func(Answer(get_image_from_openai_url(llm_data), AnswerType.IMAGE_URL))
                 return llm_data
 
         return adapt(
-            llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+            llm_handler, cache_data_convert, update_cache_callback, response_format=response_format, size=size, *args, **kwargs
         )
 
 
