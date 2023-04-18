@@ -8,7 +8,7 @@ import base64
 from io import BytesIO
 
 from gptcache.utils import import_pillow
-from gptcache import CacheError
+from gptcache.utils.error import CacheError
 from gptcache.adapter.adapter import adapt
 from gptcache.manager.scalar_data.base import Answer, AnswerType
 from gptcache.utils.response import (

@@ -1,7 +1,8 @@
 import os
 
-from gptcache import Cache, Config, get_data_manager
+from gptcache import Cache, Config
 from gptcache.adapter import openai
+from gptcache.manager import get_data_manager
 from gptcache.processor.pre import last_content_without_prompt
 from gptcache.utils.response import get_message_from_openai_answer
 
