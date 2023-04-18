@@ -325,6 +325,7 @@ def construct_image_create_resp_from_cache(image_data, response_format, size):
         raise AttributeError(f"Invalid response_format: {response_format} is not one of ['url', 'b64_json']")
 
     return {
+        "gptcache": True,
         "created": int(time.time()),
         "data": [
             {response_format: image_data}
@@ -334,5 +335,6 @@ def construct_image_create_resp_from_cache(image_data, response_format, size):
 
 def construct_audio_text_from_cache(return_text):
     return {
+        "gptcache": True,
         "text": return_text,
     }
