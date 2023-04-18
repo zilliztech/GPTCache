@@ -16,7 +16,8 @@ __all__ = [
     "import_pydantic",
     "import_langchain",
     "import_pillow",
-    "import_boto3"
+    "import_boto3",
+    "import_diffusers"
 ]
 
 import importlib.util
@@ -130,3 +131,7 @@ def import_pillow():
 
 def import_boto3():
     _check_library("boto3")
+
+
+def import_diffusers():
+    _check_library("diffusers")
