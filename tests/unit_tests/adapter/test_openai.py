@@ -11,7 +11,7 @@ from gptcache.utils.response import (
 from gptcache.adapter import openai
 from gptcache import cache
 from gptcache.manager import get_data_manager
-from gptcache.processor.pre import get_prompt, get_file_bytes
+from gptcache.processor.pre import get_prompt, get_file_name
 
 import os
 import base64
@@ -221,9 +221,10 @@ def test_image_create():
 
 
 def test_audio_transcribe():
-    cache.init(pre_embedding_func=get_file_bytes)
+    cache.init(pre_embedding_func=get_file_name)
     url = "https://github.com/towhee-io/examples/releases/download/data/blues.00000.mp3"
     audio_file = urlopen(url)
+    audio_file.name = url
     expect_answer = (
         "One bourbon, one scotch and one bill Hey Mr. Bartender, come here I want another drink and I want it now My baby she gone, "
         "she been gone tonight I ain't seen my baby since night of her life One bourbon, one scotch and one bill"
@@ -243,11 +244,12 @@ def test_audio_transcribe():
 
 def test_audio_translate():
     cache.init(
-        pre_embedding_func=get_file_bytes,
+        pre_embedding_func=get_file_name,
         data_manager=get_data_manager(data_path="data_map1.txt"),
     )
     url = "https://github.com/towhee-io/examples/releases/download/data/blues.00000.mp3"
     audio_file = urlopen(url)
+    audio_file.name = url
     expect_answer = (
         "One bourbon, one scotch and one bill Hey Mr. Bartender, come here I want another drink and I want it now My baby she gone, "
         "she been gone tonight I ain't seen my baby since night of her life One bourbon, one scotch and one bill"

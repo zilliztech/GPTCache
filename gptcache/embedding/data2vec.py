@@ -33,7 +33,7 @@ class Data2VecAudio(BaseEmbedding):
         self.__dimension = self.model.config.hidden_size
         self.sr = self.processor.feature_extractor.sampling_rate
 
-    def to_embeddings(self, data):
+    def to_embeddings(self, data, **_):
         """Generate embedding given text input
 
         :param data: path to audio file.

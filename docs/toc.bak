@@ -32,6 +32,8 @@
    bootcamp/openai/chat
    bootcamp/openai/language_translate
    bootcamp/openai/sql_translate
+   bootcamp/openai/image_generation
+   bootcamp/openai/speech_to_text
 
 .. toctree::
    :maxdepth: 1
