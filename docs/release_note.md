@@ -5,7 +5,27 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
-## v0.1.13 (2023.4.16)
+## v0.1.15 (2023.4.17)
+
+1. Add GPTCache api, makes it easier to access other different llm models and applications
+
+```python
+from gptcache.adapter.api import put, get
+from gptcache.processor.pre import get_prompt
+from gptcache import cache
+
+cache.init(pre_embedding_func=get_prompt)
+put("hello", "foo")
+print(get("hello"))
+```
+
+2. Add image generation bootcamp, link: https://github.com/zilliztech/GPTCache/blob/main/docs/bootcamp/openai/image_generation.ipynb
+
+## v0.1.14 (2023.4.17)
+
+1. Fix to fail to save the data to cache
+
+## ~~v0.1.13 (2023.4.16)~~ Don't Use it, should use the `v0.1.14`
 
 1. Add openai audio adapter (**experimental**)
 
