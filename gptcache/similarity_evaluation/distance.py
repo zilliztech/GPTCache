@@ -6,6 +6,12 @@ from gptcache.similarity_evaluation import SimilarityEvaluation
 class SearchDistanceEvaluation(SimilarityEvaluation):
     """Using search distance to evaluate sentences pair similarity.
 
+    This is the evaluator to compare two embeddings according to their distance computed in embedding retrieval stage.
+    In the retrieval stage, `search_result` is the distance used for approximate nearest neighbor search and have been
+    put into `cache_dict`. `max_distance` is used to bound this distance to make it between [0-`max_distance`]. `positive` is
+    used to indicate this distance is directly proportional to the similarity of two entites. If `positive` is set `False`,
+    `max_distance` will be used to substract this distance to get the final score.
+
     :param max_distance: the bound of maximum distance.
     :type max_distance: float
     :param positive: if the larger distance indicates more similar of two entities, It is True. Otherwise it is False.

@@ -27,6 +27,8 @@ def pad_sequence(input_ids_list: List[np.ndarray], padding_value: int = 0):
 class OnnxModelEvaluation(SimilarityEvaluation):
     """Using ONNX model to evaluate sentences pair similarity.
 
+    This evaluator use the ONNX model to evaluate the similarity of two sentences.
+
     :param model: model name of OnnxModelEvaluation. Default is 'GPTCache/albert-duplicate-onnx'.
     :type model: str
 

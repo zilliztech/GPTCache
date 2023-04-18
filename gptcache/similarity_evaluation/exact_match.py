@@ -6,6 +6,9 @@ from gptcache.similarity_evaluation.similarity_evaluation import SimilarityEvalu
 class ExactMatchEvaluation(SimilarityEvaluation):
     """Using exact metric to evaluate sentences pair similarity.
 
+    This evaluator is used to directly compare two `question` from text. If every single character in two questions can match, then this evaluator
+    will return 1 else 0.
+
     Example:
         .. code-block:: python
 
