@@ -25,13 +25,14 @@ class KReciprocalEvaluation(SearchDistanceEvaluation):
 
             from gptcache.similarity_evaluation import KReciprocalEvaluation
             from gptcache.manager.vector_data.faiss import Faiss
+            from gptcache.manager.vector_data.base import VectorData
             import numpy as np
 
             faiss = Faiss('./none', 3, 10)
-            cached_data = np.array([1.0, 2.0, 3.0])
-            faiss.add(0, cached_data)
-            evaluation = KReciprocalEvaluation(vectordb=faiss, 4.0, False)
-            query = np.array([1.1, 2.1, 3.1])
+            cached_data = np.array([0.57735027, 0.57735027, 0.57735027])
+            faiss.mul_add([VectorData(id=0, data=cached_data)])
+            evaluation = KReciprocalEvaluation(vectordb=faiss, top_k=2, max_distance = 4.0, positive=False)
+            query = np.array([0.61396013, 0.55814557, 0.55814557])
             score = evaluation.evaluation(
                 {
                     'question': 'question1',
