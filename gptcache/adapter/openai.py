@@ -10,7 +10,7 @@ from io import BytesIO
 from gptcache.utils import import_pillow
 from gptcache.utils.error import CacheError
 from gptcache.adapter.adapter import adapt
-from gptcache.manager.scalar_data.base import Answer, AnswerType
+from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
@@ -53,9 +53,9 @@ class ChatCompletion(openai.ChatCompletion):
             raise CacheError("openai error") from e
 
     @staticmethod
-    def update_cache_callback(llm_data, update_cache_func):
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
         if not isinstance(llm_data, Iterator):
-            update_cache_func(Answer(get_message_from_openai_answer(llm_data), AnswerType.STR))
+            update_cache_func(Answer(get_message_from_openai_answer(llm_data), DataType.STR))
             return llm_data
         else:
 
@@ -64,7 +64,7 @@ class ChatCompletion(openai.ChatCompletion):
                 for item in it:
                     total_answer += get_stream_message_from_openai_answer(item)
                     yield item
-                update_cache_func(Answer(total_answer, AnswerType.STR))
+                update_cache_func(Answer(total_answer, DataType.STR))
 
             return hook_openai_data(llm_data)
 
@@ -111,8 +111,8 @@ class Completion(openai.Completion):
         return construct_text_from_cache(cache_data)
 
     @staticmethod
-    def update_cache_callback(llm_data, update_cache_func):
-        update_cache_func(get_text_from_openai_answer(llm_data))
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+        update_cache_func(Answer(get_text_from_openai_answer(llm_data), DataType.STR))
         return llm_data
 
     @classmethod
@@ -157,8 +157,8 @@ class Audio(openai.Audio):
         def cache_data_convert(cache_data):
             return construct_audio_text_from_cache(cache_data)
 
-        def update_cache_callback(llm_data, update_cache_func):
-            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), AnswerType.STR))
+        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR))
             return llm_data
 
         return adapt(
@@ -176,8 +176,8 @@ class Audio(openai.Audio):
         def cache_data_convert(cache_data):
             return construct_audio_text_from_cache(cache_data)
 
-        def update_cache_callback(llm_data, update_cache_func):
-            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), AnswerType.STR))
+        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs): # pylint: disable=unused-argument
+            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR))
             return llm_data
 
         return adapt(
@@ -224,13 +224,12 @@ class Image(openai.Image):
                 size=size
                 )
 
-        def update_cache_callback(llm_data, update_cache_func):
+        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
             if response_format == "b64_json":
-                update_cache_func(Answer(get_image_from_openai_b64(llm_data), AnswerType.IMAGE_BASE64))
-                return llm_data
+                update_cache_func(Answer(get_image_from_openai_b64(llm_data), DataType.IMAGE_BASE64))
             elif response_format == "url":
-                update_cache_func(Answer(get_image_from_openai_url(llm_data), AnswerType.IMAGE_URL))
-                return llm_data
+                update_cache_func(Answer(get_image_from_openai_url(llm_data), DataType.IMAGE_URL))
+            return llm_data
 
         return adapt(
             llm_handler, cache_data_convert, update_cache_callback, response_format=response_format, size=size, *args, **kwargs
