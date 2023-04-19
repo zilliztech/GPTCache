@@ -1,0 +1,10 @@
+filters:
+  ".*":
+    reviewers:
+      - SimFG
+      - xiaofan-luan
+      - cxie
+    approvers:
+      - SimFG
+      - xiaofan-luan
+      - cxie

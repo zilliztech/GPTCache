@@ -1,0 +1,55 @@
+name: Publish package to PyPI
+# on:
+#   push:
+#     branches:
+#       - 'main'
+#     paths:
+#       - 'gptcache/**'
+#       - '!**.md'
+#       - '.github/workflows/publish_dev_package.yaml'
+#   pull_request:
+#     branches:
+#       - main
+#     paths:
+#       - '.github/workflows/publish_dev_package.yaml'
+on:
+  workflow_dispatch:
+
+  release:
+    types: [published]
+      # tags:
+      #   description: 'Test scenario tags'
+      #   required: false
+      #   type: boolean
+
+jobs:
+  build-and-publish-release:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@v2.3.1
+      with:
+        python-version: 3.8
+    # - name: Get history and tags for SCM versioning
+    #   run: |
+    #       git fetch --prune --unshallow
+    #       git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+    - name: Install pypi/build
+      run: >-
+        python -m
+        pip install
+        build
+        --user
+    - name: Build a binary wheel and a source tarball
+      run: >-
+        python -m
+        build
+        --sdist
+        --wheel
+        --outdir dist/
+        .
+    - name: Publish distribution 📦 to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.PYPI_TOKEN }}

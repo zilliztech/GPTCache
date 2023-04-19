@@ -1,0 +1,39 @@
+name: Pylint
+on:
+  push:
+    branches:
+      - main
+      - dev
+      # file paths to consider in the event
+    paths:
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+      - dev
+      # file paths to consider in the event
+    paths:
+      - 'examples/**'
+      - 'gptcache/**'
+      - 'tests/**'
+      - '!**.md'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.0.0
+    - name: Setup Python
+      uses: actions/setup-python@v3.0.0
+      with:
+        python-version: 3.8
+    - name: Python pylint
+      run: |
+        pip install pylint==2.10.2
+        make pylint_check

@@ -1,0 +1,39 @@
+.. toctree::
+   :maxdepth: 1
+   :caption: Getting Started
+   :name: getting-started
+   :hidden:
+
+   usage.md
+   feature.md
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Bootcamp
+   :name: bootcamp
+   :hidden:
+
+   bootcamp/langchain/qa_generation
+   bootcamp/langchain/question_answering
+   bootcamp/langchain/sqlite
+   bootcamp/openai/chat
+   bootcamp/openai/language_translate
+   bootcamp/openai/sql_translate
+   bootcamp/openai/image_generation
+   bootcamp/openai/speech_to_text
+
+.. toctree::
+   :maxdepth: 1
+   :caption: References
+   :name: references
+   :hidden:
+
+   references/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contributing
+   :name: contributing
+   :hidden:
+
+   contributing.md
