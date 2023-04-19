@@ -10,6 +10,10 @@ class DocGen:
 
         self.OUTPUT = os.path.abspath(output_dir)
         self.skip_list = _default_skip_list + skip_list
+        self.expand_func_list = ['core']
+        self.add_list = [
+            'adapter.api', 'adapter.adapter', 'adapter.openai', 'adapter.diffusers', 'adapter.langchain_models'
+            ]
     
     @staticmethod
     def title_bar(input):
@@ -50,6 +54,14 @@ class DocGen:
         except ImportError:
             print(f"Can't import {lib_name}")
             return
+        
+        for x in self.add_list:
+            try:
+                sub_lib_name = lib_name + '.' + x
+                __import__(sub_lib_name)
+            except ImportError:
+                print(f"Can't import {sub_lib_name}")
+                continue
 
         # Get the modules, functions, and classes
         modules = [ x for x in inspect.getmembers(lib) if inspect.ismodule(x[1]) and str.startswith(x[1].__name__, f'{lib_name}.') ]
@@ -82,7 +94,11 @@ class DocGen:
         # Iterate the modules, render the function templates and write rendered output to files
         for module in modules:
             module_name = module[0]
-            ms = [ x for x in inspect.getmembers(module[1]) if inspect.ismodule(x[1]) ]
+                         
+            if module_name in self.expand_func_list:
+                ms = [ x for x in inspect.getmembers(module[1]) if inspect.isfunction(x[1]) ]
+            else:
+                ms = [ x for x in inspect.getmembers(module[1]) if inspect.ismodule(x[1]) ]
             ms = [ x + (f"{lib_name}.{module_name}.{x[0]}",) for x in ms if x[0] not in self.skip_list ]
             t = func_temp.render({
                 "module_name": module[0],

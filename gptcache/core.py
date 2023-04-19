@@ -20,6 +20,7 @@ from gptcache.utils.log import gptcache_log
 class Cache:
     """Initialize GPTCache.
 
+
     Example:
         .. code-block:: python
 

@@ -8,19 +8,6 @@
    feature.md
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Modules
-   :name: modules
-   :hidden:
-
-   modules/llm_adapter
-   modules/embedding_generator
-   modules/cache_storage
-   modules/vector_store
-   modules/cache_manager
-   modules/similarity_evaluator
-
-.. toctree::
    :maxdepth: 1
    :caption: Bootcamp
    :name: bootcamp
