@@ -6,6 +6,7 @@ from gptcache.processor.pre import get_prompt
 from gptcache.utils import import_pillow, import_diffusers, import_torch, import_huggingface
 
 import_pillow()
+import_huggingface()
 import_diffusers()
 import_torch()
 

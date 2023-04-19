@@ -62,8 +62,10 @@ class LangChainChat(BaseChatModel, BaseModel):
 
     :param chat: LLM from langchain.chat_models.
     :type chat: Any
+
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.processor.pre import get_prompt
             # init gptcache

@@ -26,6 +26,7 @@ class ChatCompletion(openai.ChatCompletion):
 
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.processor.pre import get_prompt
             # init gptcache
@@ -89,6 +90,7 @@ class Completion(openai.Completion):
 
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.processor.pre import get_prompt
             # init gptcache
@@ -131,6 +133,7 @@ class Audio(openai.Audio):
 
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.processor.pre import get_file_bytes
             # init gptcache
@@ -190,6 +193,7 @@ class Image(openai.Image):
 
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.processor.pre import get_prompt
             # init gptcache

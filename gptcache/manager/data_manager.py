@@ -63,6 +63,7 @@ class MapDataManager(DataManager):
 
     Example:
         .. code-block:: python
+
             from gptcache.manager import get_data_manager
 
             data_manager = get_data_manager("data_map.txt", 1000)
