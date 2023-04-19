@@ -233,15 +233,22 @@ The LLM Adapter is designed to integrate different LLM models by unifying their 
   - [x] Support OpenAI ChatGPT API.
   - [x] Support langchain.
   - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic, and self-hosted models like LLaMA.
+- **Multimodal Adapter (experimental)**: 
+The Multimodal Adapter is designed to integrate different large multimodal models by unifying their APIs and request protocols. GPTCache offers a standardized interface for this purpose, with current support for integrations of image generation, audio transcription.
+  - [x] Support OpenAI Image Create.
+  - [x] Support OpenAI Audio Transcribe.
+  - [x] Support Hugging Face Stable Diffusion Pipeline (local inference).
+  - [ ] Support BLIP model (local inference).
+  - [ ] Support other multimodal services or self-hosted large multimodal models.
 - **Embedding Generator**: 
 This module is created to extract embeddings from requests for similarity search. GPTCache offers a generic interface that supports multiple embedding APIs, and presents a range of solutions to choose from. 
   - [x] Disable embedding. This will turn GPTCache into a keyword-matching cache.
   - [x] Support OpenAI embedding API.
   - [x] Support [ONNX](https://onnx.ai/) with the GPTCache/paraphrase-albert-onnx model.
-  - [x] Support [Hugging Face](https://huggingface.co/) embedding API.
+  - [x] Support [Hugging Face](https://huggingface.co/) embedding with transformers, Data2VecAudio.
   - [x] Support [Cohere](https://docs.cohere.ai/reference/embed) embedding API.
-  - [x] Support [fastText](https://fasttext.cc) embedding API.
-  - [x] Support [SentenceTransformers](https://www.sbert.net) embedding API.
+  - [x] Support [fastText](https://fasttext.cc) embedding.
+  - [x] Support [SentenceTransformers](https://www.sbert.net) embedding.
   - [ ] Support other embedding APIs.
 - **Cache Storage**:
 **Cache Storage** is where the response from LLMs, such as ChatGPT, is stored. Cached responses are retrieved to assist in evaluating similarity and are returned to the requester if there is a good semantic match. At present, GPTCache supports SQLite and offers a universally accessible interface for extension of this module.
