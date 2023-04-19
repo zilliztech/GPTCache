@@ -5,6 +5,46 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.16 (2023.4.18)
+
+1. Add StableDiffusion adapter (**experimental**)
+
+```python
+import torch
+
+from gptcache.adapter.diffusers import StableDiffusionPipeline
+from gptcache.processor.pre import get_prompt
+from gptcache import cache
+
+cache.init(
+    pre_embedding_func=get_prompt,
+)
+model_id = "stabilityai/stable-diffusion-2-1"
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+
+prompt = "a photo of an astronaut riding a horse on mars"
+pipe(prompt=prompt).images[0]
+```
+
+2. Add speech to text bootcamp, [link](https://github.com/zilliztech/GPTCache/tree/main/docs/bootcamp/openai/speech_to_text.ipynb)
+
+3. More convenient management of cache files
+
+```python
+from gptcache.manager.factory import manager_factory
+
+data_manager = manager_factory('sqlite,faiss', data_dir="test_cache", vector_params={"dimension": 5})
+```
+
+4. Add a simple GPTCache server (**experimental**)
+
+After starting this server, you can:
+
+- put the data to cache, like: `curl -X PUT -d "receive a hello message" "http://localhost:8000?prompt=hello"`
+- get the data from cache, like: `curl -X GET  "http://localhost:8000?prompt=hello"`
+
+Currently the service is just a map cache, more functions are still under development.
+
 ## v0.1.15 (2023.4.17)
 
 1. Add GPTCache api, makes it easier to access other different llm models and applications
