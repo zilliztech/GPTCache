@@ -37,3 +37,13 @@ def get_prompt(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
 
 def get_file_name(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
     return data.get("file").name
+
+
+def get_input_str(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
+    input_data = data.get("input")
+    return str(input_data["image"].peek()) + input_data["question"]
+
+
+def get_input_image_file_name(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
+    input_data = data.get("input")
+    return input_data["image"].name

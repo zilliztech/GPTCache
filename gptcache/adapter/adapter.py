@@ -96,6 +96,8 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             def update_cache_func(handled_llm_data, question=None):
                 if question is None:
                     question = pre_embedding_data
+                else:
+                    question.content = pre_embedding_data
                 chat_cache.data_manager.save(
                     question,
                     handled_llm_data,
