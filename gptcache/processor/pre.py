@@ -37,3 +37,7 @@ def get_prompt(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
 
 def get_file_name(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
     return data.get("file").name
+
+
+def get_input_str(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
+    return str(data.get("input"))

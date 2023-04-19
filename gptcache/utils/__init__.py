@@ -141,3 +141,6 @@ def import_diffusers():
 def import_torchaudio():
     _check_library("torchaudio")
 
+
+def import_replicate():
+    _check_library("replicate")
