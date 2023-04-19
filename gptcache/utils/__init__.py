@@ -17,8 +17,9 @@ __all__ = [
     "import_langchain",
     "import_pillow",
     "import_boto3",
-    "import_diffusers"
-]
+    "import_diffusers",
+    "import_torchaudio"
+    ]
 
 import importlib.util
 from typing import Optional
@@ -135,3 +136,8 @@ def import_boto3():
 
 def import_diffusers():
     _check_library("diffusers")
+
+
+def import_torchaudio():
+    _check_library("torchaudio")
+
