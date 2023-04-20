@@ -18,7 +18,8 @@ __all__ = [
     "import_pillow",
     "import_boto3",
     "import_diffusers",
-    "import_torchaudio"
+    "import_torchaudio",
+    "import_timm"
     ]
 
 import importlib.util
@@ -141,3 +142,6 @@ def import_diffusers():
 def import_torchaudio():
     _check_library("torchaudio")
 
+
+def import_timm():
+    _check_library("timm", package="timm")
