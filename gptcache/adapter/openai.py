@@ -230,7 +230,10 @@ class Image(openai.Image):
 
         def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
             if response_format == "b64_json":
-                update_cache_func(Answer(get_image_from_openai_b64(llm_data), DataType.IMAGE_BASE64))
+                img_b64 = get_image_from_openai_b64(llm_data)
+                if isinstance(img_b64, str):
+                    img_b64 = img_b64.encode("ascii")
+                update_cache_func(Answer(img_b64, DataType.IMAGE_BASE64))
             elif response_format == "url":
                 update_cache_func(Answer(get_image_from_openai_url(llm_data), DataType.IMAGE_URL))
             return llm_data
@@ -323,7 +326,7 @@ def construct_image_create_resp_from_cache(image_data, response_format, size):
             f.write(buffered.getvalue())
         image_data = target_url
     elif response_format == "b64_json":
-        image_data = base64.b64encode(buffered.getvalue())
+        image_data = base64.b64encode(buffered.getvalue()).decode("ascii")
     else:
         raise AttributeError(f"Invalid response_format: {response_format} is not one of ['url', 'b64_json']")
 

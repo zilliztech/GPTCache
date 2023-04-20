@@ -9,13 +9,14 @@ from gptcache import cache
 
 from gptcache.embedding import Onnx
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
-from gptcache.manager import get_data_manager, CacheBase, VectorBase
+from gptcache.manager import get_data_manager, CacheBase, VectorBase, ObjectBase
 
 
 onnx = Onnx()
 cache_base = CacheBase('sqlite')
 vector_base = VectorBase('milvus', host='localhost', port='19530', collection_name='gptcache_image', dimension=onnx.dimension)
-data_manager = get_data_manager(cache_base, vector_base)
+object_base = ObjectBase('local', path='./images')
+data_manager = get_data_manager(cache_base, vector_base, object_base)
 
 cache.init(
     pre_embedding_func=get_prompt,
