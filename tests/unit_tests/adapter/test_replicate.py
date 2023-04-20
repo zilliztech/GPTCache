@@ -1,4 +1,6 @@
 import base64
+import os
+
 import numpy as np
 from io import BytesIO, BufferedReader
 from unittest.mock import patch
@@ -61,6 +63,10 @@ def test_run():
         input={"image": expected_img_data}
     )
     assert answer_text == expect_answer
+
+    faiss_file = "faiss.index"
+    if os.path.isfile(faiss_file):
+        os.remove(faiss_file)
 
     data_manager = manager_factory("sqlite,faiss", data_dir='.', vector_params={"dimension": 100})
     vector_data = np.random.random((100,)).astype("float32")

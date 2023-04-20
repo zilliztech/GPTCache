@@ -1,6 +1,6 @@
 import os
-from tempfile import TemporaryDirectory
 
+from gptcache.utils.response import get_message_from_openai_answer
 from gptcache.manager.factory import get_data_manager
 from gptcache.adapter import openai
 from gptcache import cache, Cache
@@ -33,8 +33,23 @@ def test_map():
             [f"receiver the foo {i}" for i in range(10, 20)],
         )
 
+    expect_answer = "receiver the foo 15"
     answer = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=mock_messages,
     )
-    print(answer)
+    assert get_message_from_openai_answer(answer) == expect_answer
+
+    cache.flush()
+
+    bak_cache2 = Cache()
+    bak_cache2.init(data_manager=get_data_manager(data_path=bak_data_file, max_size=10))
+    cache.init(
+        data_manager=get_data_manager(data_path=data_file, max_size=10),
+        next_cache=bak_cache2,
+    )
+    answer = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=mock_messages,
+    )
+    assert get_message_from_openai_answer(answer) == expect_answer

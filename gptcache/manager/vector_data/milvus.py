@@ -187,7 +187,10 @@ class Milvus(VectorBase):
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
         self.col.compact()
 
-    def close(self):
+    def flush(self):
         self.col.flush(_async=True)
+
+    def close(self):
+        self.flush()
         if self._local_mode:
             self._server.stop()

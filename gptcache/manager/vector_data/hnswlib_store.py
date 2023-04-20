@@ -68,5 +68,8 @@ class Hnswlib(VectorBase):
         for i in ids:
             self._index.mark_deleted(i)
 
-    def close(self):
+    def flush(self):
         self._index.save_index(self._index_file_path)
+
+    def close(self):
+        self.flush()
