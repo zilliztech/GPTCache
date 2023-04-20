@@ -86,7 +86,7 @@ class Timm(BaseEmbedding):
         data_cfg = resolve_data_config(self.model.pretrained_cfg)
         transform = create_transform(**data_cfg)
 
-        image = Image.open(image_path)
+        image = Image.open(image_path).convert("RGB")
         image_tensor = transform(image)
         return image_tensor
 
