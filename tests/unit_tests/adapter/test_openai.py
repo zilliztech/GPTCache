@@ -11,7 +11,7 @@ from gptcache.utils.response import (
 from gptcache.adapter import openai
 from gptcache import cache
 from gptcache.manager import get_data_manager
-from gptcache.processor.pre import get_prompt, get_file_name
+from gptcache.processor.pre import get_prompt, get_file_name, get_file_bytes
 
 import os
 import base64
@@ -244,7 +244,7 @@ def test_audio_transcribe():
 
 def test_audio_translate():
     cache.init(
-        pre_embedding_func=get_file_name,
+        pre_embedding_func=get_file_bytes,
         data_manager=get_data_manager(data_path="data_map1.txt"),
     )
     url = "https://github.com/towhee-io/examples/releases/download/data/blues.00000.mp3"
@@ -262,6 +262,7 @@ def test_audio_translate():
         answer_text = get_audio_text_from_openai_answer(response)
         assert answer_text == expect_answer
 
+    audio_file.name = "download/data/blues.00000.mp3"
     response = openai.Audio.translate(model="whisper-1", file=audio_file)
     answer_text = get_audio_text_from_openai_answer(response)
     assert answer_text == expect_answer

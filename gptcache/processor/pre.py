@@ -39,6 +39,10 @@ def get_file_name(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
     return data.get("file").name
 
 
+def get_file_bytes(data: Dict[str, Any], **_: Dict[str, Any]) -> bytes:
+    return data.get("file").peek()
+
+
 def get_input_str(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
     input_data = data.get("input")
     return str(input_data["image"].peek()) + input_data["question"]
