@@ -18,8 +18,7 @@ from gptcache.adapter import replicate
 from gptcache.processor.pre import get_input_str, get_input_image_file_name
 from gptcache.utils.response import get_image_from_openai_url
 from gptcache.manager.factory import manager_factory
-from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
-
+from gptcache.similarity_evaluation.onnx import OnnxModelEvaluation
 
 def test_run():
     test_response = {"data": [{"url": "https://raw.githubusercontent.com/zilliztech/GPTCache/dev/docs/GPTCache.png"}]}
@@ -73,7 +72,7 @@ def test_run():
     cache.init(pre_embedding_func=get_input_image_file_name,
                data_manager=data_manager,
                embedding_func=lambda data, **_: vector_data,
-               similarity_evaluation=SearchDistanceEvaluation())
+               similarity_evaluation=OnnxModelEvaluation())
     with patch("replicate.run") as mock_create:
         mock_create.return_value = expect_answer
         answer_text = replicate.run(
@@ -88,3 +87,7 @@ def test_run():
                "question": "Which project's architecture diagram is this?"}
     )
     assert answer_text == expect_answer
+
+
+if __name__ == "__main__":
+    test_run()
