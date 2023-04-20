@@ -246,8 +246,10 @@ class SSDataManager(DataManager):
         )
         self.eviction_base.put(ids)
 
-    def get_scalar_data(self, res_data, **kwargs) -> CacheData:
+    def get_scalar_data(self, res_data, **kwargs) -> Optional[CacheData]:
         cache_data = self.s.get_data_by_id(res_data[1])
+        if cache_data is None:
+            return None
         for ans in cache_data.answers:
             if ans.answer_type != DataType.STR:
                 ans.answer = self.o.get(ans.answer)

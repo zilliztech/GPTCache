@@ -1,3 +1,5 @@
+import os
+
 from gptcache.adapter.api import put, get
 from gptcache.manager import CacheBase, VectorBase, get_data_manager
 from gptcache.processor.pre import get_prompt
@@ -38,3 +40,26 @@ def test_gptcache_api():
     assert "foo3" in messages
 
     assert get("api-hello1") is None
+
+
+def test_none_scale_data():
+    embedding_onnx = EmbeddingOnnx()
+    cache_base = CacheBase("sqlite")
+    vector_base = VectorBase("faiss", dimension=embedding_onnx.dimension, top_k=10)
+    data_manager = get_data_manager(cache_base, vector_base)
+
+    evaluation = SearchDistanceEvaluation()
+    inner_cache = Cache()
+    inner_cache.init(
+        pre_embedding_func=get_prompt,
+        embedding_func=embedding_onnx.to_embeddings,
+        data_manager=data_manager,
+        similarity_evaluation=evaluation,
+        post_process_messages_func=nop,
+        config=Config(similarity_threshold=0),
+    )
+    put("api-hello1", "foo1", cache_obj=inner_cache)
+
+    os.remove("sqlite.db")
+    CacheBase("sqlite")
+    assert get("api-hello1", cache_obj=inner_cache) is None
