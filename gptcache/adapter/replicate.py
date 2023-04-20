@@ -36,7 +36,7 @@ class Client(replicate.client.Client):
 
             # run replicate clinet with gptcache
             output = replicate.run(
-                        "andreasjansson/blip-2:4b32258c42e9efd4288bb9910bc532a69727f9acd26aa08e175713a0a857a608",
+                        "andreasjansson/blip-2:xxx",
                         input={"image": open("/path/to/merlion.png", "rb"),
                                "question": "Which city is this photo taken on?"}
                     )
