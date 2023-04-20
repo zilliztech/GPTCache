@@ -178,7 +178,7 @@ def test_image_create():
     img = img.resize((256, 256))
     buffered = BytesIO()
     img.save(buffered, format="JPEG")
-    expected_img_data = base64.b64encode(buffered.getvalue())
+    expected_img_data = base64.b64encode(buffered.getvalue()).decode("ascii")
 
     ###### Return base64 ######
     with patch("openai.Image.create") as mock_create_b64:
@@ -215,7 +215,7 @@ def test_image_create():
     response = openai.Image.create(
         prompt=prompt2, size="256x256", response_format="url"
     )
-    img_returned = get_image_from_path(response)
+    img_returned = get_image_from_path(response).decode("ascii")
     assert img_returned == expected_img_data
     os.remove(response["data"][0]["url"])
 
