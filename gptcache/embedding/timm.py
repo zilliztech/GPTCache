@@ -1,13 +1,16 @@
 import numpy as np
 
-from gptcache.utils import import_timm, import_torch
+from gptcache.utils import import_timm, import_torch, import_pillow
 from gptcache.embedding.base import BaseEmbedding
 
 import_torch()
 import_timm()
+import_pillow()
 
 import torch  # pylint: disable=C0413
 from timm.models import create_model  # pylint: disable=C0413
+from timm.data import create_transform, resolve_data_config  # pylint: disable=C0413
+from PIL import Image  # pylint: disable=C0413
 
 
 class Timm(BaseEmbedding):
@@ -20,16 +23,12 @@ class Timm(BaseEmbedding):
         .. code-block:: python
 
             import requests
-            from PIL import Image
+            from io import BytesIO
             from gptcache.embedding import Timm
 
 
-            url = 'https://raw.githubusercontent.com/zilliztech/GPTCache/main/docs/GPTCache.png'
-            image = Image.open(requests.get(url, stream=True).raw)  # Read image url as PIL.Image
-
             encoder = Timm(model='resnet50')
-            image_tensor = encoder.preprocess(image)
-            embed = encoder.to_embeddings(image_tensor)
+            embed = encoder.to_embeddings('path/to/image')
     """
 
     def __init__(self, model: str = "resnet18", device: str = "default"):
@@ -46,14 +45,18 @@ class Timm(BaseEmbedding):
         except Exception:  # pylint: disable=W0703
             self.__dimension = None
 
-    def to_embeddings(self, data, **_):
+    def to_embeddings(self, data, skip_preprocess: bool = False, **_):
         """Generate embedding given image data
 
-        :param data: image data with batch size at index 0.
-        :type data: torch.Tensor
+        :param data: image path.
+        :type data: str
+        :param skip_preprocess: flag to skip preprocess, defaults to False, enable this if the input data is torch.tensor.
+        :type skip_preprocess: bool
 
         :return: an image embedding in shape of (dim,).
         """
+        if not skip_preprocess:
+            data = self.preprocess(data)
         if data.dim() == 3:
             data = data.unsqueeze(0)
         feats = self.model.forward_features(data)
@@ -72,19 +75,18 @@ class Timm(BaseEmbedding):
         assert features.dim() == 2, f"Invalid output dim {features.dim()}"
         return features
 
-    def preprocess(self, image):
-        """Transform image from PIL.Image to torch.tensor with model transformations.
+    def preprocess(self, image_path):
+        """Load image from path and then transform image to torch.tensor with model transformations.
 
-        :param image: image data.
-        :type data: PIL.Image
+        :param image_path: image path.
+        :type image_path: str
 
         :return: an image tensor (without batch size).
         """
-        from timm.data import create_transform, resolve_data_config  # pylint: disable=C0415
-
-
         data_cfg = resolve_data_config(self.model.pretrained_cfg)
         transform = create_transform(**data_cfg)
+
+        image = Image.open(image_path)
         image_tensor = transform(image)
         return image_tensor
 
@@ -99,6 +101,6 @@ class Timm(BaseEmbedding):
         if not self.__dimension:
             input_size = self.model.pretrained_cfg["input_size"]
             dummy_input = torch.rand((1,) + input_size)
-            feats = self.to_embeddings(dummy_input)
+            feats = self.to_embeddings(dummy_input, skip_preprocess=True)
             self.__dimension = feats.shape[0]
         return self.__dimension
