@@ -1,14 +1,14 @@
 import requests
-from PIL import Image
+from io import BytesIO
 from gptcache.embedding import Timm
 
 def test_timm():
     url = 'https://raw.githubusercontent.com/zilliztech/GPTCache/main/docs/GPTCache.png'
-    image = Image.open(requests.get(url, stream=True).raw)  # Read image url as PIL.Image      
+    image_bytes = requests.get(url).content
+    image_file = BytesIO(image_bytes)  # Convert image to file-like object
 
-    encoder = Timm(model='resnet18')
-    image_tensor = encoder.preprocess(image)
-    embed = encoder.to_embeddings(image_tensor)
+    encoder = Timm(model='resnet50')
+    embed = encoder.to_embeddings(image_file)
     assert len(embed) == encoder.dimension
 
 
