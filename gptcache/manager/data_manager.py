@@ -45,6 +45,9 @@ class DataManager(metaclass=ABCMeta):
     def search(self, embedding_data, **kwargs):
         pass
 
+    def flush(self):
+        pass
+
     @abstractmethod
     def close(self):
         pass
@@ -110,7 +113,7 @@ class MapDataManager(DataManager):
         except KeyError:
             return []
 
-    def close(self):
+    def flush(self):
         try:
             with open(self.data_path, "wb") as f:
                 pickle.dump(self.data, f)
@@ -118,6 +121,9 @@ class MapDataManager(DataManager):
             gptcache_log.error(
                 "You don't have permission to access this file %s.", self.data_path
             )
+
+    def close(self):
+        self.flush()
 
 
 def normalize(vec):
@@ -262,6 +268,10 @@ class SSDataManager(DataManager):
         embedding_data = normalize(embedding_data)
         top_k = kwargs.get("top_k", -1)
         return self.v.search(data=embedding_data, top_k=top_k)
+
+    def flush(self):
+        self.s.flush()
+        self.v.flush()
 
     def close(self):
         self.s.close()

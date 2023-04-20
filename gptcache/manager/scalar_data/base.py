@@ -118,6 +118,9 @@ class CacheStorage(metaclass=ABCMeta):
     def count(self):
         pass
 
+    def flush(self):
+        pass
+
     @abstractmethod
     def close(self):
         pass

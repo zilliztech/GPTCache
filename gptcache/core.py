@@ -96,6 +96,14 @@ class Cache:
             embedding_datas=[self.embedding_func(question) for question in questions],
         )
 
+    def flush(self):
+        """Flush data, to prevent accidental loss of memory data,
+        such as using map cache management or faiss, hnswlib vector storage will be useful
+        """
+        self.data_manager.flush()
+        if self.next_cache:
+            self.next_cache.data_manager.flush()
+
     @staticmethod
     def set_openai_key():
         openai.api_key = os.getenv("OPENAI_API_KEY")

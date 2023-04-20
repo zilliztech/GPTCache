@@ -8,8 +8,13 @@ from gptcache import cache, Config, Cache
 from gptcache.embedding import Onnx as EmbeddingOnnx
 from gptcache.similarity_evaluation import SearchDistanceEvaluation
 
+faiss_file = "faiss.index"
+
 
 def test_gptcache_api():
+    if os.path.isfile(faiss_file):
+        os.remove(faiss_file)
+
     cache.init(pre_embedding_func=get_prompt)
     put("test_gptcache_api_hello", "foo")
     assert get("test_gptcache_api_hello") == "foo"
@@ -43,6 +48,9 @@ def test_gptcache_api():
 
 
 def test_none_scale_data():
+    if os.path.isfile(faiss_file):
+        os.remove(faiss_file)
+
     embedding_onnx = EmbeddingOnnx()
     cache_base = CacheBase("sqlite")
     vector_base = VectorBase("faiss", dimension=embedding_onnx.dimension, top_k=10)

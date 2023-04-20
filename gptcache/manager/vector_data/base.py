@@ -30,6 +30,8 @@ class VectorBase(ABC):
     def delete(self, ids) -> bool:
         pass
 
-    @abstractmethod
-    def close(self) -> bool:
+    def flush(self):
+        pass
+
+    def close(self):
         pass
