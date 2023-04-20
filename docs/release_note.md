@@ -5,6 +5,46 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.17 (2023.4.20)
+
+1. Add image embedding timm
+
+```python
+import requests
+from PIL import Image
+from gptcache.embedding import Timm
+
+url = 'https://raw.githubusercontent.com/zilliztech/GPTCache/main/docs/GPTCache.png'
+image = Image.open(requests.get(url, stream=True).raw)  # Read image url as PIL.Image      
+encoder = Timm(model='resnet18')
+image_tensor = encoder.preprocess(image)
+embed = encoder.to_embeddings(image_tensor)
+```
+
+2. Add Replicate adapter, vqa (visual question answering) (**experimental**)
+
+```python
+from gptcache.adapter import replicate
+
+question = "what is in the image?"
+
+replicate.run(
+    "andreasjansson/blip-2:xxx",
+    input={
+        "image": open(image_path, 'rb'),
+        "question": question
+    }
+)
+```
+
+3. Support to flush data for preventing accidental loss of memory data
+
+```python
+from gptcache import cache
+
+cache.flush()
+```
+
 ## v0.1.16 (2023.4.18)
 
 1. Add StableDiffusion adapter (**experimental**)
