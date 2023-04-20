@@ -11,7 +11,7 @@ from gptcache.manager import get_data_manager, CacheBase, VectorBase, ObjectBase
 timm = Timm('resnet18')
 cache_base = CacheBase('sqlite')
 vector_base = VectorBase('faiss', dimension=timm.dimension)
-object_base = ObjectBase('local', path='./images')
+object_base = ObjectBase('local', path='./objects')
 data_manager = get_data_manager(cache_base, vector_base, object_base)
 
 cache.init(
@@ -40,6 +40,7 @@ end = time.time()
 print('Answer:', output)
 print('Time elapsed 1:', end - start)
 
+start = time.time()
 output = replicate.run(
     "andreasjansson/blip-2:xxx",
     input={
