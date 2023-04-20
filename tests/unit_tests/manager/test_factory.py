@@ -1,4 +1,6 @@
 import unittest
+from unittest import mock
+import os
 import numpy as np
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -27,6 +29,10 @@ class TestFactory(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             manager_factory("sqlite")
+
+        with mock.patch('gptcache.manager.vector_data.milvus.Milvus.__init__') as mock_init:
+            mock_init.return_value = None
+            self.assertIsNotNone(manager_factory("sqlite,milvus", vector_params={"dimension": 5, "port": "9999"}))
 
     def test_manager(self):
         with TemporaryDirectory(dir="./") as root:
@@ -68,7 +74,8 @@ class TestFactory(unittest.TestCase):
 
     def test_manager_factory(self):
         with TemporaryDirectory(dir="./") as root:
-            m = manager_factory('sqlite,faiss,local', data_dir=root, vector_params={"dimension": 5})
+            data_dir = os.path.join(root, 'dir_not_exist')
+            m = manager_factory('sqlite,faiss,local', data_dir=data_dir, vector_params={"dimension": 5})
             m.save("test_question",
                    Answer(b"my test data",
                           DataType.IMAGE_BASE64),

@@ -1,5 +1,6 @@
 import os
 from typing import Union, Callable
+from pathlib import Path
 from gptcache.manager.data_manager import SSDataManager, MapDataManager
 from gptcache.manager import CacheBase, VectorBase, ObjectBase
 
@@ -14,7 +15,7 @@ def manager_factory(manager="Map",
                     vector_params=None,
                     object_params=None):
 
-    """Factory of `DataManager`.
+    """Factory of DataManager.
        By using this factory method, you only need to specify the root directory of the data,
        and it can automatically manage all the local files.
 
@@ -48,8 +49,10 @@ def manager_factory(manager="Map",
 
             from gptcache.manager import manager_factory
 
-            data_manager = manager_factory("sqlite,faiss", data_root="./workspace", vector_params={"dimension": 128})
+            data_manager = manager_factory("sqlite,faiss", data_dir="./workspace", vector_params={"dimension": 128})
     """
+
+    Path(data_dir).mkdir(exist_ok=True)
 
     if manager == "Map":
         return MapDataManager(os.path.join(data_dir, "data_map.txt"), max_size, get_data_container)
@@ -74,7 +77,7 @@ def manager_factory(manager="Map",
         vector_params["index_path"] = os.path.join(data_dir, "faiss.index")
     elif vector == "hnswlib":
         vector_params["index_path"] = os.path.join(data_dir, "hnswlib.index")
-    elif vector == "milvus" and vector_params["local_mode"] is True:
+    elif vector == "milvus" and vector_params.get("local_mode", False) is True:
         vector_params["local_data"] = os.path.join(data_dir, "milvus_data")
     v = VectorBase(name=vector, **vector_params)
 
