@@ -190,7 +190,7 @@ cache_obj.init(
 )
 ```
 
-3. Embeded milvus
+3. Embedded milvus
 
 The embedded Milvus is a lightweight version of Milvus that can be embedded into your Python application. It is a single binary that can be easily installed and run on your machine.
 
