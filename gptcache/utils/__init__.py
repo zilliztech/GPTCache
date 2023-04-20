@@ -145,3 +145,7 @@ def import_torchaudio():
 
 def import_timm():
     _check_library("timm", package="timm")
+
+
+def import_replicate():
+    _check_library("replicate")

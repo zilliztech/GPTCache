@@ -89,6 +89,8 @@ class MapDataManager(DataManager):
             )
 
     def save(self, question, answer, embedding_data, **kwargs):
+        if isinstance(question, Question):
+            question = question.content
         self.data[embedding_data] = (question, answer, embedding_data)
 
     def import_data(
