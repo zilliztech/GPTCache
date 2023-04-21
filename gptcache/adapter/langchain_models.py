@@ -2,7 +2,7 @@ from typing import Optional, List, Any
 
 from gptcache.adapter.adapter import adapt
 from gptcache.utils import import_pydantic, import_langchain
-from gptcache.manager.scalar_data.base import Answer, AnswerType
+from gptcache.manager.scalar_data.base import Answer, DataType
 
 import_pydantic()
 import_langchain()
@@ -62,8 +62,10 @@ class LangChainChat(BaseChatModel, BaseModel):
 
     :param chat: LLM from langchain.chat_models.
     :type chat: Any
+
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.processor.pre import get_prompt
             # init gptcache
@@ -107,8 +109,8 @@ def cache_data_convert(cache_data):
     return cache_data
 
 
-def update_cache_callback(llm_data, update_cache_func):
-    update_cache_func(Answer(llm_data, AnswerType.STR))
+def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+    update_cache_func(Answer(llm_data, DataType.STR))
     return llm_data
 
 
@@ -120,6 +122,6 @@ def cache_msg_data_convert(cache_data):
     return llm_res
 
 
-def update_cache_msg_callback(llm_data, update_cache_func):
+def update_cache_msg_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
     update_cache_func(llm_data.generations[0].text)
     return llm_data

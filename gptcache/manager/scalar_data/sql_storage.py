@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 import numpy as np
 from gptcache.utils import import_sqlalchemy
-from gptcache.manager.scalar_data.base import CacheStorage, CacheData
+from gptcache.manager.scalar_data.base import CacheStorage, CacheData, Question, QuestionDep
 
 import_sqlalchemy()
 
@@ -58,7 +58,25 @@ def get_models(table_prefix, db_type):
         answer = Column(String(1000), nullable=False)
         answer_type = Column(Integer, nullable=False)
 
-    return QuestionTable, AnswerTable
+    class QuestionDepTable(Base):
+        """
+        answer table
+        """
+        __tablename__ = table_prefix + "_question_dep"
+        __table_args__ = {"extend_existing": True}
+
+        if db_type == "oracle":
+            id = Column(
+                Integer, Sequence("id_seq", start=1), primary_key=True, autoincrement=True
+            )
+        else:
+            id = Column(Integer, primary_key=True, autoincrement=True)
+        question_id = Column(Integer, nullable=False)
+        dep_name = Column(String(255), nullable=False)
+        dep_data = Column(String(1000), nullable=False)
+        dep_type = Column(Integer, nullable=False)
+
+    return QuestionTable, AnswerTable, QuestionDepTable
 
 
 class SQLStorage(CacheStorage):
@@ -86,7 +104,7 @@ class SQLStorage(CacheStorage):
         table_name: str = "gptcache",
     ):
         self._url = url
-        self._ques, self._answer = get_models(table_name, db_type)
+        self._ques, self._answer, self._ques_dep = get_models(table_name, db_type)
         self._engine = create_engine(self._url)
         self.Session = sessionmaker(bind=self._engine)  # pylint: disable=invalid-name
         self.create()
@@ -94,16 +112,29 @@ class SQLStorage(CacheStorage):
     def create(self):
         self._ques.__table__.create(bind=self._engine, checkfirst=True)
         self._answer.__table__.create(bind=self._engine, checkfirst=True)
+        self._ques_dep.__table__.create(bind=self._engine, checkfirst=True)
 
     def _insert(self, data: CacheData, session: sqlalchemy.orm.Session):
         ques_data = self._ques(
-            question=data.question,
+            question=data.question if isinstance(data.question, str) else  data.question.content,
             embedding_data=data.embedding_data.tobytes()
             if data.embedding_data is not None
             else None,
         )
         session.add(ques_data)
         session.flush()
+        if isinstance(data.question, Question) and data.question.deps is not None:
+            all_deps = []
+            for dep in data.question.deps:
+                all_deps.append(
+                    self._ques_dep(
+                    question_id=ques_data.id,
+                    dep_name=dep.name,
+                    dep_data=dep.data,
+                    dep_type=dep.dep_type
+                    )
+                )
+                session.add_all(all_deps)
         answers = data.answers if isinstance(data.answers, list) else [data.answers]
         all_data = []
         for answer in answers:
@@ -124,7 +155,7 @@ class SQLStorage(CacheStorage):
             session.commit()
             return ids
 
-    def get_data_by_id(self, key: int) -> CacheData:
+    def get_data_by_id(self, key: int) -> Optional[CacheData]:
         with self.Session() as session:
             qs = (
                 session.query(self._ques.id, self._ques.question, self._ques.embedding_data)
@@ -139,43 +170,22 @@ class SQLStorage(CacheStorage):
                 .filter(self._answer.question_id == qs.id)
                 .all()
             )
-            res_ans = [(item.answer, item.answer_type) for item in ans]
-            return CacheData(question=qs[1], answers=res_ans, embedding_data=np.frombuffer(qs[2], dtype=np.float32))
-
-    def update_access_time(self, key: int):
-        with self.Session() as session:
-            session.query(self._ques).filter(self._ques.id == key).update(
-                {"last_access": datetime.now()}
+            deps = (
+                session.query(self._ques_dep.dep_name, self._ques_dep.dep_data, self._ques_dep.dep_type)
+                .filter(self._ques_dep.question_id == qs.id)
+                .all()
             )
-            session.commit()
+            res_ans = [(item.answer, item.answer_type) for item in ans]
+            res_deps = [QuestionDep(item.dep_name, item.dep_data, item.dep_type) for item in deps]
+            return CacheData(question=qs[1] if not deps else Question(qs[1], res_deps),
+                             answers=res_ans,
+                             embedding_data=np.frombuffer(qs[2], dtype=np.float32))
 
     def get_ids(self, deleted=True):
         state = -1 if deleted else 0
         with self.Session() as session:
             res = (
                 session.query(self._ques.id).filter(self._ques.deleted == state).all()
-            )
-            return [item.id for item in res]
-
-    def get_old_access(self, count):
-        with self.Session() as session:
-            res = (
-                session.query(self._ques.id)
-                .order_by(self._ques.last_access.asc())
-                .filter(self._ques.deleted == 0)
-                .limit(count)
-                .all()
-            )
-            return [item.id for item in res]
-
-    def get_old_create(self, count):
-        with self.Session() as session:
-            res = (
-                session.query(self._ques.id)
-                .order_by(self._ques.create_on.asc())
-                .filter(self._ques.deleted == 0)
-                .limit(count)
-                .all()
             )
             return [item.id for item in res]
 
@@ -191,6 +201,7 @@ class SQLStorage(CacheStorage):
             objs = session.query(self._ques).filter(self._ques.deleted == -1)
             q_ids = [obj.id for obj in objs]
             session.query(self._answer).filter(self._answer.question_id.in_(q_ids)).delete()
+            session.query(self._ques_dep).filter(self._ques_dep.question_id.in_(q_ids)).delete()
             objs.delete()
             session.commit()
 

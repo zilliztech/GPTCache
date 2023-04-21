@@ -1,10 +1,14 @@
 import logging
-from gptcache import cache, time_cal
+from gptcache import cache
 from gptcache.utils.error import NotInitError
+from gptcache.utils.time import time_cal
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
     chat_cache = kwargs.pop("cache_obj", cache)
+    require_object_store = kwargs.pop("require_object_store", False)
+    if require_object_store:
+        assert chat_cache.data_manager.o, "Object store is required for adapter."
     if not chat_cache.has_init:
         raise NotInitError()
     cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
@@ -53,17 +57,33 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             )
             if ret is None:
                 continue
-            rank = chat_cache.similarity_evaluation.evaluation(
-                {
+
+            if "deps" in context and hasattr(ret.question, "deps"):
+                eval_query_data = {
+                    "question": context["deps"][0]["data"],
+                    "embedding": None
+                }
+                eval_cache_data = {
+                    "question": ret.question.deps[0].data,
+                    "answer": ret.answers[0].answer,
+                    "search_result": cache_data,
+                    "embedding": None,
+                }
+            else:
+                eval_query_data = {
                     "question": pre_embedding_data,
                     "embedding": embedding_data,
-                },
-                {
+                }
+
+                eval_cache_data = {
                     "question": ret.question,
                     "answer": ret.answers[0].answer,
                     "search_result": cache_data,
                     "embedding": ret.embedding_data,
-                },
+                }
+            rank = chat_cache.similarity_evaluation.evaluation(
+                eval_query_data,
+                eval_cache_data,
                 extra_param=context.get("evaluation_func", None),
             )
             if rank_threshold <= rank:
@@ -92,15 +112,19 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     if cache_enable:
         try:
 
-            def update_cache_func(handled_llm_data):
+            def update_cache_func(handled_llm_data, question=None):
+                if question is None:
+                    question = pre_embedding_data
+                else:
+                    question.content = pre_embedding_data
                 chat_cache.data_manager.save(
-                    pre_embedding_data,
+                    question,
                     handled_llm_data,
                     embedding_data,
                     extra_param=context.get("save_func", None),
                 )
 
-            llm_data = update_cache_callback(llm_data, update_cache_func)
+            llm_data = update_cache_callback(llm_data, update_cache_func, *args, **kwargs)
         except Exception as e:  # pylint: disable=W0703
             logging.warning("failed to save the data to cache, error: %s", e)
     return llm_data

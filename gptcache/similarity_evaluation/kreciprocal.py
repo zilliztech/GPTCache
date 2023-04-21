@@ -11,6 +11,14 @@ def euclidean_distance_calculate(vec_l: np.array, vec_r: np.array):
 class KReciprocalEvaluation(SearchDistanceEvaluation):
     """Using K Reciprocal to evaluate sentences pair similarity.
 
+    This evaluator borrows popular reranking method K-reprocical reranking for similarity evaluation. K-reciprocal relation refers to the mutual
+    nearest neighbor relationship between two embeddings, where each embedding is the K nearest neighbor of the other based on a given distance
+    metric.  This evaluator checks whether the query embedding is in candidate cache embedding's `top_k` nearest neighbors. If query embedding
+    is not candidate's `top_k` neighbors, the pair will be considered as dissimilar pair. Otherwise, their distance will be kept and continue
+    for a `SearchDistanceEvaluation` check.  `max_distance` is used to bound this distance to make it between [0-`max_distance`]. `positive` is
+    used to indicate this distance is directly proportional to the similarity of two entites. If `positive` is set `False`,
+    `max_distance` will be used to substract this distance to get the final score.
+
     :param vectordb: vector database to retrieval embeddings to test k-reciprocal relationship.
     :type vectordb: gptcache.manager.vector_data.base.VectorBase
     :param top_k: for each retievaled candidates, this method need to test if the query is top-k of candidate.

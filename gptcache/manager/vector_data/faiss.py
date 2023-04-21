@@ -53,8 +53,11 @@ class Faiss(VectorBase):
         ids_to_remove = np.array(ids)
         self._index.remove_ids(faiss.IDSelectorBatch(ids_to_remove.size, faiss.swig_ptr(ids_to_remove)))
 
-    def close(self):
+    def flush(self):
         faiss.write_index(self._index, self._index_file_path)
+
+    def close(self):
+        self.flush()
 
     def count(self):
         return self._index.ntotal

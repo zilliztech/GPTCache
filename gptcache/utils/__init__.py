@@ -16,8 +16,11 @@ __all__ = [
     "import_pydantic",
     "import_langchain",
     "import_pillow",
-    "import_boto3"
-]
+    "import_boto3",
+    "import_diffusers",
+    "import_torchaudio",
+    "import_timm"
+    ]
 
 import importlib.util
 from typing import Optional
@@ -130,3 +133,19 @@ def import_pillow():
 
 def import_boto3():
     _check_library("boto3")
+
+
+def import_diffusers():
+    _check_library("diffusers")
+
+
+def import_torchaudio():
+    _check_library("torchaudio")
+
+
+def import_timm():
+    _check_library("timm", package="timm")
+
+
+def import_replicate():
+    _check_library("replicate")

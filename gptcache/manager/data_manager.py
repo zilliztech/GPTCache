@@ -4,12 +4,20 @@ from typing import List, Any, Optional, Union
 
 import cachetools
 import numpy as np
+import requests
 
+from gptcache.manager.eviction import EvictionBase
 from gptcache.utils.error import CacheError, ParamError
-from gptcache.manager.scalar_data.base import CacheStorage, CacheData, AnswerType, Answer
+from gptcache.manager.scalar_data.base import (
+    CacheStorage,
+    CacheData,
+    DataType,
+    Answer,
+    Question
+)
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.manager.object_data.base import ObjectBase
-from gptcache.manager.eviction import EvictionManager
+from gptcache.manager.eviction_manager import EvictionManager
 from gptcache.utils.log import gptcache_log
 
 
@@ -37,6 +45,9 @@ class DataManager(metaclass=ABCMeta):
     def search(self, embedding_data, **kwargs):
         pass
 
+    def flush(self):
+        pass
+
     @abstractmethod
     def close(self):
         pass
@@ -55,6 +66,7 @@ class MapDataManager(DataManager):
 
     Example:
         .. code-block:: python
+
             from gptcache.manager import get_data_manager
 
             data_manager = get_data_manager("data_map.txt", 1000)
@@ -80,6 +92,8 @@ class MapDataManager(DataManager):
             )
 
     def save(self, question, answer, embedding_data, **kwargs):
+        if isinstance(question, Question):
+            question = question.content
         self.data[embedding_data] = (question, answer, embedding_data)
 
     def import_data(
@@ -99,12 +113,17 @@ class MapDataManager(DataManager):
         except KeyError:
             return []
 
-    def close(self):
+    def flush(self):
         try:
             with open(self.data_path, "wb") as f:
                 pickle.dump(self.data, f)
         except PermissionError:
-            gptcache_log.error("You don't have permission to access this file %s.", self.data_path)
+            gptcache_log.error(
+                "You don't have permission to access this file %s.", self.data_path
+            )
+
+    def close(self):
+        self.flush()
 
 
 def normalize(vec):
@@ -128,29 +147,42 @@ class SSDataManager(DataManager):
     :type eviction:  str
     """
 
-    def __init__(self, s: CacheStorage, v: VectorBase, o: Optional[ObjectBase], max_size, clean_size, eviction="LRU"):
+    def __init__(
+        self,
+        s: CacheStorage,
+        v: VectorBase,
+        o: Optional[ObjectBase],
+        max_size,
+        clean_size,
+        policy="LRU",
+    ):
         self.max_size = max_size
-        self.cur_size = 0
         self.clean_size = clean_size
         self.s = s
         self.v = v
         self.o = o
-        self.eviction_manager = EvictionManager(self.s, self.v, eviction)
-        self.cur_size = self.s.count()
+        self.eviction_base = EvictionBase(
+            name="memory",
+            policy=policy,
+            maxsize=max_size,
+            clean_size=clean_size,
+            on_evict=self._clear,
+        )
+        self.eviction_base.put(self.s.get_ids(deleted=False))
+        self.eviction_manager = EvictionManager(self.s, self.v)
 
-    def _clear(self):
-        self.eviction_manager.soft_evict(self.clean_size)
+    def _clear(self, marked_keys):
+        self.eviction_manager.soft_evict(marked_keys)
         if self.eviction_manager.check_evict():
             self.eviction_manager.delete()
-        self.cur_size = self.s.count()
 
-    def save(self, question, answer, embedding_data , **kwargs):
+    def save(self, question, answer, embedding_data, **kwargs):
         """Save the data and vectors to cache and vector storage.
 
         :param question: question data.
         :type question: str
         :param answer: answer data.
-        :type answer: str, Answer or (Any, AnswerType)
+        :type answer: str, Answer or (Any, DataType)
         :param embedding_data: vector data.
         :type embedding_data: np.ndarray
 
@@ -164,8 +196,6 @@ class SSDataManager(DataManager):
                 data_manager.save('hello', 'hi', np.random.random((128, )).astype('float32'))
         """
 
-        if self.cur_size >= self.max_size:
-            self._clear()
         self.import_data([question], [answer], [embedding_data])
 
     def _process_answer_data(self, answers: Union[Answer, List[Answer]]):
@@ -173,14 +203,26 @@ class SSDataManager(DataManager):
             answers = [answers]
         new_ans = []
         for ans in answers:
-            if ans.answer_type != AnswerType.STR:
+            if ans.answer_type != DataType.STR:
                 new_ans.append(Answer(self.o.put(ans.answer), ans.answer_type))
             else:
                 new_ans.append(ans)
         return new_ans
 
+    def _process_question_data(self, question: Union[str, Question]):
+        if isinstance(question, Question):
+            if question.deps is None:
+                return question
+
+            for dep in question.deps:
+                if dep.dep_type == DataType.IMAGE_URL:
+                    dep.dep_type.data = self.o.put(requests.get(dep.data).content)
+            return question
+
+        return Question(question)
+
     def import_data(
-            self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any]
+        self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any]
     ):
         if len(questions) != len(answers) or len(questions) != len(embedding_datas):
             raise ParamError("Make sure that all parameters have the same length")
@@ -193,9 +235,10 @@ class SSDataManager(DataManager):
                 ans = self._process_answer_data(answers[i])
             else:
                 ans = answers[i]
+
             cache_datas.append(
                 CacheData(
-                    question=questions[i],
+                    question=self._process_question_data(questions[i]),
                     answers=ans,
                     embedding_data=embedding_data.astype("float32"),
                 )
@@ -207,23 +250,28 @@ class SSDataManager(DataManager):
                 for i, embedding_data in enumerate(embedding_datas)
             ]
         )
-        self.cur_size += len(questions)
+        self.eviction_base.put(ids)
 
-    def get_scalar_data(self, res_data, **kwargs) -> CacheData:
+    def get_scalar_data(self, res_data, **kwargs) -> Optional[CacheData]:
         cache_data = self.s.get_data_by_id(res_data[1])
+        if cache_data is None:
+            return None
         for ans in cache_data.answers:
-            if ans.answer_type != AnswerType.STR:
+            if ans.answer_type != DataType.STR:
                 ans.answer = self.o.get(ans.answer)
         return cache_data
 
     def hit_cache_callback(self, res_data, **kwargs):
-        if self.eviction_manager.policy == "LRU":
-            self.s.update_access_time(res_data[1])
+        self.eviction_base.get(res_data[1])
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)
         top_k = kwargs.get("top_k", -1)
         return self.v.search(data=embedding_data, top_k=top_k)
+
+    def flush(self):
+        self.s.flush()
+        self.v.flush()
 
     def close(self):
         self.s.close()

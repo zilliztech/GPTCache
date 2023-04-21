@@ -8,6 +8,9 @@ from gptcache.similarity_evaluation import SimilarityEvaluation
 class NumpyNormEvaluation(SimilarityEvaluation):
     """Using Numpy norm to evaluate sentences pair similarity.
 
+    This evaluator calculate the L2 distance of two embeddings for similarity check. if `enable_normal` is True,
+    both query embedding and cache embedding will be normalized.
+
     :param enable_normal: whether to normalize the embedding, defaults to False.
     :type enable_normal: bool
 
@@ -20,10 +23,12 @@ class NumpyNormEvaluation(SimilarityEvaluation):
             evaluation = NumpyNormEvaluation()
             score = evaluation.evaluation(
                 {
+                    'question': 'What is color of sky?'
                     'embedding': np.array([-0.5, -0.5])
                 },
                 {
-                    'search_result': (0, np.array([1, 1]))
+                    'question': 'What is the color of sky?'
+                    'embedding': np.array([-0.49, -0.51])
                 }
             )
     """
@@ -61,7 +66,7 @@ class NumpyNormEvaluation(SimilarityEvaluation):
             if self.enable_normal
             else src_dict["embedding"]
         )
-        _, cache_embedding = cache_dict["search_result"]
+        cache_embedding = cache_dict["embedding"]
         cache_embedding = (
             self.normalize(cache_embedding) if self.enable_normal else cache_embedding
         )

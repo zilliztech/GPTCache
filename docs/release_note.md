@@ -5,6 +5,137 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.17 (2023.4.20)
+
+1. Add image embedding timm
+
+```python
+import requests
+from PIL import Image
+from gptcache.embedding import Timm
+
+url = 'https://raw.githubusercontent.com/zilliztech/GPTCache/main/docs/GPTCache.png'
+image = Image.open(requests.get(url, stream=True).raw)  # Read image url as PIL.Image      
+encoder = Timm(model='resnet18')
+image_tensor = encoder.preprocess(image)
+embed = encoder.to_embeddings(image_tensor)
+```
+
+2. Add Replicate adapter, vqa (visual question answering) (**experimental**)
+
+```python
+from gptcache.adapter import replicate
+
+question = "what is in the image?"
+
+replicate.run(
+    "andreasjansson/blip-2:xxx",
+    input={
+        "image": open(image_path, 'rb'),
+        "question": question
+    }
+)
+```
+
+3. Support to flush data for preventing accidental loss of memory data
+
+```python
+from gptcache import cache
+
+cache.flush()
+```
+
+## v0.1.16 (2023.4.18)
+
+1. Add StableDiffusion adapter (**experimental**)
+
+```python
+import torch
+
+from gptcache.adapter.diffusers import StableDiffusionPipeline
+from gptcache.processor.pre import get_prompt
+from gptcache import cache
+
+cache.init(
+    pre_embedding_func=get_prompt,
+)
+model_id = "stabilityai/stable-diffusion-2-1"
+pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+
+prompt = "a photo of an astronaut riding a horse on mars"
+pipe(prompt=prompt).images[0]
+```
+
+2. Add speech to text bootcamp, [link](https://github.com/zilliztech/GPTCache/tree/main/docs/bootcamp/openai/speech_to_text.ipynb)
+
+3. More convenient management of cache files
+
+```python
+from gptcache.manager.factory import manager_factory
+
+data_manager = manager_factory('sqlite,faiss', data_dir="test_cache", vector_params={"dimension": 5})
+```
+
+4. Add a simple GPTCache server (**experimental**)
+
+After starting this server, you can:
+
+- put the data to cache, like: `curl -X PUT -d "receive a hello message" "http://localhost:8000?prompt=hello"`
+- get the data from cache, like: `curl -X GET  "http://localhost:8000?prompt=hello"`
+
+Currently the service is just a map cache, more functions are still under development.
+
+## v0.1.15 (2023.4.17)
+
+1. Add GPTCache api, makes it easier to access other different llm models and applications
+
+```python
+from gptcache.adapter.api import put, get
+from gptcache.processor.pre import get_prompt
+from gptcache import cache
+
+cache.init(pre_embedding_func=get_prompt)
+put("hello", "foo")
+print(get("hello"))
+```
+
+2. Add image generation bootcamp, link: https://github.com/zilliztech/GPTCache/blob/main/docs/bootcamp/openai/image_generation.ipynb
+
+## v0.1.14 (2023.4.17)
+
+1. Fix to fail to save the data to cache
+
+## ~~v0.1.13 (2023.4.16)~~ Don't Use it, should use the `v0.1.14`
+
+1. Add openai audio adapter (**experimental**)
+
+```python
+cache.init(pre_embedding_func=get_file_bytes)
+
+openai.Audio.transcribe(
+    model="whisper-1",
+    file=audio_file
+)
+```
+
+2. Improve data eviction implementation
+
+In the future, users will have greater flexibility to customize eviction methods, such as by using Redis or Memcached. Currently, the default caching library is cachetools, which provides an in-memory cache. Other libraries are not currently supported, but may be added in the future.
+
+## v0.1.12 (2023.4.15)
+
+1. The llm request can customize topk search parameters
+
+```python
+openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "user", "content": question},
+    ],
+    top_k=10,
+)
+```
+
 ## v0.1.11 (2023.4.14)
 
 1. Add openai complete adapter
@@ -99,7 +230,7 @@ cache_obj.init(
 )
 ```
 
-3. Embeded milvus
+3. Embedded milvus
 
 The embedded Milvus is a lightweight version of Milvus that can be embedded into your Python application. It is a single binary that can be easily installed and run on your machine.
 

@@ -1,11 +1,13 @@
 import unittest
+from unittest import mock
+import os
 import numpy as np
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from gptcache.manager.factory import get_data_manager
+from gptcache.manager.factory import get_data_manager, manager_factory
 from gptcache.manager import VectorBase, CacheBase, ObjectBase
-from gptcache.manager.scalar_data.base import Answer, AnswerType
+from gptcache.manager.scalar_data.base import Answer, DataType
 
 
 class TestFactory(unittest.TestCase):
@@ -15,6 +17,22 @@ class TestFactory(unittest.TestCase):
 
         m2 = get_data_manager("sqlite", "chromadb")
         self.assertIsNotNone(m2)
+
+        m3 = manager_factory("Map")
+        self.assertIsNotNone(m3)
+
+        m4 = manager_factory("sqlite,hnswlib", vector_params={"dimension": 5})
+        self.assertIsNotNone(m4)
+
+        m5 = manager_factory("sqlite,hnswlib,local", vector_params={"dimension": 5})
+        self.assertIsNotNone(m5)
+
+        with self.assertRaises(RuntimeError):
+            manager_factory("sqlite")
+
+        with mock.patch('gptcache.manager.vector_data.milvus.Milvus.__init__') as mock_init:
+            mock_init.return_value = None
+            self.assertIsNotNone(manager_factory("sqlite,milvus", vector_params={"dimension": 5, "port": "9999"}))
 
     def test_manager(self):
         with TemporaryDirectory(dir="./") as root:
@@ -28,21 +46,21 @@ class TestFactory(unittest.TestCase):
             m = get_data_manager(s, v, o)
             m.save("test_question",
                    Answer(b"my test data",
-                          AnswerType.IMAGE_BASE64),
+                          DataType.IMAGE_BASE64),
                    np.random.rand(5)
             )
             res = m.get_scalar_data(m.search(np.random.rand(5))[0])
             self.assertEqual(res.question, "test_question")
             self.assertEqual(res.answers[0].answer, b"my test data")
-            self.assertEqual(res.answers[0].answer_type, AnswerType.IMAGE_BASE64)
+            self.assertEqual(res.answers[0].answer_type, DataType.IMAGE_BASE64)
 
             # test multi answer
             emb = np.random.rand(5)
             m.save("test_question2",
                    [Answer(b"question2_BASE64",
-                           AnswerType.IMAGE_BASE64),
+                           DataType.IMAGE_BASE64),
                     Answer("question2_STR",
-                           AnswerType.STR)
+                           DataType.STR)
                    ],
                    emb
             )
@@ -50,6 +68,38 @@ class TestFactory(unittest.TestCase):
             res = m.get_scalar_data(m.search(emb)[0])
             self.assertEqual(res.question, "test_question2")
             self.assertEqual(res.answers[0].answer, b"question2_BASE64")
-            self.assertEqual(res.answers[0].answer_type, AnswerType.IMAGE_BASE64)
+            self.assertEqual(res.answers[0].answer_type, DataType.IMAGE_BASE64)
             self.assertEqual(res.answers[1].answer, "question2_STR")
-            self.assertEqual(res.answers[1].answer_type, AnswerType.STR)
+            self.assertEqual(res.answers[1].answer_type, DataType.STR)
+
+    def test_manager_factory(self):
+        with TemporaryDirectory(dir="./") as root:
+            data_dir = os.path.join(root, 'dir_not_exist')
+            m = manager_factory('sqlite,faiss,local', data_dir=data_dir, vector_params={"dimension": 5})
+            m.save("test_question",
+                   Answer(b"my test data",
+                          DataType.IMAGE_BASE64),
+                   np.random.rand(5)
+            )
+            res = m.get_scalar_data(m.search(np.random.rand(5))[0])
+            self.assertEqual(res.question, "test_question")
+            self.assertEqual(res.answers[0].answer, b"my test data")
+            self.assertEqual(res.answers[0].answer_type, DataType.IMAGE_BASE64)
+
+            # test multi answer
+            emb = np.random.rand(5)
+            m.save("test_question2",
+                   [Answer(b"question2_BASE64",
+                           DataType.IMAGE_BASE64),
+                    Answer("question2_STR",
+                           DataType.STR)
+                   ],
+                   emb
+            )
+
+            res = m.get_scalar_data(m.search(emb)[0])
+            self.assertEqual(res.question, "test_question2")
+            self.assertEqual(res.answers[0].answer, b"question2_BASE64")
+            self.assertEqual(res.answers[0].answer_type, DataType.IMAGE_BASE64)
+            self.assertEqual(res.answers[1].answer, "question2_STR")
+            self.assertEqual(res.answers[1].answer_type, DataType.STR)

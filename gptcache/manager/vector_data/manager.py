@@ -1,4 +1,4 @@
-from gptcache.utils.error import NotFoundStoreError, ParamError
+from gptcache.utils.error import NotFoundError, ParamError
 
 TOP_K = 1
 
@@ -102,5 +102,5 @@ class VectorBase:
                 top_k=top_k, max_elements=max_elements
             )
         else:
-            raise NotFoundStoreError("vector store", name)
+            raise NotFoundError("vector store", name)
         return vector_base

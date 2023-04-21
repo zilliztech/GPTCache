@@ -1,8 +1,11 @@
 import os
 import time
+
+from gptcache.manager import get_data_manager
 from gptcache.utils.error import NotInitError
 from gptcache.adapter.adapter import adapt
-from gptcache import cache, time_cal, get_data_manager, Cache
+from gptcache import cache, Cache
+from gptcache.utils.time import time_cal
 
 data_map_path = "data_map.txt"
 
@@ -17,7 +20,7 @@ def test_adapt():
     def cache_data_convert(cache_data):
         return int(cache_data)
 
-    def update_cache_callback(llm_data, update_cache_func):
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):
         update_cache_func(str(llm_data))
         return llm_data
 
@@ -75,7 +78,7 @@ def test_adapt():
     time_cal(add1, report_func=report_func)(cache_factor=10)
 
     # test cache_enable_func
-    def update_cache_callback(llm_data, update_cache_func):
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):
         time.sleep(0.5)
         update_cache_func(str(llm_data))
         return llm_data

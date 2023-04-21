@@ -65,6 +65,3 @@ class Chromadb(VectorBase):
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
         return True
-
-    def close(self):
-        return True

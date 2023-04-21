@@ -1,32 +1,50 @@
 import time
-from typing import Iterator
+from typing import Iterator, Any
+
+import os
+import openai
 
 import base64
 from io import BytesIO
-import os
 
-import openai
-
-
-from gptcache import CacheError
+from gptcache.utils import import_pillow
+from gptcache.utils.error import CacheError
 from gptcache.adapter.adapter import adapt
-from gptcache.manager.scalar_data.base import Answer, AnswerType
+from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
     get_text_from_openai_answer,
     get_image_from_openai_b64,
-    get_image_from_openai_url
+    get_image_from_openai_url,
+    get_audio_text_from_openai_answer,
 )
-from gptcache.utils import import_pillow
-
-import_pillow()
-
-from PIL import Image as PILImage # pylint: disable=C0413
 
 
 class ChatCompletion(openai.ChatCompletion):
-    """Openai ChatCompletion Wrapper"""
+    """Openai ChatCompletion Wrapper
+
+    Example:
+        .. code-block:: python
+
+            from gptcache import cache
+            from gptcache.processor.pre import get_prompt
+            # init gptcache
+            cache.init(pre_embedding_func=get_prompt)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run ChatCompletion model with gptcache
+            response = openai.ChatCompletion.create(
+                          model='gpt-3.5-turbo',
+                          messages=[
+                            {
+                                'role': 'user',
+                                'content': "what's github"
+                            }],
+                        )
+            response_content = response['choices'][0]['message']['content']
+    """
 
     @classmethod
     def llm_handler(cls, *llm_args, **llm_kwargs):
@@ -36,9 +54,9 @@ class ChatCompletion(openai.ChatCompletion):
             raise CacheError("openai error") from e
 
     @staticmethod
-    def update_cache_callback(llm_data, update_cache_func):
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
         if not isinstance(llm_data, Iterator):
-            update_cache_func(Answer(get_message_from_openai_answer(llm_data)), AnswerType.STR)
+            update_cache_func(Answer(get_message_from_openai_answer(llm_data), DataType.STR))
             return llm_data
         else:
 
@@ -47,7 +65,7 @@ class ChatCompletion(openai.ChatCompletion):
                 for item in it:
                     total_answer += get_stream_message_from_openai_answer(item)
                     yield item
-                update_cache_func(Answer(total_answer, AnswerType.STR))
+                update_cache_func(Answer(total_answer, DataType.STR))
 
             return hook_openai_data(llm_data)
 
@@ -66,11 +84,137 @@ class ChatCompletion(openai.ChatCompletion):
             **kwargs
         )
 
-class Image(openai.Image):
-    """Openai Image Wrapper"""
+
+class Completion(openai.Completion):
+    """Openai Completion Wrapper
+
+    Example:
+        .. code-block:: python
+
+            from gptcache import cache
+            from gptcache.processor.pre import get_prompt
+            # init gptcache
+            cache.init(pre_embedding_func=get_prompt)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run Completion model with gptcache
+            response = openai.Completion.create(model="text-davinci-003",
+                                                prompt="Hello world.")
+            response_text = response["choices"][0]["text"]
+    """
+
+    @classmethod
+    def llm_handler(cls, *llm_args, **llm_kwargs):
+        return super().create(*llm_args, **llm_kwargs)
+
+    @staticmethod
+    def cache_data_convert(cache_data):
+        return construct_text_from_cache(cache_data)
+
+    @staticmethod
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+        update_cache_func(Answer(get_text_from_openai_answer(llm_data), DataType.STR))
+        return llm_data
 
     @classmethod
     def create(cls, *args, **kwargs):
+        return adapt(
+            cls.llm_handler,
+            cls.cache_data_convert,
+            cls.update_cache_callback,
+            *args,
+            **kwargs
+        )
+
+
+class Audio(openai.Audio):
+    """Openai Audio Wrapper
+
+    Example:
+        .. code-block:: python
+
+            from gptcache import cache
+            from gptcache.processor.pre import get_file_bytes
+            # init gptcache
+            cache.init(pre_embedding_func=get_file_bytes)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run audio transcribe model with gptcache
+            audio_file= open("/path/to/audio.mp3", "rb")
+            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+
+            # run audio transcribe model with gptcache
+            audio_file= open("/path/to/audio.mp3", "rb")
+            transcript = openai.Audio.translate("whisper-1", audio_file)
+    """
+    @classmethod
+    def transcribe(cls, model: str, file: Any, *args, **kwargs):
+        def llm_handler(*llm_args, **llm_kwargs):
+            try:
+                return openai.Audio.transcribe(*llm_args, **llm_kwargs)
+            except Exception as e:
+                raise CacheError("openai error") from e
+
+        def cache_data_convert(cache_data):
+            return construct_audio_text_from_cache(cache_data)
+
+        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR))
+            return llm_data
+
+        return adapt(
+            llm_handler, cache_data_convert, update_cache_callback, model=model, file=file, *args, **kwargs
+        )
+
+    @classmethod
+    def translate(cls, model: str, file: Any, *args, **kwargs):
+        def llm_handler(*llm_args, **llm_kwargs):
+            try:
+                return openai.Audio.translate(*llm_args, **llm_kwargs)
+            except Exception as e:
+                raise CacheError("openai error") from e
+
+        def cache_data_convert(cache_data):
+            return construct_audio_text_from_cache(cache_data)
+
+        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs): # pylint: disable=unused-argument
+            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR))
+            return llm_data
+
+        return adapt(
+            llm_handler, cache_data_convert, update_cache_callback, model=model, file=file, *args, **kwargs
+        )
+
+
+class Image(openai.Image):
+    """Openai Image Wrapper
+
+    Example:
+        .. code-block:: python
+
+            from gptcache import cache
+            from gptcache.processor.pre import get_prompt
+            # init gptcache
+            cache.init(pre_embedding_func=get_prompt)
+            cache.set_openai_key()
+
+            from gptcache.adapter import openai
+            # run image generation model with gptcache
+            response = openai.Image.create(
+              prompt="a white siamese cat",
+              n=1,
+              size="256x256"
+            )
+            response_url = response['data'][0]['url']
+    """
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        response_format = kwargs.pop("response_format", "url")
+        size = kwargs.pop("size", "256x256")
+
         def llm_handler(*llm_args, **llm_kwargs):
             try:
                 return openai.Image.create(*llm_args, **llm_kwargs)
@@ -80,20 +224,22 @@ class Image(openai.Image):
         def cache_data_convert(cache_data):
             return construct_image_create_resp_from_cache(
                 image_data=cache_data,
-                response_format=kwargs["response_format"],
-                size=kwargs["size"]
+                response_format=response_format,
+                size=size
                 )
 
-        def update_cache_callback(llm_data, update_cache_func):
-            if kwargs["response_format"] == "b64_json":
-                update_cache_func(Answer(get_image_from_openai_b64(llm_data), AnswerType.IMAGE_BASE64))
-                return llm_data
-            elif kwargs["response_format"] == "url":
-                update_cache_func(Answer(get_image_from_openai_url(llm_data), AnswerType.IMAGE_URL))
-                return llm_data
+        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+            if response_format == "b64_json":
+                img_b64 = get_image_from_openai_b64(llm_data)
+                if isinstance(img_b64, str):
+                    img_b64 = img_b64.encode("ascii")
+                update_cache_func(Answer(img_b64, DataType.IMAGE_BASE64))
+            elif response_format == "url":
+                update_cache_func(Answer(get_image_from_openai_url(llm_data), DataType.IMAGE_URL))
+            return llm_data
 
         return adapt(
-            llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+            llm_handler, cache_data_convert, update_cache_callback, response_format=response_format, size=size, *args, **kwargs
         )
 
 
@@ -143,33 +289,6 @@ def construct_stream_resp_from_cache(return_message):
     ]
 
 
-class Completion(openai.Completion):
-    """Openai Completion Wrapper"""
-
-    @classmethod
-    def llm_handler(cls, *llm_args, **llm_kwargs):
-        return super().create(*llm_args, **llm_kwargs)
-
-    @staticmethod
-    def cache_data_convert(cache_data):
-        return construct_text_from_cache(cache_data)
-
-    @staticmethod
-    def update_cache_callback(llm_data, update_cache_func):
-        update_cache_func(get_text_from_openai_answer(llm_data))
-        return llm_data
-
-    @classmethod
-    def create(cls, *args, **kwargs):
-        return adapt(
-            cls.llm_handler,
-            cls.cache_data_convert,
-            cls.update_cache_callback,
-            *args,
-            **kwargs
-        )
-
-
 def construct_text_from_cache(return_text):
     return {
         "gptcache": True,
@@ -187,6 +306,9 @@ def construct_text_from_cache(return_text):
 
 
 def construct_image_create_resp_from_cache(image_data, response_format, size):
+    import_pillow()
+    from PIL import Image as PILImage  # pylint: disable=C0415
+
     img_bytes = base64.b64decode((image_data))
     img_file = BytesIO(img_bytes)  # convert image to file-like object
     img = PILImage.open(img_file)
@@ -204,13 +326,21 @@ def construct_image_create_resp_from_cache(image_data, response_format, size):
             f.write(buffered.getvalue())
         image_data = target_url
     elif response_format == "b64_json":
-        image_data = base64.b64encode(buffered.getvalue())
+        image_data = base64.b64encode(buffered.getvalue()).decode("ascii")
     else:
         raise AttributeError(f"Invalid response_format: {response_format} is not one of ['url', 'b64_json']")
 
     return {
+        "gptcache": True,
         "created": int(time.time()),
         "data": [
             {response_format: image_data}
         ]
         }
+
+
+def construct_audio_text_from_cache(return_text):
+    return {
+        "gptcache": True,
+        "text": return_text,
+    }
