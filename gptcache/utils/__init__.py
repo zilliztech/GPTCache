@@ -19,7 +19,9 @@ __all__ = [
     "import_boto3",
     "import_diffusers",
     "import_torchaudio",
-    "import_timm"
+    "import_torchvision",
+    "import_timm",
+    "import_vit",
     ]
 
 import importlib.util
@@ -142,10 +144,14 @@ def import_diffusers():
 def import_torchaudio():
     _check_library("torchaudio")
 
+def import_torchvision():
+    _check_library("torchvision")
 
 def import_timm():
     _check_library("timm", package="timm")
 
+def import_vit():
+    _check_library("vit", package="vit")
 
 def import_replicate():
     _check_library("replicate")
