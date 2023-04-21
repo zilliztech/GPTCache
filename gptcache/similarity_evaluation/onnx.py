@@ -71,7 +71,7 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         try:
             src_question = src_dict["question"]
             cache_question = cache_dict["question"]
-            if src_question == cache_question:
+            if src_question.lower() == cache_question.lower():
                 return 1
             return self.inference(src_question, [cache_question])
         except Exception:  # pylint: disable=W0703
