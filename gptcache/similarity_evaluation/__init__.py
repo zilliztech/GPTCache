@@ -26,8 +26,8 @@ def OnnxModelEvaluation(model="GPTCache/albert-duplicate-onnx"):
     return onnx.OnnxModelEvaluation(model)
 
 
-def NumpyNormEvaluation(enable_normal: bool = False):
-    return np.NumpyNormEvaluation(enable_normal)
+def NumpyNormEvaluation(enable_normal: bool = False, **kwargs):
+    return np.NumpyNormEvaluation(enable_normal, **kwargs)
 
 
 def SearchDistanceEvaluation(max_distance=4.0, positive=False):

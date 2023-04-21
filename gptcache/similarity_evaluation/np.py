@@ -13,6 +13,8 @@ class NumpyNormEvaluation(SimilarityEvaluation):
 
     :param enable_normal: whether to normalize the embedding, defaults to False.
     :type enable_normal: bool
+    :param question_embedding_function: optional, a function to generate question embedding
+    :type question_embedding_function: function
 
     Example:
         .. code-block:: python
@@ -33,8 +35,9 @@ class NumpyNormEvaluation(SimilarityEvaluation):
             )
     """
 
-    def __init__(self, enable_normal: bool = True):
+    def __init__(self, enable_normal: bool = True, question_embedding_function=None):
         self.enable_normal = enable_normal
+        self.question_encoder = question_embedding_function
 
     @staticmethod
     def normalize(vec: np.ndarray):
@@ -61,12 +64,19 @@ class NumpyNormEvaluation(SimilarityEvaluation):
 
         :return: evaluation score.
         """
+        if 'question' in src_dict and 'question' in cache_dict:
+            if src_dict['question'].lower() == cache_dict['question'].lower():
+                return self.range()[0]
+            if 'embedding' not in src_dict or 'embedding' not in cache_dict or not src_dict['embedding'] or not cache_dict['embedding']:
+                assert self.question_encoder, 'You need to a valid question_embedding_function to generate question embedding in the evaluator.'
+                src_dict['embedding'] = self.question_encoder(src_dict['question'])
+                cache_dict['embedding'] = self.question_encoder(cache_dict['question'])
         src_embedding = (
-            self.normalize(src_dict["embedding"])
+            self.normalize(src_dict['embedding'])
             if self.enable_normal
-            else src_dict["embedding"]
+            else src_dict['embedding']
         )
-        cache_embedding = cache_dict["embedding"]
+        cache_embedding = cache_dict['embedding']
         cache_embedding = (
             self.normalize(cache_embedding) if self.enable_normal else cache_embedding
         )

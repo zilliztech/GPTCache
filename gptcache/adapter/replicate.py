@@ -24,7 +24,7 @@ class Client(replicate.client.Client):
             timm = Timm('resnet18')
             cache_base = CacheBase('sqlite')
             vector_base = VectorBase('faiss', dimension=timm.dimension)
-            object_base = ObjectBase('local', path='./images')
+            object_base = ObjectBase('local', path='./objects')
             data_manager = get_data_manager(cache_base, vector_base, object_base)
 
             cache.init(

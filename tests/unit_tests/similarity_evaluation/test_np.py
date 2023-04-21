@@ -6,10 +6,11 @@ from gptcache.similarity_evaluation import NumpyNormEvaluation
 
 
 def test_norm():
-    evaluation = NumpyNormEvaluation(enable_normal=True)
+    embedding_func = lambda x: np.array([1, 1])
+    evaluation = NumpyNormEvaluation(enable_normal=True, question_embedding_function=embedding_func)
 
     range_min, range_max = evaluation.range()
-    print(range_max)
+    # print(range_max)
     assert math.isclose(range_min, 0.0)
     assert math.isclose(range_max, 2.0)
 
@@ -23,3 +24,19 @@ def test_norm():
         {"embedding": np.array([0.1, 0.2, 0.3, 0.4])},
     )
     assert math.isclose(score, 0.0), score
+
+    score = evaluation.evaluation(
+        {"question": "test"},
+        {"question": "test"}
+    )
+    assert math.isclose(score, 0.0), score
+
+    score = evaluation.evaluation(
+        {"question": "test1"},
+        {"question": "test2"}
+    )
+    assert math.isclose(score, 0.0), score
+
+
+if __name__ == "__main__":
+    test_norm()
