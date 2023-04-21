@@ -1,4 +1,4 @@
-__all__ = ["OpenAI", "Huggingface", "SBERT", "Cohere", "Onnx", "FastText", "Data2VecAudio", "Timm"]
+__all__ = ["OpenAI", "Huggingface", "SBERT", "Cohere", "Onnx", "FastText", "Data2VecAudio", "Timm", "ViT"]
 
 
 from gptcache.utils.lazy_import import LazyImport
@@ -11,7 +11,7 @@ cohere = LazyImport("cohere", globals(), "gptcache.embedding.cohere")
 fasttext = LazyImport("fasttext", globals(), "gptcache.embedding.fasttext")
 data2vec = LazyImport("data2vec", globals(), "gptcache.embedding.data2vec")
 timm = LazyImport("timm", globals(), "gptcache.embedding.timm")
-
+vit = LazyImport("vit", globals(), "gptcache.embedding.vit")
 
 def Cohere(model="large", api_key=None):
     return cohere.Cohere(model, api_key)
@@ -43,3 +43,6 @@ def Data2VecAudio(model="facebook/data2vec-audio-base-960h"):
 
 def Timm(model="resnet50", device="default"):
     return timm.Timm(model, device)
+
+def ViT(model="google/vit-base-patch16-384"):
+    return vit.ViT(model)
