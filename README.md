@@ -45,7 +45,7 @@ python setup.py install
 
 ### example usage
 
-These examples will help you understand how to use exact and similar matching with caching. 
+These examples will help you understand how to use exact and similar matching with caching. You can also run the example on [Colab](https://colab.research.google.com/drive/1m1s-iTDfLDk-UwUAQ_L8j1C-gzkcr2Sk?usp=share_link). And more examples you can refer to the [Bootcamp](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/chat.html)
 
 Before running the example, **make sure** the OPENAI_API_KEY environment variable is set by executing `echo $OPENAI_API_KEY`. 
 
