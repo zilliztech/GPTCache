@@ -308,6 +308,7 @@ This module is created to extract embeddings from requests for similarity search
 - **Cache Storage**:
 **Cache Storage** is where the response from LLMs, such as ChatGPT, is stored. Cached responses are retrieved to assist in evaluating similarity and are returned to the requester if there is a good semantic match. At present, GPTCache supports SQLite and offers a universally accessible interface for extension of this module.
   - [x] Support [SQLite](https://sqlite.org/docs.html).
+  - [x] Support [DuckDB](https://duckdb.org/).
   - [x] Support [PostgreSQL](https://www.postgresql.org/).
   - [x] Support [MySQL](https://www.mysql.com/).
   - [x] Support [MariaDB](https://mariadb.org/).

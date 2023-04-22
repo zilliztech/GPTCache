@@ -4,6 +4,7 @@ from gptcache.utils.error import NotFoundError
 
 SQL_URL = {
     "sqlite": "sqlite:///./sqlite.db",
+    "duckdb": "duckdb:///./duck.db",
     "postgresql": "postgresql+psycopg2://postgres:123456@127.0.0.1:5432/postgres",
     "mysql": "mysql+pymysql://root:123456@127.0.0.1:3306/mysql",
     "mariadb": "mariadb+pymysql://root:123456@127.0.0.1:3307/mysql",

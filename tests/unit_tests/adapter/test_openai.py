@@ -1,10 +1,13 @@
+import base64
+import os
+from io import BytesIO
 from unittest.mock import patch
+from urllib.request import urlopen
 
-import requests
-
-from gptcache.adapter.api import put, get
-from gptcache.embedding import Data2VecAudio
-from gptcache.similarity_evaluation import SearchDistanceEvaluation
+from gptcache import cache
+from gptcache.adapter import openai
+from gptcache.manager import get_data_manager
+from gptcache.processor.pre import get_prompt, get_file_name, get_file_bytes
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
@@ -14,15 +17,6 @@ from gptcache.utils.response import (
     get_image_from_openai_url,
     get_audio_text_from_openai_answer,
 )
-from gptcache.adapter import openai
-from gptcache import cache
-from gptcache.manager import get_data_manager, manager_factory
-from gptcache.processor.pre import get_prompt, get_file_name, get_file_bytes
-
-import os
-import base64
-from urllib.request import urlopen
-from io import BytesIO
 
 try:
     from PIL import Image

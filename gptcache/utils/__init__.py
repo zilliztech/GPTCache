@@ -115,6 +115,11 @@ def import_cxoracle():
     _check_library("cx_Oracle")
 
 
+def import_duckdb():
+    _check_library("duckdb", package="duckdb")
+    _check_library("duckdb-engine", package="duckdb-engine")
+
+
 def import_sql_client(db_name):
     if db_name == "postgresql":
         import_postgresql()
@@ -124,6 +129,8 @@ def import_sql_client(db_name):
         import_pyodbc()
     elif db_name == "oracle":
         import_cxoracle()
+    elif db_name == "duckdb":
+        import_duckdb()
 
 
 def import_pydantic():

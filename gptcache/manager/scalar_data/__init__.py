@@ -14,7 +14,9 @@ def CacheBase(name: str, **kwargs):
     :param name: the name of the cache storage, it is support 'sqlite', 'postgresql', 'mysql', 'mariadb', 'sqlserver' and  'oracle' now.
     :type name: str
     :param sql_url: the url of the sql database for cache, such as '<db_type>+<db_driver>://<username>:<password>@<host>:<port>/<database>',
-                    and the default value is related to the `cache_store` parameter, 'sqlite:///./sqlite.db' for 'sqlite',
+                    and the default value is related to the `cache_store` parameter,
+                    'sqlite:///./sqlite.db' for 'sqlite',
+                    'duckdb:///./duck.db' for 'duckdb',
                     'postgresql+psycopg2://postgres:123456@127.0.0.1:5432/postgres' for 'postgresql',
                     'mysql+pymysql://root:123456@127.0.0.1:3306/mysql' for 'mysql',
                     'mariadb+pymysql://root:123456@127.0.0.1:3307/mysql' for 'mariadb',
