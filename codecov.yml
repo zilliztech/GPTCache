@@ -34,3 +34,4 @@ ignore:
   - ".git"
   - "*.yml"
   - "*.md"
+  - "**/minigpt4.py"
