@@ -3,7 +3,7 @@ import http.server
 import json
 
 from gptcache import cache
-from gptcache.adapter.api import get, put
+from gptcache.adapter.api import get, put, init_similar_cache
 from gptcache.processor.pre import get_prompt
 
 
@@ -45,8 +45,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="localhost", help="the hostname to listen on")
     parser.add_argument("--port", type=int, default=8000, help="the port to listen on")
+    parser.add_argument("--cache-dir", default="gptcache_data", help="the cache data dir")
     args = parser.parse_args()
 
-    cache.init(pre_embedding_func=get_prompt)
-
+    init_similar_cache(args.cache_dir)
     start_server(args.host, args.port)
