@@ -141,7 +141,7 @@ class SQLStorage(CacheStorage):
             answer_data = self._answer(
                 question_id=ques_data.id,
                 answer=answer.answer,
-                answer_type=answer.answer_type
+                answer_type=int(answer.answer_type)
             )
             all_data.append(answer_data)
         session.add_all(all_data)
