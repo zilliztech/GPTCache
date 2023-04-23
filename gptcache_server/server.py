@@ -2,9 +2,7 @@ import argparse
 import http.server
 import json
 
-from gptcache import cache
 from gptcache.adapter.api import get, put, init_similar_cache
-from gptcache.processor.pre import get_prompt
 
 
 class GPTCacheHandler(http.server.BaseHTTPRequestHandler):
