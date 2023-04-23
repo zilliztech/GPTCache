@@ -5,6 +5,39 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.18 (2023.4.23)
+
+1. Add vqa bootcamp
+
+reference: https://github.com/zilliztech/GPTCache/tree/main/docs/bootcamp/replicate
+
+2. Add two streamlit multimodal demos
+
+reference: https://github.com/zilliztech/GPTCache/tree/main/docs/bootcamp/streamlit
+
+3. Add vit image embedding func
+
+```python
+from gptcache.embedding import ViT
+
+encoder = ViT(model="google/vit-base-patch16-384")
+embed = encoder.to_embeddings(image)
+```
+
+4. Add `init_similar_cache` func for the GPTCache api module
+
+```python
+from gptcache.adapter.api import init_similar_cache
+
+init_similar_cache("cache_data")
+```
+
+5. The simple GPTCache server provides similar cache
+
+- clone the GPTCache repo, `git clone https://github.com/zilliztech/GPTCache.git`
+- install the gptcache model, `pip install gptcache`
+- run the GPTCache server, `cd gptcache_server && python server.py`
+
 ## v0.1.17 (2023.4.20)
 
 1. Add image embedding timm
