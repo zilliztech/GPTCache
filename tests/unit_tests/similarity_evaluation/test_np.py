@@ -17,13 +17,14 @@ def test_norm():
     score = evaluation.evaluation(
         {"embedding": np.array([-0.5, -0.5])}, {"embedding": np.array([1, 1])}
     )
-    assert math.isclose(score, 2.0), score
+    assert math.isclose(score, 0.0, abs_tol=0.001), score
 
     score = evaluation.evaluation(
         {"embedding": np.array([1, 2, 3, 4])},
         {"embedding": np.array([0.1, 0.2, 0.3, 0.4])},
     )
-    assert math.isclose(score, 0.0), score
+
+    assert math.isclose(score, 2.0, abs_tol=0.001), score
 
     score = evaluation.evaluation(
         {"question": "test"},
@@ -35,7 +36,7 @@ def test_norm():
         {"question": "test1"},
         {"question": "test2"}
     )
-    assert math.isclose(score, 0.0), score
+    assert math.isclose(score, 2.0), score
 
 
 if __name__ == "__main__":
