@@ -22,7 +22,8 @@ __all__ = [
     "import_torchvision",
     "import_timm",
     "import_vit",
-    "import_stability"
+    "import_stability",
+    "import_scipy"
     ]
 
 import importlib.util
@@ -159,3 +160,6 @@ def import_replicate():
 
 def import_stability():
     _check_library("stability_sdk", package="stability-sdk")
+
+def import_scipy():
+    _check_library("scipy")

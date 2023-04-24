@@ -64,10 +64,10 @@ def test_stability_inference_faiss():
     if os.path.isfile(faiss_file):
         os.remove(faiss_file)
 
-    data_manager = manager_factory('sqlite,faiss,local', 
-                               data_dir='./', 
-                               vector_params={'dimension': 2},
-                               object_params={'path': './images'}
+    data_manager = manager_factory("sqlite,faiss,local", 
+                               data_dir="./", 
+                               vector_params={"dimension": 2},
+                               object_params={"path": "./images"}
                                )
     cache.init(
         pre_embedding_func=get_prompt,
