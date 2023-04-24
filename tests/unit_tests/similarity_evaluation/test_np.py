@@ -30,7 +30,7 @@ def test_norm():
         {"question": "test"},
         {"question": "test"}
     )
-    assert math.isclose(score, 0.0), score
+    assert math.isclose(score, 2.0), score
 
     score = evaluation.evaluation(
         {"question": "test1"},

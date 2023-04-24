@@ -12,7 +12,9 @@ class DocGen:
         self.skip_list = _default_skip_list + skip_list
         self.expand_func_list = ['core']
         self.add_list = [
-            'adapter.api', 'adapter.adapter', 'adapter.openai', 'adapter.diffusers', 'adapter.langchain_models', 'adapter.replicate', 'adapter.stability_sdk'
+            'adapter.api', 'adapter.adapter', 'adapter.openai', 'adapter.diffusers',
+            'adapter.langchain_models', 'adapter.replicate', 'adapter.stability_sdk',
+            
             ]
     
     @staticmethod
