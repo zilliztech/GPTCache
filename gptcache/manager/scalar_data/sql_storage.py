@@ -55,7 +55,7 @@ def get_models(table_prefix, db_type):
         else:
             id = Column(Integer, primary_key=True, autoincrement=True)
         question_id = Column(Integer, nullable=False)
-        answer = Column(String(1000), nullable=False)
+        answer = Column(String(2000), nullable=False)
         answer_type = Column(Integer, nullable=False)
 
     class QuestionDepTable(Base):

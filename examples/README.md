@@ -1,10 +1,32 @@
 # Example
 
+- [How to run Visual Question Answering with MiniGPT-4](#How-to-run-Visual-Question-Answering-with-MiniGPT-4)
 - [How to set the `embedding` function](#How-to-set-the-embedding-function)
 - [How to set the `data manager` class](#How-to-set-the-data-manager-class)
 - [How to set the `similarity evaluation` interface](#How-to-set-the-similarity-evaluation-interface)
 - [Other cache init params](#Other-cache-init-params)
 - [Benchmark](#Benchmark)
+
+## How to run Visual Question Answering with MiniGPT-4
+
+You can run [vqa_demo.py](./vqa_demo.py) to implement the image Q&A, which uses MiniGPT-4 for generating answers and then GPTCache to cache the answers.
+
+>  Note that you need to make sure that [minigpt4](https://github.com/Vision-CAIR/MiniGPT-4) and [gptcache](https://gptcache.readthedocs.io/en/dev/index.html) are successfully installed, and move the **vqa_demo.py** file to the MiniGPT-4 directory.
+
+```bash
+$ python vqa_demo.py --cfg-path eval_configs/minigpt4_eval.yaml  --gpu-id 0
+```
+
+The above command will use the exact match cache, i.e. map cache management method. When you ask the same image and question, it will hit the cache directly and return the answer quickly.
+
+If you want to use similar search cache, you can run the following command to set `map` to `False`, which will use sqlite3 and faiss to manage the cache to search for similar images and questions in the cache.
+
+> You can also set `dir` to your workspace directory.
+
+```bash
+$ python vqa_demo.py --cfg-path eval_configs/minigpt4_eval.yaml  --gpu-id 0 --dir /path/to/workspace --no-map
+```
+
 
 ## How to set the `embedding` function
 
