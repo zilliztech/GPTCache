@@ -40,7 +40,7 @@ def put(prompt: str, data: Any, **kwargs) -> None:
     Example:
         .. code-block:: python
 
-            from gptcache.adapter.api import save
+            from gptcache.adapter.api import put
             from gptcache.processor.pre import get_prompt
 
             cache.init(pre_embedding_func=get_prompt)
@@ -67,7 +67,7 @@ def get(prompt: str, **kwargs) -> Any:
     Example:
         .. code-block:: python
 
-            from gptcache.adapter.api import save
+            from gptcache.adapter.api import put, get
             from gptcache.processor.pre import get_prompt
 
             cache.init(pre_embedding_func=get_prompt)

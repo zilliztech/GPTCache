@@ -1,10 +1,12 @@
 import logging
 from gptcache import cache
+from gptcache.processor.post import temperature_softmax
 from gptcache.utils.error import NotInitError
 from gptcache.utils.time import time_cal
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
+    temperature = kwargs.pop("temperature", 0.0)
     chat_cache = kwargs.pop("cache_obj", cache)
     require_object_store = kwargs.pop("require_object_store", False)
     if require_object_store:
@@ -91,9 +93,16 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 chat_cache.data_manager.hit_cache_callback(cache_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         if len(cache_answers) != 0:
-            return_message = chat_cache.post_process_messages_func(
-                [t[1] for t in cache_answers]
-            )
+            if chat_cache.post_process_messages_func is temperature_softmax:
+                return_message = chat_cache.post_process_messages_func(
+                    messages=[t[1] for t in cache_answers],
+                    scores = [t[0] for t in cache_answers],
+                    temperature=temperature
+                )
+            else:
+                return_message = chat_cache.post_process_messages_func(
+                    [t[1] for t in cache_answers]
+                )
             chat_cache.report.hint_cache()
             return cache_data_convert(return_message)
 

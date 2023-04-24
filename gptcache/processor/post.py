@@ -66,6 +66,7 @@ def temperature_softmax(messages: List[Any], scores: List[float], temperature: f
     :param temperature: A non-negative number of sampling temperature, defaults to 0.
                         A higher temperature makes the output more random.
                         A lower temperature means a more deterministic and confident output.
+    :type temperature: float
 
     Example:
         .. code-block:: python
