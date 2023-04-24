@@ -9,7 +9,8 @@ class NumpyNormEvaluation(SimilarityEvaluation):
     """Using Numpy norm to evaluate sentences pair similarity.
 
     This evaluator calculate the L2 distance of two embeddings for similarity check. if `enable_normal` is True,
-    both query embedding and cache embedding will be normalized.
+    both query embedding and cache embedding will be normalized. Note normalized distance will substracted by
+    maximum distance so it will be positively correlated with the similarity.
 
     :param enable_normal: whether to normalize the embedding, defaults to False.
     :type enable_normal: bool
@@ -80,7 +81,7 @@ class NumpyNormEvaluation(SimilarityEvaluation):
         cache_embedding = (
             self.normalize(cache_embedding) if self.enable_normal else cache_embedding
         )
-        return np.linalg.norm(src_embedding - cache_embedding)
+        return self.range()[1] - np.linalg.norm(src_embedding - cache_embedding)
 
     def range(self) -> Tuple[float, float]:
         """Range of similarity score.
