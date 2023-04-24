@@ -5,10 +5,10 @@ from gptcache.manager.data_manager import SSDataManager, MapDataManager
 from gptcache.manager import CacheBase, VectorBase, ObjectBase
 
 
-def manager_factory(manager="Map",
+def manager_factory(manager="map",
                     data_dir="./",
-                    max_size = 1000,
-                    clean_size = None,
+                    max_size=1000,
+                    clean_size=None,
                     eviction: str = "LRU",
                     get_data_container: Callable = None,
                     scalar_params=None,
@@ -53,8 +53,9 @@ def manager_factory(manager="Map",
     """
 
     Path(data_dir).mkdir(exist_ok=True)
+    manager = manager.lower()
 
-    if manager == "Map":
+    if manager == "map":
         return MapDataManager(os.path.join(data_dir, "data_map.txt"), max_size, get_data_container)
 
     db_infos = manager.split(",")
@@ -62,7 +63,7 @@ def manager_factory(manager="Map",
         raise RuntimeError("Error manager format: %s, the correct is \"{scalar},{vector},{object}\", object is optional" % manager)
 
     if len(db_infos) == 2:
-        db_infos.append(None)
+        db_infos.append("")
     scalar, vector, obj = db_infos
 
     if scalar_params is None:
@@ -85,7 +86,7 @@ def manager_factory(manager="Map",
         object_params = {}
     if obj == "local":
         object_params["path"] = os.path.join(data_dir, "local_obj")
-    o = None if obj is None else ObjectBase(name=obj, **object_params)
+    o = ObjectBase(name=obj, **object_params) if obj else None
     return get_data_manager(s, v, o, max_size, clean_size, eviction)
 
 
