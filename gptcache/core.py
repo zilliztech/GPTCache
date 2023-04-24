@@ -83,17 +83,20 @@ class Cache:
             except Exception as e:  # pylint: disable=W0703
                 gptcache_log.error(e)
 
-    def import_data(self, questions: List[Any], answers: List[Any]) -> None:
+    def import_data(self, questions: List[Any], answers: List[Any], session_ids: List[Optional[str]] = None) -> None:
         """Import data to GPTCache
 
         :param questions: preprocessed question Data
         :param answers: list of answers to questions
+        :param session_ids: list of the session id.
         :return: None
         """
+
         self.data_manager.import_data(
             questions=questions,
             answers=answers,
             embedding_datas=[self.embedding_func(question) for question in questions],
+            session_ids=session_ids if session_ids else [None for _ in range(len(questions))],
         )
 
     def flush(self):

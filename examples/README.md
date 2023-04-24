@@ -5,6 +5,7 @@
 - [How to set the `data manager` class](#How-to-set-the-data-manager-class)
 - [How to set the `similarity evaluation` interface](#How-to-set-the-similarity-evaluation-interface)
 - [Other cache init params](#Other-cache-init-params)
+- [How to run with session](#How-to-run-with-session)
 - [Benchmark](#Benchmark)
 
 ## How to run Visual Question Answering with MiniGPT-4
@@ -461,6 +462,77 @@ openai.ChatCompletion.create(
 </details>
 
 For more details, please refer to: [API Reference](https://gptcache.readthedocs.io/)
+
+## How to run with session
+
+Session can isolate the context of each connection, and can also filter the results after recall, and if not satisfied will re-request rather than return the cache results directly. 
+
+First we need to initialize the cache:
+
+```python
+from gptcache import cache
+
+cache.init()
+cache.set_openai_key()
+```
+
+Then we can set the session parameter for each request.
+
+### Run in `with` method
+
+```python
+from gptcache.session import Session
+
+with Session() as session:
+    response = openai.ChatCompletion.create(
+                            model='gpt-3.5-turbo',
+                            messages=[
+                              {
+                                  'role': 'user',
+                                  'content': "what's github"
+                              }],
+                            session=session
+                          )
+```
+
+Note that the `with` method will delete the session data directly on exit, if you don't want to delete data in your sesion, you can run the following code but without `session.drop()`.
+
+### Custom Session
+
+You can customize the `name` of the sesion, and the `check_hit_func` method to check if a hit is satisfied, which method has four parameters:
+
+- `cur_session_id`:  the name of the current session
+
+- `cache_session_ids`: a list of session names for caching the same content if you are using map as a data management method. Otherwise a list of session names for similar content and same answer
+
+- `cache_question`: a list with one question which same as the you asked if you use a map as a data management method. Otherwise it is a list that is similar to the question you asked with the same answer, and it is correspondence with `cache_session_ids`
+
+- `cache_answer`: the content of the cached answer
+
+In the following code,  `my_check_hit` is defined to check if the cached answer contains "GitHub", and return `True` if it does, then gptcache will continue with the subsequent evaluation operations, and if it does not contain it will return `False` and will re-run the request.
+
+```python
+from gptcache.session import Session
+
+def my_check_hit_func(cur_session_id, cache_session_ids, cache_questions, cache_answer):
+    if "GitHub" in cache_answer:
+        return True
+    return False
+session = Session(name="my-session", check_hit_func=my_check_hit_func)
+
+response = openai.ChatCompletion.create(
+                          model='gpt-3.5-turbo',
+                          messages=[
+                            {
+                                'role': 'user',
+                                'content': "what's github"
+                            }],
+                          session=session
+                        )
+# session.drop() # Optional
+```
+
+And you can also run `data_manager.list_sessions` to list all the sessions.
 
 ## [Benchmark](https://github.com/zilliztech/GPTCache/tree/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py)
 
