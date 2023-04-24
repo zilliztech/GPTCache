@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from gptcache.adapter import diffusers as cache_diffusers
 from gptcache import cache
 from gptcache.processor.pre import get_prompt
