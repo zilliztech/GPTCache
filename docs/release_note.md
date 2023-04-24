@@ -5,6 +5,57 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.19 (2023.4.24)
+
+1. Add stability sdk adapter (text -> image)
+
+```python
+import os
+import time
+
+from gptcache import cache
+from gptcache.processor.pre import get_prompt
+from gptcache.adapter.stability_sdk import StabilityInference, generation
+from gptcache.embedding import Onnx
+from gptcache.manager.factory import manager_factory
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
+
+# init gptcache
+onnx = Onnx()
+data_manager = manager_factory('sqlite,faiss,local', 
+                               data_dir='./', 
+                               vector_params={'dimension': onnx.dimension},
+                               object_params={'path': './images'}
+                               )
+cache.init(
+    pre_embedding_func=get_prompt,
+    embedding_func=onnx.to_embeddings,
+    data_manager=data_manager,
+    similarity_evaluation=SearchDistanceEvaluation()
+    )
+
+api_key = os.getenv('STABILITY_KEY', 'key-goes-here')
+
+stability_api = StabilityInference(
+    key=os.environ['STABILITY_KEY'], # API Key reference.
+    verbose=False, # Print debug messages.
+    engine='stable-diffusion-xl-beta-v2-2-2', # Set the engine to use for generation.
+)
+
+start = time.time()
+answers = stability_api.generate(
+    prompt='a cat sitting besides a dog',
+    width=256,
+    height=256
+    )
+```
+
+stability reference: https://platform.stability.ai/docs/features/text-to-image
+
+2. Add minigpt4 adapter
+
+Notice: It cannot be used directly, it needs to cooperate with mini-GPT4 source code, refer to: https://github.com/Vision-CAIR/MiniGPT-4/pull/136
+
 ## v0.1.18 (2023.4.23)
 
 1. Add vqa bootcamp
