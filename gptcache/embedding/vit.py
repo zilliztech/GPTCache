@@ -18,6 +18,7 @@ class ViT(BaseEmbedding):
 
     Example:
         .. code-block:: python
+
             import io
             from PIL import Image
             from gptcache.embedding import ImageEmbedding
