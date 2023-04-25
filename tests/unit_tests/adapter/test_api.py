@@ -44,23 +44,28 @@ def test_none_scale_data():
     if os.path.isfile(faiss_file):
         os.remove(faiss_file)
 
-    embedding_onnx = EmbeddingOnnx()
-    cache_base = CacheBase("sqlite")
-    vector_base = VectorBase("faiss", dimension=embedding_onnx.dimension, top_k=10)
-    data_manager = get_data_manager(cache_base, vector_base)
+    def init_cache():
+        embedding_onnx = EmbeddingOnnx()
+        cache_base = CacheBase("sqlite")
+        vector_base = VectorBase("faiss", dimension=embedding_onnx.dimension, top_k=10)
+        data_manager = get_data_manager(cache_base, vector_base)
 
-    evaluation = SearchDistanceEvaluation()
-    inner_cache = Cache()
-    inner_cache.init(
-        pre_embedding_func=get_prompt,
-        embedding_func=embedding_onnx.to_embeddings,
-        data_manager=data_manager,
-        similarity_evaluation=evaluation,
-        post_process_messages_func=nop,
-        config=Config(similarity_threshold=0),
-    )
+        evaluation = SearchDistanceEvaluation()
+        inner_cache = Cache()
+        inner_cache.init(
+            pre_embedding_func=get_prompt,
+            embedding_func=embedding_onnx.to_embeddings,
+            data_manager=data_manager,
+            similarity_evaluation=evaluation,
+            post_process_messages_func=nop,
+            config=Config(similarity_threshold=0),
+        )
+        return inner_cache
+
+    inner_cache = init_cache()
     put("api-hello1", "foo1", cache_obj=inner_cache)
 
     os.remove("sqlite.db")
-    CacheBase("sqlite")
+    inner_cache = init_cache()
+    print("hello", get("api-hello1", cache_obj=inner_cache))
     assert get("api-hello1", cache_obj=inner_cache) is None
