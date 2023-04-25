@@ -4,7 +4,7 @@ from typing import Optional, List, Any
 
 import openai
 
-from gptcache.processor.post import first
+from gptcache.processor.post import temperature_softmax
 from gptcache.similarity_evaluation import ExactMatchEvaluation
 from gptcache.manager import get_data_manager
 from gptcache.processor.pre import last_content
@@ -51,7 +51,7 @@ class Cache:
         embedding_func=string_embedding,
         data_manager: DataManager = get_data_manager(),
         similarity_evaluation=ExactMatchEvaluation(),
-        post_process_messages_func=first,
+        post_process_messages_func=temperature_softmax,
         config=Config(),
         next_cache=None,
     ):
@@ -62,7 +62,7 @@ class Cache:
         :param embedding_func: a function to extract embeddings from requests for similarity search, defaults to ``string_embedding``
         :param data_manager: a ``DataManager`` module, defaults to ``get_data_manager()``
         :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``ExactMatchEvaluation()``
-        :param post_process_messages_func: a function to post-process messages, defaults to ``first``
+        :param post_process_messages_func: a function to post-process messages, defaults to ``temperature_softmax`` with a default temperature of 0.0
         :param config: a module to pass configurations, defaults to ``Config()``
         :param next_cache: customized method for next cache
         """

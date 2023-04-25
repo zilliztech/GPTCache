@@ -4,6 +4,7 @@ import time
 from gptcache.manager import get_data_manager
 from gptcache.utils.error import NotInitError
 from gptcache.adapter.adapter import adapt
+from gptcache.processor.post import first
 from gptcache import cache, Cache
 from gptcache.utils.time import time_cal
 
@@ -59,6 +60,7 @@ def test_adapt():
         pre_embedding_func=pre_embedding,
         embedding_func=delay_embedding,
         data_manager=map_manager,
+        post_process_messages_func=first
     )
 
     def report_func(delta_time):
