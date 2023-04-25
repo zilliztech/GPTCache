@@ -6,6 +6,8 @@ from gptcache.utils.time import time_cal
 
 
 def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
+    user_temperature = "temperature" in kwargs
+    user_top_k = "top_k" in kwargs
     temperature = kwargs.pop("temperature", 0.0)
     chat_cache = kwargs.pop("cache_obj", cache)
     require_object_store = kwargs.pop("require_object_store", False)
@@ -38,7 +40,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         )(
             embedding_data,
             extra_param=context.get("search_func", None),
-            top_k=kwargs.pop("top_k", -1),
+            top_k=kwargs.pop("top_k", 5) if (user_temperature and not user_top_k) else kwargs.pop("top_k", -1),
         )
         if cache_data_list is None:
             cache_data_list = []
