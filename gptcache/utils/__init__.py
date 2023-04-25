@@ -146,20 +146,26 @@ def import_diffusers():
 def import_torchaudio():
     _check_library("torchaudio")
 
+
 def import_torchvision():
     _check_library("torchvision")
+
 
 def import_timm():
     _check_library("timm", package="timm")
 
+
 def import_vit():
     _check_library("vit", package="vit")
+
 
 def import_replicate():
     _check_library("replicate")
 
+
 def import_stability():
     _check_library("stability_sdk", package="stability-sdk")
+
 
 def import_scipy():
     _check_library("scipy")
