@@ -52,7 +52,7 @@ def manager_factory(manager="map",
             data_manager = manager_factory("sqlite,faiss", data_dir="./workspace", vector_params={"dimension": 128})
     """
 
-    Path(data_dir).mkdir(exist_ok=True)
+    Path(data_dir).mkdir(parents=True, exist_ok=True)
     manager = manager.lower()
 
     if manager == "map":

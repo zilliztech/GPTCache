@@ -103,3 +103,8 @@ class TestFactory(unittest.TestCase):
             self.assertEqual(res.answers[0].answer_type, DataType.IMAGE_BASE64)
             self.assertEqual(res.answers[1].answer, "question2_STR")
             self.assertEqual(res.answers[1].answer_type, DataType.STR)
+
+    def test_multi_level_directory(self):
+        with TemporaryDirectory(dir="./") as root:
+            data_dir = os.path.join(root, 'a/b')
+            manager_factory('sqlite,faiss,local', data_dir=data_dir, vector_params={"dimension": 5})
