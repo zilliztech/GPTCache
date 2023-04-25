@@ -231,7 +231,7 @@ class SSDataManager(DataManager):
             normalize(embedding_data) for embedding_data in embedding_datas
         ]
         for i, embedding_data in enumerate(embedding_datas):
-            if self.o is not None:
+            if self.o is not None and not isinstance(answers[i], str):
                 ans = self._process_answer_data(answers[i])
             else:
                 ans = answers[i]
