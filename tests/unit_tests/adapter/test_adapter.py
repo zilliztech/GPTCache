@@ -1,10 +1,13 @@
 import os
 import time
+import numpy
 
-from gptcache.manager import get_data_manager
+from gptcache.manager import get_data_manager, manager_factory
 from gptcache.utils.error import NotInitError
 from gptcache.adapter.adapter import adapt
-from gptcache.processor.post import first
+from gptcache.adapter.api import put, get
+from gptcache.processor.pre import get_prompt
+from gptcache.processor.post import first, nop
 from gptcache import cache, Cache
 from gptcache.utils.time import time_cal
 
@@ -118,3 +121,35 @@ def test_not_init_cache():
         is_exception = True
 
     assert is_exception
+
+
+def test_cache_temperature():
+    if os.path.exists("faiss.index"):
+        os.remove("faiss.index")
+    if os.path.exists("sqlite.db"):
+        os.remove("sqlite.db")
+    data_manager = manager_factory("sqlite,faiss", vector_params={"dimension": 3, "top_k": 2})
+    cache.init(
+        pre_embedding_func=get_prompt,
+        embedding_func=lambda x, **_: numpy.ones((3,)).astype("float32"),
+        data_manager=data_manager,
+        post_process_messages_func=nop
+        )
+    assert cache.data_manager.v._top_k == 2
+    prompt = "test"
+    answer = "test answer"
+    for _ in range(5):
+        put(prompt=prompt, data=answer, skip_cache=True)
+
+    answers = get(prompt=prompt, temperature=0.0, top_k=3)
+    assert len(answers) == 3
+
+    answers = get(prompt=prompt, temperature=0.0)
+    assert len(answers) == 5
+
+    answers = get(prompt=prompt)
+    assert len(answers) == 2
+
+
+if __name__ == "__main__":
+    test_cache_temperature()

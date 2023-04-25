@@ -71,7 +71,7 @@ def test_stability_inference_faiss():
                                )
     cache.init(
         pre_embedding_func=get_prompt,
-        embedding_func=lambda x, **_: np.random.random((2,)).astype("float32"),
+        embedding_func=lambda x, **_: np.ones((2,)).astype("float32"),
         data_manager=data_manager,
         similarity_evaluation=SearchDistanceEvaluation()
     )
