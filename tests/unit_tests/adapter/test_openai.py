@@ -1,4 +1,10 @@
 from unittest.mock import patch
+
+import requests
+
+from gptcache.adapter.api import put, get
+from gptcache.embedding import Data2VecAudio
+from gptcache.similarity_evaluation import SearchDistanceEvaluation
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
@@ -10,7 +16,7 @@ from gptcache.utils.response import (
 )
 from gptcache.adapter import openai
 from gptcache import cache
-from gptcache.manager import get_data_manager
+from gptcache.manager import get_data_manager, manager_factory
 from gptcache.processor.pre import get_prompt, get_file_name, get_file_bytes
 
 import os
@@ -266,3 +272,23 @@ def test_audio_translate():
     response = openai.Audio.translate(model="whisper-1", file=audio_file)
     answer_text = get_audio_text_from_openai_answer(response)
     assert answer_text == expect_answer
+
+
+# def test_audio_api():
+#     data2vec = Data2VecAudio()
+#     data_manager = manager_factory("sqlite,faiss,local", "audio_api", vector_params={"dimension": data2vec.dimension})
+#     cache.init(
+#         pre_embedding_func=get_prompt,
+#         embedding_func=data2vec.to_embeddings,
+#         data_manager=data_manager,
+#         similarity_evaluation=SearchDistanceEvaluation(),
+#     )
+#     # url = "https://github.com/towhee-io/examples/releases/download/data/blues.00000.mp3"
+#     url = "https://github.com/towhee-io/examples/releases/download/data/ah_yes.wav"
+#     expect_answer = (
+#         "One bourbon, one scotch and one bill Hey Mr. Bartender, come here I want another drink and I want it now My baby she gone, "
+#         "she been gone tonight I ain't seen my baby since night of her life One bourbon, one scotch and one bill"
+#     )
+#     put(prompt=url, data=expect_answer)
+#
+#     assert get(prompt=url) == expect_answer

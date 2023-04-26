@@ -70,7 +70,7 @@ class CacheData:
     answers: List[Answer]
     embedding_data: Optional[np.ndarray] = None
 
-    def __init__(self, question, answers, embedding_data = None):
+    def __init__(self, question, answers, embedding_data=None):
         self.question = question
         self.answers = []
         if isinstance(answers, (str, Answer)):

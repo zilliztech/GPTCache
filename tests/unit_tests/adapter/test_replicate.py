@@ -67,8 +67,8 @@ def test_run():
     if os.path.isfile(faiss_file):
         os.remove(faiss_file)
 
-    data_manager = manager_factory("sqlite,faiss", data_dir='.', vector_params={"dimension": 100})
-    vector_data = np.random.random((100,)).astype("float32")
+    data_manager = manager_factory("sqlite,faiss", data_dir='.', vector_params={"dimension": 3})
+    vector_data = np.ones((3,)).astype("float32")
     cache.init(pre_embedding_func=get_input_image_file_name,
                data_manager=data_manager,
                embedding_func=lambda data, **_: vector_data,
