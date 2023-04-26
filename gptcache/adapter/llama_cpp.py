@@ -29,7 +29,7 @@ class Llama(llama_cpp.Llama):
             data_manager=m,
             embedding_func=onnx.to_embeddings
         )
-        llm = LlamaCpp('./models/7B/ggml-model.bin')
+        llm = Llama('./models/7B/ggml-model.bin')
         answer = llm(prompt=question, cache_obj=llm_cache)
     """
     def __call__(
