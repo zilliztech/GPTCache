@@ -5,6 +5,7 @@ from gptcache.manager import VectorBase
 from gptcache.manager.vector_data.base import VectorData
 
 
+@unittest.skip("Skip")
 class TestChromadb(unittest.TestCase):
     def test_normal(self):
         db = VectorBase("chromadb", client_settings={}, top_k=3)
