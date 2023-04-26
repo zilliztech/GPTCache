@@ -1,4 +1,5 @@
 from gptcache.embedding import Data2VecAudio
+from gptcache.adapter.api import _get_model
 
 import requests
 from io import BytesIO
@@ -9,6 +10,12 @@ def test_data2vec_audio():
     req = requests.get(url)
     audio = BytesIO(req.content) 
     t = Data2VecAudio(model="facebook/data2vec-audio-base-960h")
+    data = t.to_embeddings(audio)
+    assert len(data) == t.dimension, f"{len(data)}, {t.dimension}"
+
+    req = requests.get(url)
+    audio = BytesIO(req.content) 
+    t = _get_model("data2vecaudio")
     data = t.to_embeddings(audio)
     assert len(data) == t.dimension, f"{len(data)}, {t.dimension}"
 

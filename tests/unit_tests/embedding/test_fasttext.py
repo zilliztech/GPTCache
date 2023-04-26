@@ -3,6 +3,8 @@ from unittest.mock import patch
 from gptcache.embedding import FastText
 
 from gptcache.utils import import_fasttext
+from gptcache.adapter.api import _get_model
+
 import_fasttext()
 
 import fasttext
@@ -23,3 +25,7 @@ def test_embedding():
                         ft = FastText(dim=128)
                         assert len(ft.to_embeddings("foo")) == 128
                         assert ft.dimension == 128
+
+                        ft1 = _get_model("fasttext", model_config={"dim": 128})
+                        assert len(ft1.to_embeddings("foo")) == 128
+                        assert ft1.dimension == 128
