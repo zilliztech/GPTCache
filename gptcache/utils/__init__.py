@@ -23,7 +23,8 @@ __all__ = [
     "import_timm",
     "import_vit",
     "import_stability",
-    "import_scipy"
+    "import_scipy",
+    "import_llama_cpp_python"
     ]
 
 import importlib.util
@@ -169,3 +170,7 @@ def import_stability():
 
 def import_scipy():
     _check_library("scipy")
+
+
+def import_llama_cpp_python():
+    _check_library("llama_cpp", package="llama-cpp-python")
