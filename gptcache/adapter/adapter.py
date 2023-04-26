@@ -98,7 +98,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             if chat_cache.post_process_messages_func is temperature_softmax:
                 return_message = chat_cache.post_process_messages_func(
                     messages=[t[1] for t in cache_answers],
-                    scores = [t[0] for t in cache_answers],
+                    scores=[t[0] for t in cache_answers],
                     temperature=temperature
                 )
             else:

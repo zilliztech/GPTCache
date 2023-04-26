@@ -5,6 +5,23 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.20 (2023.4.26)
+
+1. support the `temperature` param, like openai
+
+A non-negative number of sampling temperature, defaults to 0.
+A higher temperature makes the output more random.
+A lower temperature means a more deterministic and confident output.
+
+2. Add llama adapter
+
+```python
+from gptcache.adapter.llama_cpp import Llama
+
+llm = Llama('./models/7B/ggml-model.bin')
+answer = llm(prompt=question)
+```
+
 ## v0.1.19 (2023.4.24)
 
 1. Add stability sdk adapter (text -> image)
