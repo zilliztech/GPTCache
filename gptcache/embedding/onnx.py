@@ -49,10 +49,11 @@ class Onnx(BaseEmbedding):
         :return: a text embedding in shape of (dim,).
         """
         encoded_text = self.tokenizer.encode_plus(data, padding="max_length")
+
         ort_inputs = {
-            "input_ids": np.array(encoded_text["input_ids"]).reshape(1, -1),
-            "attention_mask": np.array(encoded_text["attention_mask"]).reshape(1, -1),
-            "token_type_ids": np.array(encoded_text["token_type_ids"]).reshape(1, -1),
+            "input_ids": np.array(encoded_text["input_ids"]).astype("int64").reshape(1, -1),
+            "attention_mask": np.array(encoded_text["attention_mask"]).astype("int64").reshape(1, -1),
+            "token_type_ids": np.array(encoded_text["token_type_ids"]).astype("int64").reshape(1, -1),
         }
 
         ort_outputs = self.ort_session.run(None, ort_inputs)
