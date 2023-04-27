@@ -34,8 +34,15 @@ def _update_cache_callback(
 
 
 def put(prompt: str, data: Any, **kwargs) -> None:
-    """save api, save qa pair information to GPTCache
+    """put api, put qa pair information to GPTCache
     Please make sure that the `pre_embedding_func` param is `get_prompt` when initializing the cache
+
+    :param prompt: the cache data key, usually question text
+    :type prompt: str
+    :param data: the cache data value, usually answer text
+    :type data: Any
+    :param kwargs: list of user-defined parameters
+    :type kwargs: Dict
 
     Example:
         .. code-block:: python
@@ -61,8 +68,13 @@ def put(prompt: str, data: Any, **kwargs) -> None:
 
 
 def get(prompt: str, **kwargs) -> Any:
-    """search api, search the cache data according to the `prompt`
+    """get api, get the cache data according to the `prompt`
     Please make sure that the `pre_embedding_func` param is `get_prompt` when initializing the cache
+
+    :param prompt: the cache data key, usually question text
+    :type prompt: str
+    :param kwargs: list of user-defined parameters
+    :type kwargs: Dict
 
     Example:
         .. code-block:: python
@@ -90,6 +102,27 @@ def init_similar_cache(
     post_func: Callable[[List[Any]], Any] = first,
     config: Config = Config(),
 ):
+    """Provide a quick way to initialize cache for api service
+
+    :param data_dir: cache data storage directory
+    :type data_dir: str
+    :param cache_obj: specify to initialize the Cache object, if not specified, initialize the global object
+    :type cache_obj: Optional[Cache]
+    :param post_func: post-processing of the cached result list, the most similar result is taken by default
+    :type post_func: Callable[[List[Any]], Any]
+    :param config: cache configuration, the core is similar threshold
+    :type config: gptcache.Config
+    :return: None
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.adapter.api import put, get, init_similar_cache
+
+            init_similar_cache()
+            put("hello", "foo")
+            print(get("hello"))
+    """
     onnx = Onnx()
     data_manager = manager_factory(
         "sqlite,faiss", data_dir=data_dir, vector_params={"dimension": onnx.dimension}
