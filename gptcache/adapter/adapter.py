@@ -22,11 +22,18 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     # you want to retry to send the request to chatgpt when the cache is negative
     cache_skip = kwargs.pop("cache_skip", False)
     cache_factor = kwargs.pop("cache_factor", 1.0)
-    pre_embedding_data = chat_cache.pre_embedding_func(
+    pre_embedding_res = chat_cache.pre_embedding_func(
         kwargs,
         extra_param=context.get("pre_embedding_func", None),
         prompts=chat_cache.config.prompts,
     )
+    if isinstance(pre_embedding_res, tuple):
+        pre_store_data = pre_embedding_res[0]
+        pre_embedding_data = pre_embedding_res[1]
+    else:
+        pre_store_data = pre_embedding_res
+        pre_embedding_data = pre_embedding_res
+
     if cache_enable:
         embedding_data = time_cal(
             chat_cache.embedding_func,
@@ -78,7 +85,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 }
             else:
                 eval_query_data = {
-                    "question": pre_embedding_data,
+                    "question": pre_store_data,
                     "embedding": embedding_data,
                 }
 
@@ -131,9 +138,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
 
             def update_cache_func(handled_llm_data, question=None):
                 if question is None:
-                    question = pre_embedding_data
+                    question = pre_store_data
                 else:
-                    question.content = pre_embedding_data
+                    question.content = pre_store_data
                 chat_cache.data_manager.save(
                     question,
                     handled_llm_data,
