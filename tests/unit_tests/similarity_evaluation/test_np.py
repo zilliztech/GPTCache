@@ -2,12 +2,14 @@ import math
 
 import numpy as np
 
+from gptcache.adapter.api import _get_eval
 from gptcache.similarity_evaluation import NumpyNormEvaluation
 
 
-def test_norm():
-    embedding_func = lambda x: np.array([1, 1])
-    evaluation = NumpyNormEvaluation(enable_normal=True, question_embedding_function=embedding_func)
+embedding_func = lambda x: np.array([1, 1])
+
+
+def _test_evaluation(evaluation):
 
     range_min, range_max = evaluation.range()
     # print(range_max)
@@ -37,6 +39,15 @@ def test_norm():
         {"question": "test2"}
     )
     assert math.isclose(score, 2.0), score
+
+
+def test_norm():
+    evaluation = NumpyNormEvaluation(enable_normal=True, question_embedding_function=embedding_func)
+    _test_evaluation(evaluation)
+
+
+def test_get_eval():
+    evaluation = _get_eval(strategy="numpy", kws={"enable_normal": True, "question_embedding_function": embedding_func})
 
 
 if __name__ == "__main__":

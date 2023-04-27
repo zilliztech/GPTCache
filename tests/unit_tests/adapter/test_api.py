@@ -1,12 +1,20 @@
+# pylint: disable=wrong-import-position
 import os
+from pathlib import Path
 
-from gptcache.adapter.api import put, get, init_similar_cache
+from gptcache.utils import import_ruamel
+from gptcache.adapter.api import put, get, init_similar_cache, init_similar_cache_from_config
 from gptcache.manager import CacheBase, VectorBase, get_data_manager
 from gptcache.processor.pre import get_prompt
 from gptcache.processor.post import nop
 from gptcache import cache, Config, Cache
 from gptcache.embedding import Onnx as EmbeddingOnnx
 from gptcache.similarity_evaluation import SearchDistanceEvaluation
+
+import_ruamel()
+
+from ruamel.yaml import YAML
+
 
 faiss_file = "faiss.index"
 
@@ -69,3 +77,35 @@ def test_none_scale_data():
     inner_cache = init_cache()
     print("hello", get("api-hello1", cache_obj=inner_cache))
     assert get("api-hello1", cache_obj=inner_cache) is None
+
+
+def test_init_with_config():
+    yaml_path = Path("test.yaml")
+
+    if yaml_path.exists():
+        yaml_path.unlink()
+
+    config = {
+        "storage_config": {
+            "manager": "sqlite,faiss",
+            "data_dir": "./",
+        },
+        "model_source": "onnx",
+        "evaluation": "distance",
+        "pre_function": "get_prompt",
+        "post_function": "first",
+        "config_kws": {"threshold": 0}
+    }
+
+    with open(yaml_path, "w+", encoding="utf-8") as f:
+        yaml = YAML(typ="unsafe", pure=True)
+        yaml.dump(config, f)
+
+    init_similar_cache_from_config(
+        config_dir=yaml_path
+    )
+
+    put("api-hello", "foo")
+    assert get("api-hello") == "foo"
+
+    yaml_path.unlink()
