@@ -31,6 +31,7 @@ import importlib.util
 from typing import Optional
 
 from gptcache.utils.dependency_control import prompt_install
+from gptcache.utils.softmax import softmax  # pylint: disable=unused-argument
 
 
 def _check_library(libname: str, prompt: bool = True, package: Optional[str] = None):
