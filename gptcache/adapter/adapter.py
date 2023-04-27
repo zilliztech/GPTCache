@@ -10,6 +10,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     user_top_k = "top_k" in kwargs
     temperature = kwargs.pop("temperature", 0.0)
     chat_cache = kwargs.pop("cache_obj", cache)
+    session = kwargs.pop("session", None)
     require_object_store = kwargs.pop("require_object_store", False)
     if require_object_store:
         assert chat_cache.data_manager.o, "Object store is required for adapter."
@@ -57,7 +58,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         )
         for cache_data in cache_data_list:
             ret = chat_cache.data_manager.get_scalar_data(
-                cache_data, extra_param=context.get("get_scalar_data", None)
+                cache_data,
+                extra_param=context.get("get_scalar_data", None),
+                session=session,
             )
             if ret is None:
                 continue
@@ -91,9 +94,10 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 extra_param=context.get("evaluation_func", None),
             )
             if rank_threshold <= rank:
-                cache_answers.append((rank, ret.answers[0].answer))
+                cache_answers.append((rank, ret.answers[0].answer, cache_data))
                 chat_cache.data_manager.hit_cache_callback(cache_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
+        answers_dict = dict((d[1], d[2]) for d in cache_answers)
         if len(cache_answers) != 0:
             if chat_cache.post_process_messages_func is temperature_softmax:
                 return_message = chat_cache.post_process_messages_func(
@@ -106,6 +110,8 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     [t[1] for t in cache_answers]
                 )
             chat_cache.report.hint_cache()
+            if session:
+                chat_cache.data_manager.add_session(answers_dict[return_message], session.name, pre_embedding_data)
             return cache_data_convert(return_message)
 
     next_cache = chat_cache.next_cache
@@ -133,6 +139,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     handled_llm_data,
                     embedding_data,
                     extra_param=context.get("save_func", None),
+                    session=session,
                 )
 
             llm_data = update_cache_callback(llm_data, update_cache_func, *args, **kwargs)

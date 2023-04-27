@@ -58,6 +58,23 @@ def get_models(table_prefix, db_type):
         answer = Column(String(2000), nullable=False)
         answer_type = Column(Integer, nullable=False)
 
+    class SessionTable(Base):
+        """
+        session table
+        """
+        __tablename__ = table_prefix + "_session"
+        __table_args__ = {"extend_existing": True}
+
+        if db_type == "oracle":
+            id = Column(
+                Integer, Sequence("id_seq", start=1), primary_key=True, autoincrement=True
+            )
+        else:
+            id = Column(Integer, primary_key=True, autoincrement=True)
+        question_id = Column(Integer, nullable=False)
+        session_id = Column(String(500), nullable=False)
+        session_question = Column(String(2000), nullable=False)
+
     class QuestionDepTable(Base):
         """
         answer table
@@ -76,7 +93,7 @@ def get_models(table_prefix, db_type):
         dep_data = Column(String(1000), nullable=False)
         dep_type = Column(Integer, nullable=False)
 
-    return QuestionTable, AnswerTable, QuestionDepTable
+    return QuestionTable, AnswerTable, QuestionDepTable, SessionTable
 
 
 class SQLStorage(CacheStorage):
@@ -104,7 +121,7 @@ class SQLStorage(CacheStorage):
         table_name: str = "gptcache",
     ):
         self._url = url
-        self._ques, self._answer, self._ques_dep = get_models(table_name, db_type)
+        self._ques, self._answer, self._ques_dep, self._session = get_models(table_name, db_type)
         self._engine = create_engine(self._url)
         self.Session = sessionmaker(bind=self._engine)  # pylint: disable=invalid-name
         self.create()
@@ -113,13 +130,12 @@ class SQLStorage(CacheStorage):
         self._ques.__table__.create(bind=self._engine, checkfirst=True)
         self._answer.__table__.create(bind=self._engine, checkfirst=True)
         self._ques_dep.__table__.create(bind=self._engine, checkfirst=True)
+        self._session.__table__.create(bind=self._engine, checkfirst=True)
 
     def _insert(self, data: CacheData, session: sqlalchemy.orm.Session):
         ques_data = self._ques(
-            question=data.question if isinstance(data.question, str) else  data.question.content,
-            embedding_data=data.embedding_data.tobytes()
-            if data.embedding_data is not None
-            else None,
+            question=data.question if isinstance(data.question, str) else data.question.content,
+            embedding_data=data.embedding_data.tobytes() if data.embedding_data is not None else None,
         )
         session.add(ques_data)
         session.flush()
@@ -145,6 +161,13 @@ class SQLStorage(CacheStorage):
             )
             all_data.append(answer_data)
         session.add_all(all_data)
+        if data.session_id:
+            session_data = self._session(
+                question_id=ques_data.id,
+                session_id=data.session_id,
+                session_question=data.question if isinstance(data.question, str) else data.question.content,
+            )
+            session.add(session_data)
         return ques_data.id
 
     def batch_insert(self, all_data: List[CacheData]):
@@ -175,11 +198,18 @@ class SQLStorage(CacheStorage):
                 .filter(self._ques_dep.question_id == qs.id)
                 .all()
             )
+            session_ids = (
+                session.query(self._session.session_id)
+                .filter(self._session.question_id == qs.id)
+                .all()
+            )
             res_ans = [(item.answer, item.answer_type) for item in ans]
             res_deps = [QuestionDep(item.dep_name, item.dep_data, item.dep_type) for item in deps]
             return CacheData(question=qs[1] if not deps else Question(qs[1], res_deps),
                              answers=res_ans,
-                             embedding_data=np.frombuffer(qs[2], dtype=np.float32))
+                             embedding_data=np.frombuffer(qs[2], dtype=np.float32),
+                             session_id=session_ids,
+                             )
 
     def get_ids(self, deleted=True):
         state = -1 if deleted else 0
@@ -202,6 +232,7 @@ class SQLStorage(CacheStorage):
             q_ids = [obj.id for obj in objs]
             session.query(self._answer).filter(self._answer.question_id.in_(q_ids)).delete()
             session.query(self._ques_dep).filter(self._ques_dep.question_id.in_(q_ids)).delete()
+            session.query(self._session).filter(self._session.question_id.in_(q_ids)).delete()
             objs.delete()
             session.commit()
 
@@ -214,6 +245,30 @@ class SQLStorage(CacheStorage):
                 .filter(self._ques.deleted == state)
                 .scalar()
             )
+
+    def add_session(self, question_id, session_id, session_question):
+        with self.Session() as session:
+            session_data = self._session(
+                question_id=question_id,
+                session_id=session_id,
+                session_question=session_question,
+            )
+            session.add(session_data)
+            session.commit()
+
+    def delete_session(self, keys):
+        with self.Session() as session:
+            session.query(self._session).filter(self._session.id.in_(keys)).delete()
+            session.commit()
+
+    def list_sessions(self, session_id=None, key=None):
+        with self.Session() as session:
+            query = session.query(self._session)
+            if session_id:
+                query = query.filter(self._session.session_id == session_id)
+            elif key:
+                query = query.filter(self._session.question_id == key)
+            return query.all()
 
     def close(self):
         pass
