@@ -69,8 +69,9 @@ class CacheData:
     question: Union[str, Question]
     answers: List[Answer]
     embedding_data: Optional[np.ndarray] = None
+    session_id: Optional[str] = None
 
-    def __init__(self, question, answers, embedding_data=None):
+    def __init__(self, question, answers, embedding_data=None, session_id=None):
         self.question = question
         self.answers = []
         if isinstance(answers, (str, Answer)):
@@ -83,6 +84,7 @@ class CacheData:
             else:
                 self.answers.append(Answer(answer=data))
         self.embedding_data = embedding_data
+        self.session_id = session_id
 
 
 class CacheStorage(metaclass=ABCMeta):
@@ -119,6 +121,18 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     def flush(self):
+        pass
+
+    @abstractmethod
+    def add_session(self, question_id, session_id, session_question):
+        pass
+
+    @abstractmethod
+    def list_sessions(self, session_id, key):
+        pass
+
+    @abstractmethod
+    def delete_session(self, keys):
         pass
 
     @abstractmethod

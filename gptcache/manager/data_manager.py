@@ -30,7 +30,7 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def import_data(
-        self, questions: List[Any], answers: List[Any], embedding_datas: List[Any]
+        self, questions: List[Any], answers: List[Any], embedding_datas: List[Any], session_ids: List[Optional[str]]
     ):
         pass
 
@@ -46,6 +46,18 @@ class DataManager(metaclass=ABCMeta):
         pass
 
     def flush(self):
+        pass
+
+    @abstractmethod
+    def add_session(self, res_data, session_id, pre_embedding_data):
+        pass
+
+    @abstractmethod
+    def list_sessions(self, session_id, key):
+        pass
+
+    @abstractmethod
+    def delete_session(self, session_id):
         pass
 
     @abstractmethod
@@ -94,17 +106,24 @@ class MapDataManager(DataManager):
     def save(self, question, answer, embedding_data, **kwargs):
         if isinstance(question, Question):
             question = question.content
-        self.data[embedding_data] = (question, answer, embedding_data)
+        session = kwargs.get("session", None)
+        session_id = {session.name} if session else set()
+        self.data[embedding_data] = (question, answer, embedding_data, session_id)
 
     def import_data(
-        self, questions: List[Any], answers: List[Any], embedding_datas: List[Any]
+        self, questions: List[Any], answers: List[Any], embedding_datas: List[Any], session_ids: List[Optional[str]]
     ):
-        if len(questions) != len(answers) or len(questions) != len(embedding_datas):
+        if len(questions) != len(answers) or len(questions) != len(embedding_datas) or len(questions) != len(session_ids):
             raise ParamError("Make sure that all parameters have the same length")
         for i, embedding_data in enumerate(embedding_datas):
-            self.data[embedding_data] = (questions[i], answers[i], embedding_datas[i])
+            self.data[embedding_data] = (questions[i], answers[i], embedding_datas[i], {session_ids[i]} if session_ids[i] else set())
 
     def get_scalar_data(self, res_data, **kwargs) -> CacheData:
+        session = kwargs.get("session", None)
+        if session:
+            answer = res_data[1].answer if isinstance(res_data[1], Answer) else res_data[1]
+            if not session.check_hit_func(session.name, list(res_data[3]), [res_data[0]], answer):
+                return None
         return CacheData(question=res_data[0], answers=res_data[1])
 
     def search(self, embedding_data, **kwargs):
@@ -121,6 +140,25 @@ class MapDataManager(DataManager):
             gptcache_log.error(
                 "You don't have permission to access this file %s.", self.data_path
             )
+
+    def add_session(self, res_data, session_id, pre_embedding_data):
+        res_data[3].add(session_id)
+
+    def list_sessions(self, session_id=None, key=None):
+        session_ids = set()
+        for k in self.data:
+            if session_id and session_id in self.data[k][3]:
+                session_ids.add(k)
+            elif len(self.data[k][3]) > 0:
+                session_ids.update(self.data[k][3])
+        return list(session_ids)
+
+    def delete_session(self, session_id):
+        keys = self.list_sessions(session_id=session_id)
+        for k in keys:
+            self.data[k][3].remove(session_id)
+            if len(self.data[k][3]) == 0:
+                del self.data[k]
 
     def close(self):
         self.flush()
@@ -195,8 +233,9 @@ class SSDataManager(DataManager):
                 data_manager = get_data_manager(CacheBase('sqlite'), VectorBase('faiss', dimension=128))
                 data_manager.save('hello', 'hi', np.random.random((128, )).astype('float32'))
         """
-
-        self.import_data([question], [answer], [embedding_data])
+        session = kwargs.get("session", None)
+        session_id = session.name if session else None
+        self.import_data([question], [answer], [embedding_data], [session_id])
 
     def _process_answer_data(self, answers: Union[Answer, List[Answer]]):
         if isinstance(answers, Answer):
@@ -222,9 +261,9 @@ class SSDataManager(DataManager):
         return Question(question)
 
     def import_data(
-        self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any]
+        self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any], session_ids: List[Optional[str]]
     ):
-        if len(questions) != len(answers) or len(questions) != len(embedding_datas):
+        if len(questions) != len(answers) or len(questions) != len(embedding_datas) or len(questions) != len(session_ids):
             raise ParamError("Make sure that all parameters have the same length")
         cache_datas = []
         embedding_datas = [
@@ -241,6 +280,7 @@ class SSDataManager(DataManager):
                     question=self._process_question_data(questions[i]),
                     answers=ans,
                     embedding_data=embedding_data.astype("float32"),
+                    session_id=session_ids[i]
                 )
             )
         ids = self.s.batch_insert(cache_datas)
@@ -253,9 +293,18 @@ class SSDataManager(DataManager):
         self.eviction_base.put(ids)
 
     def get_scalar_data(self, res_data, **kwargs) -> Optional[CacheData]:
+        session = kwargs.get("session", None)
         cache_data = self.s.get_data_by_id(res_data[1])
         if cache_data is None:
             return None
+
+        if session:
+            cache_answer = cache_data.answers[0].answer if isinstance(cache_data.answers[0], Answer) else cache_data.answers[0]
+            res_list = self.list_sessions(key=res_data[1])
+            cache_session_ids, cache_questions = [r.session_id for r in res_list], [r.session_question for r in res_list]
+            if not session.check_hit_func(session.name, cache_session_ids, cache_questions, cache_answer):
+                return None
+
         for ans in cache_data.answers:
             if ans.answer_type != DataType.STR:
                 ans.answer = self.o.get(ans.answer)
@@ -272,6 +321,21 @@ class SSDataManager(DataManager):
     def flush(self):
         self.s.flush()
         self.v.flush()
+
+    def add_session(self, res_data, session_id, pre_embedding_data):
+        self.s.add_session(res_data[1], session_id, pre_embedding_data)
+
+    def list_sessions(self, session_id=None, key=None):
+        res = self.s.list_sessions(session_id, key)
+        if key:
+            return res
+        if session_id:
+            return list(r.id for r in res)
+        return list(set(r.session_id for r in res))
+
+    def delete_session(self, session_id):
+        keys = self.list_sessions(session_id=session_id)
+        self.s.delete_session(keys)
 
     def close(self):
         self.s.close()
