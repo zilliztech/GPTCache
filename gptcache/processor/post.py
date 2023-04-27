@@ -2,6 +2,8 @@ import random
 from typing import List, Any
 import numpy
 
+from gptcache.utils import softmax
+
 
 def random_one(messages: List[Any]) -> Any:
     """Randomly select one result after evaluation.
@@ -77,11 +79,6 @@ def temperature_softmax(messages: List[Any], scores: List[float], temperature: f
             scores = [0.9, 0.5, 0.1]
             answer = temperature_softmax(messages, scores, temperature=0.5)
     """
-    from gptcache.utils import import_scipy  # pylint: disable=C0415
-
-    import_scipy()
-
-    from scipy.special import softmax  # pylint: disable=C0415
 
     if temperature > 0:
         scores = softmax([x / temperature for x in scores])
