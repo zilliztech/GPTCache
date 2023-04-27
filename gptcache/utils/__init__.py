@@ -24,7 +24,8 @@ __all__ = [
     "import_vit",
     "import_stability",
     "import_scipy",
-    "import_llama_cpp_python"
+    "import_llama_cpp_python",
+    "import_ruamel"
     ]
 
 import importlib.util
@@ -175,3 +176,6 @@ def import_scipy():
 
 def import_llama_cpp_python():
     _check_library("llama_cpp", package="llama-cpp-python")
+
+def import_ruamel():
+    _check_library("ruamel-yaml")

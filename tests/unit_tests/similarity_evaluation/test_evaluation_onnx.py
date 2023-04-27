@@ -1,11 +1,10 @@
 import math
 
+from gptcache.adapter.api import _get_eval
 from gptcache.similarity_evaluation import OnnxModelEvaluation
 
 
-def test_onnx():
-    evaluation = OnnxModelEvaluation()
-
+def _test_evaluation(evaluation):
     range_min, range_max = evaluation.range()
     assert math.isclose(range_min, 0.0)
     assert math.isclose(range_max, 1.0)
@@ -22,3 +21,13 @@ def test_onnx():
 
     score = evaluation.evaluation({"question": query}, {"question": candidate_2})
     assert score < 0.1
+
+
+def test_onnx():
+    evaluation = OnnxModelEvaluation()
+    _test_evaluation(evaluation)
+
+
+def test_get_eval():
+    evaluation = _get_eval("onnx")
+    _test_evaluation(evaluation)

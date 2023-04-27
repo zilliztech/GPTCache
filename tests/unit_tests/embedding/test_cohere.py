@@ -3,6 +3,7 @@ import types
 from unittest.mock import patch
 from gptcache.utils import import_cohere
 from gptcache.embedding import Cohere
+from gptcache.adapter.api import _get_model
 
 import_cohere()
 
@@ -21,5 +22,12 @@ def test_embedding():
         dimension = 512
         mock_create.return_value = types.SimpleNamespace(embeddings=[[0] * dimension])
         c1 = Cohere("foo")
+        assert c1.dimension == dimension
+        assert len(c1.to_embeddings("foo")) == dimension
+
+    with patch("cohere.Client.embed") as mock_create:
+        dimension = 4096
+        mock_create.return_value = types.SimpleNamespace(embeddings=[[0] * dimension])
+        c1 = _get_model("cohere")
         assert c1.dimension == dimension
         assert len(c1.to_embeddings("foo")) == dimension
