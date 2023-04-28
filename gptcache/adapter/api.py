@@ -167,6 +167,8 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
     storage_config.setdefault("manager", "sqlite,faiss")
     storage_config.setdefault("data_dir", "gptcache_data")
     storage_config.setdefault("vector_params", {})
+    if not storage_config["vector_params"]:
+        storage_config["vector_params"] = {}
     storage_config["vector_params"]["dimension"] = embedding_model.dimension
     data_manager = manager_factory(**storage_config)
 
@@ -183,6 +185,8 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
     post_func = _get_post_func(post_process)
 
     config_kws = init_conf.get("config", {})
+    if not config_kws:
+        config_kws = {}
     config = Config(**config_kws)
 
     cache_obj.init(
