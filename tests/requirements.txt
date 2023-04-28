@@ -16,3 +16,4 @@ pytest-sugar==0.9.5
 pytest-parallel
 torch
 mock
+pexpect

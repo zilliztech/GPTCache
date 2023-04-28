@@ -180,6 +180,56 @@ for question in questions:
     print(f'Answer: {response_text(response)}\n')
 ```
 
+#### OpenAI API + GPTCache, use temperature
+
+> You can always pass a parameter of temperature while requesting the API service or model.
+> 
+> The range of `temperature` is [0, 2], default value is 0.0.
+> 
+> A higher temperature means a higher possibility of skipping cache search and requesting large model directly.
+> When temperature is 2, it will skip cache and send request to large model directly for sure. When temperature is 0, it will search cache before requesting large model service.
+> 
+> The default `post_process_messages_func` is `temperature_softmax`. In this case, refer to [API reference](https://gptcache.readthedocs.io/en/latest/references/processor.html#module-gptcache.processor.post) to learn about how `temperature` affects output.
+
+```python
+import time
+
+from gptcache import cache, Config
+from gptcache.manager import manager_factory
+from gptcache.embedding import Onnx
+from gptcache.processor.post import temperature_softmax
+from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
+from gptcache.adapter import openai
+
+cache.set_openai_key()
+
+onnx = Onnx()
+data_manager = manager_factory("sqlite,faiss", vector_params={"dimension": onnx.dimension})
+
+cache.init(
+    embedding_func=onnx.to_embeddings,
+    data_manager=data_manager,
+    similarity_evaluation=SearchDistanceEvaluation(),
+    post_process_messages_func=temperature_softmax
+    )
+# cache.config = Config(similarity_threshold=0.2)
+
+question = "what's github"
+
+for _ in range(3):
+    start = time.time()
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        temperature = 1.0,  # Change temperature here
+        messages=[{
+            "role": "user",
+            "content": question
+        }],
+    )
+    print("Time elapsed:", round(time.time() - start, 3))
+    print("Answer:", response["choices"][0]["message"]["content"])
+```
+
 </details>
 
 To use GPTCache exclusively, only the following lines of code are required, and there is no need to modify any existing code.

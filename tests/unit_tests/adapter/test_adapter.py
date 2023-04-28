@@ -141,6 +141,12 @@ def test_cache_temperature():
     for _ in range(5):
         put(prompt=prompt, data=answer, skip_cache=True)
 
+    answers = get(prompt=prompt, temperature=2.0)
+    assert answers is None
+
+    answers = get(prompt=prompt, temperature=1.5)
+    assert answers in [None, [answer] * 5]
+
     answers = get(prompt=prompt, temperature=0.0, top_k=3)
     assert len(answers) == 3
 
