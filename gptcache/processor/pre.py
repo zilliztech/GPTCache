@@ -61,3 +61,7 @@ def get_image_question(data: Dict[str, Any], **_: Dict[str, Any]) -> str:  # pra
 
 def get_image(data: Dict[str, Any], **_: Dict[str, Any]) -> str:  # pragma: no cover
     return data.get("image")
+
+
+def get_inputs(data: Dict[str, Any], **_: Dict[str, Any]):
+    return data.get("inputs")
