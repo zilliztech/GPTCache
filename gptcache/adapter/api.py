@@ -167,8 +167,7 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
     storage_config.setdefault("manager", "sqlite,faiss")
     storage_config.setdefault("data_dir", "gptcache_data")
     storage_config.setdefault("vector_params", {})
-    if not storage_config["vector_params"]:
-        storage_config["vector_params"] = {}
+    storage_config["vector_params"] = storage_config["vector_params"] or {}
     storage_config["vector_params"]["dimension"] = embedding_model.dimension
     data_manager = manager_factory(**storage_config)
 
@@ -184,9 +183,7 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
     post_process = init_conf.get("post_function", "first")
     post_func = _get_post_func(post_process)
 
-    config_kws = init_conf.get("config", {})
-    if not config_kws:
-        config_kws = {}
+    config_kws = init_conf.get("config", {}) or {}
     config = Config(**config_kws)
 
     cache_obj.init(
@@ -201,7 +198,7 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
 
 def _get_model(model_src, model_config = None):
     model_src = model_src.lower()
-    model_config = {} if model_config else {}
+    model_config = model_config or {}
 
     if model_src == "onnx":
         return Onnx(**model_config)
@@ -225,7 +222,7 @@ def _get_model(model_src, model_config = None):
 
 def _get_eval(strategy, kws = None):
     strategy = strategy.lower()
-    kws = kws if kws else {}
+    kws = kws or {}
 
     if "distance" in strategy:
         return SearchDistanceEvaluation(**kws)
