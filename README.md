@@ -282,7 +282,10 @@ A [sample benchmark](https://github.com/zilliztech/gpt-cache/blob/main/examples/
 The LLM Adapter is designed to integrate different LLM models by unifying their APIs and request protocols. GPTCache offers a standardized interface for this purpose, with current support for ChatGPT integration.
   - [x] Support OpenAI ChatGPT API.
   - [x] Support langchain.
-  - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic, and self-hosted models like LLaMA.
+  - [x] Support [minigpt4](https://github.com/Vision-CAIR/MiniGPT-4.git)
+  - [x] Support [Llamacpp](https://github.com/ggerganov/llama.cpp.git).
+  - [x] Support [dolly](https://github.com/databrickslabs/dolly.git).
+  - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic.
 - **Multimodal Adapter (experimental)**: 
 The Multimodal Adapter is designed to integrate different large multimodal models by unifying their APIs and request protocols. GPTCache offers a standardized interface for this purpose, with current support for integrations of image generation, audio transcription.
   - [x] Support OpenAI Image Create API.
