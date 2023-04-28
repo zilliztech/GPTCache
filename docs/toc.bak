@@ -22,6 +22,8 @@
    bootcamp/openai/image_generation
    bootcamp/openai/speech_to_text
    bootcamp/replicate/visual_question_answering
+   bootcamp/temperature/chat
+   bootcamp/temperature/create_image
 
 .. toctree::
    :maxdepth: 1
