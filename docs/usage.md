@@ -248,3 +248,20 @@ openai.ChatCompletion.create(
     cache_skip=True
 )
 ```
+
+**session:** Specify the sesion of the current request, you can also set some rules to check if the session hits the cache, see this [example](https://github.com/zilliztech/GPTCache/tree/main/examples#How-to-run-with-session) for more details.
+
+```python
+from gptcache.session import Session
+
+session = Session(name="my-session")
+question = "what do you think about chatgpt"
+
+openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "user", "content": question}
+    ],
+    session=session
+)
+```
