@@ -20,7 +20,15 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     context = kwargs.pop("cache_context", {})
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
-    cache_skip = kwargs.pop("cache_skip", False)
+    if 0 < temperature < 2:
+        cache_skip_options = [True, False]
+        prob_cache_skip = [0, 1]
+        cache_skip = kwargs.pop("cache_skip", temperature_softmax(
+            messages=cache_skip_options, scores = prob_cache_skip, temperature=temperature))
+    elif temperature >= 2:
+        cache_skip = kwargs.pop("cache_skip", True)
+    else:  # temperature <= 0
+        cache_skip = kwargs.pop("cache_skip", False)
     cache_factor = kwargs.pop("cache_factor", 1.0)
     pre_embedding_res = chat_cache.pre_embedding_func(
         kwargs,
