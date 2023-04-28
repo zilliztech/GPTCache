@@ -509,6 +509,8 @@ You can customize the `name` of the sesion, and the `check_hit_func` method to c
 
 - `cache_answer`: the content of the cached answer
 
+> The default `check_hit_func` returns `cur_session_id not in cache_session_ids`, which means that the answers returned cannot be in the same session.
+
 In the following code,  `my_check_hit` is defined to check if the cached answer contains "GitHub", and return `True` if it does, then gptcache will continue with the subsequent evaluation operations, and if it does not contain it will return `False` and will re-run the request.
 
 ```python
