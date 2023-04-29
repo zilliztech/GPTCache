@@ -5,6 +5,61 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.21 (2023.4.29)
+
+1. Support the temperature param
+
+```python
+from gptcache.adapter import openai
+
+openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    temperature = 1.0,  # Change temperature here
+    messages=[{
+        "role": "user",
+        "content": question
+    }],
+)
+```
+
+2. Add the session layer
+
+```python
+from gptcache.adapter import openai
+from gptcache.session import Session
+
+session = Session(name="my-session")
+question = "what do you think about chatgpt"
+openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "user", "content": question}
+    ],
+    session=session
+)
+```
+
+details: https://github.com/zilliztech/GPTCache/tree/main/examples#How-to-run-with-session
+
+3. Support config cache with yaml for server
+
+```python
+from gptcache.adapter.api import init_similar_cache_from_config
+
+init_similar_cache_from_config(config_dir="cache_config_template.yml")
+```
+
+config file template: https://github.com/zilliztech/GPTCache/blob/main/cache_config_template.yml
+
+4. Adapt the dolly model
+
+```python
+from gptcache.adapter.dolly import Dolly
+
+llm = Dolly.from_model(model="databricks/dolly-v2-3b")
+llm(question)
+```
+
 ## v0.1.20 (2023.4.26)
 
 1. support the `temperature` param, like openai
