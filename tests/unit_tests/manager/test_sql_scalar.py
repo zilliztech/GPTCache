@@ -1,17 +1,29 @@
 import unittest
 from pathlib import Path
-import numpy as np
 from tempfile import TemporaryDirectory
 
-from gptcache.manager.scalar_data.sql_storage import SQLStorage
+import numpy as np
+
 from gptcache.manager.scalar_data.base import CacheData, Question
+from gptcache.manager.scalar_data.sql_storage import SQLStorage
+from gptcache.utils import import_sql_client
 
 
 class TestSQLStore(unittest.TestCase):
-    def test_normal(self):
+
+    def test_sqlite(self):
+        self._inner_test_normal("sqlite")
+        self._inner_test_with_deps("sqlite")
+
+    def test_duckdb(self):
+        import_sql_client("duckdb")
+        self._inner_test_normal("duckdb")
+        self._inner_test_with_deps("duckdb")
+
+    def _inner_test_normal(self, db_name: str):
         with TemporaryDirectory(dir='./') as root:
-            db_path = Path(root) / 'sqlite.db'
-            db = SQLStorage(url="sqlite:///" + str(db_path))
+            db_path = Path(root) / f'{db_name}1.db'
+            db = SQLStorage(db_type=db_name, url=f"{db_name}:///" + str(db_path))
             db.create()
             data = []
             for i in range(1, 10):
@@ -41,11 +53,11 @@ class TestSQLStore(unittest.TestCase):
             self.assertEqual(db.count_answers(), 40)
             self.assertEqual(db.count(is_all=True), 7)
 
-    def test_with_deps(self):
+    def _inner_test_with_deps(self, db_name: str):
         with TemporaryDirectory(dir='./') as root:
-            db_path = Path(root) / 'sqlite.db'
-            db = SQLStorage(url="sqlite:///" + str(db_path))
-            db.create()        
+            db_path = Path(root) / f'{db_name}2.db'
+            db = SQLStorage(db_type=db_name, url=f"{db_name}:///" + str(db_path))
+            db.create()
             data_id = db.batch_insert([
                 CacheData(
                     Question.from_dict({

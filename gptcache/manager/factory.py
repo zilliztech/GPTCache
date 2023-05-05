@@ -103,7 +103,7 @@ def get_data_manager(
     """Generate `SSDataManager` (with `cache_base`, `vector_base`, `max_size`, `clean_size` and `eviction` params),
        or `MAPDataManager` (with `data_path`, `max_size` and `get_data_container` params) to manager the data.
 
-    :param cache_base: a CacheBase object, or the name of the cache storage, it is support 'sqlite', 'postgresql',
+    :param cache_base: a CacheBase object, or the name of the cache storage, it is support 'sqlite', 'duckdb', 'postgresql',
                        'mysql', 'mariadb', 'sqlserver' and  'oracle' now.
     :type cache_base: :class:`CacheBase` or str
     :param vector_base: a VectorBase object, or the name of the vector storage, it is support 'milvus', 'faiss' and
