@@ -29,4 +29,9 @@ setuptools.setup(
     url="https://github.com/zilliztech/GPTCache",
     license='https://opensource.org/license/mit/',
     python_requires='>=3.8.1',
+    entry_points={
+        'console_scripts': [
+            'gptcache_server=gptcache_server.server:main',
+        ],
+    },
 )

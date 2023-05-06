@@ -42,7 +42,7 @@ def start_server(host: str, port: int):
     httpd.serve_forever()
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--host", default="localhost", help="the hostname to listen on")
     parser.add_argument("-p", "--port", type=int, default=8000, help="the port to listen on")
@@ -57,3 +57,7 @@ if __name__ == "__main__":
         init_similar_cache(args.cache_dir)
 
     start_server(args.host, args.port)
+
+
+if __name__ == "__main__":
+    main()
