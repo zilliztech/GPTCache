@@ -5,6 +5,28 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.22 (2023.5.7)
+
+1. Process the dialog context through the context processing interface, which currently supports two ways: summarize and selective context
+
+```python
+import transformers
+from gptcache.processor.context.summarization_context import SummarizationContextProcess
+from gptcache.processor.context.selective_context import SelectiveContextProcess
+from gptcache import cache
+
+summarizer = transformers.pipeline("summarization", model="facebook/bart-large-cnn")
+context_process = SummarizationContextProcess(summarizer, None, 512)
+cache.init(
+    pre_embedding_func=context_process.pre_process,
+)
+
+context_processor = SelectiveContextProcess()
+cache.init(
+    pre_embedding_func=context_process.pre_process,
+)
+```
+
 ## v0.1.21 (2023.4.29)
 
 1. Support the temperature param
