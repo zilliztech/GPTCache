@@ -25,7 +25,8 @@ __all__ = [
     "import_stability",
     "import_scipy",
     "import_llama_cpp_python",
-    "import_ruamel"
+    "import_ruamel",
+    "import_selective_context",
     ]
 
 import importlib.util
@@ -184,5 +185,10 @@ def import_scipy():
 def import_llama_cpp_python():
     _check_library("llama_cpp", package="llama-cpp-python")
 
+
 def import_ruamel():
     _check_library("ruamel-yaml")
+
+
+def import_selective_context():
+    _check_library("selective_context")
