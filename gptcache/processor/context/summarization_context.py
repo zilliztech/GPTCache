@@ -1,16 +1,21 @@
 from typing import Dict, Any
+
+import numpy as np
+
 from gptcache.processor import ContextProcess
 from gptcache.utils import import_huggingface
-import numpy as np
+
 import_huggingface()
 
-import transformers # pylint: disable=C0413
+import transformers  # pylint: disable=C0413
+
 
 class SummarizationContextProcess(ContextProcess):
     """A context processor for summarizing large amounts of text data using a summarizer model.
 
     :param summarizer: The summarizer model to use for summarization.
-    :type summarizer: transformers.PreTrainedModel :param tokenizer: The tokenizer to use for tokenizing the text data.
+    :type summarizer: transformers.PreTrainedModel
+    :param tokenizer: The tokenizer to use for tokenizing the text data.
     It used for measuring the output length.
     :type tokenizer: transformers.PreTrainedTokenizer
     :param target_length: The length of the summarized text.

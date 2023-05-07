@@ -1,10 +1,10 @@
-from gptcache.processor.context.summarization_context import SummarizationContextProcess
-from transformers import pipeline, RobertaTokenizer
+from gptcache.processor.context.selective_context import SelectiveContextProcess
+from gptcache.utils import import_selective_context
 
 
-def test_summarization_context_process():
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-    context_process = SummarizationContextProcess(summarizer, None, 512)
+def test_selective_context_process():
+    import_selective_context()
+    context_process = SelectiveContextProcess()
     chat = []
     chat.append(
         {
@@ -33,5 +33,4 @@ In other words, the answer "42" is a humorous and satirical take on the idea tha
 
     context_process.format_all_content({"messages": chat})
     save_content, embedding_content = context_process.process_all_content()
-    tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
-    assert len(tokenizer.tokenize(embedding_content)) < 512
+    assert len(save_content) > len(embedding_content)

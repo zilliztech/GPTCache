@@ -5,31 +5,33 @@ from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
 from gptcache.manager import manager_factory
-from gptcache.processor.context.summarization_context import SummarizationContextProcess
-from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
-from gptcache.utils import import_huggingface
+from gptcache.processor.context.selective_context import SelectiveContextProcess
+from gptcache.similarity_evaluation import SearchDistanceEvaluation
+from gptcache.utils import import_selective_context
 
-import_huggingface()
-import transformers  # pylint: disable=C0413
+import_selective_context()
 
 
 def response_text(openai_resp):
     return openai_resp["choices"][0]["message"]["content"]
 
 
+# Need to download the corresponding model before use
+# `pip install spacy && python -m spacy download en_core_web_sm`
+
+
 def cache_init():
+    context_processor = SelectiveContextProcess()
     onnx = Onnx()
-    summarizer = transformers.pipeline("summarization", model="facebook/bart-large-cnn")
-    context_process = SummarizationContextProcess(summarizer, None, 512)
     data_manager = manager_factory(
         "sqlite,faiss", vector_params={"dimension": onnx.dimension}
     )
-    dir_name, _ = os.path.split(os.path.abspath(__file__))
+    evaluation = SearchDistanceEvaluation()
     cache.init(
-        pre_embedding_func=context_process.pre_process,
+        pre_embedding_func=context_processor.pre_process,
         embedding_func=onnx.to_embeddings,
         data_manager=data_manager,
-        similarity_evaluation=SearchDistanceEvaluation(),
+        similarity_evaluation=evaluation,
     )
     os.environ["OPENAI_API_KEY"] = "API KEY"
     cache.set_openai_key()
