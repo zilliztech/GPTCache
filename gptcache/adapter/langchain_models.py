@@ -1,6 +1,7 @@
 from typing import Optional, List, Any
 
 from gptcache.adapter.adapter import adapt
+from gptcache.session import Session
 from gptcache.utils import import_pydantic, import_langchain
 from gptcache.manager.scalar_data.base import Answer, DataType
 
@@ -37,18 +38,21 @@ class LangChainLLMs(LLM, BaseModel):
     """
 
     llm: Any
+    session: Session = None
 
     @property
     def _llm_type(self) -> str:
         return "gptcache_llm"
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None, **kwargs) -> str:
+        session = self.session if "session" not in kwargs else kwargs.pop("session")
         return adapt(
             self.llm,
             cache_data_convert,
             update_cache_callback,
             prompt=prompt,
             stop=stop,
+            session=session,
             **kwargs
         )
 
@@ -79,24 +83,29 @@ class LangChainChat(BaseChatModel, BaseModel):
     """
 
     chat: Any
+    session: Session = None
 
     def _generate(self, messages: Any, stop: Optional[List[str]] = None, **kwargs):
+        session = self.session if "session" not in kwargs else kwargs.pop("session")
         return adapt(
             self.chat._generate,
             cache_msg_data_convert,
             update_cache_msg_callback,
             messages=messages,
             stop=stop,
+            session=session,
             **kwargs
         )
 
     async def _agenerate(self, messages: List[List[BaseMessage]], stop: Optional[List[str]] = None, **kwargs) -> LLMResult:
+        session = self.session if "session" not in kwargs else kwargs.pop("session")
         return adapt(
             self.chat._agenerate,
             cache_msg_data_convert,
             update_cache_msg_callback,
             messages=messages,
             stop=stop,
+            session=session,
             **kwargs
         )
 
