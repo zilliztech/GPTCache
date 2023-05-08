@@ -495,7 +495,9 @@ with Session() as session:
                           )
 ```
 
-Note that the `with` method will delete the session data directly on exit, if you don't want to delete data in your sesion, you can run the following code but without `session.drop()`.
+> The `with` method will delete the session data directly on exit, if you don't want to delete data in your sesion, you can run the following code but without `session.drop()`.
+>
+> If you are using `LangChainLLMs`, you can set the session for current LLM, e.g. `llm = LangChainLLMs(llm=OpenAI(temperature=0), session=session)`. Or you can run the llm with specific session, e.g. `llm = LangChainLLMs(llm=OpenAI(temperature=0)` , and run `llm(question, session=session)`.
 
 ### Custom Session
 
