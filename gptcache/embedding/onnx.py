@@ -30,13 +30,13 @@ class Onnx(BaseEmbedding):
     """
 
     def __init__(self, model="GPTCache/paraphrase-albert-onnx"):
-        tokenizer_name = "sentence-transformers/paraphrase-albert-small-v2"
+        tokenizer_name = "GPTCache/paraphrase-albert-small-v2"
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
         self.model = model
         onnx_model_path = hf_hub_download(repo_id=model, filename="model.onnx")
         self.ort_session = onnxruntime.InferenceSession(onnx_model_path)
         config = AutoConfig.from_pretrained(
-            "sentence-transformers/paraphrase-albert-small-v2"
+            "GPTCache/paraphrase-albert-small-v2"
         )
         self.__dimension = config.hidden_size
 

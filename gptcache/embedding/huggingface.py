@@ -13,7 +13,7 @@ from transformers import AutoTokenizer, AutoModel  # pylint: disable=C0413
 class Huggingface(BaseEmbedding):
     """Generate sentence embedding for given text using pretrained models from Huggingface transformers.
 
-    :param model: model name, defaults to 'sentence-transformers/all-MiniLM-L6-v2'.
+    :param model: model name, defaults to 'distilbert-base-uncased'.
     :type model: str
 
     Example:
@@ -22,11 +22,11 @@ class Huggingface(BaseEmbedding):
             from gptcache.embedding import Huggingface
 
             test_sentence = 'Hello, world.'
-            encoder = Huggingface(model='sentence-transformers/all-MiniLM-L6-v2')
+            encoder = Huggingface(model='distilbert-base-uncased')
             embed = encoder.to_embeddings(test_sentence)
     """
 
-    def __init__(self, model: str = "sentence-transformers/all-MiniLM-L6-v2"):
+    def __init__(self, model: str = "distilbert-base-uncased"):
         self.model = AutoModel.from_pretrained(model)
         self.model.eval()
 
