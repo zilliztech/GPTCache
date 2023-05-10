@@ -19,7 +19,7 @@ class SBERT(BaseEmbedding):
             from gptcache.embedding import SBERT
 
             test_sentence = 'Hello, world.'
-            encoder = SBERT('paraphrase-albert-small-v2')
+            encoder = SBERT('all-MiniLM-L6-v2')
             embed = encoder.to_embeddings(test_sentence)
     """
 

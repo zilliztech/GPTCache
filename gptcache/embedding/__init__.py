@@ -22,7 +22,7 @@ def OpenAI(model="text-embedding-ada-002", api_key=None):
     return openai.OpenAI(model, api_key)
 
 
-def Huggingface(model="sentence-transformers/all-mpnet-base-v2"):
+def Huggingface(model="distilbert-base-uncased"):
     return huggingface.Huggingface(model)
 
 
