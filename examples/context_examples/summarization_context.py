@@ -9,18 +9,12 @@ from gptcache.processor.context.summarization_context import SummarizationContex
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 from gptcache.utils import import_huggingface
 
-import_huggingface()
-import transformers  # pylint: disable=C0413
-
-
 def response_text(openai_resp):
     return openai_resp["choices"][0]["message"]["content"]
 
-
 def cache_init():
     onnx = Onnx()
-    summarizer = transformers.pipeline("summarization", model="facebook/bart-large-cnn")
-    context_process = SummarizationContextProcess(summarizer, None, 512)
+    context_process = SummarizationContextProcess()
     data_manager = manager_factory(
         "sqlite,faiss", vector_params={"dimension": onnx.dimension}
     )
