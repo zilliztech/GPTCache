@@ -281,8 +281,8 @@ A [sample benchmark](https://github.com/zilliztech/gpt-cache/blob/main/examples/
 - **LLM Adapter**: 
 The LLM Adapter is designed to integrate different LLM models by unifying their APIs and request protocols. GPTCache offers a standardized interface for this purpose, with current support for ChatGPT integration.
   - [x] Support OpenAI ChatGPT API.
-  - [x] Support langchain.
-  - [x] Support [minigpt4](https://github.com/Vision-CAIR/MiniGPT-4.git)
+  - [x] Support [langchain](https://github.com/hwchase17/langchain).
+  - [x] Support [minigpt4](https://github.com/Vision-CAIR/MiniGPT-4.git).
   - [x] Support [Llamacpp](https://github.com/ggerganov/llama.cpp.git).
   - [x] Support [dolly](https://github.com/databrickslabs/dolly.git).
   - [ ] Support other LLMs, such as Hugging Face Hub, Bard, Anthropic.
@@ -314,12 +314,12 @@ This module is created to extract embeddings from requests for similarity search
   - [x] Support [MariaDB](https://mariadb.org/).
   - [x] Support [SQL Server](https://www.microsoft.com/en-us/sql-server/).
   - [x] Support [Oracle](https://www.oracle.com/).
+  - [x] Support [Duckdb](https://github.com/duckdb/duckdb).
   - [ ] Support [MongoDB](https://www.mongodb.com/).
   - [ ] Support [Redis](https://redis.io/).
   - [ ] Support [Minio](https://min.io/).
   - [ ] Support [HBase](https://hbase.apache.org/).
   - [ ] Support [ElasticSearch](https://www.elastic.co/).
-  - [ ] Support [Duckdb](https://github.com/duckdb/duckdb).
   - [ ] Support other storages.
 - **Vector Store**:
 The **Vector Store** module helps find the K most similar requests from the input request's extracted embedding. The results can help assess similarity. GPTCache provides a user-friendly interface that supports various vector stores, including Milvus, Zilliz Cloud, and FAISS. More options will be available in the future.
