@@ -1,19 +1,19 @@
 # pylint: disable=wrong-import-position
 from typing import Any, Optional, Callable, List
 
-import gptcache.processor.pre
 import gptcache.processor.post
-from gptcache.utils import import_ruamel
+import gptcache.processor.pre
 from gptcache import Cache, cache, Config
-from gptcache.processor.post import first
 from gptcache.adapter.adapter import adapt
-from gptcache.manager import manager_factory
-from gptcache.processor.pre import get_prompt
 from gptcache.embedding import Onnx, Huggingface, SBERT, FastText, Data2VecAudio, Timm, ViT, OpenAI, Cohere
+from gptcache.manager import manager_factory
+from gptcache.processor.post import first
+from gptcache.processor.pre import get_prompt
 from gptcache.similarity_evaluation import (
     SearchDistanceEvaluation, NumpyNormEvaluation, OnnxModelEvaluation,
     ExactMatchEvaluation, KReciprocalEvaluation
 )
+from gptcache.utils import import_ruamel
 
 import_ruamel()
 
@@ -110,6 +110,7 @@ def get(prompt: str, **kwargs) -> Any:
 def init_similar_cache(
     data_dir: str = "api_cache",
     cache_obj: Optional[Cache] = None,
+    pre_func: Callable = get_prompt,
     post_func: Callable[[List[Any]], Any] = first,
     config: Config = Config(),
 ):
@@ -119,6 +120,8 @@ def init_similar_cache(
     :type data_dir: str
     :param cache_obj: specify to initialize the Cache object, if not specified, initialize the global object
     :type cache_obj: Optional[Cache]
+    :param pre_func: pre-processing of the cache input text
+    :type pre_func: Callable
     :param post_func: post-processing of the cached result list, the most similar result is taken by default
     :type post_func: Callable[[List[Any]], Any]
     :param config: cache configuration, the core is similar threshold
@@ -141,7 +144,7 @@ def init_similar_cache(
     evaluation = SearchDistanceEvaluation()
     cache_obj = cache_obj if cache_obj else cache
     cache_obj.init(
-        pre_embedding_func=get_prompt,
+        pre_embedding_func=pre_func,
         embedding_func=onnx.to_embeddings,
         data_manager=data_manager,
         similarity_evaluation=evaluation,

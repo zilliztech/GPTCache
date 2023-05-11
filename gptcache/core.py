@@ -4,16 +4,16 @@ from typing import Optional, List, Any
 
 import openai
 
-from gptcache.processor.post import temperature_softmax
-from gptcache.similarity_evaluation import ExactMatchEvaluation
-from gptcache.manager import get_data_manager
-from gptcache.processor.pre import last_content
+from gptcache.config import Config
 from gptcache.embedding.string import to_embeddings as string_embedding
+from gptcache.manager import get_data_manager
 from gptcache.manager.data_manager import DataManager
+from gptcache.processor.post import temperature_softmax
+from gptcache.processor.pre import last_content
 from gptcache.report import Report
+from gptcache.similarity_evaluation import ExactMatchEvaluation
 from gptcache.similarity_evaluation import SimilarityEvaluation
 from gptcache.utils.cache_func import cache_all
-from gptcache.config import Config
 from gptcache.utils.log import gptcache_log
 
 
@@ -83,7 +83,7 @@ class Cache:
             except Exception as e:  # pylint: disable=W0703
                 gptcache_log.error(e)
 
-    def import_data(self, questions: List[Any], answers: List[Any], session_ids: List[Optional[str]] = None) -> None:
+    def import_data(self, questions: List[Any], answers: List[Any], session_ids: Optional[List[Optional[str]]] = None) -> None:
         """Import data to GPTCache
 
         :param questions: preprocessed question Data
