@@ -5,6 +5,35 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.23 (2023.5.11)
+
+1. Support the session for the `LangChainLLMs`
+
+```python
+from langchain import OpenAI
+from gptcache.adapter.langchain_models import LangChainLLMs
+from gptcache.session import Session
+
+session = Session(name="sqlite-example")
+llm = LangChainLLMs(llm=OpenAI(temperature=0), session=session)
+```
+
+2. Optimize the summarization context process
+
+```python
+from gptcache import cache
+from gptcache.processor.context.summarization_context import SummarizationContextProcess
+
+context_process = SummarizationContextProcess()
+cache.init(
+    pre_embedding_func=context_process.pre_process,
+)
+```
+
+3. Add BabyAGI bootcamp
+
+details: https://github.com/zilliztech/GPTCache/blob/main/docs/bootcamp/langchain/baby_agi.ipynb
+
 ## v0.1.22 (2023.5.7)
 
 1. Process the dialog context through the context processing interface, which currently supports two ways: summarize and selective context
