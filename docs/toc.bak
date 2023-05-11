@@ -16,6 +16,7 @@
    bootcamp/langchain/qa_generation
    bootcamp/langchain/question_answering
    bootcamp/langchain/sqlite
+   bootcamp/langchain/baby_agi
    bootcamp/openai/chat
    bootcamp/openai/language_translate
    bootcamp/openai/sql_translate
