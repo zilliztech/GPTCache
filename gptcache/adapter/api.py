@@ -6,7 +6,9 @@ import gptcache.processor.pre
 from gptcache import Cache, cache, Config
 from gptcache.adapter.adapter import adapt
 from gptcache.embedding import Onnx, Huggingface, SBERT, FastText, Data2VecAudio, Timm, ViT, OpenAI, Cohere
+from gptcache.embedding.base import BaseEmbedding
 from gptcache.manager import manager_factory
+from gptcache.manager.data_manager import DataManager
 from gptcache.processor.post import first
 from gptcache.processor.pre import get_prompt
 from gptcache.similarity_evaluation import (
@@ -14,10 +16,6 @@ from gptcache.similarity_evaluation import (
     ExactMatchEvaluation, KReciprocalEvaluation
 )
 from gptcache.utils import import_ruamel
-
-import_ruamel()
-
-from ruamel.yaml import YAML
 
 
 def _cache_data_converter(cache_data):
@@ -111,6 +109,8 @@ def init_similar_cache(
     data_dir: str = "api_cache",
     cache_obj: Optional[Cache] = None,
     pre_func: Callable = get_prompt,
+    embedding: Optional[BaseEmbedding] = None,
+    data_manager: Optional[DataManager] = None,
     post_func: Callable[[List[Any]], Any] = first,
     config: Config = Config(),
 ):
@@ -122,6 +122,10 @@ def init_similar_cache(
     :type cache_obj: Optional[Cache]
     :param pre_func: pre-processing of the cache input text
     :type pre_func: Callable
+    :param embedding: embedding object
+    :type embedding: BaseEmbedding
+    :param data_manager: data manager object
+    :type data_manager: DataManager
     :param post_func: post-processing of the cached result list, the most similar result is taken by default
     :type post_func: Callable[[List[Any]], Any]
     :param config: cache configuration, the core is similar threshold
@@ -137,15 +141,17 @@ def init_similar_cache(
             put("hello", "foo")
             print(get("hello"))
     """
-    onnx = Onnx()
-    data_manager = manager_factory(
-        "sqlite,faiss", data_dir=data_dir, vector_params={"dimension": onnx.dimension}
-    )
+    if not embedding:
+        embedding = Onnx()
+    if not data_manager:
+        data_manager = manager_factory(
+            "sqlite,faiss", data_dir=data_dir, vector_params={"dimension": embedding.dimension}
+        )
     evaluation = SearchDistanceEvaluation()
     cache_obj = cache_obj if cache_obj else cache
     cache_obj.init(
         pre_embedding_func=pre_func,
-        embedding_func=onnx.to_embeddings,
+        embedding_func=embedding.to_embeddings,
         data_manager=data_manager,
         similarity_evaluation=evaluation,
         post_process_messages_func=post_func,
@@ -154,6 +160,8 @@ def init_similar_cache(
 
 
 def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] = None):
+    import_ruamel()
+    from ruamel.yaml import YAML  # pylint: disable=C0415
 
     if config_dir:
         with open(config_dir, "r", encoding="utf-8") as f:
