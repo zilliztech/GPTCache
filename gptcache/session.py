@@ -1,14 +1,14 @@
 import uuid
-from typing import Callable
+from typing import Callable, Optional
 
 from gptcache import cache
 from gptcache.manager.data_manager import DataManager
-from gptcache.utils.log import gptcache_log
 from gptcache.processor.check_hit import check_hit_session
+from gptcache.utils.log import gptcache_log
 
 
 class Session:
-    """"
+    """
     Session for gptcache.
 
     :param name: the name of the session, defaults to `uuid.uuid4().hex`.
@@ -43,20 +43,30 @@ class Session:
                         )
             response_content = response['choices'][0]['message']['content']
     """
-    def __init__(self, name: str = None, data_manager: DataManager = None, check_hit_func: Callable = None):
+
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        data_manager: Optional[DataManager] = None,
+        check_hit_func: Optional[Callable] = None,
+    ):
         self._name = uuid.uuid4().hex if not name else name
         self._data_manager = cache.data_manager if not data_manager else data_manager
-        self.check_hit_func = check_hit_session if not check_hit_func else check_hit_func
+        self.check_hit_func = (
+            check_hit_session if not check_hit_func else check_hit_func
+        )
 
     @property
     def name(self):
         return self._name
 
     def __enter__(self):
-        gptcache_log.warning("The `with` method will delete the session data directly on exit.")
+        gptcache_log.warning(
+            "The `with` method will delete the session data directly on exit."
+        )
         return self
 
-    def __exit__(self, type, value, traceback):  # pylint: disable=redefined-builtin
+    def __exit__(self, *_):
         self.drop()
 
     def drop(self):
