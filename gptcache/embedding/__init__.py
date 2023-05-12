@@ -12,6 +12,7 @@ fasttext = LazyImport("fasttext", globals(), "gptcache.embedding.fasttext")
 data2vec = LazyImport("data2vec", globals(), "gptcache.embedding.data2vec")
 timm = LazyImport("timm", globals(), "gptcache.embedding.timm")
 vit = LazyImport("vit", globals(), "gptcache.embedding.vit")
+langchain = LazyImport("langchain", globals(), "gptcache.embedding.langchain")
 
 
 def Cohere(model="large", api_key=None):
@@ -48,3 +49,7 @@ def Timm(model="resnet50", device="default"):
 
 def ViT(model="google/vit-base-patch16-384"):
     return vit.ViT(model)
+
+
+def LangChain(embeddings, dimension = 0):
+    return langchain.LangChain(embeddings, dimension)
