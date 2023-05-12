@@ -49,7 +49,7 @@ def VectorBase(name: str, **kwargs):
     :param local_data: required when local_mode is True.
     :type local_data: str
 
-    :param url: the host for PostgreSQL vector database, defaults to 'localhost'.
+    :param url: the connection url for PostgreSQL database, defaults to 'postgresql://postgres@localhost:5432/postgres'
     :type url: str
     :param index_params: the index parameters for pgvector.
     :type index_params: dict

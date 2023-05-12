@@ -29,15 +29,13 @@ class VectorType(UserDefinedType):
     def get_col_spec(self, **_):
         return f"vector({self.precision})"
 
+    # pylint: disable=unused-argument
     def bind_processor(self, dialect):
-        def process(value):
-            return value
-        return process
+        return lambda value: value
 
+    # pylint: disable=unused-argument
     def result_processor(self, dialect, coltype):
-        def process(value):
-            return value
-        return process
+        return lambda value: value
 
 def get_model_and_index(table_prefix, vector_dimension, index_type, lists):
     class VectorStoreTable(Base):
@@ -45,13 +43,13 @@ def get_model_and_index(table_prefix, vector_dimension, index_type, lists):
         vector store table
         """
 
-        __tablename__ = table_prefix + "_vector_store"
+        __tablename__ = table_prefix + "_pg_vector_store"
         __table_args__ = {"extend_existing": True}
         id = Column(Integer, primary_key=True, autoincrement=False)
         embedding = Column(VectorType(vector_dimension), nullable=False)
 
     vector_store_index = Index(
-        f"idx_{table_prefix}_vector_store_embedding",
+        f"idx_{table_prefix}_pg_vector_store_embedding",
         text(f"embedding {index_type}"),
         postgresql_using="ivfflat",
         postgresql_with={"lists": lists}
@@ -66,7 +64,7 @@ def get_model_and_index(table_prefix, vector_dimension, index_type, lists):
 class PGVector(VectorBase):
     """vector store: pgvector
 
-    :param url: the url for PostgreSQL database, defaults to 'postgresql://postgres@localhost:5432/postgres'.
+    :param url: the connection url for PostgreSQL database, defaults to 'postgresql://postgres@localhost:5432/postgres'.
     :type url: str
     :type collection_name: str
     :param dimension: the dimension of the vector, defaults to 0.
@@ -153,12 +151,9 @@ class PGVector(VectorBase):
 
         return search_result
 
-    def delete(self, ids = None):
+    def delete(self, ids):
         with self._session() as session:
-            if ids is None:
-                self._query(session).delete()
-            else:
-                self._query(session).filter(self._store.id.in_(ids)).delete()
+            self._query(session).filter(self._store.id.in_(ids)).delete()
             session.commit()
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument

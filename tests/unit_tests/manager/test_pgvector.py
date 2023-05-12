@@ -12,7 +12,7 @@ class TestPgvector(unittest.TestCase):
         dim = 512
         top_k = 10
 
-        url = os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@localhost:5432/postgres")
+        url = os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@postgres:5432/postgres")
 
         db = VectorBase(
             "pgvector",
@@ -24,7 +24,7 @@ class TestPgvector(unittest.TestCase):
                 "params": {"lists": 100, "probes": 10},
             },
         )
-        db.delete()
+        db.delete([i for i in range(size)])
         data = np.random.randn(size, dim).astype(np.float32)
         db.mul_add([VectorData(id=i, data=v) for v, i in zip(data, range(size))])
         self.assertEqual(len(db.search(data[0])), top_k)
