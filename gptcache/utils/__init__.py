@@ -28,7 +28,8 @@ __all__ = [
     "import_ruamel",
     "import_selective_context",
     "import_docarray",
-]
+    "import_httpx",
+    ]
 
 import importlib.util
 from typing import Optional
@@ -194,6 +195,9 @@ def import_ruamel():
 def import_selective_context():
     _check_library("selective_context")
 
-
 def import_docarray():
     _check_library("docarray")
+
+def import_httpx():
+    _check_library("httpx")
+
