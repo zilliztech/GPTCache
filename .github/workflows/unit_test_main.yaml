@@ -28,6 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+    services:
+      postgres:
+        image: ankane/pgvector
+        env:
+          POSTGRES_PASSWORD: postgres
     steps:
       - uses: actions/checkout@main
 
