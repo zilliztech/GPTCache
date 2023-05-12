@@ -7,10 +7,11 @@ from gptcache.embedding import Onnx
 from gptcache.manager import manager_factory
 from gptcache.processor.context.summarization_context import SummarizationContextProcess
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
-from gptcache.utils import import_huggingface
+
 
 def response_text(openai_resp):
     return openai_resp["choices"][0]["message"]["content"]
+
 
 def cache_init():
     onnx = Onnx()
