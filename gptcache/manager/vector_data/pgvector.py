@@ -73,8 +73,8 @@ class PGVector(VectorBase):
     :type dimension: int
     :param top_k: the umber of the vectors results to return, defaults to 1.
     :type top_k: int
-    :param index_params: the index parameters for pgvector, defaults to the HNSW index: {'metric_type': 'L2', 'index_type': 'HNSW', 'params': {'M':
-                         8, 'efConstruction': 64}}.
+    :param index_params: the index parameters for pgvector, defaults to 'vector_l2_ops' index:
+                         {"index_type": "L2", "params": {"lists": 100, "probes": 10}.
     :type index_params: dict
     """
 
