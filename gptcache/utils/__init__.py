@@ -28,7 +28,8 @@ __all__ = [
     "import_ruamel",
     "import_selective_context",
     "import_paddle",
-    "import_paddlenlp"
+    "import_paddlenlp",
+    "import_httpx"
     ]
 
 import importlib.util
@@ -200,3 +201,6 @@ def import_paddle():
 
 def import_paddlenlp():
     _check_library("paddlenlp")
+
+def import_httpx():
+    _check_library("httpx")
