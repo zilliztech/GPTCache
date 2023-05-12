@@ -18,3 +18,4 @@ torch
 mock
 pexpect
 spacy
+safetensors
