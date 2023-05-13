@@ -13,6 +13,7 @@ def VectorBase(name: str, **kwargs):
        `Faiss` (with , `index_path`, `dimension`, `top_k` params),
        `Chromadb` (with `top_k`, `client_settings`, `persist_directory`, `collection_name` params),
        `Hnswlib` (with `index_file_path`, `dimension`, `top_k`, `max_elements` params).
+       `pgvector` (with `url`, `collection_name`, `index_params`, `top_k`, `dimension` params).
 
     :param name: the name of the vectorbase, it is support 'milvus', 'faiss', 'chromadb', 'hnswlib' now.
     :type name: str
@@ -47,6 +48,13 @@ def VectorBase(name: str, **kwargs):
     :type local_mode: bool
     :param local_data: required when local_mode is True.
     :type local_data: str
+
+    :param url: the connection url for PostgreSQL database, defaults to 'postgresql://postgres@localhost:5432/postgres'
+    :type url: str
+    :param index_params: the index parameters for pgvector.
+    :type index_params: dict
+    :param collection_name: the prefix of the table for PostgreSQL pgvector, defaults to 'gptcache'.
+    :type collection_name: str
 
     :param client_settings: the setting for Chromadb.
     :type client_settings: Settings
