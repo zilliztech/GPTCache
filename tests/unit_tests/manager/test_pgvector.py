@@ -12,7 +12,7 @@ class TestPgvector(unittest.TestCase):
         dim = 512
         top_k = 10
 
-        url = os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@postgres:5432/postgres")
+        url = os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@localhost:5432/postgres")
 
         db = VectorBase(
             "pgvector",
