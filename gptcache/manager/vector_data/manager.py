@@ -16,6 +16,13 @@ MILVUS_INDEX_PARAMS = {
     "params": {"M": 8, "efConstruction": 64},
 }
 
+PGVECTOR_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+PGVECTOR_INDEX_PARAMS = {
+    "index_type": "L2",
+    "params": {"lists": 100, "probes": 10}
+}
+
+
 COLLECTION_NAME = "gptcache"
 
 
@@ -108,6 +115,19 @@ class VectorBase:
 
             index_path = kwargs.pop("index_path", "./docarray_index.bin")
             vector_base = DocArrayIndex(index_file_path=index_path, top_k=top_k)
+        elif name == "pgvector":
+            from gptcache.manager.vector_data.pgvector import PGVector
+            dimension = kwargs.get("dimension", DIMENSION)
+            url = kwargs.get("url", PGVECTOR_URL)
+            collection_name = kwargs.get("collection_name", COLLECTION_NAME)
+            index_params = kwargs.get("index_params", PGVECTOR_INDEX_PARAMS)
+            vector_base = PGVector(
+                dimension = dimension,
+                top_k = top_k,
+                url = url,
+                collection_name = collection_name,
+                index_params = index_params
+            )
         else:
             raise NotFoundError("vector store", name)
         return vector_base

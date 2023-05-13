@@ -328,7 +328,7 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [Milvus Lite](https://github.com/milvus-io/milvus-lite), a lightweight version of Milvus that can be embedded into your Python application.
   - [x] Support [FAISS](https://faiss.ai/), a library for efficient similarity search and clustering of dense vectors.
   - [x] Support [Hnswlib](https://github.com/nmslib/hnswlib), header-only C++/python library for fast approximate nearest neighbors.
-  - [x] Support [pgvector](https://github.com/pgvector/pgvector), Open-source vector similarity search for Postgres 
+  - [x] Support [pgvector](https://github.com/pgvector/pgvector), open-source vector similarity search for Postgres.
   - [ ] Support qdrant
   - [ ] Support weaviate
   - [ ] Support chroma
