@@ -1,9 +1,9 @@
 from typing import Optional, List, Any
 
 from gptcache.adapter.adapter import adapt
+from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.session import Session
 from gptcache.utils import import_pydantic, import_langchain
-from gptcache.manager.scalar_data.base import Answer, DataType
 
 import_pydantic()
 import_langchain()
@@ -81,6 +81,10 @@ class LangChainChat(BaseChatModel, BaseModel):
             chat = LangChainLLMs(chat=ChatOpenAI(temperature=0))
             chat([HumanMessage(content="Translate this sentence from English to French. I love programming.")])
     """
+
+    @property
+    def _llm_type(self) -> str:
+        return "gptcache_llm_chat"
 
     chat: Any
     session: Session = None
