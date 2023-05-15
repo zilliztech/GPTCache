@@ -1,16 +1,13 @@
+import base64
+import os
 import time
+from io import BytesIO
 from typing import Iterator, Any
 
-import os
-import openai
-
-import base64
-from io import BytesIO
-
-from gptcache.utils import import_pillow
-from gptcache.utils.error import CacheError
 from gptcache.adapter.adapter import adapt
 from gptcache.manager.scalar_data.base import Answer, DataType
+from gptcache.utils import import_openai, import_pillow
+from gptcache.utils.error import CacheError
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
@@ -19,6 +16,10 @@ from gptcache.utils.response import (
     get_image_from_openai_url,
     get_audio_text_from_openai_answer,
 )
+
+import_openai()
+
+import openai  # pylint: disable=C0413
 
 
 class ChatCompletion(openai.ChatCompletion):
