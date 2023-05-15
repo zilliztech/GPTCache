@@ -115,11 +115,11 @@ class VectorBase:
             collection_name = kwargs.get("collection_name", COLLECTION_NAME)
             index_params = kwargs.get("index_params", PGVECTOR_INDEX_PARAMS)
             vector_base = PGVector(
-                dimension = dimension,
-                top_k = top_k,
-                url = url,
-                collection_name = collection_name,
-                index_params = index_params
+                dimension=dimension,
+                top_k=top_k,
+                url=url,
+                collection_name=collection_name,
+                index_params=index_params
             )
         else:
             raise NotFoundError("vector store", name)

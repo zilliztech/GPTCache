@@ -1,9 +1,13 @@
-import numpy as np
-import openai
 import os
 
-from gptcache.embedding.base import BaseEmbedding
+import numpy as np
 
+from gptcache.embedding.base import BaseEmbedding
+from gptcache.utils import import_openai
+
+import_openai()
+
+import openai  # pylint: disable=C0413
 
 class OpenAI(BaseEmbedding):
     """Generate text embedding for given text using OpenAI.
