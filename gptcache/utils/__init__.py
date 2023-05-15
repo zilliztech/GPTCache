@@ -29,6 +29,7 @@ __all__ = [
     "import_selective_context",
     "import_docarray",
     "import_httpx",
+    "import_openai",
     ]
 
 import importlib.util
@@ -195,9 +196,14 @@ def import_ruamel():
 def import_selective_context():
     _check_library("selective_context")
 
+
 def import_docarray():
     _check_library("docarray")
+
 
 def import_httpx():
     _check_library("httpx")
 
+
+def import_openai():
+    _check_library("openai")

@@ -1,4 +1,3 @@
-openai
 numpy
 cachetools
 requests

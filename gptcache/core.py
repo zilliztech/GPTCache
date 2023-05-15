@@ -2,8 +2,6 @@ import atexit
 import os
 from typing import Optional, List, Any
 
-import openai
-
 from gptcache.config import Config
 from gptcache.embedding.string import to_embeddings as string_embedding
 from gptcache.manager import get_data_manager
@@ -13,6 +11,7 @@ from gptcache.processor.pre import last_content
 from gptcache.report import Report
 from gptcache.similarity_evaluation import ExactMatchEvaluation
 from gptcache.similarity_evaluation import SimilarityEvaluation
+from gptcache.utils import import_openai
 from gptcache.utils.cache_func import cache_all
 from gptcache.utils.log import gptcache_log
 
@@ -109,6 +108,9 @@ class Cache:
 
     @staticmethod
     def set_openai_key():
+        import_openai()
+        import openai  # pylint: disable=C0415
+
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
