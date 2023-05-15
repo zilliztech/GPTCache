@@ -1,13 +1,15 @@
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
+
 import numpy as np
-from gptcache.utils import import_sqlalchemy
+
 from gptcache.manager.scalar_data.base import (
     CacheStorage,
     CacheData,
     Question,
     QuestionDep,
 )
+from gptcache.utils import import_sqlalchemy
 
 import_sqlalchemy()
 
@@ -22,11 +24,11 @@ from sqlalchemy.types import (  # pylint: disable=C0413
 from sqlalchemy.orm import sessionmaker  # pylint: disable=C0413
 from sqlalchemy.ext.declarative import declarative_base  # pylint: disable=C0413
 
-Base = declarative_base()
-
 
 def get_models(table_prefix, db_type):
-    class QuestionTable(Base):
+    DynamicBase = declarative_base(class_registry={})  # pylint: disable=C0103
+
+    class QuestionTable(DynamicBase):
         """
         question table
         """
@@ -45,7 +47,7 @@ def get_models(table_prefix, db_type):
         embedding_data = Column(LargeBinary, nullable=True)
         deleted = Column(Integer, default=0)
 
-    class AnswerTable(Base):
+    class AnswerTable(DynamicBase):
         """
         answer table
         """
@@ -62,7 +64,7 @@ def get_models(table_prefix, db_type):
         answer = Column(String(2000), nullable=False)
         answer_type = Column(Integer, nullable=False)
 
-    class SessionTable(Base):
+    class SessionTable(DynamicBase):
         """
         session table
         """
@@ -84,7 +86,7 @@ def get_models(table_prefix, db_type):
         session_id = Column(String(500), nullable=False)
         session_question = Column(String(2000), nullable=False)
 
-    class QuestionDepTable(Base):
+    class QuestionDepTable(DynamicBase):
         """
         answer table
         """
