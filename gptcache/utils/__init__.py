@@ -29,7 +29,8 @@ __all__ = [
     "import_selective_context",
     "import_paddle",
     "import_paddlenlp",
-    "import_httpx"
+    "import_httpx",
+    "import_openai"
     ]
 
 import importlib.util
@@ -204,3 +205,7 @@ def import_paddlenlp():
 
 def import_httpx():
     _check_library("httpx")
+
+
+def import_openai():
+    _check_library("openai")

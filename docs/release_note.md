@@ -5,6 +5,42 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.24 (2023.5.15)
+
+1. Support the langchain embedding
+
+```python
+from gptcache.embedding import LangChain
+from langchain.embeddings.openai import OpenAIEmbeddings
+
+test_sentence = 'Hello, world.'
+embeddings = OpenAIEmbeddings(model="your-embeddings-deployment-name")
+encoder = LangChain(embeddings=embeddings)
+embed = encoder.to_embeddings(test_sentence)
+```
+
+2. Add gptcache client
+
+```python
+from gptcache import Client
+
+client = Client()
+client.put("Hi", "Hi back")
+ans = client.get("Hi")
+```
+
+3. Support pgvector as vector store
+
+```python
+from gptcache.manager import manager_factory
+
+data_manager = manager_factory("sqlite,pgvector", vector_params={"dimension": 10})
+```
+
+4. Add the GPTCache server doc
+
+reference: https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md#Build-GPTCache-server
+
 ## v0.1.23 (2023.5.11)
 
 1. Support the session for the `LangChainLLMs`
