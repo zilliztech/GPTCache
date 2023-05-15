@@ -313,3 +313,48 @@ for _ in range(3):
     print("Time elapsed:", round(time.time() - start, 3))
     print("Answer:", response["choices"][0]["message"]["content"])
 ```
+
+### Build GPTCache server
+
+GPTCache now supports building a server with caching and conversation capabilities. You can start a customized GPTCache service within a few lines. Here is a simple example to show how to build and interact with GPTCache server. For more detailed information, arguments, parameters, refer to [this](../examples/README.md).
+
+**Start server**
+
+Once you have GPTCache installed, you can start the server with following command:
+```shell
+$ gptcache_server -s 127.0.0.1 -p 8000
+```
+
+**GPTCache service configuration**
+
+You can config the server via a YAML file, refer to the [template](../gptcache_server/dockerfiles/Dockerfile).
+
+**Build sevice with docker**
+
+Also, you can start the service in a docker container:
+
+Build image with the [Dockerfile](../gptcache_server/dockerfiles/Dockerfile) GPTCache provides
+```shell
+$ docker build -t gptcache:v1
+```
+
+**Intereact with the server**
+
+GPTCache supports two ways of intereaction with the server:
+
+- With command line:
+    ```shell
+    $ curl -X PUT -d "receive a hello message" "http://localhost:4000?prompt=hello"
+    $ curl -X GET  "http://localhost:4000?prompt=hello"
+    "receive a hello message"
+    ```
+- With python client:
+    ```python
+    >>> from gptcache import Client
+
+    >>> client = Client(uri="http://localhost:8000")
+    >>> client.put("Hi", "Hi back")
+    200
+    >>> client.get("Hi")
+    'Hi back'
+    ```
