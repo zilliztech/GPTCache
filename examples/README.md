@@ -6,6 +6,7 @@
 - [How to set the `similarity evaluation` interface](#How-to-set-the-similarity-evaluation-interface)
 - [Other cache init params](#Other-cache-init-params)
 - [How to run with session](#How-to-run-with-session)
+- [How to build GPTCache server](#How-to-build-GPTCache-server)
 - [Benchmark](#Benchmark)
 
 ## How to run Visual Question Answering with MiniGPT-4
@@ -537,6 +538,98 @@ response = openai.ChatCompletion.create(
 ```
 
 And you can also run `data_manager.list_sessions` to list all the sessions.
+
+## How to build GPTCache server
+
+GPTCache now supports building a server with caching and conversation capabilities. You can start a customized GPTCache service within a few lines.
+
+### Start server
+
+Once you have GPTCache installed, you can start the server with following command:
+```shell
+$ gptcache_server -s [HOST] -p [PORT] -d [CACHE_DIRECTORY] -f [CACHE_CONFIG_FILE]
+```
+The args are optional:
+- -s/--host: Specify the host to start GPTCache service, defaults to "0.0.0.0".
+- -p/--port: Specify the port to access to the service, defaults to 8000.
+- -d/--cache-dir: Specify the directory of the cache, defaults to `gptcache_data` folder.
+- -f/--cache-config-file: Specify the YAML file to config GPTCache service, defaults to None.
+
+**GPTCache service configuration**
+
+You can config the server via a YAML file, here is an example config yaml:
+
+```yaml
+model_src:
+    onnx
+model_config:
+    # Set model kws here including `model`, `api_key` if needed
+storage_config:
+    data_dir:
+        gptcache_data
+    manager:
+        sqlite,faiss
+    vector_params:
+        # Set vector storage related params here
+evaluation: 
+    distance
+evaluation_kws:
+    # Set evaluation metric kws here
+pre_function:
+    get_prompt
+post_function:
+    first
+config:
+    threshold: 0.8
+    # Set other config here
+```
+- model_src: The model source.
+- model_config: The model name, model config, api key.
+- data_dir: The cache directory.
+- manager: The cache storage and vector storage.
+- evaluation: The evaluation storage.
+- pre_function: The pre-processing function.
+- post_function: The post-processing function.
+
+For `model_src`, `evaluation`, `storage_config` options, check [README.md](../README.md) for more.
+
+**Build sevice with docker**
+
+Also, you can start the service in a docker container:
+
+- Build image with the [Dockerfile](../gptcache_server/dockerfiles/Dockerfile) GPTCache provides
+    ```shell
+    $ docker build -t gptcache:v1
+    ```
+- Build and run the service in a conatiner with default port
+    ```shell
+    $ docker run -p 8000:8000 -it gptcache:v1
+    ```
+- Build and run the service in a conatiner with certain port (e.g. 4000)
+    ```shell
+    $ docker run -p 4000:4000 -it gptcache:v0 gptcache_server -s 0.0.0.0 -p 4000
+    ```
+
+**Intereact with the server**
+
+GPTCache supports two ways of intereaction with the server:
+
+- With command line:
+    ```shell
+    $ curl -X PUT -d "receive a hello message" "http://localhost:4000?prompt=hello"
+    $ curl -X GET  "http://localhost:4000?prompt=hello"
+    "receive a hello message"
+    ```
+- With python client:
+    ```python
+    >>> from gptcache import Client
+
+    >>> client = Client(uri="http://localhost:8000")
+    >>> client.put("Hi", "Hi back")
+    200
+    >>> client.get("Hi")
+    'Hi back'
+    ```
 
 ## [Benchmark](https://github.com/zilliztech/GPTCache/tree/main/examples/benchmark/benchmark_sqlite_faiss_onnx.py)
 
