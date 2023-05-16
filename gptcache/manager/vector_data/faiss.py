@@ -18,7 +18,7 @@ class Faiss(VectorBase):
     :type index_path: str
     :param dimension: the dimension of the vector, defaults to 0.
     :type dimension: int
-    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :param top_k: the number of the vectors results to return, defaults to 1.
     :type top_k: int
     """
 

@@ -37,7 +37,7 @@ class Milvus(VectorBase):
     :type collection_name: str
     :param dimension: the dimension of the vector, defaults to 0.
     :type dimension: int
-    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :param top_k: the number of the vectors results to return, defaults to 1.
     :type top_k: int
     :param index_params: the index parameters for Milvus, defaults to the HNSW index: {'metric_type': 'L2', 'index_type': 'HNSW', 'params': {'M':
                          8, 'efConstruction': 64}}.
