@@ -13,18 +13,10 @@
    :name: bootcamp
    :hidden:
 
-   bootcamp/langchain/qa_generation
-   bootcamp/langchain/question_answering
-   bootcamp/langchain/sqlite
-   bootcamp/langchain/baby_agi
-   bootcamp/openai/chat
-   bootcamp/openai/language_translate
-   bootcamp/openai/sql_translate
-   bootcamp/openai/image_generation
-   bootcamp/openai/speech_to_text
-   bootcamp/replicate/visual_question_answering
-   bootcamp/temperature/chat
-   bootcamp/temperature/create_image
+   bootcamp/langchain/index
+   bootcamp/openai/index
+   bootcamp/replicate/index
+   bootcamp/temperature/index
 
 .. toctree::
    :maxdepth: 1
