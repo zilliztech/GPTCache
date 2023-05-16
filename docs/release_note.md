@@ -1,4 +1,4 @@
-# 🎉 Introduction to new functions of GPTCache
+# Release Note
 
 To read the following content, you need to understand the basic use of GPTCache, references:
 
