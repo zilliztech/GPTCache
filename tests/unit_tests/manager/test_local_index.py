@@ -10,22 +10,28 @@ from gptcache.manager.vector_data.hnswlib_store import Hnswlib
 from gptcache.manager.vector_data import VectorBase
 from gptcache.manager.vector_data.base import VectorData
 
+DIM = 512
+MAX_ELEMENTS = 10000
+SIZE = 1000
+TOP_K = 10
+
 
 class TestLocalIndex(unittest.TestCase):
     def test_faiss(self):
-        self._internal_test_normal(Faiss)
-        self._internal_test_with_rebuild(Faiss)
-        self._internal_test_reload(Faiss)
-        self._internal_test_delete(Faiss)
+        cls = partial(Faiss, dimension=DIM)
+        self._internal_test_normal(cls)
+        self._internal_test_with_rebuild(cls)
+        self._internal_test_reload(cls)
+        self._internal_test_delete(cls)
 
         with TemporaryDirectory(dir='./') as root:
             index_path = str((Path(root) / 'index.bin').absolute())
             self._internal_test_create_from_vector_base(
-                name='faiss', top_k=3, dimension=512, index_path=index_path
+                name='faiss', top_k=3, dimension=DIM, index_path=index_path
             )
 
     def test_hnswlib(self):
-        cls = partial(Hnswlib, max_elements=10000)
+        cls = partial(Hnswlib, max_elements=MAX_ELEMENTS, dimension=DIM)
         self._internal_test_normal(cls)
         self._internal_test_with_rebuild(cls)
         self._internal_test_reload(cls)
@@ -36,9 +42,9 @@ class TestLocalIndex(unittest.TestCase):
             self._internal_test_create_from_vector_base(
                 name='hnswlib',
                 top_k=3,
-                dimension=512,
+                dimension=DIM,
                 index_path=index_path,
-                max_elements=10000,
+                max_elements=MAX_ELEMENTS,
             )
 
     def test_docarray(self):
@@ -56,69 +62,57 @@ class TestLocalIndex(unittest.TestCase):
     def _internal_test_normal(self, vector_class):
         with TemporaryDirectory(dir='./') as root:
             index_path = str((Path(root) / 'index.bin').absolute())
-            size = 1000
-            dim = 512
-            top_k = 10
-            index = vector_class(index_file_path=index_path, dimension=dim, top_k=top_k)
-            data = np.random.randn(size, dim).astype(np.float32)
+            index = vector_class(index_file_path=index_path, top_k=TOP_K)
+            data = np.random.randn(SIZE, DIM).astype(np.float32)
             index.mul_add(
-                [VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))]
+                [VectorData(id=i, data=v) for v, i in zip(data, list(range(SIZE)))]
             )
-            self.assertEqual(len(index.search(data[0])), top_k)
-            index.mul_add([VectorData(id=size, data=data[0])])
+            self.assertEqual(len(index.search(data[0])), TOP_K)
+            index.mul_add([VectorData(id=SIZE, data=data[0])])
             ret = index.search(data[0])
-            self.assertIn(ret[0][1], [0, size])
-            self.assertIn(ret[1][1], [0, size])
+            self.assertIn(ret[0][1], [0, SIZE])
+            self.assertIn(ret[1][1], [0, SIZE])
 
     def _internal_test_with_rebuild(self, vector_class):
         with TemporaryDirectory(dir='./') as root:
             index_path = str((Path(root) / 'index.bin').absolute())
-            size = 1000
-            dim = 512
-            top_k = 10
-            index = vector_class(index_file_path=index_path, dimension=dim, top_k=top_k)
-            data = np.random.randn(size, dim).astype(np.float32)
+            index = vector_class(index_file_path=index_path, top_k=TOP_K)
+            data = np.random.randn(SIZE, DIM).astype(np.float32)
             index.mul_add(
-                [VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))]
+                [VectorData(id=i, data=v) for v, i in zip(data, list(range(SIZE)))]
             )
             index.delete([0, 1, 2])
-            index.rebuild(list(range(3, size)))
+            index.rebuild(list(range(3, SIZE)))
             self.assertNotEqual(index.search(data[0])[0], 0)
 
     def _internal_test_reload(self, vector_class):
         with TemporaryDirectory(dir='./') as root:
             index_path = str((Path(root) / 'index.bin').absolute())
-            size = 1000
-            dim = 512
-            top_k = 10
-            index = vector_class(index_file_path=index_path, dimension=dim, top_k=top_k)
-            data = np.random.randn(size, dim).astype(np.float32)
+            index = vector_class(index_file_path=index_path, top_k=TOP_K)
+            data = np.random.randn(SIZE, DIM).astype(np.float32)
             index.mul_add(
-                [VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))]
+                [VectorData(id=i, data=v) for v, i in zip(data, list(range(SIZE)))]
             )
             index.close()
 
             new_index = vector_class(
-                index_file_path=index_path, dimension=dim, top_k=top_k
+                index_file_path=index_path, top_k=TOP_K
             )
-            self.assertEqual(len(new_index.search(data[0])), top_k)
-            new_index.mul_add([VectorData(id=size, data=data[0])])
+            self.assertEqual(len(new_index.search(data[0])), TOP_K)
+            new_index.mul_add([VectorData(id=SIZE, data=data[0])])
             ret = new_index.search(data[0])
-            self.assertIn(ret[0][1], [0, size])
-            self.assertIn(ret[1][1], [0, size])
+            self.assertIn(ret[0][1], [0, SIZE])
+            self.assertIn(ret[1][1], [0, SIZE])
 
     def _internal_test_delete(self, vector_class):
         with TemporaryDirectory(dir='./') as root:
             index_path = str((Path(root) / 'index.bin').absolute())
-            size = 1000
-            dim = 512
-            top_k = 10
-            index = vector_class(index_file_path=index_path, dimension=dim, top_k=top_k)
-            data = np.random.randn(size, dim).astype(np.float32)
+            index = vector_class(index_file_path=index_path, top_k=TOP_K)
+            data = np.random.randn(SIZE, DIM).astype(np.float32)
             index.mul_add(
-                [VectorData(id=i, data=v) for v, i in zip(data, list(range(size)))]
+                [VectorData(id=i, data=v) for v, i in zip(data, list(range(SIZE)))]
             )
-            self.assertEqual(len(index.search(data[0])), top_k)
+            self.assertEqual(len(index.search(data[0])), TOP_K)
             index.delete([0, 1, 2, 3])
             self.assertNotEqual(index.search(data[0])[0][1], 0)
             if hasattr(index, 'count'):
@@ -126,6 +120,10 @@ class TestLocalIndex(unittest.TestCase):
 
     def _internal_test_create_from_vector_base(self, **kwargs):
         index = VectorBase(**kwargs)
-        data = np.random.randn(100, 512).astype(np.float32)
+        data = np.random.randn(100, DIM).astype(np.float32)
         index.mul_add([VectorData(id=i, data=v) for v, i in zip(data, range(100))])
         self.assertEqual(index.search(data[0])[0][1], 0)
+
+
+if __name__ == "__main__":
+    unittest.main()

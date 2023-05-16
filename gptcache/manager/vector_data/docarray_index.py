@@ -1,8 +1,6 @@
-import os
 from typing import List, Optional, Tuple
 
 import numpy as np
-from docarray.typing import NdArray
 from pydantic import parse_obj_as
 
 from gptcache.manager.vector_data.base import VectorBase, VectorData
@@ -10,6 +8,7 @@ from gptcache.utils import import_docarray
 
 import_docarray()
 
+from docarray.typing import NdArray  # pylint: disable=C0413
 from docarray import BaseDoc, DocList  # pylint: disable=C0413
 from docarray.index import InMemoryExactNNIndex  # pylint: disable=C0413
 
@@ -31,7 +30,7 @@ class DocArrayIndex(VectorBase):
     :type top_k: int
     """
 
-    def __init__(self, index_file_path: str, top_k: int, **kwargs):
+    def __init__(self, index_file_path: str, top_k: int):
         self._index = InMemoryExactNNIndex[DocarrayVectorData](
             index_file_path=index_file_path
         )
@@ -57,7 +56,8 @@ class DocArrayIndex(VectorBase):
 
         :param data: The query vector data.
         :param top_k: The number of top matches to return.
-        :return: A list of tuples, each containing the match score and the ID of the matched vector data element.
+        :return: A list of tuples, each containing the match score and
+            the ID of the matched vector data element.
         """
 
         if len(self._index) == 0:
