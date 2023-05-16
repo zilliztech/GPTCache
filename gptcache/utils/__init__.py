@@ -29,7 +29,8 @@ __all__ = [
     "import_selective_context",
     "import_httpx",
     "import_openai",
-    ]
+    "import_docarray",
+]
 
 import importlib.util
 from typing import Optional
@@ -202,3 +203,7 @@ def import_httpx():
 
 def import_openai():
     _check_library("openai")
+
+
+def import_docarray():
+    _check_library("docarray")

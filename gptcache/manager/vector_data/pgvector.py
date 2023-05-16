@@ -69,7 +69,7 @@ class PGVector(VectorBase):
     :type collection_name: str
     :param dimension: the dimension of the vector, defaults to 0.
     :type dimension: int
-    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :param top_k: the number of the vectors results to return, defaults to 1.
     :type top_k: int
     :param index_params: the index parameters for pgvector, defaults to 'vector_l2_ops' index:
                          {"index_type": "L2", "params": {"lists": 100, "probes": 10}.

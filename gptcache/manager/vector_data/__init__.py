@@ -18,7 +18,7 @@ def VectorBase(name: str, **kwargs):
     :param name: the name of the vectorbase, it is support 'milvus', 'faiss', 'chromadb', 'hnswlib' now.
     :type name: str
 
-    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :param top_k: the number of the vectors results to return, defaults to 1.
     :type top_k: int
 
     :param dimension: the dimension of the vector, defaults to 0.
