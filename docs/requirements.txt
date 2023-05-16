@@ -14,8 +14,3 @@ sphinx_copybutton
 pydata-sphinx-theme
 m2r2
 sphinx_toolbox
-# python_docs_theme
-# sphinx_markdown_tables
-# sphinx_rtd_theme
-# recommonmark
-# sphinx_markdown_tables

@@ -248,6 +248,25 @@ More Docs：
 - [Features, all features currently supported by the cache](docs/feature.md)
 - [Examples, learn better custom caching](examples/README.md)
 
+## 🎓 Bootcamp
+
+- GPTCache with **LangChain**
+  - [QA Generation](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/qa_generation.html)
+  - [Question Answering](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/question_answering.html)
+  - [SQL Chain](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/sqlite.html)
+  - [BabyAGI User Guide](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/baby_agi.html)
+- GPTCache with **OpenAI**
+  - [Chat completion](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/chat.html)
+  - [Language Translation](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/language_translate.html)
+  - [SQL Translate](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/sql_translate.html)
+  - [Multimodal: Image Generation](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/image_generation.html)
+  - [Multimodal: Speech to Text](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/speech_to_text.html)
+- GPTCache with **Replicate**
+  - [Visual Question Answering](https://gptcache.readthedocs.io/en/latest/bootcamp/replicate/visual_question_answering.html)
+- GPTCache with **Temperature Param**
+  - [OpenAI Chat](https://gptcache.readthedocs.io/en/latest/bootcamp/temperature/chat.html)
+  - [OpenAI Image Creation](https://gptcache.readthedocs.io/en/latest/bootcamp/temperature/create_image.html)
+
 ## 😎 What can this help with?
 GPTCache offers the following primary benefits:
 
@@ -329,9 +348,9 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [FAISS](https://faiss.ai/), a library for efficient similarity search and clustering of dense vectors.
   - [x] Support [Hnswlib](https://github.com/nmslib/hnswlib), header-only C++/python library for fast approximate nearest neighbors.
   - [x] Support [pgvector](https://github.com/pgvector/pgvector), open-source vector similarity search for Postgres.
+  - [x] Support [chroma](https://github.com/chroma-core/chroma), the AI-native open-source embedding database.
   - [ ] Support qdrant
   - [ ] Support weaviate
-  - [ ] Support chroma
   - [ ] Support other vector databases.
 - **Cache Manager**:
 The **Cache Manager** is responsible for controlling the operation of both the **Cache Storage** and **Vector Store**.

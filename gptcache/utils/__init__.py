@@ -22,6 +22,7 @@ __all__ = [
     "import_torchvision",
     "import_timm",
     "import_vit",
+    "import_replicate",
     "import_stability",
     "import_scipy",
     "import_llama_cpp_python",
