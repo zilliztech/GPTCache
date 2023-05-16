@@ -14,17 +14,19 @@ import hnswlib  # pylint: disable=C0413
 class Hnswlib(VectorBase):
     """vector store: hnswlib
 
-    :param index_path: the path to hnswlib index, defaults to 'hnswlib_index.bin'.
-    :type index_path: str
+    :param index_file_path: the path to hnswlib index, defaults to 'hnswlib_index.bin'.
+    :type index_file_path: str
     :param dimension: the dimension of the vector, defaults to 0.
     :type dimension: int
-    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :param top_k: the number of the vectors results to return, defaults to 1.
     :type top_k: int
     :param max_elements: max_elements of hnswlib, defaults 100000.
     :type max_elements: int
     """
 
-    def __init__(self, index_file_path: str, dimension: int, top_k: int, max_elements: int):
+    def __init__(
+        self, index_file_path: str, dimension: int, top_k: int, max_elements: int
+    ):
         self._index_file_path = index_file_path
         self._dimension = dimension
         self._max_elements = max_elements

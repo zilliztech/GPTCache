@@ -27,7 +27,8 @@ __all__ = [
     "import_llama_cpp_python",
     "import_ruamel",
     "import_selective_context",
-    ]
+    "import_docarray",
+]
 
 import importlib.util
 from typing import Optional
@@ -192,3 +193,7 @@ def import_ruamel():
 
 def import_selective_context():
     _check_library("selective_context")
+
+
+def import_docarray():
+    _check_library("docarray")

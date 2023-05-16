@@ -67,7 +67,7 @@ class VectorBase:
                 index_params=index_params,
                 search_params=search_params,
                 local_mode=local_mode,
-                local_data=local_data
+                local_data=local_data,
             )
         elif name == "faiss":
             from gptcache.manager.vector_data.faiss import Faiss
@@ -98,9 +98,16 @@ class VectorBase:
             max_elements = kwargs.pop("max_elements", 100000)
             VectorBase.check_dimension(dimension)
             vector_base = Hnswlib(
-                index_file_path=index_path, dimension=dimension,
-                top_k=top_k, max_elements=max_elements
+                index_file_path=index_path,
+                dimension=dimension,
+                top_k=top_k,
+                max_elements=max_elements,
             )
+        elif name == "docarray":
+            from gptcache.manager.vector_data.docarray_index import DocArrayIndex
+
+            index_path = kwargs.pop("index_path", "./docarray_index.bin")
+            vector_base = DocArrayIndex(index_file_path=index_path, top_k=top_k)
         else:
             raise NotFoundError("vector store", name)
         return vector_base

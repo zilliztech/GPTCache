@@ -18,7 +18,7 @@ class Chromadb(VectorBase):
     :type persist_directory: str
     :param collection_name: the name of the collection in Chromadb, defaults to 'gptcache'.
     :type collection_name: str
-    :param top_k: the umber of the vectors results to return, defaults to 1.
+    :param top_k: the number of the vectors results to return, defaults to 1.
     :type top_k: int
 
     """
