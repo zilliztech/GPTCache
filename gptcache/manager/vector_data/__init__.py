@@ -14,6 +14,8 @@ def VectorBase(name: str, **kwargs):
        `Chromadb` (with `top_k`, `client_settings`, `persist_directory`, `collection_name` params),
        `Hnswlib` (with `index_file_path`, `dimension`, `top_k`, `max_elements` params).
        `pgvector` (with `url`, `collection_name`, `index_params`, `top_k`, `dimension` params).
+       `docarray` (with `index_file_path`, `top_k` params).
+
 
     :param name: the name of the vectorbase, it is support 'milvus', 'faiss', 'chromadb', 'hnswlib' now.
     :type name: str

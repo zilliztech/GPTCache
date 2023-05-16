@@ -27,7 +27,6 @@ __all__ = [
     "import_llama_cpp_python",
     "import_ruamel",
     "import_selective_context",
-    "import_docarray",
     "import_httpx",
     "import_openai",
     ]
