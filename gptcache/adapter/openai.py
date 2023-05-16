@@ -31,7 +31,7 @@ class ChatCompletion(openai.ChatCompletion):
             from gptcache import cache
             from gptcache.processor.pre import get_prompt
             # init gptcache
-            cache.init(pre_embedding_func=get_prompt)
+            cache.init()
             cache.set_openai_key()
 
             from gptcache.adapter import openai
@@ -95,7 +95,7 @@ class Completion(openai.Completion):
             from gptcache import cache
             from gptcache.processor.pre import get_prompt
             # init gptcache
-            cache.init(pre_embedding_func=get_prompt)
+            cache.init()
             cache.set_openai_key()
 
             from gptcache.adapter import openai
