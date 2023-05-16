@@ -123,7 +123,3 @@ class TestLocalIndex(unittest.TestCase):
         data = np.random.randn(100, DIM).astype(np.float32)
         index.mul_add([VectorData(id=i, data=v) for v, i in zip(data, range(100))])
         self.assertEqual(index.search(data[0])[0][1], 0)
-
-
-if __name__ == "__main__":
-    unittest.main()
