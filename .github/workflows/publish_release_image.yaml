@@ -1,0 +1,35 @@
+name: Publish image to dockerhub
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-and-publish-image:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout 
+      uses: actions/checkout@master
+
+    - name: Get version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+    - name: Docker Build
+      shell: bash
+      run: |
+        docker build "./gptcache_server/dockerfiles" -t "zilliz/gptcache:${{ steps.get_version.outputs.VERSION }}"
+
+    - name: Docker login 
+      if: success()
+      uses: azure/docker-login@v1
+      with:
+        username: ${{ secrets.ZILLIZ_DOCKERHUB_USERNAME }} 
+        password: ${{ secrets.ZILLIZ_DOCKERHUB_PASSWORD }}
+
+    - name: Docker Push
+      if: success()
+      continue-on-error: false
+      shell: bash
+      run: |
+        docker push zilliz/gptcache:${{ steps.get_version.outputs.VERSION }}
