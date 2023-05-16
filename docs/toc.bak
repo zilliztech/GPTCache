@@ -6,6 +6,7 @@
 
    usage.md
    feature.md
+   release_note.md
 
 .. toctree::
    :maxdepth: 1

@@ -27,7 +27,6 @@ class DocGen:
             "adapter.diffusers",
             "adapter.dolly",
             "adapter.langchain_models",
-            "adapter.llama_cpp",
             "adapter.replicate",
             "adapter.stability_sdk",
         ]

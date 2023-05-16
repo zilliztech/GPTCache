@@ -6,7 +6,7 @@
 - [How to set the `similarity evaluation` interface](#How-to-set-the-similarity-evaluation-interface)
 - [Other cache init params](#Other-cache-init-params)
 - [How to run with session](#How-to-run-with-session)
-- [How to build GPTCache server](#How-to-build-GPTCache-server)
+- [How to use GPTCache server](#How-to-use-GPTCache-server)
 - [Benchmark](#Benchmark)
 
 ## How to run Visual Question Answering with MiniGPT-4
@@ -539,7 +539,7 @@ response = openai.ChatCompletion.create(
 
 And you can also run `data_manager.list_sessions` to list all the sessions.
 
-## How to build GPTCache server
+## How to use GPTCache server
 
 GPTCache now supports building a server with caching and conversation capabilities. You can start a customized GPTCache service within a few lines.
 
@@ -555,7 +555,7 @@ The args are optional:
 - -d/--cache-dir: Specify the directory of the cache, defaults to `gptcache_data` folder.
 - -f/--cache-config-file: Specify the YAML file to config GPTCache service, defaults to None.
 
-**GPTCache service configuration**
+**GPTCache server configuration**
 
 You can config the server via a YAML file, here is an example config yaml:
 
@@ -593,31 +593,31 @@ config:
 
 For `model_src`, `evaluation`, `storage_config` options, check [README.md](../README.md) for more.
 
-**Build sevice with docker**
+**Use the docker to start the GPTCache server**
 
 Also, you can start the service in a docker container:
 
-- Build image with the [Dockerfile](../gptcache_server/dockerfiles/Dockerfile) GPTCache provides
+- Get image from the dockerhub
     ```shell
-    $ docker build -t gptcache:v1
+    $ docker pull zilliz/gptcache:latest
     ```
-- Build and run the service in a conatiner with default port
+- Run the service in a container with default port
     ```shell
-    $ docker run -p 8000:8000 -it gptcache:v1
+    $ docker run -p 8000:8000 -it zilliz/gptcache:latest
     ```
-- Build and run the service in a conatiner with certain port (e.g. 4000)
+- Run the service in a container with certain port (e.g. 8000) and config file (e.g. gptcache.yml)
     ```shell
-    $ docker run -p 4000:4000 -it gptcache:v0 gptcache_server -s 0.0.0.0 -p 4000
+    $ docker run -p 8000:8000 -it gptcache:v0 gptcache_server -s 0.0.0.0 -p 8000 -f gptcache.yml
     ```
 
-**Intereact with the server**
+**Interact with the server**
 
-GPTCache supports two ways of intereaction with the server:
+GPTCache supports two ways of interaction with the server:
 
 - With command line:
     ```shell
-    $ curl -X PUT -d "receive a hello message" "http://localhost:4000?prompt=hello"
-    $ curl -X GET  "http://localhost:4000?prompt=hello"
+    $ curl -X PUT -d "receive a hello message" "http://localhost:8000?prompt=hello"
+    $ curl -X GET  "http://localhost:8000?prompt=hello"
     "receive a hello message"
     ```
 - With python client:

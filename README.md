@@ -10,6 +10,8 @@ Slash Your LLM API Costs by 10x 💰, Boost Speed by 100x ⚡
 
 🎉 GPTCache has been fully integrated with 🦜️🔗[LangChain](https://github.com/hwchase17/langchain) ! Here are detailed [usage instructions](https://python.langchain.com/en/latest/modules/models/llms/examples/llm_caching.html?highlight=cache#gptcache).
 
+🐳 [The GPTCache server docker image](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md#Use-GPTCache-server) has been released, which means that **any language** will be able to use GPTCache!
+
 📔 This project is undergoing swift development, and as such, the API may be subject to change at any time. For the most up-to-date information, please refer to the latest [documentation]( https://gptcache.readthedocs.io/en/latest/) and [release note](https://github.com/zilliztech/GPTCache/blob/main/docs/release_note.md).
 
 ## Quick Install

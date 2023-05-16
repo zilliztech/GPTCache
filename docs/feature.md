@@ -1,4 +1,4 @@
-# 🥳 Feature
+# Feature
 
 - Support the openai chat completion normal and stream request
 - Get top_k similar search results, it can be set when creating the data manager
