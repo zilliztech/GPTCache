@@ -316,7 +316,7 @@ for _ in range(3):
 
 ### Use GPTCache server
 
-GPTCache now supports building a server with caching and conversation capabilities. You can start a customized GPTCache service within a few lines. Here is a simple example to show how to build and interact with GPTCache server. For more detailed information, arguments, parameters, refer to [this](../examples/README.md).
+GPTCache now supports building a server with caching and conversation capabilities. You can start a customized GPTCache service within a few lines. Here is a simple example to show how to build and interact with GPTCache server. For more detailed information, arguments, parameters, refer to [this](https://github.com/zilliztech/gpt-cache/tree/main/examples).
 
 **Start server**
 

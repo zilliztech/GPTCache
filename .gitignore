@@ -137,3 +137,5 @@ dmypy.json
 **/example.py
 **/example.db
 **/.chroma
+docs/references/*
+!docs/references/index.rst

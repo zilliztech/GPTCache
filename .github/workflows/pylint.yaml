@@ -20,6 +20,7 @@ on:
       - 'examples/**'
       - 'gptcache/**'
       - 'tests/**'
+      - 'docs/**'
       - '!**.md'
       - '.github/workflows/**'
   workflow_dispatch:
@@ -37,3 +38,13 @@ jobs:
       run: |
         pip install pylint==2.10.2
         make pylint_check
+    - name: Install doc dependency
+        shell: bash
+        working-directory: docs
+        run: |
+          pip install -r requirements.txt
+    - name: Make the readthedoc html
+        shell: bash
+        working-directory: docs
+        run: |
+          make html

@@ -5,6 +5,7 @@
 # from the environment for the first two.
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
+SPHINXAUTOBUILD   ?= sphinx-autobuild
 SOURCEDIR     = .
 BUILDDIR      = _build
 
