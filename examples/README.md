@@ -379,11 +379,10 @@ Reference: [similarity evaluation dir](https://github.com/zilliztech/GPTCache/tr
         return s
     ```
 
-- **config**: includes cache-related configurations, which currently consist of the following: `log_time_func`, `similarity_threshold`, and `similarity_positive`.
+- **config**: includes cache-related configurations, which currently consist of the following: `log_time_func`, `similarity_threshold`.
 
   - log_time_func: The function logging time-consuming operations currently detects `embedding` and `search` functions.
   - similarity_threshold
-  - similarity_positive: When set to `True`, a higher value indicates a higher degree of similarity. When set to `False`, a lower value indicates a higher degree of similarity.
 
 - **next_cache**: This points to the next cache object, which is useful for implementing multi-level cache functions.
 
@@ -411,7 +410,6 @@ one_cache.init(embedding_func=onnx.to_embeddings,
                evaluation_func=pair_evaluation,
                config=Config(
                    similarity_threshold=1,
-                   similarity_positive=False,
                     ),
                )
 

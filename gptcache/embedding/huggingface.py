@@ -1,7 +1,7 @@
 import numpy as np
 
-from gptcache.utils import import_huggingface, import_torch
 from gptcache.embedding.base import BaseEmbedding
+from gptcache.utils import import_huggingface, import_torch
 
 import_torch()
 import_huggingface()
@@ -23,6 +23,10 @@ class Huggingface(BaseEmbedding):
 
             test_sentence = 'Hello, world.'
             encoder = Huggingface(model='distilbert-base-uncased')
+            embed = encoder.to_embeddings(test_sentence)
+
+            test_sentence = '什么是Github'
+            huggingface = Huggingface(model='uer/albert-base-chinese-cluecorpussmall')
             embed = encoder.to_embeddings(test_sentence)
     """
 

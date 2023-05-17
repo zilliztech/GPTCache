@@ -261,6 +261,7 @@ More Docs：
   - [Chat completion](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/chat.html)
   - [Language Translation](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/language_translate.html)
   - [SQL Translate](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/sql_translate.html)
+  - [Twitter Classifier](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/tweet_classifier.html)
   - [Multimodal: Image Generation](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/image_generation.html)
   - [Multimodal: Speech to Text](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/speech_to_text.html)
 - GPTCache with **Replicate**
@@ -335,7 +336,6 @@ This module is created to extract embeddings from requests for similarity search
   - [x] Support [MariaDB](https://mariadb.org/).
   - [x] Support [SQL Server](https://www.microsoft.com/en-us/sql-server/).
   - [x] Support [Oracle](https://www.oracle.com/).
-  - [x] Support [Duckdb](https://github.com/duckdb/duckdb).
   - [ ] Support [MongoDB](https://www.mongodb.com/).
   - [ ] Support [Redis](https://redis.io/).
   - [ ] Support [Minio](https://min.io/).
@@ -349,8 +349,8 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [Milvus Lite](https://github.com/milvus-io/milvus-lite), a lightweight version of Milvus that can be embedded into your Python application.
   - [x] Support [FAISS](https://faiss.ai/), a library for efficient similarity search and clustering of dense vectors.
   - [x] Support [Hnswlib](https://github.com/nmslib/hnswlib), header-only C++/python library for fast approximate nearest neighbors.
-  - [x] Support [pgvector](https://github.com/pgvector/pgvector), open-source vector similarity search for Postgres.
-  - [x] Support [chroma](https://github.com/chroma-core/chroma), the AI-native open-source embedding database.
+  - [x] Support [PGVector](https://github.com/pgvector/pgvector), open-source vector similarity search for Postgres.
+  - [x] Support [Chroma](https://github.com/chroma-core/chroma), the AI-native open-source embedding database.
   - [x] Support [DocArray](https://github.com/docarray/docarray), DocArray is a library for representing, sending and storing multi-modal data, perfect for Machine Learning applications.
   - [ ] Support qdrant
   - [ ] Support weaviate

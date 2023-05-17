@@ -7,9 +7,12 @@ class Config:
     """Pass configuration.
 
     :param log_time_func: optional, customized log time function
+    :type log_time_func: Optional[Callable[[str, float], None]]
     :param similarity_threshold: a threshold ranged from 0 to 1 to filter search results with similarity score higher than the threshold.
-                                 When it is 0, there is no hits. When it is 1, all search results will be returned as hits.
+    When it is 0, there is no hits. When it is 1, all search results will be returned as hits.
     :type similarity_threshold: float
+    :param prompts: optional, if the request content will remove the prompt string when the request contains the prompt list
+    :type prompts: Optional[List[str]]
 
     Example:
         .. code-block:: python

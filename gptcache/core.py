@@ -17,7 +17,7 @@ from gptcache.utils.log import gptcache_log
 
 
 class Cache:
-    """Initialize GPTCache.
+    """GPTCache core object.
 
 
     Example:
