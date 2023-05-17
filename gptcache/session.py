@@ -9,7 +9,8 @@ from gptcache.utils.log import gptcache_log
 
 class Session:
     """
-    Session for gptcache.
+    Session for gptcache. Session can isolate the context of each connection, and can also filter the results after recall,
+    and if not satisfied will re-request rather than return the cache results directly.
 
     :param name: the name of the session, defaults to `uuid.uuid4().hex`.
     :type name:  str
