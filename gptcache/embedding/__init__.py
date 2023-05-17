@@ -1,4 +1,4 @@
-__all__ = ["OpenAI", "Huggingface", "SBERT", "Cohere", "Onnx", "FastText", "Data2VecAudio", "Timm", "ViT"]
+__all__ = ["OpenAI", "Huggingface", "SBERT", "Cohere", "Onnx", "FastText", "Data2VecAudio", "Timm", "ViT","PaddleNLP"]
 
 
 from gptcache.utils.lazy_import import LazyImport
@@ -12,6 +12,9 @@ fasttext = LazyImport("fasttext", globals(), "gptcache.embedding.fasttext")
 data2vec = LazyImport("data2vec", globals(), "gptcache.embedding.data2vec")
 timm = LazyImport("timm", globals(), "gptcache.embedding.timm")
 vit = LazyImport("vit", globals(), "gptcache.embedding.vit")
+paddlenlp = LazyImport("paddlenlp", globals(), "gptcache.embedding.paddlenlp")
+
+
 
 
 def Cohere(model="large", api_key=None):
@@ -48,3 +51,7 @@ def Timm(model="resnet50", device="default"):
 
 def ViT(model="google/vit-base-patch16-384"):
     return vit.ViT(model)
+
+
+def PaddleNLP(model="rocketqa-zh-base-query-encoder"):
+    return paddlenlp.PaddleNLP(model)
