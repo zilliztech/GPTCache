@@ -20,7 +20,7 @@ class DocGen:
 
         self.OUTPUT = os.path.abspath(output_dir)
         self.skip_list = _default_skip_list + skip_list
-        self.expand_func_list = ["core"]
+        self.expand_func_list = []
         self.add_list = [
             "adapter.api",
             "adapter.openai",
@@ -30,24 +30,22 @@ class DocGen:
             "adapter.replicate",
             "adapter.stability_sdk",
         ]
+        self.add_root_list = [
+            "report",
+            "session",
+        ]
 
     @staticmethod
-    def title_bar(input):
-        return "=" * len(input)
+    def title_bar(input_str):
+        return "=" * len(input_str)
 
     @staticmethod
-    def section_bar(input):
-        return "-" * len(input)
+    def section_bar(input_str):
+        return "-" * len(input_str)
 
     @staticmethod
-    def cap(input):
-        r = ""
-        if input == "gptcache":
-            r = "GPTCache"
-        else:
-            r = str.capitalize(input)
-
-        return r
+    def cap(input_str):
+        return "GPTCache" if input_str == "gptcache" else str.join(" ", [i.capitalize() for i in input_str.split("_")])
 
     def generate(self, lib_name):
         # Set the output directory
@@ -71,8 +69,8 @@ class DocGen:
             return
 
         for x in self.add_list:
+            sub_lib_name = lib_name + "." + x
             try:
-                sub_lib_name = lib_name + "." + x
                 __import__(sub_lib_name)
             except ImportError:
                 print(f"Can't import {sub_lib_name}")
@@ -88,6 +86,12 @@ class DocGen:
         classes = [x for x in inspect.getmembers(lib) if inspect.isclass(x[1])]
 
         cf_combined = classes + functions
+        classes_method = [
+            (f"{y[0]}.{x[0]}", x) for y in classes for x in inspect.getmembers(y[1]) if
+            inspect.isfunction(x[1]) and not x[0].startswith("_")
+        ]
+        cf_combined.extend(classes_method)
+        cf_combined.sort(key=lambda x: x[0])
         cf_combined = [
             x + (f"{lib_name}.{x[0]}",)
             for x in cf_combined
@@ -110,17 +114,31 @@ class DocGen:
             f.write(t)
 
         # Iterate the modules, render the function templates and write rendered output to files
+        print("modules:", modules)
         for module in modules:
             module_name = module[0]
 
             if module_name in self.expand_func_list:
-                ms = [
+                ms_func = [
                     x for x in inspect.getmembers(module[1]) if inspect.isfunction(x[1])
                 ]
-            else:
+                ms.extend(ms_func)
+            elif module_name not in self.add_root_list:
                 ms = [
                     x for x in inspect.getmembers(module[1]) if inspect.ismodule(x[1])
                 ]
+            else:
+                ms = []
+
+            classes = [
+                x for x in inspect.getmembers(module[1]) if inspect.isclass(x[1]) and x[1].__module__.startswith(f"{lib_name}.{module_name}")
+            ]
+            ms.extend(classes)
+            class_method = [
+                (f"{y[0]}.{x[0]}", x) for y in classes for x in inspect.getmembers(y[1]) if inspect.isfunction(x[1]) and not x[0].startswith("__")
+            ]
+            ms.extend(class_method)
+
             ms = [
                 x + (f"{lib_name}.{module_name}.{x[0]}",)
                 for x in ms
