@@ -12,34 +12,25 @@
 
 import os
 import sys
-from m2r2 import parse_from_file
 
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('..'))
-sys.path.insert(0, os.path.abspath('_exts'))
+sys.path.insert(0, os.path.abspath("."))
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("_exts"))
 from _exts.docgen import DocGen
 from _exts.indexCon import IndexCon
-
-# -- Preactions --------------------------------------------------------------
-
-# Prepare docs
-docgen = DocGen(output_dir='references')
-docgen.generate('gptcache')
-
-IndexCon('../README.md', 'index.rst')
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'GPTCache'
-copyright = '2023, Zilliz Inc'
-author = 'Zilliz Inc.'
+project = "GPTCache"
+copyright = "2023, Zilliz Inc"
+author = "Zilliz Inc."
 
 # The full version, including alpha/beta/rc tags
-release = 'main'
+release = "main"
 
 html_title = project
-html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = "%b %d, %Y"
 
 
 # -- General configuration ---------------------------------------------------
@@ -49,29 +40,28 @@ html_last_updated_fmt = '%b %d, %Y'
 # ones.
 
 extensions = [
-    'myst_nb',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autodoc.typehints',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-    'sphinxcontrib.autodoc_pydantic',
-    'sphinx_copybutton',
-    'sphinx_panels',
-    'sphinx_toolbox.collapse'
+    "myst_nb",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autodoc.typehints",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
+    "sphinx_panels",
+    "sphinx_toolbox.collapse",
+    "sphinxcontrib.autodoc_pydantic",
 ]
 
-
-myst_enable_extensions = [
-    "dollarmath",
-    "amsmath",
-    "deflist",
-    "html_admonition",
-    "html_image",
-    "colon_fence",
-    "smartquotes",
-    "replacements"
-]
+intersphinx_mapping = {
+    "torch": ("https://pytorch.org/docs/stable/", None),
+    "numpy": ("https://numpy.org/devdocs/", None),
+    "python": ("https://docs.python.org/3", None),
+}
+autodoc_member_order = "bysource"
+autodoc_mock_imports = ["httpx"]
+autodoc_inherit_docstrings = False
 
 autodoc_pydantic_model_show_json = False
 autodoc_pydantic_field_list_validators = False
@@ -83,19 +73,19 @@ autodoc_pydantic_model_members = False
 autodoc_pydantic_model_undoc_members = False
 
 source_suffix = {
-    '.rst': 'restructuredtext',
-    '.ipynb': 'myst-nb',
-    '.md': 'myst-nb',
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".md": "myst-nb",
 }
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 
-exclude_patterns = ['_build']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "references/client*"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -105,20 +95,20 @@ exclude_patterns = ['_build']
 #
 # html_theme = 'alabaster'
 # html_theme = 'python_docs_theme'
-html_theme = 'sphinx_book_theme'
+html_theme = "sphinx_book_theme"
 
 html_theme_options = {
-    'path_to_docs': 'docs',
-    'repository_url': 'https://github.com/zilliztech/GPTCache',
-    'use_repository_button': True
+    "path_to_docs": "docs",
+    "repository_url": "https://github.com/zilliztech/GPTCache",
+    "use_repository_button": True,
 }
 
 html_context = {
-    'display_github': True,  # Integrate GitHub
-    'github_user': 'zilliztech',  # Username
-    'github_repo': 'GPTCache',  # Repo name
-    'github_version': 'main',  # Version
-    'conf_py_path': '/docs'  # Path in the checkout to the docs root
+    "display_github": True,  # Integrate GitHub
+    "github_user": "zilliztech",  # Username
+    "github_repo": "GPTCache",  # Repo name
+    "github_version": "main",  # Version
+    "conf_py_path": "/docs/",  # Path in the checkout to the docs root
 }
 
 html_show_sphinx = False
@@ -126,7 +116,15 @@ html_show_sphinx = False
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named 'default.css' will overwrite the builtin 'default.css'.
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
-nb_execution_mode = 'off'
-myst_enable_extensions = ['colon_fence']
+nb_execution_mode = "off"
+myst_enable_extensions = ["colon_fence"]
+
+# -- Preactions --------------------------------------------------------------
+
+# Prepare docs
+docgen = DocGen(output_dir="references")
+docgen.generate("gptcache")
+
+IndexCon("../README.md", "index.rst")

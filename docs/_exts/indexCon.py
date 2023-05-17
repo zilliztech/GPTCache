@@ -50,32 +50,7 @@ class IndexCon:
         
         with open('toc.bak', 'r') as t:
           f.write(t.read())
-                
 
-
-
-      
-
-
-
-
-
-
-      
-
-      
-
-      
-      
-
-
-
-
-            
-          
-      
-
-          
 if __name__ == '__main__':
   index = IndexCon('../../README.md')
 

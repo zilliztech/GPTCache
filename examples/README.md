@@ -605,7 +605,7 @@ config:
 - pre_function: The pre-processing function.
 - post_function: The post-processing function.
 
-For `model_src`, `evaluation`, `storage_config` options, check [README.md](../README.md) for more.
+For `model_src`, `evaluation`, `storage_config` options, check [README.md](https://github.com/zilliztech/gpt-cache/tree/main/examples) for more.
 
 **Use the docker to start the GPTCache server**
 
