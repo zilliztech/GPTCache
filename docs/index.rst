@@ -422,6 +422,7 @@ A `sample benchmark <https://github.com/zilliztech/gpt-cache/blob/main/examples/
   * [x] Support `Hnswlib <https://github.com/nmslib/hnswlib>`_\ , header-only C++/python library for fast approximate nearest neighbors.
   * [x] Support `pgvector <https://github.com/pgvector/pgvector>`_\ , open-source vector similarity search for Postgres.
   * [x] Support `chroma <https://github.com/chroma-core/chroma>`_\ , the AI-native open-source embedding database.
+  * [x] Support `DocArray <https://github.com/docarray/docarray>`_\ , DocArray is a library for representing, sending and storing multi-modal data, perfect for Machine Learning applications.
   * [ ] Support qdrant
   * [ ] Support weaviate
   * [ ] Support other vector databases.
