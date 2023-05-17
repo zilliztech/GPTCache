@@ -35,7 +35,6 @@ __all__ = [
     "import_docarray"
 ]
 
-
 import importlib.util
 from typing import Optional
 
@@ -200,12 +199,15 @@ def import_ruamel():
 def import_selective_context():
     _check_library("selective_context")
 
+
 def import_paddle():
     _check_library("paddlepaddle")
 
+    
 def import_paddlenlp():
     _check_library("paddlenlp")
 
+    
 def import_httpx():
     _check_library("httpx")
 
