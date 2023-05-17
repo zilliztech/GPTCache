@@ -1,18 +1,10 @@
-FROM ubuntu:20.04
+FROM python:3.8-slim-bullseye
 
-RUN apt-get update          && \
-    apt-get install -y         \
-              zip              \
-              curl             \
-              wget             \
-              unzip            \
-              python3.8        \
-              python3-pip      \
-              libgl1-mesa-glx
+ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN pip3 install -U pip
+RUN pip3 install --upgrade pip
 
-RUN pip3 install gptcache
+RUN pip3 install --no-cache-dir gptcache
 
 WORKDIR /workspace
 
