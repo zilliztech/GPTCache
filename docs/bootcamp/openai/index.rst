@@ -9,6 +9,6 @@ OpenAI
    chat
    image_generation
    sql_translate
+   tweet_classifier
    image_generation
    speech_to_text
-   tweet_classifier
