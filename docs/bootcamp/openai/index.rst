@@ -11,3 +11,4 @@ OpenAI
    sql_translate
    image_generation
    speech_to_text
+   tweet_classifier
