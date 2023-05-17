@@ -1,7 +1,6 @@
 from typing import List, Optional, Tuple
 
 import numpy as np
-from pydantic import parse_obj_as
 
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils import import_docarray
@@ -59,13 +58,11 @@ class DocArrayIndex(VectorBase):
         :return: A list of tuples, each containing the match score and
             the ID of the matched vector data element.
         """
-
         if len(self._index) == 0:
             return None
         if top_k == -1:
             top_k = self._top_k
-        query = parse_obj_as(NdArray, data)
-        docs, scores = self._index.find(query, search_field="data", limit=top_k)
+        docs, scores = self._index.find(data, search_field="data", limit=top_k)
         return list(zip(scores, docs.id))
 
     def rebuild(self, ids: Optional[List[int]] = None) -> bool:
