@@ -3,8 +3,8 @@ import numpy as np
 from gptcache.utils import import_paddlenlp,import_paddle
 from gptcache.embedding.base import BaseEmbedding
 
-import_paddle
-import_paddlenlp
+import_paddle()
+import_paddlenlp()
 
 
 import paddle
