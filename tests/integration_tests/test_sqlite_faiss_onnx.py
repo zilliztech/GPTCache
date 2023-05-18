@@ -1,15 +1,13 @@
-import atexit
-import os
 import pytest
-from base.client_base import Base
-from utils.util_log import test_log as log
-from common import common_func as cf
 
-from gptcache.adapter import openai
-from gptcache.manager import get_data_manager, VectorBase
+from base.client_base import Base
+from common import common_func as cf
 from gptcache import cache, Config
+from gptcache.adapter import openai
 from gptcache.embedding import Onnx
+from gptcache.manager import get_data_manager, VectorBase
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
+from utils.util_log import test_log as log
 
 
 class TestSqliteInvalid(Base):
