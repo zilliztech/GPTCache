@@ -1,17 +1,16 @@
-import os
-import sys
 import unittest
-from unittest.mock import patch
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from gptcache import Cache
-from gptcache.processor.pre import get_inputs
-from gptcache.manager.factory import manager_factory
 from gptcache.embedding import Onnx
+from gptcache.manager.factory import manager_factory
+from gptcache.processor.pre import get_inputs
 
 question = "test_dolly"
 expect_answer = "hello world"
 onnx = Onnx()
+
 
 class MockDolly:
     def __init__(self, *args, **kwargs):

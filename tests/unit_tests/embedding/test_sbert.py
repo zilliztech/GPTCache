@@ -1,7 +1,10 @@
-from gptcache.embedding import SBERT
+import pytest
+
 from gptcache.adapter.api import _get_model
+from gptcache.embedding import SBERT
 
 
+@pytest.mark.tags("L2")
 def test_sbert():
     t = SBERT("all-MiniLM-L6-v2")
     dimension = t.dimension

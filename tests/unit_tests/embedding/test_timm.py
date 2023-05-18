@@ -1,9 +1,13 @@
-import requests
 from io import BytesIO
-from gptcache.embedding import Timm
+
+import pytest
+import requests
+
 from gptcache.adapter.api import _get_model
+from gptcache.embedding import Timm
 
 
+@pytest.mark.tags("L2")
 def test_timm():
     url = 'https://raw.githubusercontent.com/zilliztech/GPTCache/main/docs/GPTCache.png'
     image_bytes = requests.get(url).content

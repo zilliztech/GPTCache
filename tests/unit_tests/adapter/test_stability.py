@@ -3,7 +3,7 @@ import base64
 from io import BytesIO
 import os
 import numpy as np
-
+import pytest
 
 from gptcache.adapter import stability_sdk as cache_stability
 from gptcache.adapter.stability_sdk import generation, construct_resp_from_cache
@@ -23,6 +23,7 @@ import stability_sdk
 from PIL import ImageChops, Image
 
 
+@pytest.mark.tags("L2")
 def test_stability_inference_map():
     cache.init(pre_embedding_func=get_prompt)
     expected_img = Image.new("RGB", (1, 1))
@@ -59,6 +60,7 @@ def test_stability_inference_map():
     assert not diff.getbbox()
 
 
+@pytest.mark.tags("L2")
 def test_stability_inference_faiss():
     faiss_file = "faiss.index"
     if os.path.isfile(faiss_file):
@@ -110,12 +112,3 @@ def test_stability_inference_faiss():
     assert len(answers) == 1, f"Expect to get 1 image but got {len(answers)}"
     diff = ImageChops.difference(answers[0], expected_img)
     assert not diff.getbbox()
-
-
-
-if __name__ == "__main__":
-    test_stability_inference_map()
-    test_stability_inference_faiss()
-        
-
-    

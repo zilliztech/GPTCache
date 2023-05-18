@@ -1,5 +1,7 @@
-from gptcache.adapter import diffusers as cache_diffusers
+import pytest
+
 from gptcache import cache
+from gptcache.adapter import diffusers as cache_diffusers
 from gptcache.processor.pre import get_prompt
 from gptcache.utils import import_pillow, import_diffusers, import_torch, import_huggingface
 
@@ -75,6 +77,7 @@ def get_dummy_components():
     return components
 
 
+@pytest.mark.tags("L2")
 def test_stable_diffusion():
     cache.init(pre_embedding_func=get_prompt)
     prompt = "test"
@@ -89,6 +92,3 @@ def test_stable_diffusion():
     diff = ImageChops.difference(origin_image, return_image)
     assert not diff.getbbox()
 
-
-if __name__ == "__main__":
-    test_stable_diffusion()
