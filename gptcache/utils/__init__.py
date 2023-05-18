@@ -211,7 +211,7 @@ def import_openai():
 
 def import_docarray():
     _check_library("docarray")
-    
+
 
 def import_paddle():
     _check_library("paddlepaddle")

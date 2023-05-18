@@ -7,8 +7,8 @@ import_paddle()
 import_paddlenlp()
 
 
-import paddle
-from paddlenlp.transformers import AutoModel,AutoTokenizer
+import paddle # pylint: disable=C0413
+from paddlenlp.transformers import AutoModel,AutoTokenizer # pylint: disable=C0413
 
 class PaddleNLP(BaseEmbedding):
     """Generate sentence embedding for given text using pretrained models from PaddleNLP transformers.
@@ -33,9 +33,8 @@ class PaddleNLP(BaseEmbedding):
         self.tokenizer = AutoTokenizer.from_pretrained(model)
         if not self.tokenizer.pad_token:
             self.tokenizer.pad_token = "<pad>"
-      
         self.__dimension = None
-      
+
 
     def to_embeddings(self, data, **_):
         """Generate embedding given text input
@@ -57,14 +56,14 @@ class PaddleNLP(BaseEmbedding):
     def post_proc(self, token_embeddings, inputs):
         attention_mask = paddle.ones(inputs["token_type_ids"].shape)
         input_mask_expanded = (
-            attention_mask.unsqueeze(-1).expand(token_embeddings.shape).astype('float32')
+            attention_mask.unsqueeze(-1).expand(token_embeddings.shape).astype("float32")
         )
         sentence_embs = paddle.sum(
             token_embeddings * input_mask_expanded, 1
         ) / paddle.clip(input_mask_expanded.sum(1), min=1e-9)
         return sentence_embs
 
-    
+
     @property
     def dimension(self):
         """Embedding dimension.
