@@ -1,9 +1,9 @@
 import base64
 import os
-
-import numpy as np
 from io import BytesIO, BufferedReader
 from unittest.mock import patch
+
+import numpy as np
 
 from gptcache.utils import import_replicate, import_pillow
 
@@ -20,7 +20,9 @@ from gptcache.utils.response import get_image_from_openai_url
 from gptcache.manager.factory import manager_factory
 from gptcache.similarity_evaluation.onnx import OnnxModelEvaluation
 
-def test_run():
+
+
+def test_replicate():
     test_response = {"data": [{"url": "https://raw.githubusercontent.com/zilliztech/GPTCache/dev/docs/GPTCache.png"}]}
     img_bytes = base64.b64decode(get_image_from_openai_url(test_response))
     img_file = BytesIO(img_bytes)  # convert image to file-like object
@@ -87,7 +89,3 @@ def test_run():
                "question": "Which project's architecture diagram is this?"}
     )
     assert answer_text == expect_answer
-
-
-if __name__ == "__main__":
-    test_run()

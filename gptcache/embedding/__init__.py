@@ -14,8 +14,7 @@ timm = LazyImport("timm", globals(), "gptcache.embedding.timm")
 vit = LazyImport("vit", globals(), "gptcache.embedding.vit")
 langchain = LazyImport("langchain", globals(), "gptcache.embedding.langchain")
 paddlenlp = LazyImport("paddlenlp", globals(), "gptcache.embedding.paddlenlp")
-
-
+rwkv = LazyImport("rwkv", globals(), "gptcache.embedding.rwkv")
 
 
 def Cohere(model="large", api_key=None):
@@ -58,5 +57,10 @@ def LangChain(embeddings, dimension = 0):
     return langchain.LangChain(embeddings, dimension)
 
 
+
 def PaddleNLP(model="ernie-3.0-medium-zh"):
     return paddlenlp.PaddleNLP(model)
+
+  
+def Rwkv(model="sgugger/rwkv-430M-pile"):
+    return rwkv.Rwkv(model)

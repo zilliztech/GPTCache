@@ -71,5 +71,6 @@ class Session:
         self.drop()
 
     def drop(self):
+        """Drop the session and delete all data in the session"""
         self._data_manager.delete_session(self.name)
         gptcache_log.info("Deleting data in the session: %s.", self.name)

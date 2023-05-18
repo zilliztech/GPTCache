@@ -34,6 +34,7 @@ class Report:
         )
 
     def average_search_time(self):
+        """Average search time."""
         return round(
             self.search_all_time / self.search_count
             if self.embedding_count != 0
@@ -42,4 +43,5 @@ class Report:
         )
 
     def hint_cache(self):
+        """hint cache count."""
         self.hint_cache_count += 1

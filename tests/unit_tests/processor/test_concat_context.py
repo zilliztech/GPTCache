@@ -1,13 +1,9 @@
-import pytest
+from gptcache.processor.context.concat_context import ConcatContextProcess
 from transformers import pipeline, RobertaTokenizer
 
-from gptcache.processor.context.summarization_context import SummarizationContextProcess
 
-
-@pytest.mark.tags("L2")
-def test_summarization_context_process():
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-    context_process = SummarizationContextProcess(summarizer, None, 512)
+def test_concat_context_process():
+    context_process = ConcatContextProcess()
     chat = []
     chat.append(
         {
@@ -36,5 +32,4 @@ In other words, the answer "42" is a humorous and satirical take on the idea tha
 
     context_process.format_all_content({"messages": chat})
     save_content, embedding_content = context_process.process_all_content()
-    tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
-    assert len(tokenizer.tokenize(embedding_content)) < 512
+    assert len(embedding_content) > 0
