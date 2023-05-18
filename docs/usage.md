@@ -200,7 +200,6 @@ one_cache.init(embedding_func=onnx.to_embeddings,
                evaluation_func=pair_evaluation,
                config=Config(
                    similarity_threshold=1,
-                   similarity_positive=False,
                     ),
                )
 

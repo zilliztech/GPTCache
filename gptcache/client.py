@@ -12,6 +12,15 @@ class Client:
 
     :param uri: the uri leads to the server, defaults to "http://localhost:8000".
     :type uri: str
+
+    Example:
+        .. code-block:: python
+
+            from gptcache import client
+
+            client = Client(uri="http://localhost:8000")
+            client.put("Hi", "Hi back")
+            ans = client.get("Hi")
     """
 
     def __init__(self, uri: str = "http://localhost:8000"):

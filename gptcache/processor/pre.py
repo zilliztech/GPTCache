@@ -3,6 +3,7 @@ from typing import Dict, Any
 
 
 def last_content(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
+    """get the last content of the message"""
     return data.get("messages")[-1]["content"]
 
 

@@ -33,6 +33,7 @@ __all__ = [
     "import_httpx",
     "import_openai",
     "import_docarray"
+    "softmax",
 ]
 
 import importlib.util

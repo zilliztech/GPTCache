@@ -308,6 +308,7 @@ More Docs：
   * `Chat completion <https://gptcache.readthedocs.io/en/latest/bootcamp/openai/chat.html>`_
   * `Language Translation <https://gptcache.readthedocs.io/en/latest/bootcamp/openai/language_translate.html>`_
   * `SQL Translate <https://gptcache.readthedocs.io/en/latest/bootcamp/openai/sql_translate.html>`_
+  * `Twitter Classifier <https://gptcache.readthedocs.io/en/latest/bootcamp/openai/tweet_classifier.html>`_
   * `Multimodal: Image Generation <https://gptcache.readthedocs.io/en/latest/bootcamp/openai/image_generation.html>`_
   * `Multimodal: Speech to Text <https://gptcache.readthedocs.io/en/latest/bootcamp/openai/speech_to_text.html>`_
 
@@ -404,7 +405,6 @@ A `sample benchmark <https://github.com/zilliztech/gpt-cache/blob/main/examples/
   * [x] Support `MariaDB <https://mariadb.org/>`_.
   * [x] Support `SQL Server <https://www.microsoft.com/en-us/sql-server/>`_.
   * [x] Support `Oracle <https://www.oracle.com/>`_.
-  * [x] Support `Duckdb <https://github.com/duckdb/duckdb>`_.
   * [ ] Support `MongoDB <https://www.mongodb.com/>`_.
   * [ ] Support `Redis <https://redis.io/>`_.
   * [ ] Support `Minio <https://min.io/>`_.
@@ -420,8 +420,8 @@ A `sample benchmark <https://github.com/zilliztech/gpt-cache/blob/main/examples/
   * [x] Support `Milvus Lite <https://github.com/milvus-io/milvus-lite>`_\ , a lightweight version of Milvus that can be embedded into your Python application.
   * [x] Support `FAISS <https://faiss.ai/>`_\ , a library for efficient similarity search and clustering of dense vectors.
   * [x] Support `Hnswlib <https://github.com/nmslib/hnswlib>`_\ , header-only C++/python library for fast approximate nearest neighbors.
-  * [x] Support `pgvector <https://github.com/pgvector/pgvector>`_\ , open-source vector similarity search for Postgres.
-  * [x] Support `chroma <https://github.com/chroma-core/chroma>`_\ , the AI-native open-source embedding database.
+  * [x] Support `PGVector <https://github.com/pgvector/pgvector>`_\ , open-source vector similarity search for Postgres.
+  * [x] Support `Chroma <https://github.com/chroma-core/chroma>`_\ , the AI-native open-source embedding database.
   * [x] Support `DocArray <https://github.com/docarray/docarray>`_\ , DocArray is a library for representing, sending and storing multi-modal data, perfect for Machine Learning applications.
   * [ ] Support qdrant
   * [ ] Support weaviate
