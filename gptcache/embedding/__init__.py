@@ -13,6 +13,7 @@ data2vec = LazyImport("data2vec", globals(), "gptcache.embedding.data2vec")
 timm = LazyImport("timm", globals(), "gptcache.embedding.timm")
 vit = LazyImport("vit", globals(), "gptcache.embedding.vit")
 langchain = LazyImport("langchain", globals(), "gptcache.embedding.langchain")
+rwkv = LazyImport("rwkv", globals(), "gptcache.embedding.rwkv")
 
 
 def Cohere(model="large", api_key=None):
@@ -53,3 +54,8 @@ def ViT(model="google/vit-base-patch16-384"):
 
 def LangChain(embeddings, dimension = 0):
     return langchain.LangChain(embeddings, dimension)
+
+
+def Rwkv(model="sgugger/rwkv-430M-pile"):
+    return rwkv.Rwkv(model)
+

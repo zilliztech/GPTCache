@@ -5,7 +5,7 @@ import gptcache.processor.post
 import gptcache.processor.pre
 from gptcache import Cache, cache, Config
 from gptcache.adapter.adapter import adapt
-from gptcache.embedding import Onnx, Huggingface, SBERT, FastText, Data2VecAudio, Timm, ViT, OpenAI, Cohere
+from gptcache.embedding import Onnx, Huggingface, SBERT, FastText, Data2VecAudio, Timm, ViT, OpenAI, Cohere, Rwkv
 from gptcache.embedding.base import BaseEmbedding
 from gptcache.manager import manager_factory
 from gptcache.manager.data_manager import DataManager
@@ -229,6 +229,8 @@ def _get_model(model_src, model_config = None):
         return OpenAI(**model_config)
     if model_src == "cohere":
         return Cohere(**model_config)
+    if model_src == "rwkv":
+        return Rwkv(**model_config)
 
 
 def _get_eval(strategy, kws = None):
