@@ -136,6 +136,20 @@ fast_text = FastText()
 
 </details>
 
+<details>
+
+<summary> PaddleNLP </summary>
+
+```python
+from gptcache.embedding import PaddleNLP
+
+paddlenlp = PaddleNLP()
+# paddlenlp.dimension
+# paddlenlp.to_embeddings
+```
+
+</details>
+
 ### Custom embedding
 
 The function has two parameters: the preprocessed string and parameters reserved for user customization. To acquire these parameters, a similar method to the one above is used: `kwargs.get("embedding_func", {})`.
