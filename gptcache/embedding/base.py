@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 class BaseEmbedding(metaclass=ABCMeta):
     """
-    _Embedding base.
+    Base Embedding interface.
     """
 
     @abstractmethod

@@ -1,7 +1,10 @@
-from gptcache.processor.context.summarization_context import SummarizationContextProcess
+import pytest
 from transformers import pipeline, RobertaTokenizer
 
+from gptcache.processor.context.summarization_context import SummarizationContextProcess
 
+
+@pytest.mark.tags("L2")
 def test_summarization_context_process():
     summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
     context_process = SummarizationContextProcess(summarizer, None, 512)

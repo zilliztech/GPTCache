@@ -135,7 +135,7 @@ class DocGen:
             ]
             ms.extend(classes)
             class_method = [
-                (f"{y[0]}.{x[0]}", x) for y in classes for x in inspect.getmembers(y[1]) if inspect.isfunction(x[1]) and not x[0].startswith("__")
+                (f"{y[0]}.{x[0]}", x) for y in classes for x in inspect.getmembers(y[1]) if inspect.isfunction(x[1]) and not x[0].startswith("_")
             ]
             ms.extend(class_method)
 
@@ -151,5 +151,8 @@ class DocGen:
 
 
 if __name__ == "__main__":
-    gen = DocGen()
+    gen = DocGen(skip_list=[
+        "processor.context",
+        "adapter.adapter",
+    ])
     gen.generate("gptcache")
