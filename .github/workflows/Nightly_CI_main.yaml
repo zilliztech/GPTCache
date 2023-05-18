@@ -21,9 +21,17 @@ on:
 
 jobs:
   nightly-CI-gpt-cache-cli-main:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
+    services:
+      postgres:
+        image: ankane/pgvector
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@main
 
@@ -48,6 +56,12 @@ jobs:
         working-directory: tests
         run: |
           pip install -r requirements.txt
+
+      - name: Download the `en_core_web_sm` model
+        shell: bash
+        working-directory: tests
+        run: |
+          python3 -m spacy download en_core_web_sm
 
       - name: Nightly CI Tests
         timeout-minutes: 10

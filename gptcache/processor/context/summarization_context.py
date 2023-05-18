@@ -21,7 +21,7 @@ class SummarizationContextProcess(ContextProcess):
     :param target_length: The length of the summarized text.
     :type target_length: int
     """
-    def __init__(self, summarizer = transformers.pipeline("summarization", model="facebook/bart-large-cnn"),
+    def __init__(self, summarizer=transformers.pipeline("summarization", model="facebook/bart-large-cnn"),
                   tokenizer=None, target_length=512):
         self.summarizer = summarizer
         self.target_length = target_length
@@ -30,7 +30,7 @@ class SummarizationContextProcess(ContextProcess):
         self.tokenizer = tokenizer
         self.content = ""
 
-    def summarize_to_sentence(self, summarizer, sentences, target_size = 1000):
+    def summarize_to_sentence(self, summarizer, sentences, target_size=1000):
         lengths = []
         for sentence in sentences:
             lengths.append(len(sentence))
