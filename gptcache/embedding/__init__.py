@@ -61,6 +61,6 @@ def LangChain(embeddings, dimension = 0):
 def PaddleNLP(model="ernie-3.0-medium-zh"):
     return paddlenlp.PaddleNLP(model)
 
-  
+
 def Rwkv(model="sgugger/rwkv-430M-pile"):
     return rwkv.Rwkv(model)
