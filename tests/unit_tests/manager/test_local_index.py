@@ -1,14 +1,16 @@
 import unittest
-import numpy as np
 from functools import partial
-from tempfile import TemporaryDirectory
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
+import numpy as np
+import pytest
+
+from gptcache.manager.vector_data import VectorBase
+from gptcache.manager.vector_data.base import VectorData
 from gptcache.manager.vector_data.docarray_index import DocArrayIndex
 from gptcache.manager.vector_data.faiss import Faiss
 from gptcache.manager.vector_data.hnswlib_store import Hnswlib
-from gptcache.manager.vector_data import VectorBase
-from gptcache.manager.vector_data.base import VectorData
 
 DIM = 512
 MAX_ELEMENTS = 10000
@@ -30,6 +32,7 @@ class TestLocalIndex(unittest.TestCase):
                 name='faiss', top_k=3, dimension=DIM, index_path=index_path
             )
 
+    @pytest.mark.tags("L2")
     def test_hnswlib(self):
         cls = partial(Hnswlib, max_elements=MAX_ELEMENTS, dimension=DIM)
         self._internal_test_normal(cls)

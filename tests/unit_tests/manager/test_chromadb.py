@@ -1,10 +1,13 @@
 import unittest
+
 import numpy as np
+import pytest
 
 from gptcache.manager import VectorBase
 from gptcache.manager.vector_data.base import VectorData
 
 
+@pytest.mark.tags("L2")
 class TestChromadb(unittest.TestCase):
     def test_normal(self):
         db = VectorBase("chromadb", client_settings={}, top_k=3)

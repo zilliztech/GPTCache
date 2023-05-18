@@ -28,7 +28,7 @@ on:
 
 jobs:
   pylint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.0.0
     - name: Setup Python
