@@ -1,4 +1,18 @@
-__all__ = ["OpenAI", "Huggingface", "SBERT", "Cohere", "Onnx", "FastText", "Data2VecAudio", "Timm", "ViT", "LangChain", "PaddleNLP"]
+__all__ = [
+    "OpenAI",
+    "Huggingface",
+    "SBERT",
+    "Cohere",
+    "Onnx",
+    "FastText",
+    "Data2VecAudio",
+    "Timm",
+    "ViT",
+    "LangChain",
+    "Rwkv",
+    "PaddleNLP"
+]
+
 
 
 from gptcache.utils.lazy_import import LazyImport
@@ -53,7 +67,7 @@ def ViT(model="google/vit-base-patch16-384"):
     return vit.ViT(model)
 
 
-def LangChain(embeddings, dimension = 0):
+def LangChain(embeddings, dimension=0):
     return langchain.LangChain(embeddings, dimension)
 
 

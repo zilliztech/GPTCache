@@ -1,11 +1,12 @@
 import numpy as np
 
-from gptcache.utils import import_huggingface
 from gptcache.embedding.base import BaseEmbedding
+from gptcache.utils import import_huggingface
 
 import_huggingface()
 
 from transformers import AutoTokenizer, RwkvModel  # pylint: disable=C0413
+
 
 class Rwkv(BaseEmbedding):
     """Generate sentence embedding for given text using RWKV models.
@@ -23,6 +24,7 @@ class Rwkv(BaseEmbedding):
             encoder = Rwkv(model='sgugger/rwkv-430M-pile')
             embed = encoder.to_embeddings(test_sentence)
     """
+
     def __init__(self, model: str = "sgugger/rwkv-430M-pile"):
         self.model = RwkvModel.from_pretrained(model)
         self.model.eval()
@@ -46,7 +48,7 @@ class Rwkv(BaseEmbedding):
         """
         inputs = self.tokenizer(data, return_tensors="pt")
         outputs = self.model(inputs["input_ids"])
-        emb = outputs.last_hidden_state[0,0,:].detach().numpy()
+        emb = outputs.last_hidden_state[0, 0, :].detach().numpy()
         return np.array(emb).astype("float32")
 
     @property

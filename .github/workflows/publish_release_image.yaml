@@ -33,3 +33,5 @@ jobs:
       shell: bash
       run: |
         docker push zilliz/gptcache:${{ steps.get_version.outputs.VERSION }}
+        docker tag zilliz/gptcache:${{ steps.get_version.outputs.VERSION }} zilliz/gptcache:latest
+        docker push zilliz/gptcache:latest

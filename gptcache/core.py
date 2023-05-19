@@ -80,7 +80,8 @@ class Cache:
             try:
                 self.data_manager.close()
             except Exception as e:  # pylint: disable=W0703
-                gptcache_log.error(e)
+                if not os.getenv("IS_CI"):
+                    gptcache_log.error(e)
 
     def import_data(self, questions: List[Any], answers: List[Any], session_ids: Optional[List[Optional[str]]] = None) -> None:
         """Import data to GPTCache

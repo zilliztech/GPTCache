@@ -1,5 +1,4 @@
 from gptcache.processor.context.concat_context import ConcatContextProcess
-from transformers import pipeline, RobertaTokenizer
 
 
 def test_concat_context_process():

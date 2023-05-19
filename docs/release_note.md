@@ -5,6 +5,26 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.25 (2023.5.18)
+
+1. Support the DocArray vector database
+
+```python
+from gptcache.manager import manager_factory
+
+data_manager = manager_factory("sqlite,docarray")
+```
+
+2. Add rwkv model for embedding
+
+```python
+from gptcache.embedding import Rwkv
+
+test_sentence = 'Hello, world.'
+encoder = Rwkv(model='sgugger/rwkv-430M-pile')
+embed = encoder.to_embeddings(test_sentence)
+```
+
 ## v0.1.24 (2023.5.15)
 
 1. Support the langchain embedding

@@ -1,6 +1,8 @@
 import pytest
-from gptcache.embedding import Rwkv
+
 from gptcache.adapter.api import _get_model
+from gptcache.embedding import Rwkv
+
 
 @pytest.mark.tags("L2")
 def test_rwkv():

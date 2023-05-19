@@ -1,8 +1,9 @@
 import os
-from typing import Union, Callable
 from pathlib import Path
-from gptcache.manager.data_manager import SSDataManager, MapDataManager
+from typing import Union, Callable
+
 from gptcache.manager import CacheBase, VectorBase, ObjectBase
+from gptcache.manager.data_manager import SSDataManager, MapDataManager
 
 
 def manager_factory(manager="map",
@@ -74,10 +75,9 @@ def manager_factory(manager="map",
 
     if vector_params is None:
         vector_params = {}
-    if vector == "faiss":
-        vector_params["index_path"] = os.path.join(data_dir, "faiss.index")
-    elif vector == "hnswlib":
-        vector_params["index_path"] = os.path.join(data_dir, "hnswlib.index")
+    local_vector_type = ["faiss", "hnswlib", "docarray"]
+    if vector in local_vector_type:
+        vector_params["index_path"] = os.path.join(data_dir, f"{vector}.index")
     elif vector == "milvus" and vector_params.get("local_mode", False) is True:
         vector_params["local_data"] = os.path.join(data_dir, "milvus_data")
     v = VectorBase(name=vector, **vector_params)
