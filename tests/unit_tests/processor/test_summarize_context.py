@@ -6,7 +6,7 @@ from gptcache.processor.context.summarization_context import SummarizationContex
 
 @pytest.mark.tags("L2")
 def test_summarization_context_process():
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    summarizer = pipeline("summarization", model="ainize/bart-base-cnn")
     context_process = SummarizationContextProcess(summarizer, None, 512)
     chat = []
     chat.append(
