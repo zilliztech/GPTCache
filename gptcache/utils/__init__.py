@@ -76,6 +76,10 @@ def import_huggingface():
     _check_library("transformers")
 
 
+def import_uform():
+    _check_library("uform")
+
+
 def import_torch():
     _check_library("torch")
 
