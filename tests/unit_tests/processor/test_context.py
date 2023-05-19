@@ -2,15 +2,15 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict
 from unittest.mock import patch
 
-from gptcache.manager import manager_factory
-from gptcache.utils.response import get_message_from_openai_answer
-from gptcache.adapter import openai
 from gptcache import cache
-from gptcache.processor.pre import all_content
+from gptcache.adapter import openai
+from gptcache.manager import manager_factory
 from gptcache.processor import ContextProcess
+from gptcache.processor.pre import all_content
+from gptcache.utils.response import get_message_from_openai_answer
 
 
-class TestContextProcess(ContextProcess):
+class CITestContextProcess(ContextProcess):
     def __init__(self):
         self.content = ""
 
@@ -26,7 +26,7 @@ class TestContextProcess(ContextProcess):
 def test_context_process():
     with TemporaryDirectory(dir="./") as root:
         map_manager = manager_factory(data_dir=root)
-        context_process = TestContextProcess()
+        context_process = CITestContextProcess()
         cache.init(
             pre_embedding_func=context_process.pre_process, data_manager=map_manager
         )

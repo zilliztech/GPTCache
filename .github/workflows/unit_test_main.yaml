@@ -73,7 +73,7 @@ jobs:
         shell: bash
         working-directory: tests
         run: |
-          python3 -m pytest ./
+          IS_CI=true python3 -m pytest ./
 
       - name: Generate coverage report
         run: |
