@@ -214,7 +214,7 @@ def import_docarray():
 
 
 def import_paddle():
-    _check_library("paddlepaddle")
+    _check_library("paddlepaddle", package="paddlepaddle==2.4.0")
 
 
 def import_paddlenlp():
