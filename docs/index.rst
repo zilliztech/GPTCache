@@ -303,6 +303,10 @@ More Docs：
   * `SQL Chain <https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/sqlite.html>`_
   * `BabyAGI User Guide <https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/baby_agi.html>`_
 
+* GPTCache with **Llama_index**
+
+  * `WebPage QA <https://gptcache.readthedocs.io/en/latest/bootcamp/llama_index/webpage_qa.html>`_
+
 * GPTCache with **OpenAI**
 
   * `Chat completion <https://gptcache.readthedocs.io/en/latest/bootcamp/openai/chat.html>`_
@@ -479,6 +483,7 @@ For comprehensive instructions on how to contribute, please refer to our `contri
    :hidden:
 
    bootcamp/langchain/index
+   bootcamp/llama_index/index
    bootcamp/openai/index
    bootcamp/replicate/index
    bootcamp/temperature/index
