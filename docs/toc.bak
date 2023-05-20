@@ -15,6 +15,7 @@
    :hidden:
 
    bootcamp/langchain/index
+   bootcamp/llama_index/index
    bootcamp/openai/index
    bootcamp/replicate/index
    bootcamp/temperature/index
