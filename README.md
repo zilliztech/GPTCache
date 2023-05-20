@@ -257,6 +257,8 @@ More Docs：
   - [Question Answering](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/question_answering.html)
   - [SQL Chain](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/sqlite.html)
   - [BabyAGI User Guide](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/baby_agi.html)
+- GPTCache with **Llama_index**
+  - [WebPage QA](https://gptcache.readthedocs.io/en/latest/bootcamp/langchain/webpage_qa.html)
 - GPTCache with **OpenAI**
   - [Chat completion](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/chat.html)
   - [Language Translation](https://gptcache.readthedocs.io/en/latest/bootcamp/openai/language_translate.html)
