@@ -73,7 +73,9 @@ jobs:
         shell: bash
         working-directory: tests
         run: |
-          IS_CI=true python3 -m pytest ./
+          export IS_CI=true
+          export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+          python3 -m pytest ./
 
       - name: Generate coverage report
         run: |

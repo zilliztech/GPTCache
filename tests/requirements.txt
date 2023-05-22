@@ -20,3 +20,4 @@ mock
 pexpect
 spacy
 safetensors
+protobuf==3.20.0

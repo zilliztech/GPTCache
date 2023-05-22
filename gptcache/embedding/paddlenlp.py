@@ -1,14 +1,14 @@
 import numpy as np
 
-from gptcache.utils import import_paddlenlp,import_paddle
 from gptcache.embedding.base import BaseEmbedding
+from gptcache.utils import import_paddlenlp, import_paddle
 
 import_paddle()
 import_paddlenlp()
 
 
-import paddle # pylint: disable=C0413
-from paddlenlp.transformers import AutoModel,AutoTokenizer # pylint: disable=C0413
+import paddle  # pylint: disable=C0413
+from paddlenlp.transformers import AutoModel, AutoTokenizer  # pylint: disable=C0413
 
 class PaddleNLP(BaseEmbedding):
     """Generate sentence embedding for given text using pretrained models from PaddleNLP transformers.
@@ -34,7 +34,6 @@ class PaddleNLP(BaseEmbedding):
         if not self.tokenizer.pad_token:
             self.tokenizer.pad_token = "<pad>"
         self.__dimension = None
-
 
     def to_embeddings(self, data, **_):
         """Generate embedding given text input
@@ -62,7 +61,6 @@ class PaddleNLP(BaseEmbedding):
             token_embeddings * input_mask_expanded, 1
         ) / paddle.clip(input_mask_expanded.sum(1), min=1e-9)
         return sentence_embs
-
 
     @property
     def dimension(self):

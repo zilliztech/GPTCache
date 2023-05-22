@@ -1,15 +1,15 @@
-from io import BytesIO
 import base64
 import warnings
 from dataclasses import dataclass
+from io import BytesIO
 from typing import List
 
 from gptcache.adapter.adapter import adapt
 from gptcache.manager.scalar_data.base import Answer, DataType
-from gptcache.utils.error import CacheError
 from gptcache.utils import (
     import_stability, import_pillow
-    )
+)
+from gptcache.utils.error import CacheError
 
 import_pillow()
 import_stability()
@@ -17,7 +17,6 @@ import_stability()
 from PIL import Image as PILImage  # pylint: disable=C0413
 from stability_sdk import client  # pylint: disable=C0413
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation  # pylint: disable=C0413
-
 
 
 class StabilityInference(client.StabilityInference):
