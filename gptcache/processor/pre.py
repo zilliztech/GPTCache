@@ -224,3 +224,21 @@ def get_inputs(data: Dict[str, Any], **_: Dict[str, Any]):
             # "hello"
     """
     return data.get("inputs")
+
+
+def get_openai_moderation_input(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
+    """get the input param of the openai moderation request params
+
+    :param data: the user openai moderation request data
+    :type data: Dict[str, Any]
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.processor.pre import get_openai_moderation_input
+
+            content = get_openai_moderation_input({"input": ["hello", "world"]})
+            # "['hello', 'world']"
+    """
+
+    return str(data.get("input"))

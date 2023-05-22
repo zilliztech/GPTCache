@@ -27,7 +27,7 @@ class Huggingface(BaseEmbedding):
 
             test_sentence = '什么是Github'
             huggingface = Huggingface(model='uer/albert-base-chinese-cluecorpussmall')
-            embed = encoder.to_embeddings(test_sentence)
+            embed = huggingface.to_embeddings(test_sentence)
     """
 
     def __init__(self, model: str = "distilbert-base-uncased"):

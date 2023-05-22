@@ -1,12 +1,11 @@
-import os
 import time
 
-from gptcache import cache, Config
-from gptcache.manager import manager_factory
+from gptcache import cache
+from gptcache.adapter import openai
 from gptcache.embedding import Onnx
+from gptcache.manager import manager_factory
 from gptcache.processor.post import temperature_softmax
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
-from gptcache.adapter import openai
 
 cache.set_openai_key()
 

@@ -1,8 +1,9 @@
 import base64
+import json
 import os
 import time
 from io import BytesIO
-from typing import Iterator, Any
+from typing import Iterator, Any, List
 
 from gptcache.adapter.adapter import adapt
 from gptcache.manager.scalar_data.base import Answer, DataType
@@ -55,9 +56,13 @@ class ChatCompletion(openai.ChatCompletion):
             raise CacheError("openai error") from e
 
     @staticmethod
-    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+    def update_cache_callback(
+        llm_data, update_cache_func, *args, **kwargs
+    ):  # pylint: disable=unused-argument
         if not isinstance(llm_data, Iterator):
-            update_cache_func(Answer(get_message_from_openai_answer(llm_data), DataType.STR))
+            update_cache_func(
+                Answer(get_message_from_openai_answer(llm_data), DataType.STR)
+            )
             return llm_data
         else:
 
@@ -82,7 +87,7 @@ class ChatCompletion(openai.ChatCompletion):
             cache_data_convert,
             cls.update_cache_callback,
             *args,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -114,7 +119,9 @@ class Completion(openai.Completion):
         return construct_text_from_cache(cache_data)
 
     @staticmethod
-    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+    def update_cache_callback(
+        llm_data, update_cache_func, *args, **kwargs
+    ):  # pylint: disable=unused-argument
         update_cache_func(Answer(get_text_from_openai_answer(llm_data), DataType.STR))
         return llm_data
 
@@ -125,7 +132,7 @@ class Completion(openai.Completion):
             cls.cache_data_convert,
             cls.update_cache_callback,
             *args,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -150,6 +157,7 @@ class Audio(openai.Audio):
             audio_file= open("/path/to/audio.mp3", "rb")
             transcript = openai.Audio.translate("whisper-1", audio_file)
     """
+
     @classmethod
     def transcribe(cls, model: str, file: Any, *args, **kwargs):
         def llm_handler(*llm_args, **llm_kwargs):
@@ -161,12 +169,22 @@ class Audio(openai.Audio):
         def cache_data_convert(cache_data):
             return construct_audio_text_from_cache(cache_data)
 
-        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
-            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR))
+        def update_cache_callback(
+            llm_data, update_cache_func, *args, **kwargs
+        ):  # pylint: disable=unused-argument
+            update_cache_func(
+                Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR)
+            )
             return llm_data
 
         return adapt(
-            llm_handler, cache_data_convert, update_cache_callback, model=model, file=file, *args, **kwargs
+            llm_handler,
+            cache_data_convert,
+            update_cache_callback,
+            model=model,
+            file=file,
+            *args,
+            **kwargs,
         )
 
     @classmethod
@@ -180,12 +198,22 @@ class Audio(openai.Audio):
         def cache_data_convert(cache_data):
             return construct_audio_text_from_cache(cache_data)
 
-        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs): # pylint: disable=unused-argument
-            update_cache_func(Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR))
+        def update_cache_callback(
+            llm_data, update_cache_func, *args, **kwargs
+        ):  # pylint: disable=unused-argument
+            update_cache_func(
+                Answer(get_audio_text_from_openai_answer(llm_data), DataType.STR)
+            )
             return llm_data
 
         return adapt(
-            llm_handler, cache_data_convert, update_cache_callback, model=model, file=file, *args, **kwargs
+            llm_handler,
+            cache_data_convert,
+            update_cache_callback,
+            model=model,
+            file=file,
+            *args,
+            **kwargs,
         )
 
 
@@ -224,24 +252,92 @@ class Image(openai.Image):
 
         def cache_data_convert(cache_data):
             return construct_image_create_resp_from_cache(
-                image_data=cache_data,
-                response_format=response_format,
-                size=size
-                )
+                image_data=cache_data, response_format=response_format, size=size
+            )
 
-        def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+        def update_cache_callback(
+            llm_data, update_cache_func, *args, **kwargs
+        ):  # pylint: disable=unused-argument
             if response_format == "b64_json":
                 img_b64 = get_image_from_openai_b64(llm_data)
                 if isinstance(img_b64, str):
                     img_b64 = img_b64.encode("ascii")
                 update_cache_func(Answer(img_b64, DataType.IMAGE_BASE64))
             elif response_format == "url":
-                update_cache_func(Answer(get_image_from_openai_url(llm_data), DataType.IMAGE_URL))
+                update_cache_func(
+                    Answer(get_image_from_openai_url(llm_data), DataType.IMAGE_URL)
+                )
             return llm_data
 
         return adapt(
-            llm_handler, cache_data_convert, update_cache_callback, response_format=response_format, size=size, *args, **kwargs
+            llm_handler,
+            cache_data_convert,
+            update_cache_callback,
+            response_format=response_format,
+            size=size,
+            *args,
+            **kwargs,
         )
+
+
+class Moderation(openai.Moderation):
+    """Openai Moderation Wrapper
+
+    Example:
+        .. code-block:: python
+
+        from gptcache.adapter import openai
+        from gptcache.adapter.api import init_similar_cache
+        from gptcache.processor.pre import get_openai_moderation_input
+
+        init_similar_cache(pre_func=get_openai_moderation_input)
+        openai.Moderation.create(
+            input="I want to kill them.",
+        )
+    """
+
+    @classmethod
+    def llm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return super().create(*llm_args, **llm_kwargs)
+        except openai.error.OpenAIError as e:
+            raise CacheError("openai error") from e
+
+    @classmethod
+    def cache_data_convert(cls, cache_data):
+        return json.loads(cache_data)
+
+    @classmethod
+    def update_cache_callback(
+        cls, llm_data, update_cache_func, *args, **kwargs
+    ):  # pylint: disable=unused-argument
+        update_cache_func(Answer(json.dumps(llm_data, indent=4), DataType.STR))
+        return llm_data
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        res = adapt(
+            cls.llm_handler,
+            cls.cache_data_convert,
+            cls.update_cache_callback,
+            *args,
+            **kwargs,
+        )
+
+        input_request_param = kwargs.get("input")
+        expect_res_len = 1
+        if isinstance(input_request_param, List):
+            expect_res_len = len(input_request_param)
+        if len(res.get("results")) != expect_res_len:
+            kwargs["cache_skip"] = True
+            res = adapt(
+                cls.llm_handler,
+                cls.cache_data_convert,
+                cls.update_cache_callback,
+                *args,
+                **kwargs,
+            )
+        return res
 
 
 def construct_resp_from_cache(return_message):
@@ -329,15 +425,15 @@ def construct_image_create_resp_from_cache(image_data, response_format, size):
     elif response_format == "b64_json":
         image_data = base64.b64encode(buffered.getvalue()).decode("ascii")
     else:
-        raise AttributeError(f"Invalid response_format: {response_format} is not one of ['url', 'b64_json']")
+        raise AttributeError(
+            f"Invalid response_format: {response_format} is not one of ['url', 'b64_json']"
+        )
 
     return {
         "gptcache": True,
         "created": int(time.time()),
-        "data": [
-            {response_format: image_data}
-        ]
-        }
+        "data": [{response_format: image_data}],
+    }
 
 
 def construct_audio_text_from_cache(return_text):
