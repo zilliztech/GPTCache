@@ -16,6 +16,7 @@ def test_nop():
     assert "foo" in message
     assert "foo2" in message
 
+
 def test_temperature_softmax():
     message = temperature_softmax(messages=["foo", "foo2"], scores=[0.0, 1.0], temperature=0.5)
     assert message in ["foo", "foo2"]

@@ -1,7 +1,7 @@
-import logging
 from gptcache import cache
 from gptcache.processor.post import temperature_softmax
 from gptcache.utils.error import NotInitError
+from gptcache.utils.log import gptcache_log
 from gptcache.utils.time import time_cal
 
 
@@ -23,8 +23,14 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     if 0 < temperature < 2:
         cache_skip_options = [True, False]
         prob_cache_skip = [0, 1]
-        cache_skip = kwargs.pop("cache_skip", temperature_softmax(
-            messages=cache_skip_options, scores = prob_cache_skip, temperature=temperature))
+        cache_skip = kwargs.pop(
+            "cache_skip",
+            temperature_softmax(
+                messages=cache_skip_options,
+                scores=prob_cache_skip,
+                temperature=temperature,
+            ),
+        )
     elif temperature >= 2:
         cache_skip = kwargs.pop("cache_skip", True)
     else:  # temperature <= 0
@@ -56,7 +62,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         )(
             embedding_data,
             extra_param=context.get("search_func", None),
-            top_k=kwargs.pop("top_k", 5) if (user_temperature and not user_top_k) else kwargs.pop("top_k", -1),
+            top_k=kwargs.pop("top_k", 5)
+            if (user_temperature and not user_top_k)
+            else kwargs.pop("top_k", -1),
         )
         if cache_data_list is None:
             cache_data_list = []
@@ -83,7 +91,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             if "deps" in context and hasattr(ret.question, "deps"):
                 eval_query_data = {
                     "question": context["deps"][0]["data"],
-                    "embedding": None
+                    "embedding": None,
                 }
                 eval_cache_data = {
                     "question": ret.question.deps[0].data,
@@ -108,6 +116,12 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 eval_cache_data,
                 extra_param=context.get("evaluation_func", None),
             )
+            gptcache_log.debug(
+                "similarity: [user question] %s, [cache question] %s, [value] %f",
+                pre_store_data,
+                ret.question,
+                rank,
+            )
             if rank_threshold <= rank:
                 cache_answers.append((rank, ret.answers[0].answer, cache_data))
                 chat_cache.data_manager.hit_cache_callback(cache_data)
@@ -118,7 +132,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 return_message = chat_cache.post_process_messages_func(
                     messages=[t[1] for t in cache_answers],
                     scores=[t[0] for t in cache_answers],
-                    temperature=temperature
+                    temperature=temperature,
                 )
             else:
                 return_message = chat_cache.post_process_messages_func(
@@ -126,7 +140,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 )
             chat_cache.report.hint_cache()
             if session:
-                chat_cache.data_manager.add_session(answers_dict[return_message], session.name, pre_embedding_data)
+                chat_cache.data_manager.add_session(
+                    answers_dict[return_message], session.name, pre_embedding_data
+                )
             return cache_data_convert(return_message)
 
     next_cache = chat_cache.next_cache
@@ -157,7 +173,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     session=session,
                 )
 
-            llm_data = update_cache_callback(llm_data, update_cache_func, *args, **kwargs)
+            llm_data = update_cache_callback(
+                llm_data, update_cache_func, *args, **kwargs
+            )
         except Exception as e:  # pylint: disable=W0703
-            logging.warning("failed to save the data to cache, error: %s", e)
+            gptcache_log.warning("failed to save the data to cache, error: %s", e)
     return llm_data

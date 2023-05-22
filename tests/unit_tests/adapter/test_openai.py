@@ -1,13 +1,20 @@
 import base64
 import os
+import random
 from io import BytesIO
 from unittest.mock import patch
 from urllib.request import urlopen
 
 from gptcache import cache
 from gptcache.adapter import openai
+from gptcache.adapter.api import init_similar_cache
 from gptcache.manager import get_data_manager
-from gptcache.processor.pre import get_prompt, get_file_name, get_file_bytes
+from gptcache.processor.pre import (
+    get_prompt,
+    get_file_name,
+    get_file_bytes,
+    get_openai_moderation_input,
+)
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
@@ -266,6 +273,124 @@ def test_audio_translate():
     response = openai.Audio.translate(model="whisper-1", file=audio_file)
     answer_text = get_audio_text_from_openai_answer(response)
     assert answer_text == expect_answer
+
+
+def test_moderation():
+    init_similar_cache(
+        data_dir=str(random.random()), pre_func=get_openai_moderation_input
+    )
+    expect_violence = 0.8864422
+    with patch("openai.Moderation.create") as mock_create:
+        mock_create.return_value = {
+            "id": "modr-7IxkwrKvfnNJJIBsXAc0mfcpGaQJF",
+            "model": "text-moderation-004",
+            "results": [
+                {
+                    "categories": {
+                        "hate": False,
+                        "hate/threatening": False,
+                        "self-harm": False,
+                        "sexual": False,
+                        "sexual/minors": False,
+                        "violence": True,
+                        "violence/graphic": False,
+                    },
+                    "category_scores": {
+                        "hate": 0.18067425,
+                        "hate/threatening": 0.0032884814,
+                        "self-harm": 1.8089558e-09,
+                        "sexual": 9.759996e-07,
+                        "sexual/minors": 1.3364182e-08,
+                        "violence": 0.8864422,
+                        "violence/graphic": 3.2011528e-08,
+                    },
+                    "flagged": True,
+                }
+            ],
+        }
+        response = openai.Moderation.create(
+            input=["I want to kill them."],
+        )
+        assert (
+            response.get("results")[0].get("category_scores").get("violence")
+            == expect_violence
+        )
+
+    response = openai.Moderation.create(
+        input="I want to kill them.",
+    )
+    assert (
+        response.get("results")[0].get("category_scores").get("violence")
+        == expect_violence
+    )
+
+    expect_violence = 0.88708615
+    with patch("openai.Moderation.create") as mock_create:
+        mock_create.return_value = {
+            "id": "modr-7Ixe5Bvq4wqzZb1xtOxGxewg0G87F",
+            "model": "text-moderation-004",
+            "results": [
+                {
+                    "flagged": False,
+                    "categories": {
+                        "sexual": False,
+                        "hate": False,
+                        "violence": False,
+                        "self-harm": False,
+                        "sexual/minors": False,
+                        "hate/threatening": False,
+                        "violence/graphic": False,
+                    },
+                    "category_scores": {
+                        "sexual": 1.5214279e-06,
+                        "hate": 2.0188916e-06,
+                        "violence": 1.8034231e-09,
+                        "self-harm": 1.0547879e-10,
+                        "sexual/minors": 2.6696927e-09,
+                        "hate/threatening": 8.445262e-12,
+                        "violence/graphic": 5.324232e-10,
+                    },
+                },
+                {
+                    "flagged": True,
+                    "categories": {
+                        "sexual": False,
+                        "hate": False,
+                        "violence": True,
+                        "self-harm": False,
+                        "sexual/minors": False,
+                        "hate/threatening": False,
+                        "violence/graphic": False,
+                    },
+                    "category_scores": {
+                        "sexual": 9.5307604e-07,
+                        "hate": 0.18386655,
+                        "violence": 0.88708615,
+                        "self-harm": 1.7594172e-09,
+                        "sexual/minors": 1.3112497e-08,
+                        "hate/threatening": 0.0032587533,
+                        "violence/graphic": 3.1731048e-08,
+                    },
+                },
+            ],
+        }
+        response = openai.Moderation.create(
+            input=["hello, world", "I want to kill them."],
+        )
+        assert not response.get("results")[0].get("flagged")
+        assert (
+            response.get("results")[1].get("category_scores").get("violence")
+            == expect_violence
+        )
+
+    response = openai.Moderation.create(
+        input=["hello, world", "I want to kill them."],
+    )
+    assert not response.get("results")[0].get("flagged")
+    assert (
+        response.get("results")[1].get("category_scores").get("violence")
+        == expect_violence
+    )
 
 
 # def test_audio_api():

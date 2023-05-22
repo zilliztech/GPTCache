@@ -3,7 +3,7 @@ from gptcache.processor.pre import (
     all_content,
     nop,
     last_content_without_prompt,
-    get_prompt,
+    get_prompt, get_openai_moderation_input,
 )
 
 
@@ -44,3 +44,8 @@ def test_nop():
 def test_get_prompt():
     content = get_prompt({"prompt": "foo"})
     assert content == "foo"
+
+
+def test_get_openai_moderation_input():
+    content = get_openai_moderation_input({"input": ["hello", "world"]})
+    assert content == "['hello', 'world']"
