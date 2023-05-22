@@ -5,15 +5,30 @@ import gptcache.processor.post
 import gptcache.processor.pre
 from gptcache import Cache, cache, Config
 from gptcache.adapter.adapter import adapt
-from gptcache.embedding import Onnx, Huggingface, SBERT, FastText, Data2VecAudio, Timm, ViT, OpenAI, Cohere, Rwkv
+from gptcache.embedding import (
+    Onnx,
+    Huggingface,
+    SBERT,
+    FastText,
+    Data2VecAudio,
+    Timm,
+    ViT,
+    OpenAI,
+    Cohere,
+    Rwkv,
+    PaddleNLP,
+)
 from gptcache.embedding.base import BaseEmbedding
 from gptcache.manager import manager_factory
 from gptcache.manager.data_manager import DataManager
 from gptcache.processor.post import first
 from gptcache.processor.pre import get_prompt
 from gptcache.similarity_evaluation import (
-    SearchDistanceEvaluation, NumpyNormEvaluation, OnnxModelEvaluation,
-    ExactMatchEvaluation, KReciprocalEvaluation
+    SearchDistanceEvaluation,
+    NumpyNormEvaluation,
+    OnnxModelEvaluation,
+    ExactMatchEvaluation,
+    KReciprocalEvaluation,
 )
 from gptcache.utils import import_ruamel
 
@@ -145,7 +160,9 @@ def init_similar_cache(
         embedding = Onnx()
     if not data_manager:
         data_manager = manager_factory(
-            "sqlite,faiss", data_dir=data_dir, vector_params={"dimension": embedding.dimension}
+            "sqlite,faiss",
+            data_dir=data_dir,
+            vector_params={"dimension": embedding.dimension},
         )
     evaluation = SearchDistanceEvaluation()
     cache_obj = cache_obj if cache_obj else cache
@@ -207,7 +224,7 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
     )
 
 
-def _get_model(model_src, model_config = None):
+def _get_model(model_src, model_config=None):
     model_src = model_src.lower()
     model_config = model_config or {}
 
@@ -231,9 +248,11 @@ def _get_model(model_src, model_config = None):
         return Cohere(**model_config)
     if model_src == "rwkv":
         return Rwkv(**model_config)
+    if model_src == "paddlenlp":
+        return PaddleNLP(**model_config)
 
 
-def _get_eval(strategy, kws = None):
+def _get_eval(strategy, kws=None):
     strategy = strategy.lower()
     kws = kws or {}
 

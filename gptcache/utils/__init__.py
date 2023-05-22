@@ -214,7 +214,8 @@ def import_docarray():
 
 
 def import_paddle():
-    _check_library("paddlepaddle", package="paddlepaddle==2.4.0")
+    prompt_install("protobuf==3.20.0")
+    _check_library("paddlepaddle")
 
 
 def import_paddlenlp():
