@@ -1,12 +1,11 @@
 import time
 
-from gptcache.processor.pre import get_input_image_file_name
 from gptcache import cache
-
-from gptcache.embedding import Timm, Onnx
 from gptcache.adapter import replicate
-from gptcache.similarity_evaluation.np import NumpyNormEvaluation
+from gptcache.embedding import Timm, Onnx
 from gptcache.manager import get_data_manager, CacheBase, VectorBase, ObjectBase
+from gptcache.processor.pre import get_input_image_file_name
+from gptcache.similarity_evaluation.np import NumpyNormEvaluation
 
 timm = Timm('resnet18')
 onnx = Onnx()
@@ -23,7 +22,7 @@ cache.init(
     )
     
 
-image_path = '../../docs/GPTCache.png'
+image_path = '../../../docs/GPTCache.png'
 
 
 # run replicate clinet with gptcache

@@ -1,19 +1,20 @@
-import os
 import io
+import os
 import time
+
 from PIL import Image
 
 from gptcache import cache
-from gptcache.processor.pre import get_prompt
 from gptcache.adapter.stability_sdk import StabilityInference, generation
 from gptcache.embedding import Onnx
 from gptcache.manager.factory import manager_factory
+from gptcache.processor.pre import get_prompt
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 # init gptcache
 onnx = Onnx()
-data_manager = manager_factory('sqlite,faiss,local', 
-                               data_dir='./', 
+data_manager = manager_factory('sqlite,faiss,local',
+                               data_dir='/',
                                vector_params={'dimension': onnx.dimension},
                                object_params={'path': './images'}
                                )
