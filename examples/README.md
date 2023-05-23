@@ -592,7 +592,7 @@ pre_function:
 post_function:
     first
 config:
-    threshold: 0.8
+    similarity_threshold: 0.8
     # Set other config here
 ```
 - model_src: The model source.
