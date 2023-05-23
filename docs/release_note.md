@@ -5,6 +5,35 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.26 (2023.5.23)
+
+1. Support the paddlenlp embedding
+
+```python
+from gptcache.embedding import PaddleNLP
+
+test_sentence = 'Hello, world.'
+encoder = PaddleNLP(model='ernie-3.0-medium-zh')
+embed = encoder.to_embeddings(test_sentence)
+```
+
+2. Support [the openai Moderation api](https://platform.openai.com/docs/api-reference/moderations)
+
+```python
+from gptcache.adapter import openai
+from gptcache.adapter.api import init_similar_cache
+from gptcache.processor.pre import get_openai_moderation_input
+
+init_similar_cache(pre_func=get_openai_moderation_input)
+openai.Moderation.create(
+    input="hello, world",
+)
+```
+
+3. Add the llama_index bootcamp, through which you can learn how GPTCache works with llama index
+
+details: [WebPage QA](https://gptcache.readthedocs.io/en/latest/bootcamp/llama_index/webpage_qa.html)
+
 ## v0.1.25 (2023.5.18)
 
 1. Support the DocArray vector database
