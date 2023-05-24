@@ -1,5 +1,5 @@
 # pylint: disable=wrong-import-position
-from typing import Any, Optional, Callable, List
+from typing import Any, Optional, Callable
 
 import gptcache.processor.post
 import gptcache.processor.pre
@@ -21,7 +21,7 @@ from gptcache.embedding import (
 from gptcache.embedding.base import BaseEmbedding
 from gptcache.manager import manager_factory
 from gptcache.manager.data_manager import DataManager
-from gptcache.processor.post import first
+from gptcache.processor.post import temperature_softmax
 from gptcache.processor.pre import get_prompt
 from gptcache.similarity_evaluation import (
     SearchDistanceEvaluation,
@@ -126,7 +126,7 @@ def init_similar_cache(
     pre_func: Callable = get_prompt,
     embedding: Optional[BaseEmbedding] = None,
     data_manager: Optional[DataManager] = None,
-    post_func: Callable[[List[Any]], Any] = first,
+    post_func: Callable = temperature_softmax,
     config: Config = Config(),
 ):
     """Provide a quick way to initialize cache for api service

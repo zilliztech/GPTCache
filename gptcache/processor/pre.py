@@ -226,6 +226,23 @@ def get_inputs(data: Dict[str, Any], **_: Dict[str, Any]):
     return data.get("inputs")
 
 
+def get_messages_last_content(data: Dict[str, Any], **_: Any) -> str:
+    """ get the last content of the llm request messages array
+
+    :param data: the user llm request data
+    :type data: Dict[str, Any]
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.processor.pre import get_messages_last_content
+
+            content = get_messages_last_content({"messages": [{"content": "hello"}, {"content": "world"}]})
+            # "world"
+    """
+    return data.get("messages")[-1].content
+
+
 def get_openai_moderation_input(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
     """get the input param of the openai moderation request params
 
