@@ -5,6 +5,7 @@ __all__ = [
     "import_cohere",
     "import_fasttext",
     "import_huggingface",
+    "import_uform",
     "import_torch",
     "import_huggingface_hub",
     "import_onnxruntime",
