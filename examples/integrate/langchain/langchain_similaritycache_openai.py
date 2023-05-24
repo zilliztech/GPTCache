@@ -1,16 +1,14 @@
 import os
+import time
 
 import openai
-import time
-from langchain.llms import OpenAI
 from langchain import PromptTemplate
+from langchain.llms import OpenAI
 
-from gptcache.adapter.langchain_models import LangChainLLMs
-from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache import Cache
-from gptcache.embedding import Onnx
+from gptcache.adapter.api import init_similar_cache
+from gptcache.adapter.langchain_models import LangChainLLMs
 from gptcache.processor.pre import get_prompt
-from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -25,16 +23,7 @@ llm = OpenAI()
 question = "What NFL team won the Super Bowl in the year Justin Bieber was born?"
 
 llm_cache = Cache()
-onnx = Onnx()
-cache_base = CacheBase('sqlite')
-vector_base = VectorBase('faiss', dimension=onnx.dimension)
-data_manager = get_data_manager(cache_base, vector_base, max_size=10, clean_size=2)
-llm_cache.init(
-    pre_embedding_func=get_prompt,
-    embedding_func=onnx.to_embeddings,
-    data_manager=data_manager,
-    similarity_evaluation=SearchDistanceEvaluation(),
-)
+init_similar_cache(pre_func=get_prompt, cache_obj=llm_cache)
 
 
 before = time.time()

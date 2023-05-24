@@ -49,3 +49,8 @@ def test_get_prompt():
 def test_get_openai_moderation_input():
     content = get_openai_moderation_input({"input": ["hello", "world"]})
     assert content == "['hello', 'world']"
+
+
+def test_get_messages_last_content():
+    content = last_content({"messages": [{"content": "foo1"}, {"content": "foo2"}]})
+    assert content == "foo2"

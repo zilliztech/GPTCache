@@ -71,9 +71,9 @@ class LangChainChat(BaseChatModel, BaseModel):
         .. code-block:: python
 
             from gptcache import cache
-            from gptcache.processor.pre import get_prompt
+            from gptcache.processor.pre import get_messages_last_content
             # init gptcache
-            cache.init(pre_embedding_func=get_prompt)
+            cache.init(pre_embedding_func=get_messages_last_content)
             cache.set_openai_key()
             from langchain.chat_models import ChatOpenAI
             from gptcache.adapter.langchain_models import LangChainChat
