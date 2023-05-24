@@ -1,12 +1,13 @@
-import os
+from typing import Union, Any
 
 from gptcache.embedding.base import BaseEmbedding
 from gptcache.utils import import_uform, import_pillow
+from gptcache.utils.error import ParamError
 
 import_pillow()
 import_uform()
 
-from uform import get_model  # pylint: disable=C0413 # nopep8
+from uform import TritonClient, get_model  # pylint: disable=C0413 # nopep8
 from PIL import Image  # pylint: disable=C0413 # nopep8
 
 
@@ -15,6 +16,8 @@ class UForm(BaseEmbedding):
 
     :param model: model name, defaults to 'unum-cloud/uform-vl-english'.
     :type model: str
+    :param embedding_type: type of embedding, defaults to 'text'. options: text, image
+    :type embedding_type: str
 
     Example:
         .. code-block:: python
@@ -30,11 +33,20 @@ class UForm(BaseEmbedding):
             embed = encoder.to_embeddings(test_sentence)
     """
 
-    def __init__(self, model: str = "unum-cloud/uform-vl-english"):
-        self.model = get_model(model)
-        self.__dimension = self.model.image_encoder.dim
+    def __init__(self, model: Union[str, TritonClient] = "unum-cloud/uform-vl-english", embedding_type: str = "text"):
+        if isinstance(model, str):
+            self.__model = get_model(model)
+        else:
+            self.__model = model
+        self.__embedding_type = embedding_type
+        if embedding_type == "text":
+            self.__dimension = self.__model.text_encoder.proj.out_features
+        elif embedding_type == "image":
+            self.__dimension = self.__model.img_encoder.proj.out_features
+        else:
+            raise ParamError(f"Unknown embedding type: {embedding_type}")
 
-    def to_embeddings(self, data: str, **_):
+    def to_embeddings(self, data: Any, **_):
         """Generate embedding given text input or a path to a file.
 
         :param data: text in string, or a path to an image file.
@@ -42,15 +54,14 @@ class UForm(BaseEmbedding):
 
         :return: an embedding in shape of (dim,).
         """
-        if os.path.exists(data):
+        if self.__embedding_type == "image":
             data = Image.open(data)
-            data = self.model.preprocess_image(data)
-            emb = self.model.encode_image(data)
-            return emb.detach().numpy().flatten()
+            data = self.__model.preprocess_image(data)
+            emb = self.__model.encode_image(data)
         else:
-            data = self.model.preprocess_text(data)
-            emb = self.model.encode_text(data)
-            return emb.detach().numpy().flatten()
+            data = self.__model.preprocess_text(data)
+            emb = self.__model.encode_text(data)
+        return emb.detach().numpy().flatten()
 
     @property
     def dimension(self):

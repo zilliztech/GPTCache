@@ -1,10 +1,7 @@
-import pytest
-
 from gptcache.adapter.api import _get_model
 from gptcache.embedding import Rwkv
 
 
-@pytest.mark.tags("L2")
 def test_rwkv():
     t = Rwkv("sgugger/rwkv-430M-pile")
     data = t.to_embeddings("foo")

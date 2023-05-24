@@ -1,13 +1,11 @@
 from io import BytesIO
 
-import pytest
 import requests
 
 from gptcache.adapter.api import _get_model
 from gptcache.embedding import Data2VecAudio
 
 
-@pytest.mark.tags("L2")
 def test_data2vec_audio():
     url = "https://github.com/towhee-io/examples/releases/download/data/ah_yes.wav"
     req = requests.get(url)
