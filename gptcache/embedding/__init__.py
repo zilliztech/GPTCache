@@ -11,6 +11,7 @@ __all__ = [
     "LangChain",
     "Rwkv",
     "PaddleNLP",
+    "UForm",
 ]
 
 
@@ -28,6 +29,7 @@ vit = LazyImport("vit", globals(), "gptcache.embedding.vit")
 langchain = LazyImport("langchain", globals(), "gptcache.embedding.langchain")
 rwkv = LazyImport("rwkv", globals(), "gptcache.embedding.rwkv")
 paddlenlp = LazyImport("paddlenlp", globals(), "gptcache.embedding.paddlenlp")
+uform = LazyImport("uform", globals(), "gptcache.embedding.uform")
 
 
 def Cohere(model="large", api_key=None):
@@ -76,3 +78,7 @@ def Rwkv(model="sgugger/rwkv-430M-pile"):
 
 def PaddleNLP(model="ernie-3.0-medium-zh"):
     return paddlenlp.PaddleNLP(model)
+
+
+def UForm(model="unum-cloud/uform-vl-multilingual", embedding_type="text"):
+    return uform.UForm(model, embedding_type)

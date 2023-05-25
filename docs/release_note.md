@@ -5,6 +5,21 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.27 (2023.5.25)
+1. Support the uform embedding, which can be used the **bilingual** (english + chinese) language
+
+```python
+from gptcache.embedding import UForm
+
+test_sentence = 'Hello, world.'
+encoder = UForm(model='unum-cloud/uform-vl-english')
+embed = encoder.to_embeddings(test_sentence)
+
+test_sentence = '什么是Github'
+encoder = UForm(model='unum-cloud/uform-vl-multilingual')
+embed = encoder.to_embeddings(test_sentence)
+```
+
 ## v0.1.26 (2023.5.23)
 
 1. Support the paddlenlp embedding
