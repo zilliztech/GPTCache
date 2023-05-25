@@ -114,7 +114,6 @@ class DocGen:
             f.write(t)
 
         # Iterate the modules, render the function templates and write rendered output to files
-        print("modules:", modules)
         for module in modules:
             module_name = module[0]
 

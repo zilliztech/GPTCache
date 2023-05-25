@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import numpy as np
 
@@ -24,8 +24,22 @@ from sqlalchemy.types import (  # pylint: disable=C0413
 from sqlalchemy.orm import sessionmaker  # pylint: disable=C0413
 from sqlalchemy.ext.declarative import declarative_base  # pylint: disable=C0413
 
+DEFAULT_LEN_DOCT = {
+    "question_question": 3000,
+    "answer_answer": 3000,
+    "session_id": 1000,
+    "dep_name": 1000,
+    "dep_data": 3000,
+}
 
-def get_models(table_prefix, db_type):
+
+def _get_table_len(config: Dict, column_alias: str) -> int:
+    if config and column_alias in config and config[column_alias] > 0:
+        return config[column_alias]
+    return DEFAULT_LEN_DOCT.get(column_alias, 1000)
+
+
+def get_models(table_prefix, db_type, table_len_config):
     DynamicBase = declarative_base(class_registry={})  # pylint: disable=C0103
 
     class QuestionTable(DynamicBase):
@@ -41,7 +55,10 @@ def get_models(table_prefix, db_type):
             id = Column(Integer, question_id_seq, primary_key=True, autoincrement=True)
         else:
             id = Column(Integer, primary_key=True, autoincrement=True)
-        question = Column(String(1000), nullable=False)
+        question = Column(
+            String(_get_table_len(table_len_config, "question_question")),
+            nullable=False,
+        )
         create_on = Column(DateTime, default=datetime.now)
         last_access = Column(DateTime, default=datetime.now)
         embedding_data = Column(LargeBinary, nullable=True)
@@ -61,7 +78,9 @@ def get_models(table_prefix, db_type):
         else:
             id = Column(Integer, primary_key=True, autoincrement=True)
         question_id = Column(Integer, nullable=False)
-        answer = Column(String(2000), nullable=False)
+        answer = Column(
+            String(_get_table_len(table_len_config, "answer_answer")), nullable=False
+        )
         answer_type = Column(Integer, nullable=False)
 
     class SessionTable(DynamicBase):
@@ -83,8 +102,13 @@ def get_models(table_prefix, db_type):
         else:
             id = Column(Integer, primary_key=True, autoincrement=True)
         question_id = Column(Integer, nullable=False)
-        session_id = Column(String(500), nullable=False)
-        session_question = Column(String(2000), nullable=False)
+        session_id = Column(
+            String(_get_table_len(table_len_config, "session_id")), nullable=False
+        )
+        session_question = Column(
+            String(_get_table_len(table_len_config, "question_question")),
+            nullable=False,
+        )
 
     class QuestionDepTable(DynamicBase):
         """
@@ -102,8 +126,12 @@ def get_models(table_prefix, db_type):
         else:
             id = Column(Integer, primary_key=True, autoincrement=True)
         question_id = Column(Integer, nullable=False)
-        dep_name = Column(String(255), nullable=False)
-        dep_data = Column(String(1000), nullable=False)
+        dep_name = Column(
+            String(_get_table_len(table_len_config, "dep_name")), nullable=False
+        )
+        dep_data = Column(
+            String(_get_table_len(table_len_config, "dep_data")), nullable=False
+        )
         dep_type = Column(Integer, nullable=False)
 
     return QuestionTable, AnswerTable, QuestionDepTable, SessionTable
@@ -134,10 +162,13 @@ class SQLStorage(CacheStorage):
         db_type: str = "sqlite",
         url: str = "sqlite:///./sqlite.db",
         table_name: str = "gptcache",
+        table_len_config=None,
     ):
+        if table_len_config is None:
+            table_len_config = {}
         self._url = url
         self._ques, self._answer, self._ques_dep, self._session = get_models(
-            table_name, db_type
+            table_name, db_type, table_len_config
         )
         self._engine = create_engine(self._url)
         self.Session = sessionmaker(bind=self._engine)  # pylint: disable=invalid-name
