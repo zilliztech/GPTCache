@@ -14,3 +14,4 @@ sphinx_copybutton
 pydata-sphinx-theme
 m2r2
 sphinx_toolbox
+protobuf==3.20.2
