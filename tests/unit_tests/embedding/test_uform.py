@@ -2,7 +2,7 @@ from io import BytesIO
 
 import requests
 
-from gptcache.embedding.uform import UForm
+from gptcache.embedding import UForm
 from gptcache.utils import import_uform, import_pillow
 from gptcache.utils.error import ParamError
 
