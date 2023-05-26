@@ -7,14 +7,9 @@
 
 
    gptcache
-   adapter
-   client
-   config
-   core
-   embedding
-   manager
    processor
-   report
-   session
-   similarity_evaluation
+   embedding
    utils
+   adapter
+   manager
+   similarity_evaluation

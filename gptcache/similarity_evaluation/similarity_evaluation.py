@@ -9,6 +9,7 @@ class SimilarityEvaluation(metaclass=ABCMeta):
 
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.similarity_evaluation import SearchDistanceEvaluation
 
