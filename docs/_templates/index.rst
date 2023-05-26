@@ -6,5 +6,5 @@
    :caption: Contents:
 
 {% for module in modules %}
-   {{ module[0] }} 
+   {{ module }}
 {%- endfor -%}

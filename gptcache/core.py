@@ -47,10 +47,12 @@ class Cache:
         self,
         cache_enable_func=cache_all,
         pre_embedding_func=last_content,
+        pre_func=None,
         embedding_func=string_embedding,
         data_manager: DataManager = get_data_manager(),
         similarity_evaluation=ExactMatchEvaluation(),
         post_process_messages_func=temperature_softmax,
+        post_func=None,
         config=Config(),
         next_cache=None,
     ):
@@ -58,20 +60,22 @@ class Cache:
 
         :param cache_enable_func: a function to enable cache, defaults to ``cache_all``
         :param pre_embedding_func: a function to preprocess embedding, defaults to ``last_content``
+        :param pre_func: a function to preprocess embedding, same as ``pre_embedding_func``
         :param embedding_func: a function to extract embeddings from requests for similarity search, defaults to ``string_embedding``
         :param data_manager: a ``DataManager`` module, defaults to ``get_data_manager()``
         :param similarity_evaluation: a module to calculate embedding similarity, defaults to ``ExactMatchEvaluation()``
         :param post_process_messages_func: a function to post-process messages, defaults to ``temperature_softmax`` with a default temperature of 0.0
+        :param post_func: a function to post-process messages, same as ``post_process_messages_func``
         :param config: a module to pass configurations, defaults to ``Config()``
         :param next_cache: customized method for next cache
         """
         self.has_init = True
         self.cache_enable_func = cache_enable_func
-        self.pre_embedding_func = pre_embedding_func
+        self.pre_embedding_func = pre_func if pre_func else pre_embedding_func
         self.embedding_func = embedding_func
         self.data_manager: DataManager = data_manager
         self.similarity_evaluation = similarity_evaluation
-        self.post_process_messages_func = post_process_messages_func
+        self.post_process_messages_func = post_func if post_func else post_process_messages_func
         self.config = config
         self.next_cache = next_cache
 

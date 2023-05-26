@@ -286,14 +286,14 @@ class Moderation(openai.Moderation):
     Example:
         .. code-block:: python
 
-        from gptcache.adapter import openai
-        from gptcache.adapter.api import init_similar_cache
-        from gptcache.processor.pre import get_openai_moderation_input
+            from gptcache.adapter import openai
+            from gptcache.adapter.api import init_similar_cache
+            from gptcache.processor.pre import get_openai_moderation_input
 
-        init_similar_cache(pre_func=get_openai_moderation_input)
-        openai.Moderation.create(
-            input="I want to kill them.",
-        )
+            init_similar_cache(pre_func=get_openai_moderation_input)
+            openai.Moderation.create(
+                input="I want to kill them.",
+            )
     """
 
     @classmethod

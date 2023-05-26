@@ -595,7 +595,7 @@ config:
     similarity_threshold: 0.8
     # Set other config here
 ```
-- model_src: The model source.
+- model_source: The model source.
 - model_config: The model name, model config, api key.
 - data_dir: The cache directory.
 - manager: The cache storage and vector storage.

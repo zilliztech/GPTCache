@@ -16,8 +16,8 @@ import sys
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath(".."))
 sys.path.insert(0, os.path.abspath("_exts"))
-from _exts.docgen import DocGen
-from _exts.indexCon import IndexCon
+from _exts.index_con import IndexCon
+from _exts.docgen2 import DocGen
 
 
 # -- Project information -----------------------------------------------------
@@ -51,7 +51,6 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_panels",
     "sphinx_toolbox.collapse",
-    "sphinxcontrib.autodoc_pydantic",
 ]
 
 intersphinx_mapping = {
@@ -59,18 +58,19 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/devdocs/", None),
     "python": ("https://docs.python.org/3", None),
 }
-autodoc_member_order = "bysource"
-autodoc_mock_imports = ["httpx"]
-autodoc_inherit_docstrings = False
 
-autodoc_pydantic_model_show_json = False
-autodoc_pydantic_field_list_validators = False
-autodoc_pydantic_config_members = False
-autodoc_pydantic_model_show_config_summary = False
-autodoc_pydantic_model_show_validator_members = False
-autodoc_pydantic_model_show_field_summary = False
-autodoc_pydantic_model_members = False
-autodoc_pydantic_model_undoc_members = False
+autodoc_member_order = "bysource"
+autodoc_mock_imports = [
+    "httpx",
+    "protobuf",
+    "minigpt4",
+    "llama_cpp",
+    "transformers",
+    "diffusers",
+    "stability_sdk",
+    "paddle",
+    "paddlenlp",
+]
 
 source_suffix = {
     ".rst": "restructuredtext",
@@ -89,9 +89,6 @@ exclude_patterns = [
     "_build",
     "Thumbs.db",
     ".DS_Store",
-    "references/client*",
-    "references/config*",
-    "references/core*",
 ]
 
 
@@ -131,7 +128,7 @@ myst_enable_extensions = ["colon_fence"]
 # -- Preactions --------------------------------------------------------------
 
 # Prepare docs
-docgen = DocGen(output_dir="references")
-docgen.generate("gptcache")
+docgen = DocGen()
+docgen.generate()
 
 IndexCon("../README.md", "index.rst")

@@ -7,11 +7,7 @@ autodoc_pydantic
 myst_nb
 sphinx-autobuild
 sphinx_book_theme
-sphinx_rtd_theme
-sphinx-typlog-theme
 sphinx-panels
 sphinx_copybutton
-pydata-sphinx-theme
 m2r2
 sphinx_toolbox
-protobuf==3.20.0

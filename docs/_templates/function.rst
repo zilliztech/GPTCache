@@ -4,9 +4,11 @@
 .. contents:: Index
 
 {% for func in funcs  -%}
-{{module_name}}.{{func[0]}}
-{{ func[2] | section_bar }}
-.. automodule:: {{func[2]}}
-    :members:
+{{func[0]}}
+{{ func[0] | section_bar }}
+.. automodule:: {{func[1]}}
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 {% endfor %}

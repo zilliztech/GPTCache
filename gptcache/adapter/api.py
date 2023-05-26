@@ -29,6 +29,7 @@ from gptcache.similarity_evaluation import (
     OnnxModelEvaluation,
     ExactMatchEvaluation,
     KReciprocalEvaluation,
+    SimilarityEvaluation,
 )
 from gptcache.utils import import_ruamel
 
@@ -126,6 +127,7 @@ def init_similar_cache(
     pre_func: Callable = get_prompt,
     embedding: Optional[BaseEmbedding] = None,
     data_manager: Optional[DataManager] = None,
+    evaluation: Optional[SimilarityEvaluation] = None,
     post_func: Callable = temperature_softmax,
     config: Config = Config(),
 ):
@@ -141,6 +143,8 @@ def init_similar_cache(
     :type embedding: BaseEmbedding
     :param data_manager: data manager object
     :type data_manager: DataManager
+    :param evaluation: similarity evaluation object
+    :type evaluation: SimilarityEvaluation
     :param post_func: post-processing of the cached result list, the most similar result is taken by default
     :type post_func: Callable[[List[Any]], Any]
     :param config: cache configuration, the core is similar threshold
@@ -164,7 +168,8 @@ def init_similar_cache(
             data_dir=data_dir,
             vector_params={"dimension": embedding.dimension},
         )
-    evaluation = SearchDistanceEvaluation()
+    if not evaluation:
+        evaluation = SearchDistanceEvaluation()
     cache_obj = cache_obj if cache_obj else cache
     cache_obj.init(
         pre_embedding_func=pre_func,
