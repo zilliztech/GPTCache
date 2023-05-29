@@ -1,11 +1,9 @@
-from typing import Iterator
 import time
+from typing import Iterator
 
 from gptcache.adapter.adapter import adapt
 from gptcache.manager.scalar_data.base import DataType, Answer
-
 from gptcache.utils import import_llama_cpp_python
-
 
 import_llama_cpp_python()
 
@@ -21,16 +19,16 @@ class Llama(llama_cpp.Llama):
     Example:
         .. code-block:: python
 
-        onnx = Onnx()
-        m = manager_factory('sqlite,faiss,local', data_dir=root, vector_params={"dimension": onnx.dimension})
-        llm_cache = Cache()
-        llm_cache.init(
-            pre_embedding_func=get_prompt,
-            data_manager=m,
-            embedding_func=onnx.to_embeddings
-        )
-        llm = Llama('./models/7B/ggml-model.bin')
-        answer = llm(prompt=question, cache_obj=llm_cache)
+            onnx = Onnx()
+            m = manager_factory('sqlite,faiss,local', data_dir=root, vector_params={"dimension": onnx.dimension})
+            llm_cache = Cache()
+            llm_cache.init(
+                pre_embedding_func=get_prompt,
+                data_manager=m,
+                embedding_func=onnx.to_embeddings
+            )
+            llm = Llama('./models/7B/ggml-model.bin')
+            answer = llm(prompt=question, cache_obj=llm_cache)
     """
     def __call__(
             self,
@@ -54,8 +52,8 @@ class Llama(llama_cpp.Llama):
 
         def cache_data_convert(cache_data):
             if kwargs.get("stream", False):
-                return construct_stream_resp_from_cache(cache_data)
-            return construct_resp_from_cache(cache_data)
+                return _construct_stream_resp_from_cache(cache_data)
+            return _construct_resp_from_cache(cache_data)
 
         return adapt(
             self.create_completion,
@@ -66,7 +64,7 @@ class Llama(llama_cpp.Llama):
         )
 
 
-def construct_resp_from_cache(return_message):
+def _construct_resp_from_cache(return_message):
     return {
         "gptcache": True,
         "choices": [
@@ -82,7 +80,7 @@ def construct_resp_from_cache(return_message):
     }
 
 
-def construct_stream_resp_from_cache(return_message):
+def _construct_stream_resp_from_cache(return_message):
     return [
         {
             "gptcache": True,

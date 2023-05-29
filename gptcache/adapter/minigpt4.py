@@ -1,13 +1,8 @@
-from gptcache.adapter.adapter import adapt
-from gptcache.utils.error import CacheError
-from gptcache.manager.scalar_data.base import DataType, Question, Answer
-
 from argparse import Namespace
 
 from minigpt4.common.config import Config
 from minigpt4.common.registry import registry
 from minigpt4.conversation.conversation import Chat, CONV_VISION
-
 # pylint: disable=wildcard-import
 # imports modules for registration
 from minigpt4.datasets.builders import *
@@ -16,12 +11,17 @@ from minigpt4.processors import *
 from minigpt4.runners import *
 from minigpt4.tasks import *
 
+from gptcache.adapter.adapter import adapt
+from gptcache.manager.scalar_data.base import DataType, Question, Answer
+from gptcache.utils.error import CacheError
+
 
 class MiniGPT4:  # pragma: no cover
     """MiniGPT4 Wrapper
 
     Example:
         .. code-block:: python
+
             from gptcache import cache
             from gptcache.processor.pre import get_image_question
             from gptcache.adapter.minigpt4 import MiniGPT4
@@ -53,7 +53,7 @@ class MiniGPT4:  # pragma: no cover
         chat = Chat(model, vis_processor, device="cuda:{}".format(args.gpu_id))
         return cls(chat, return_hit)
 
-    def llm_handler(self, image, question):
+    def _llm_handler(self, image, question):
         chat_state = CONV_VISION.copy()
         img_list = []
         try:
@@ -86,5 +86,5 @@ class MiniGPT4:  # pragma: no cover
             return llm_data
 
         return adapt(
-            self.llm_handler, cache_data_convert, update_cache_callback, image=image, question=question, cache_context=cache_context, *args, **kwargs
+            self._llm_handler, cache_data_convert, update_cache_callback, image=image, question=question, cache_context=cache_context, *args, **kwargs
         )

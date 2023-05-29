@@ -1,4 +1,5 @@
 from typing import List
+
 import numpy as np
 
 from gptcache.manager.vector_data.base import VectorBase, VectorData
@@ -17,13 +18,14 @@ from sqlalchemy.ext.declarative import declarative_base  # pylint: disable=C0413
 
 Base = declarative_base()
 
-class VectorType(UserDefinedType):
+
+class _VectorType(UserDefinedType):
     """
     pgvector type mapping for sqlalchemy
     """
     cache_ok = True
 
-    def __init__(self, precision = 8):
+    def __init__(self, precision=8):
         self.precision = precision
 
     def get_col_spec(self, **_):
@@ -37,7 +39,8 @@ class VectorType(UserDefinedType):
     def result_processor(self, dialect, coltype):
         return lambda value: value
 
-def get_model_and_index(table_prefix, vector_dimension, index_type, lists):
+
+def _get_model_and_index(table_prefix, vector_dimension, index_type, lists):
     class VectorStoreTable(Base):
         """
         vector store table
@@ -46,7 +49,7 @@ def get_model_and_index(table_prefix, vector_dimension, index_type, lists):
         __tablename__ = table_prefix + "_pg_vector_store"
         __table_args__ = {"extend_existing": True}
         id = Column(Integer, primary_key=True, autoincrement=False)
-        embedding = Column(VectorType(vector_dimension), nullable=False)
+        embedding = Column(_VectorType(vector_dimension), nullable=False)
 
     vector_store_index = Index(
         f"idx_{table_prefix}_pg_vector_store_embedding",
@@ -58,7 +61,6 @@ def get_model_and_index(table_prefix, vector_dimension, index_type, lists):
     vector_store_index.table = VectorStoreTable.__table__
 
     return VectorStoreTable, vector_store_index
-
 
 
 class PGVector(VectorBase):
@@ -77,19 +79,18 @@ class PGVector(VectorBase):
     """
 
     INDEX_PARAM = {
-        "L2": { "operator": "<->", "name": "vector_l2_ops" }, # The only one supported now
-        "cosine": { "operator": "<=>", "name": "vector_cosine_ops" },
-        "inner_product": { "operator": "<->", "name": "vector_ip_ops" },
+        "L2": {"operator": "<->", "name": "vector_l2_ops"},  # The only one supported now
+        "cosine": {"operator": "<=>", "name": "vector_cosine_ops"},
+        "inner_product": {"operator": "<->", "name": "vector_ip_ops"},
     }
 
-
     def __init__(
-        self,
-        url: str,
-        index_params: dict,
-        collection_name: str = "gptcache",
-        dimension: int = 0,
-        top_k: int = 1,
+            self,
+            url: str,
+            index_params: dict,
+            collection_name: str = "gptcache",
+            dimension: int = 0,
+            top_k: int = 1,
     ):
         if dimension <= 0:
             raise ValueError(
@@ -99,11 +100,11 @@ class PGVector(VectorBase):
         self.top_k = top_k
         self.index_params = index_params
         self._url = url
-        self._store, self._index = get_model_and_index(
+        self._store, self._index = _get_model_and_index(
             collection_name,
             dimension,
-            index_type = self.INDEX_PARAM[index_params["index_type"]]["name"],
-            lists = index_params["params"]["lists"]
+            index_type=self.INDEX_PARAM[index_params["index_type"]]["name"],
+            lists=index_params["params"]["lists"]
         )
         self._connect(url)
         self._create_collection()
@@ -158,7 +159,8 @@ class PGVector(VectorBase):
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
         with self._engine.connect() as con:
-            con.execution_options(isolation_level="AUTOCOMMIT").execute(text(f"REINDEX INDEX CONCURRENTLY {self._index.name}"))
+            con.execution_options(isolation_level="AUTOCOMMIT").execute(
+                text(f"REINDEX INDEX CONCURRENTLY {self._index.name}"))
 
     def flush(self):
         with self._session() as session:

@@ -148,7 +148,7 @@ def init_similar_cache(
     :param post_func: post-processing of the cached result list, the most similar result is taken by default
     :type post_func: Callable[[List[Any]], Any]
     :param config: cache configuration, the core is similar threshold
-    :type config: gptcache.Config
+    :type config: Config
     :return: None
 
     Example:

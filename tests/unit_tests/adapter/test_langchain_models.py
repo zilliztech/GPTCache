@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 
 from gptcache import Cache
-from gptcache.adapter.langchain_models import LangChainLLMs, LangChainChat, cache_msg_data_convert
+from gptcache.adapter.langchain_models import LangChainLLMs, LangChainChat, _cache_msg_data_convert
 from gptcache.processor.pre import get_prompt
 from gptcache.utils import import_pydantic, import_langchain
 
@@ -98,7 +98,7 @@ def test_langchain_chats():
         }
 
         answer = chat(messages=question, cache_obj=llm_cache)
-        assert answer == cache_msg_data_convert(msg).generations[0].message
+        assert answer == _cache_msg_data_convert(msg).generations[0].message
 
     answer = chat(messages=question, cache_obj=llm_cache)
-    assert answer == cache_msg_data_convert(msg).generations[0].message
+    assert answer == _cache_msg_data_convert(msg).generations[0].message

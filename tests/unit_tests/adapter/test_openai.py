@@ -5,7 +5,7 @@ from io import BytesIO
 from unittest.mock import patch
 from urllib.request import urlopen
 
-from gptcache import cache
+from gptcache import cache, Cache
 from gptcache.adapter import openai
 from gptcache.adapter.api import init_similar_cache
 from gptcache.manager import get_data_manager
@@ -13,7 +13,7 @@ from gptcache.processor.pre import (
     get_prompt,
     get_file_name,
     get_file_bytes,
-    get_openai_moderation_input,
+    get_openai_moderation_input, last_content,
 )
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
@@ -312,16 +312,16 @@ def test_moderation():
             input=["I want to kill them."],
         )
         assert (
-            response.get("results")[0].get("category_scores").get("violence")
-            == expect_violence
+                response.get("results")[0].get("category_scores").get("violence")
+                == expect_violence
         )
 
     response = openai.Moderation.create(
         input="I want to kill them.",
     )
     assert (
-        response.get("results")[0].get("category_scores").get("violence")
-        == expect_violence
+            response.get("results")[0].get("category_scores").get("violence")
+            == expect_violence
     )
 
     expect_violence = 0.88708615
@@ -379,8 +379,8 @@ def test_moderation():
         )
         assert not response.get("results")[0].get("flagged")
         assert (
-            response.get("results")[1].get("category_scores").get("violence")
-            == expect_violence
+                response.get("results")[1].get("category_scores").get("violence")
+                == expect_violence
         )
 
     response = openai.Moderation.create(
@@ -388,10 +388,85 @@ def test_moderation():
     )
     assert not response.get("results")[0].get("flagged")
     assert (
-        response.get("results")[1].get("category_scores").get("violence")
-        == expect_violence
+            response.get("results")[1].get("category_scores").get("violence")
+            == expect_violence
     )
 
+
+def test_base_llm_cache():
+    cache_obj = Cache()
+    init_similar_cache(
+        data_dir=str(random.random()), pre_func=last_content, cache_obj=cache_obj
+    )
+    question = "What's Github"
+    expect_answer = "Github is a great place to start"
+
+    with patch("openai.ChatCompletion.create") as mock_create:
+        datas = {
+            "choices": [
+                {
+                    "message": {"content": expect_answer, "role": "assistant"},
+                    "finish_reason": "stop",
+                    "index": 0,
+                }
+            ],
+            "created": 1677825464,
+            "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion.chunk",
+        }
+        mock_create.return_value = datas
+
+        is_proxy = False
+
+        def proxy_openai_chat_complete(*args, **kwargs):
+            nonlocal is_proxy
+            is_proxy = True
+            import openai as real_openai
+            return real_openai.ChatCompletion.create(*args, **kwargs)
+
+        openai.ChatCompletion.llm = proxy_openai_chat_complete
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+            cache_obj=cache_obj,
+        )
+        assert is_proxy
+
+        assert get_message_from_openai_answer(response) == expect_answer, response
+
+    is_exception = False
+    try:
+        openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+        )
+    except Exception:
+        is_exception = True
+    assert is_exception
+
+    openai.ChatCompletion.cache_args = {"cache_obj": cache_obj}
+
+    print(openai.ChatCompletion.fill_base_args(foo="hello"))
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": question},
+        ],
+    )
+
+    openai.ChatCompletion.llm = None
+    openai.ChatCompletion.cache_args = {}
+    assert get_message_from_openai_answer(response) == expect_answer, response
 
 # def test_audio_api():
 #     data2vec = Data2VecAudio()
