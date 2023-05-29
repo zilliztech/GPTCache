@@ -48,8 +48,8 @@ class LangChainLLMs(LLM, BaseModel):
         session = self.session if "session" not in kwargs else kwargs.pop("session")
         return adapt(
             self.llm,
-            cache_data_convert,
-            update_cache_callback,
+            _cache_data_convert,
+            _update_cache_callback,
             prompt=prompt,
             stop=stop,
             session=session,
@@ -93,8 +93,8 @@ class LangChainChat(BaseChatModel, BaseModel):
         session = self.session if "session" not in kwargs else kwargs.pop("session")
         return adapt(
             self.chat._generate,
-            cache_msg_data_convert,
-            update_cache_msg_callback,
+            _cache_msg_data_convert,
+            _update_cache_msg_callback,
             messages=messages,
             stop=stop,
             session=session,
@@ -105,8 +105,8 @@ class LangChainChat(BaseChatModel, BaseModel):
         session = self.session if "session" not in kwargs else kwargs.pop("session")
         return adapt(
             self.chat._agenerate,
-            cache_msg_data_convert,
-            update_cache_msg_callback,
+            _cache_msg_data_convert,
+            _update_cache_msg_callback,
             messages=messages,
             stop=stop,
             session=session,
@@ -118,16 +118,16 @@ class LangChainChat(BaseChatModel, BaseModel):
         return res.generations[0].message
 
 
-def cache_data_convert(cache_data):
+def _cache_data_convert(cache_data):
     return cache_data
 
 
-def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+def _update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
     update_cache_func(Answer(llm_data, DataType.STR))
     return llm_data
 
 
-def cache_msg_data_convert(cache_data):
+def _cache_msg_data_convert(cache_data):
     llm_res = ChatResult(generations=[ChatGeneration(text="",
                                                      generation_info=None,
                                                      message=AIMessage(content=cache_data, additional_kwargs={}))],
@@ -135,6 +135,6 @@ def cache_msg_data_convert(cache_data):
     return llm_res
 
 
-def update_cache_msg_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+def _update_cache_msg_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
     update_cache_func(llm_data.generations[0].text)
     return llm_data

@@ -58,7 +58,7 @@ class StabilityInference(client.StabilityInference):
                         img.save('path/to/save/image.png')
     """
 
-    def llm_handler(self, *llm_args, **llm_kwargs):
+    def _llm_handler(self, *llm_args, **llm_kwargs):
         try:
             return super().generate(*llm_args, **llm_kwargs)
         except Exception as e:
@@ -69,7 +69,7 @@ class StabilityInference(client.StabilityInference):
         height = kwargs.get("height", 512)
 
         def cache_data_convert(cache_data):
-            return construct_resp_from_cache(cache_data, width=width, height=height)
+            return _construct_resp_from_cache(cache_data, width=width, height=height)
 
         def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
             def hook_stream_data(it):
@@ -93,11 +93,11 @@ class StabilityInference(client.StabilityInference):
             return hook_stream_data(llm_data)
 
         return adapt(
-            self.llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+            self._llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
 
 
-def construct_resp_from_cache(img_64, height, width):
+def _construct_resp_from_cache(img_64, height, width):
     img_bytes = base64.b64decode((img_64))
     img_file = BytesIO(img_bytes)
     img = PILImage.open(img_file)

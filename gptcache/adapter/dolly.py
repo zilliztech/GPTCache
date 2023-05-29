@@ -1,8 +1,8 @@
 from typing import Any
 
 from gptcache.adapter.adapter import adapt
-from gptcache.utils import import_huggingface, import_torch
 from gptcache.manager.scalar_data.base import Answer, DataType
+from gptcache.utils import import_huggingface, import_torch
 
 import_torch()
 import_huggingface()
@@ -52,17 +52,17 @@ class Dolly:
     def __call__(self, prompt: str, **kwargs):
         return adapt(
             self._dolly_pipeline,
-            cache_data_convert,
-            update_cache_callback,
+            _cache_data_convert,
+            _update_cache_callback,
             inputs=prompt,
             **kwargs
         )
 
 
-def cache_data_convert(cache_data):
+def _cache_data_convert(cache_data):
     return [{"generated_text": cache_data, "gptcache": True}]
 
 
-def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
+def _update_cache_callback(llm_data, update_cache_func, *args, **kwargs):  # pylint: disable=unused-argument
     update_cache_func(Answer(llm_data[0]["generated_text"], DataType.STR))
     return llm_data

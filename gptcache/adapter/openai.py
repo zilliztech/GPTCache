@@ -6,6 +6,7 @@ from io import BytesIO
 from typing import Iterator, Any, List
 
 from gptcache.adapter.adapter import adapt
+from gptcache.adapter.base import BaseCacheLLM
 from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.utils import import_openai, import_pillow
 from gptcache.utils.error import CacheError
@@ -20,10 +21,12 @@ from gptcache.utils.response import (
 
 import_openai()
 
-import openai  # pylint: disable=C0413
+# pylint: disable=C0413
+# pylint: disable=E1102
+import openai
 
 
-class ChatCompletion(openai.ChatCompletion):
+class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     """Openai ChatCompletion Wrapper
 
     Example:
@@ -49,14 +52,14 @@ class ChatCompletion(openai.ChatCompletion):
     """
 
     @classmethod
-    def llm_handler(cls, *llm_args, **llm_kwargs):
+    def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return super().create(*llm_args, **llm_kwargs)
+            return super().create(*llm_args, **llm_kwargs) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
         except openai.error.OpenAIError as e:
             raise CacheError("openai error") from e
 
     @staticmethod
-    def update_cache_callback(
+    def _update_cache_callback(
         llm_data, update_cache_func, *args, **kwargs
     ):  # pylint: disable=unused-argument
         if not isinstance(llm_data, Iterator):
@@ -79,19 +82,20 @@ class ChatCompletion(openai.ChatCompletion):
     def create(cls, *args, **kwargs):
         def cache_data_convert(cache_data):
             if kwargs.get("stream", False):
-                return construct_stream_resp_from_cache(cache_data)
-            return construct_resp_from_cache(cache_data)
+                return _construct_stream_resp_from_cache(cache_data)
+            return _construct_resp_from_cache(cache_data)
 
+        kwargs = cls.fill_base_args(**kwargs)
         return adapt(
-            cls.llm_handler,
+            cls._llm_handler,
             cache_data_convert,
-            cls.update_cache_callback,
+            cls._update_cache_callback,
             *args,
             **kwargs,
         )
 
 
-class Completion(openai.Completion):
+class Completion(openai.Completion, BaseCacheLLM):
     """Openai Completion Wrapper
 
     Example:
@@ -111,15 +115,15 @@ class Completion(openai.Completion):
     """
 
     @classmethod
-    def llm_handler(cls, *llm_args, **llm_kwargs):
-        return super().create(*llm_args, **llm_kwargs)
+    def _llm_handler(cls, *llm_args, **llm_kwargs):
+        return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
 
     @staticmethod
-    def cache_data_convert(cache_data):
-        return construct_text_from_cache(cache_data)
+    def _cache_data_convert(cache_data):
+        return _construct_text_from_cache(cache_data)
 
     @staticmethod
-    def update_cache_callback(
+    def _update_cache_callback(
         llm_data, update_cache_func, *args, **kwargs
     ):  # pylint: disable=unused-argument
         update_cache_func(Answer(get_text_from_openai_answer(llm_data), DataType.STR))
@@ -127,10 +131,11 @@ class Completion(openai.Completion):
 
     @classmethod
     def create(cls, *args, **kwargs):
+        kwargs = cls.fill_base_args(**kwargs)
         return adapt(
-            cls.llm_handler,
-            cls.cache_data_convert,
-            cls.update_cache_callback,
+            cls._llm_handler,
+            cls._cache_data_convert,
+            cls._update_cache_callback,
             *args,
             **kwargs,
         )
@@ -167,7 +172,7 @@ class Audio(openai.Audio):
                 raise CacheError("openai error") from e
 
         def cache_data_convert(cache_data):
-            return construct_audio_text_from_cache(cache_data)
+            return _construct_audio_text_from_cache(cache_data)
 
         def update_cache_callback(
             llm_data, update_cache_func, *args, **kwargs
@@ -196,7 +201,7 @@ class Audio(openai.Audio):
                 raise CacheError("openai error") from e
 
         def cache_data_convert(cache_data):
-            return construct_audio_text_from_cache(cache_data)
+            return _construct_audio_text_from_cache(cache_data)
 
         def update_cache_callback(
             llm_data, update_cache_func, *args, **kwargs
@@ -251,7 +256,7 @@ class Image(openai.Image):
                 raise CacheError("openai error") from e
 
         def cache_data_convert(cache_data):
-            return construct_image_create_resp_from_cache(
+            return _construct_image_create_resp_from_cache(
                 image_data=cache_data, response_format=response_format, size=size
             )
 
@@ -280,7 +285,7 @@ class Image(openai.Image):
         )
 
 
-class Moderation(openai.Moderation):
+class Moderation(openai.Moderation, BaseCacheLLM):
     """Openai Moderation Wrapper
 
     Example:
@@ -297,18 +302,18 @@ class Moderation(openai.Moderation):
     """
 
     @classmethod
-    def llm_handler(cls, *llm_args, **llm_kwargs):
+    def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return super().create(*llm_args, **llm_kwargs)
+            return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
         except openai.error.OpenAIError as e:
             raise CacheError("openai error") from e
 
     @classmethod
-    def cache_data_convert(cls, cache_data):
+    def _cache_data_convert(cls, cache_data):
         return json.loads(cache_data)
 
     @classmethod
-    def update_cache_callback(
+    def _update_cache_callback(
         cls, llm_data, update_cache_func, *args, **kwargs
     ):  # pylint: disable=unused-argument
         update_cache_func(Answer(json.dumps(llm_data, indent=4), DataType.STR))
@@ -316,10 +321,11 @@ class Moderation(openai.Moderation):
 
     @classmethod
     def create(cls, *args, **kwargs):
+        kwargs = cls.fill_base_args(**kwargs)
         res = adapt(
-            cls.llm_handler,
-            cls.cache_data_convert,
-            cls.update_cache_callback,
+            cls._llm_handler,
+            cls._cache_data_convert,
+            cls._update_cache_callback,
             *args,
             **kwargs,
         )
@@ -331,16 +337,16 @@ class Moderation(openai.Moderation):
         if len(res.get("results")) != expect_res_len:
             kwargs["cache_skip"] = True
             res = adapt(
-                cls.llm_handler,
-                cls.cache_data_convert,
-                cls.update_cache_callback,
+                cls._llm_handler,
+                cls._cache_data_convert,
+                cls._update_cache_callback,
                 *args,
                 **kwargs,
             )
         return res
 
 
-def construct_resp_from_cache(return_message):
+def _construct_resp_from_cache(return_message):
     return {
         "gptcache": True,
         "choices": [
@@ -356,7 +362,7 @@ def construct_resp_from_cache(return_message):
     }
 
 
-def construct_stream_resp_from_cache(return_message):
+def _construct_stream_resp_from_cache(return_message):
     created = int(time.time())
     return [
         {
@@ -386,7 +392,7 @@ def construct_stream_resp_from_cache(return_message):
     ]
 
 
-def construct_text_from_cache(return_text):
+def _construct_text_from_cache(return_text):
     return {
         "gptcache": True,
         "choices": [
@@ -402,7 +408,7 @@ def construct_text_from_cache(return_text):
     }
 
 
-def construct_image_create_resp_from_cache(image_data, response_format, size):
+def _construct_image_create_resp_from_cache(image_data, response_format, size):
     import_pillow()
     from PIL import Image as PILImage  # pylint: disable=C0415
 
@@ -436,7 +442,7 @@ def construct_image_create_resp_from_cache(image_data, response_format, size):
     }
 
 
-def construct_audio_text_from_cache(return_text):
+def _construct_audio_text_from_cache(return_text):
     return {
         "gptcache": True,
         "text": return_text,

@@ -1,20 +1,20 @@
-from unittest.mock import patch
 import base64
-from io import BytesIO
 import os
+from io import BytesIO
+from unittest.mock import patch
+
 import numpy as np
 import pytest
 
-from gptcache.adapter import stability_sdk as cache_stability
-from gptcache.adapter.stability_sdk import generation, construct_resp_from_cache
 from gptcache import cache
-from gptcache.processor.pre import get_prompt
+from gptcache.adapter import stability_sdk as cache_stability
+from gptcache.adapter.stability_sdk import generation, _construct_resp_from_cache
 from gptcache.manager.factory import manager_factory
+from gptcache.processor.pre import get_prompt
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
-
 from gptcache.utils import (
     import_stability, import_pillow
-    )
+)
 
 import_pillow()
 import_stability()
@@ -31,7 +31,7 @@ def test_stability_inference_map():
     buffered = BytesIO()
     expected_img.save(buffered, format="PNG")
     test_img_b64 = base64.b64encode(buffered.getvalue())
-    expected_response = construct_resp_from_cache(test_img_b64, 1, 1)
+    expected_response = _construct_resp_from_cache(test_img_b64, 1, 1)
 
     stability_api = cache_stability.StabilityInference(key="ThisIsTest")
     with patch.object(stability_sdk.client.StabilityInference, "generate") as mock_call:
@@ -83,7 +83,7 @@ def test_stability_inference_faiss():
     buffered = BytesIO()
     expected_img.save(buffered, format="PNG")
     test_img_b64 = base64.b64encode(buffered.getvalue())
-    expected_response = construct_resp_from_cache(test_img_b64, 1, 1)
+    expected_response = _construct_resp_from_cache(test_img_b64, 1, 1)
 
     with patch("stability_sdk.client.StabilityInference.generate") as mock_call:
         mock_call.return_value = expected_response
