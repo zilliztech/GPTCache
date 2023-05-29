@@ -1,4 +1,5 @@
 import re
+import string
 from typing import Dict, Any
 
 
@@ -47,19 +48,108 @@ def last_content_without_prompt(data: Dict[str, Any], **params: Dict[str, Any]) 
     return new_content_str
 
 
-def all_content(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
-    """ get all content of the message list
+def _get_pattern_value(pattern_str: str, value_str: str):
+    literal_text_arr = []
+    field_name_arr = []
+    for literal_text, field_name, _, _ in string.Formatter().parse(pattern_str):
+        literal_text_arr.append(literal_text)
+        if field_name is not None:
+            field_name_arr.append(
+                field_name if field_name else str(len(field_name_arr))
+            )
+
+    pattern_values = {}
+    last_end = 0
+    for i, literal_text in enumerate(literal_text_arr):
+        start = value_str.find(literal_text, last_end)
+        if i == len(literal_text_arr) - 1:
+            end = len(value_str)
+        else:
+            end = value_str.find(literal_text_arr[i + 1], start + 1)
+        if start == -1 or end == -1:
+            break
+        start += len(literal_text)
+        pattern_values[field_name_arr[i]] = value_str[start:end]
+        last_end = end
+    return pattern_values
+
+
+def last_content_without_template(data: Dict[str, Any], **params: Dict[str, Any]) -> Any:
+    """get the last content's template values of the message list without template content.
+
+    When considering a cache agent or chain, the majority of the content consists of template content,
+    while the essential information is simply a list of parameters within the template.
+    In this way, the cache key is composed of a string made up of all the parameter values in the list.
+
+    WARNING: Two parameters without intervals cannot appear in the template,
+    for example: template = "{foo}{hoo}" is not supported,
+    but template = "{foo}:{hoo}" is supported
 
     :param data: the user llm request data
     :type data: Dict[str, Any]
 
-    Example:
+    :Example with str template:
+        .. code-block:: python
+
+            from gptcache import Config
+            from gptcache.processor.pre import last_content_without_template
+
+            template_obj = "tell me a joke about {subject}"
+            prompt = template_obj.format(subject="animal")
+            value = last_content_without_template(
+                data={"messages": [{"content": prompt}]}, cache_config=Config(template=template_obj)
+            )
+            print(value)
+            # ['animal']
+
+    :Example with langchain template:
+        .. code-block:: python
+
+            from langchain import PromptTemplate
+
+            from gptcache import Config
+            from gptcache.processor.pre import last_content_without_template
+
+            template_obj = PromptTemplate.from_template("tell me a joke about {subject}")
+            prompt = template_obj.format(subject="animal")
+
+            value = last_content_without_template(
+                data={"messages": [{"content": prompt}]},
+                cache_config=Config(template=template_obj.template),
+            )
+            print(value)
+            # ['animal']
+
+    NOTE: At present, only the simple PromptTemplate in langchain is supported.
+    For ChatPromptTemplate, it needs to be adjusted according to the template array.
+    If you need to use it, you need to pass in the final dialog template yourself.
+    The reason why it cannot be advanced is that ChatPromptTemplate
+    does not provide a method to directly return the template string.
+    """
+    last_content_str = data.get("messages")[-1]["content"]
+    cache_config = params.get("cache_config", None)
+    if not (cache_config and cache_config.template):
+        return last_content_str
+
+    pattern_value = _get_pattern_value(cache_config.template, last_content_str)
+    return str(list(pattern_value.values()))
+
+
+def all_content(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
+    """get all content of the message list
+
+    :param data: the user llm request data
+    :type data: Dict[str, Any]
+
+    :Example:
         .. code-block:: python
 
             from gptcache.processor.pre import all_content
 
-            content = all_content({"messages": [{"content": "foo1"}, {"content": "foo2"}]})
-            # content = "foo1\nfoo2"
+            content = all_content(
+                {"messages": [{"content": "foo1"}, {"content": "foo2"}]}
+            )
+            # content = "foo1\\nfoo2"
     """
     s = ""
     messages = data.get("messages")

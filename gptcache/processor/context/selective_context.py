@@ -26,6 +26,13 @@ class SelectiveContextProcess(ContextProcess):
 
     more details: https://github.com/liyucheng09/Selective_Context
 
+    Example:
+        .. code-block:: python
+
+            from gptcache.processor.context.selective_context import SelectiveContextProcess
+
+            context_process = SelectiveContextProcess()
+            cache.init(pre_embedding_func=context_process.pre_process)
     """
 
     content: str = ""

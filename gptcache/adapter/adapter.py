@@ -40,6 +40,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         kwargs,
         extra_param=context.get("pre_embedding_func", None),
         prompts=chat_cache.config.prompts,
+        cache_config=chat_cache.config,
     )
     if isinstance(pre_embedding_res, tuple):
         pre_store_data = pre_embedding_res[0]
