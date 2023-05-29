@@ -56,7 +56,7 @@ extensions = [
 intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/stable/", None),
     "numpy": ("https://numpy.org/devdocs/", None),
-    "python": ("https://docs.python.org/3", None),
+    "python": ("https://docs.python.org/3.8/", None),
 }
 
 autodoc_member_order = "bysource"

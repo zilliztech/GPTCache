@@ -20,6 +20,14 @@ class SummarizationContextProcess(ContextProcess):
     :type tokenizer: transformers.PreTrainedTokenizer
     :param target_length: The length of the summarized text.
     :type target_length: int
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.processor.context.summarization_context import SummarizationContextProcess
+
+            context_process = SummarizationContextProcess()
+            cache.init(pre_embedding_func=context_process.pre_process)
     """
     def __init__(self, summarizer=transformers.pipeline("summarization", model="facebook/bart-large-cnn"),
                   tokenizer=None, target_length=512):
