@@ -1,9 +1,9 @@
 # Example
 
 - [How to run Visual Question Answering with MiniGPT-4](#How-to-run-Visual-Question-Answering-with-MiniGPT-4)
-- [How to set the `embedding` function](#How-to-set-the-embedding-function)
-- [How to set the `data manager` class](#How-to-set-the-data-manager-class)
-- [How to set the `similarity evaluation` interface](#How-to-set-the-similarity-evaluation-interface)
+- [How to set the **embedding** function](#How-to-set-the-embedding-function)
+- [How to set the **data manager** class](#How-to-set-the-data-manager-class)
+- [How to set the **similarity evaluation** interface](#How-to-set-the-similarity-evaluation-interface)
 - [Other cache init params](#Other-cache-init-params)
 - [How to run with session](#How-to-run-with-session)
 - [How to use GPTCache server](#How-to-use-GPTCache-server)
@@ -572,10 +572,10 @@ The args are optional:
 You can config the server via a YAML file, here is an example config yaml:
 
 ```yaml
-model_src:
+embedding:
     onnx
-model_config:
-    # Set model kws here including `model`, `api_key` if needed
+embedding_config:
+    # Set embedding model params here
 storage_config:
     data_dir:
         gptcache_data
@@ -585,7 +585,7 @@ storage_config:
         # Set vector storage related params here
 evaluation: 
     distance
-evaluation_kws:
+evaluation_config:
     # Set evaluation metric kws here
 pre_function:
     get_prompt
@@ -595,15 +595,15 @@ config:
     similarity_threshold: 0.8
     # Set other config here
 ```
-- model_source: The model source.
-- model_config: The model name, model config, api key.
+- embedding: The embedding model source, options: [How to set the **embedding** function](#How-to-set-the-embedding-function)
+- embedding_config: The embedding model config, details: [Embedding Reference](https://gptcache.readthedocs.io/en/latest/references/embedding.html)
 - data_dir: The cache directory.
 - manager: The cache storage and vector storage.
-- evaluation: The evaluation storage.
+- evaluation: The evaluation component, options: [How to set the **similarity evaluation** interface](#How-to-set-the-similarity-evaluation-interface)
+- evaluation_config: The evaluation config, options: [Similarity Evaluation Reference](https://gptcache.readthedocs.io/en/latest/references/similarity_evaluation.html)
 - pre_function: The pre-processing function.
 - post_function: The post-processing function.
-
-For `model_src`, `evaluation`, `storage_config` options, check [README.md](https://github.com/zilliztech/gpt-cache/tree/main/examples) for more.
+- config: The cache config, like `similarity_threshold`
 
 **Use the docker to start the GPTCache server**
 

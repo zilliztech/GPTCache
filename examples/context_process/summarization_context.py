@@ -5,7 +5,7 @@ from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
 from gptcache.manager import manager_factory
-from gptcache.processor.context.summarization_context import SummarizationContextProcess
+from gptcache.processor.context import SummarizationContextProcess
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
 

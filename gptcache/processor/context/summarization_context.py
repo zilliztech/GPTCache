@@ -31,6 +31,8 @@ class SummarizationContextProcess(ContextProcess):
     """
     def __init__(self, summarizer=transformers.pipeline("summarization", model="facebook/bart-large-cnn"),
                   tokenizer=None, target_length=512):
+        if not summarizer:
+            summarizer = transformers.pipeline("summarization", model="facebook/bart-large-cnn")
         self.summarizer = summarizer
         self.target_length = target_length
         if tokenizer is None:

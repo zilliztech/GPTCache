@@ -1,8 +1,8 @@
-from gptcache.processor.context.concat_context import ConcatContextProcess
+from gptcache.adapter.api import _get_pre_context_function
 
 
 def test_concat_context_process():
-    context_process = ConcatContextProcess()
+    context_process = _get_pre_context_function("concat")
     chat = []
     chat.append(
         {

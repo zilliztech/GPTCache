@@ -5,6 +5,97 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.28 (2023.5.29)
+To handle a large prompt, there are currently two options available:
+
+1. Increase the column size of CacheStorage.
+
+```python
+from gptcache.manager import manager_factory
+
+data_manager = manager_factory(
+    "sqlite,faiss", scalar_params={"table_len_config": {"question_question": 5000}}
+)
+
+```
+More Details:
+- 'question_question': the question column size in the question table, default to 3000.
+- 'answer_answer': the answer column size in the answer table, default to 3000.
+- 'session_id': the session id column size in the session table, default to 1000.
+- 'dep_name': the name column size in the dep table, default to 1000.
+- 'dep_data': the data column size in the dep table, default to 3000.
+
+2. When using a template, use the dynamic value in the template as the cache key instead of using the entire template as the key.
+
+- **str template**
+```python
+from gptcache import Config
+from gptcache.processor.pre import last_content_without_template
+
+template_obj = "tell me a joke about {subject}"
+prompt = template_obj.format(subject="animal")
+value = last_content_without_template(
+    data={"messages": [{"content": prompt}]}, cache_config=Config(template=template_obj)
+)
+print(value)
+# ['animal']
+```
+
+- **langchain prompt template**
+
+```python
+from langchain import PromptTemplate
+
+from gptcache import Config
+from gptcache.processor.pre import last_content_without_template
+
+template_obj = PromptTemplate.from_template("tell me a joke about {subject}")
+prompt = template_obj.format(subject="animal")
+
+value = last_content_without_template(
+    data={"messages": [{"content": prompt}]},
+    cache_config=Config(template=template_obj.template),
+)
+print(value)
+# ['animal']
+```
+
+3. Wrap the openai object, reference: [BaseCacheLLM](https://gptcache.readthedocs.io/en/dev/references/adapter.html#module-gptcache.adapter.base)
+
+```python
+import random
+
+from gptcache import Cache
+from gptcache.adapter import openai
+from gptcache.adapter.api import init_similar_cache
+from gptcache.processor.pre import last_content
+
+cache_obj = Cache()
+init_similar_cache(
+    data_dir=str(random.random()), pre_func=last_content, cache_obj=cache_obj
+)
+
+
+def proxy_openai_chat_complete(*args, **kwargs):
+    nonlocal is_proxy
+    is_proxy = True
+    import openai as real_openai
+
+    return real_openai.ChatCompletion.create(*args, **kwargs)
+
+
+openai.ChatCompletion.llm = proxy_openai_chat_complete
+openai.ChatCompletion.cache_args = {"cache_obj": cache_obj}
+
+openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What's GitHub"},
+    ],
+)
+```
+
 ## v0.1.27 (2023.5.25)
 1. Support the uform embedding, which can be used the **bilingual** (english + chinese) language
 
