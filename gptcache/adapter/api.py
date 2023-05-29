@@ -21,6 +21,11 @@ from gptcache.embedding import (
 from gptcache.embedding.base import BaseEmbedding
 from gptcache.manager import manager_factory
 from gptcache.manager.data_manager import DataManager
+from gptcache.processor.context import (
+    SummarizationContextProcess,
+    SelectiveContextProcess,
+    ConcatContextProcess,
+)
 from gptcache.processor.post import temperature_softmax
 from gptcache.processor.pre import get_prompt
 from gptcache.similarity_evaluation import (
@@ -192,9 +197,15 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
     else:
         init_conf = {}
 
-    model_src = init_conf.get("model_source", "onnx")
-    model_config = init_conf.get("model_config", {})
-    embedding_model = _get_model(model_src, model_config)
+    # Due to the problem with the first naming, it is reserved to ensure compatibility
+    embedding = init_conf.get("model_source", "")
+    if not embedding:
+        embedding = init_conf.get("embedding", "onnx")
+    # ditto
+    embedding_config = init_conf.get("model_config", {})
+    if not embedding_config:
+        embedding_config = init_conf.get("embedding_config", {})
+    embedding_model = _get_model(embedding, embedding_config)
 
     storage_config = init_conf.get("storage_config", {})
     storage_config.setdefault("manager", "sqlite,faiss")
@@ -205,13 +216,23 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
     data_manager = manager_factory(**storage_config)
 
     eval_strategy = init_conf.get("evaluation", "distance")
-    eval_kws = init_conf.get("evaluation_kws")
-    evaluation = _get_eval(eval_strategy, eval_kws)
+    # Due to the problem with the first naming, it is reserved to ensure compatibility
+    eval_config = init_conf.get("evaluation_kws", {})
+    if not eval_config:
+        eval_config = init_conf.get("evaluation_config", {})
+    evaluation = _get_eval(eval_strategy, eval_config)
 
     cache_obj = cache_obj if cache_obj else cache
 
-    pre_prcocess = init_conf.get("pre_function", "get_prompt")
-    pre_func = _get_pre_func(pre_prcocess)
+    pre_process = init_conf.get("pre_context_function")
+    if pre_process:
+        pre_func = _get_pre_context_function(
+            pre_process, init_conf.get("pre_context_config")
+        )
+        pre_func = pre_func.pre_process
+    else:
+        pre_process = init_conf.get("pre_function", "get_prompt")
+        pre_func = _get_pre_func(pre_process)
 
     post_process = init_conf.get("post_function", "first")
     post_func = _get_post_func(post_process)
@@ -273,8 +294,19 @@ def _get_eval(strategy, kws=None):
         return KReciprocalEvaluation(**kws)
 
 
-def _get_pre_func(pre_prcocess):
-    return getattr(gptcache.processor.pre, pre_prcocess)
+def _get_pre_func(pre_process):
+    return getattr(gptcache.processor.pre, pre_process)
+
+
+def _get_pre_context_function(pre_context_process, kws=None):
+    pre_context_process = pre_context_process.lower()
+    kws = kws or {}
+    if pre_context_process in "summarization":
+        return SummarizationContextProcess(**kws)
+    if pre_context_process in "selective":
+        return SelectiveContextProcess(**kws)
+    if pre_context_process in "concat":
+        return ConcatContextProcess()
 
 
 def _get_post_func(post_process):

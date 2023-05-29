@@ -5,7 +5,7 @@ from gptcache import cache
 from gptcache.adapter import openai
 from gptcache.embedding import Onnx
 from gptcache.manager import manager_factory
-from gptcache.processor.context.selective_context import SelectiveContextProcess
+from gptcache.processor.context import SelectiveContextProcess
 from gptcache.similarity_evaluation import SearchDistanceEvaluation
 from gptcache.utils import import_selective_context
 
