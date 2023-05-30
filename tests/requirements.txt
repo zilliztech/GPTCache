@@ -1,6 +1,6 @@
 --extra-index-url https://test.pypi.org/simple/
 loguru==0.5.3
-pytest-cov==2.8.1
+pytest-cov==4.1.0
 pytest==7.2.0
 coverage==7.2.3
 pytest-assume==2.4.3
@@ -21,4 +21,6 @@ pexpect
 spacy
 safetensors
 typing_extensions<4.6.0
+stability-sdk
+grpcio==1.53.0
 protobuf==3.20.0
