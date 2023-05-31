@@ -20,9 +20,9 @@ __all__ = [
 ]
 
 
-def SummarizationContextProcess(summarizer=None, tokenizer=None, target_length=512):
+def SummarizationContextProcess(model_name=None, tokenizer=None, target_length=512):
     return summarization.SummarizationContextProcess(
-        summarizer, tokenizer, target_length
+        model_name, tokenizer, target_length
     )
 
 

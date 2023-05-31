@@ -9,6 +9,22 @@ import_huggingface()
 
 import transformers  # pylint: disable=C0413
 
+def summarize_to_length(summarizer, text, target_len, max_len=1024):
+    tokenizer = summarizer.tokenizer
+    def token_length(text):
+        return len(tokenizer.encode(text))
+    segment_len = max_len - 100
+    summary_result = text
+    while token_length(text) > target_len:
+        tokens = tokenizer.encode(text)
+        segments = [tokens[i:i+segment_len] for i in range(0, len(tokens), segment_len-1)]
+        summary_result = ""
+        for segment in segments:
+            len_seg = int(len(segment)/4)
+            summary = summarizer(tokenizer.decode(segment), min_length=max(len_seg-10, 1), max_length=len_seg)
+            summary_result += summary[0]["summary_text"]
+        text = summary_result
+    return summary_result
 
 class SummarizationContextProcess(ContextProcess):
     """A context processor for summarizing large amounts of text data using a summarizer model.
@@ -29,10 +45,9 @@ class SummarizationContextProcess(ContextProcess):
             context_process = SummarizationContextProcess()
             cache.init(pre_embedding_func=context_process.pre_process)
     """
-    def __init__(self, summarizer=transformers.pipeline("summarization", model="facebook/bart-large-cnn"),
+    def __init__(self, model_name="facebook/bart-large-cnn",
                   tokenizer=None, target_length=512):
-        if not summarizer:
-            summarizer = transformers.pipeline("summarization", model="facebook/bart-large-cnn")
+        summarizer = transformers.pipeline(task="summarization", model=model_name)
         self.summarizer = summarizer
         self.target_length = target_length
         if tokenizer is None:
@@ -40,7 +55,7 @@ class SummarizationContextProcess(ContextProcess):
         self.tokenizer = tokenizer
         self.content = ""
 
-    def summarize_to_sentence(self, summarizer, sentences, target_size=1000):
+    def summarize_to_sentence(self, sentences, target_size=1000):
         lengths = []
         for sentence in sentences:
             lengths.append(len(sentence))
@@ -49,8 +64,8 @@ class SummarizationContextProcess(ContextProcess):
         target_sentences = []
         for sent, target_len in zip(sentences, target_lengths):
             if len(self.tokenizer.tokenize(sent)) > target_len:
-                response = summarizer(sent, max_length=target_len, min_length=1, do_sample=False)
-                target_sentence = response[0]["summary_text"]
+                response = summarize_to_length(self.summarizer, sent, target_len, self.tokenizer.model_max_length)
+                target_sentence = response
             else:
                 target_sentence = sent
             target_sentences.append(target_sentence)
@@ -71,7 +86,7 @@ class SummarizationContextProcess(ContextProcess):
             for message in content:
                 ret += "[#RS]{}[#RE][#CS]{}[#CE]".format(message["role"], message["content"])
             return ret
-        result = self.summarize_to_sentence(self.summarizer, [message["content"] for message in self.content], self.target_length)
+        result = self.summarize_to_sentence([message["content"] for message in self.content], self.target_length)
         save_content = serialize_content(self.content)
         embedding_content = result
         return save_content, embedding_content

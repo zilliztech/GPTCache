@@ -4,7 +4,7 @@ import numpy
 
 from gptcache.manager import get_data_manager, manager_factory
 from gptcache.utils.error import NotInitError
-from gptcache.adapter.adapter import adapt
+from gptcache.adapter.adapter import adapt, summarize_input
 from gptcache.adapter.api import put, get
 from gptcache.processor.pre import get_prompt
 from gptcache.processor.post import first, nop
@@ -156,6 +156,10 @@ def test_cache_temperature():
     answers = get(prompt=prompt)
     assert len(answers) == 2
 
+def test_input_summarization():
+    text = "A large language model (LLM) is a language model consisting of a neural network with many parameters (typically billions of weights or more), trained on large quantities of unlabeled text using self-supervised learning or semi-supervised learning. LLMs emerged around 2018 and perform well at a wide variety of tasks. This has shifted the focus of natural language processing research away from the previous paradigm of training specialized supervised models for specific tasks."
+    summary = summarize_input(text, 40)
+    assert len(summary.split()) < 40
 
 if __name__ == "__main__":
     test_cache_temperature()
