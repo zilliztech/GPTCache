@@ -22,3 +22,4 @@ class TestUSearchDB(unittest.TestCase):
                    for i in range(size)])
         self.assertEqual(len(db.search(np.random.rand(dim))), top_k)
         self.assertEqual(db.count(), size)
+        db.close()
