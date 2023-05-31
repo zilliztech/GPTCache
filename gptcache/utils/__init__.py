@@ -6,6 +6,7 @@ __all__ = [
     "import_fasttext",
     "import_huggingface",
     "import_uform",
+    "import_usearch",
     "import_torch",
     "import_huggingface_hub",
     "import_onnxruntime",
@@ -35,7 +36,7 @@ __all__ = [
     "softmax",
     "import_paddle",
     "import_paddlenlp"
-    ]
+]
 
 import importlib.util
 from typing import Optional
@@ -79,6 +80,10 @@ def import_huggingface():
 
 def import_uform():
     _check_library("uform")
+
+
+def import_usearch():
+    _check_library("usearch")
 
 
 def import_torch():
