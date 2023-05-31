@@ -12,7 +12,7 @@ class TestUSearchDB(unittest.TestCase):
         top_k = 10
 
         db = USearch(
-            index_file_path='./',
+            index_file_path='./index.usearch',
             dimension=dim,
             top_k=top_k,
             metric='cos',
