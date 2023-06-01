@@ -52,7 +52,7 @@ def test_report():
     report.hint_cache()
 
     assert report.average_embedding_time() == 2
-    assert report.embedding_count == 2
+    assert report.op_embedding.count == 2
     assert report.average_search_time() == 3
-    assert report.search_count == 2
+    assert report.op_search.count == 2
     assert report.hint_cache_count == 2

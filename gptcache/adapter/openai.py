@@ -5,6 +5,7 @@ import time
 from io import BytesIO
 from typing import Iterator, Any, List
 
+from gptcache import cache
 from gptcache.adapter.adapter import adapt
 from gptcache.adapter.base import BaseCacheLLM
 from gptcache.manager.scalar_data.base import Answer, DataType
@@ -18,6 +19,7 @@ from gptcache.utils.response import (
     get_image_from_openai_url,
     get_audio_text_from_openai_answer,
 )
+from gptcache.utils.token import token_counter
 
 import_openai()
 
@@ -80,10 +82,19 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
 
     @classmethod
     def create(cls, *args, **kwargs):
+        chat_cache = kwargs.get("cache_obj", cache)
+        enable_token_counter = chat_cache.config.enable_token_counter
+
         def cache_data_convert(cache_data):
+            if enable_token_counter:
+                input_token = _num_tokens_from_messages(kwargs.get("messages"))
+                output_token = token_counter(cache_data)
+                saved_token = [input_token, output_token]
+            else:
+                saved_token = [0, 0]
             if kwargs.get("stream", False):
-                return _construct_stream_resp_from_cache(cache_data)
-            return _construct_resp_from_cache(cache_data)
+                return _construct_stream_resp_from_cache(cache_data, saved_token)
+            return _construct_resp_from_cache(cache_data, saved_token)
 
         kwargs = cls.fill_base_args(**kwargs)
         return adapt(
@@ -346,9 +357,10 @@ class Moderation(openai.Moderation, BaseCacheLLM):
         return res
 
 
-def _construct_resp_from_cache(return_message):
+def _construct_resp_from_cache(return_message, saved_token):
     return {
         "gptcache": True,
+        "saved_token": saved_token,
         "choices": [
             {
                 "message": {"role": "assistant", "content": return_message},
@@ -362,7 +374,7 @@ def _construct_resp_from_cache(return_message):
     }
 
 
-def _construct_stream_resp_from_cache(return_message):
+def _construct_stream_resp_from_cache(return_message, saved_token):
     created = int(time.time())
     return [
         {
@@ -388,6 +400,7 @@ def _construct_stream_resp_from_cache(return_message):
             "choices": [{"delta": {}, "finish_reason": "stop", "index": 0}],
             "created": created,
             "object": "chat.completion.chunk",
+            "saved_token": saved_token,
         },
     ]
 
@@ -447,3 +460,19 @@ def _construct_audio_text_from_cache(return_text):
         "gptcache": True,
         "text": return_text,
     }
+
+
+def _num_tokens_from_messages(messages):
+    """Returns the number of tokens used by a list of messages."""
+    tokens_per_message = 3
+    tokens_per_name = 1
+
+    num_tokens = 0
+    for message in messages:
+        num_tokens += tokens_per_message
+        for key, value in message.items():
+            num_tokens += token_counter(value)
+            if key == "name":
+                num_tokens += tokens_per_name
+    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
+    return num_tokens

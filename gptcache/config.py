@@ -15,6 +15,10 @@ class Config:
     :type prompts: Optional[List[str]]
     :param template: optional, if the request content will remove the template string and only keep the parameter value in the template
     :type template: Optional[str]
+    :param auto_flush: it will be automatically flushed every time xx pieces of data are added, default to 20
+    :type auto_flush: int
+    :param enable_token_counter: enable token counter, default to False
+    :type enable_token_counter: bool
 
     Example:
         .. code-block:: python
@@ -30,6 +34,8 @@ class Config:
             similarity_threshold: float = 0.8,
             prompts: Optional[List[str]] = None,
             template: Optional[str] = None,
+            auto_flush: int = 20,
+            enable_token_counter: bool = True,
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError(
@@ -39,3 +45,5 @@ class Config:
         self.similarity_threshold = similarity_threshold
         self.prompts = prompts
         self.template = template
+        self.auto_flush = auto_flush
+        self.enable_token_counter = enable_token_counter

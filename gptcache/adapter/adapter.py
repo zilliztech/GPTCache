@@ -36,7 +36,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     else:  # temperature <= 0
         cache_skip = kwargs.pop("cache_skip", False)
     cache_factor = kwargs.pop("cache_factor", 1.0)
-    pre_embedding_res = chat_cache.pre_embedding_func(
+    pre_embedding_res = time_cal(
+        chat_cache.pre_embedding_func,
+        func_name="pre_process",
+        report_func=chat_cache.report.pre,
+    )(
         kwargs,
         extra_param=context.get("pre_embedding_func", None),
         prompts=chat_cache.config.prompts,
@@ -81,7 +85,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             else rank_threshold
         )
         for cache_data in cache_data_list:
-            ret = chat_cache.data_manager.get_scalar_data(
+            ret = time_cal(
+                chat_cache.data_manager.get_scalar_data,
+                func_name="get_data",
+                report_func=chat_cache.report.data,
+            )(
                 cache_data,
                 extra_param=context.get("get_scalar_data", None),
                 session=session,
@@ -112,7 +120,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     "search_result": cache_data,
                     "embedding": ret.embedding_data,
                 }
-            rank = chat_cache.similarity_evaluation.evaluation(
+            rank = time_cal(
+                chat_cache.similarity_evaluation.evaluation,
+                func_name="evaluation",
+                report_func=chat_cache.report.evaluation,
+            )(
                 eval_query_data,
                 eval_cache_data,
                 extra_param=context.get("evaluation_func", None),
@@ -129,16 +141,25 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         answers_dict = dict((d[1], d[2]) for d in cache_answers)
         if len(cache_answers) != 0:
-            if chat_cache.post_process_messages_func is temperature_softmax:
-                return_message = chat_cache.post_process_messages_func(
-                    messages=[t[1] for t in cache_answers],
-                    scores=[t[0] for t in cache_answers],
-                    temperature=temperature,
-                )
-            else:
-                return_message = chat_cache.post_process_messages_func(
-                    [t[1] for t in cache_answers]
-                )
+
+            def post_process():
+                if chat_cache.post_process_messages_func is temperature_softmax:
+                    return_message = chat_cache.post_process_messages_func(
+                        messages=[t[1] for t in cache_answers],
+                        scores=[t[0] for t in cache_answers],
+                        temperature=temperature,
+                    )
+                else:
+                    return_message = chat_cache.post_process_messages_func(
+                        [t[1] for t in cache_answers]
+                    )
+                return return_message
+
+            return_message = time_cal(
+                post_process,
+                func_name="post_process",
+                report_func=chat_cache.report.post,
+            )()
             chat_cache.report.hint_cache()
             if session:
                 chat_cache.data_manager.add_session(
@@ -156,7 +177,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
     else:
-        llm_data = llm_handler(*args, **kwargs)
+        llm_data = time_cal(
+            llm_handler, func_name="llm_request", report_func=chat_cache.report.llm
+        )(*args, **kwargs)
 
     if cache_enable:
         try:
@@ -166,13 +189,23 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     question = pre_store_data
                 else:
                     question.content = pre_store_data
-                chat_cache.data_manager.save(
+                time_cal(
+                    chat_cache.data_manager.save,
+                    func_name="save",
+                    report_func=chat_cache.report.save,
+                )(
                     question,
                     handled_llm_data,
                     embedding_data,
                     extra_param=context.get("save_func", None),
                     session=session,
                 )
+                if (
+                    chat_cache.report.op_save.count > 0
+                    and chat_cache.report.op_save.count % chat_cache.config.auto_flush
+                    == 0
+                ):
+                    chat_cache.flush()
 
             llm_data = update_cache_callback(
                 llm_data, update_cache_func, *args, **kwargs
