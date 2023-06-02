@@ -336,18 +336,41 @@ $ docker run -p 8000:8000 -it zilliz/gptcache:latest
 GPTCache supports two ways of interaction with the server:
 
 - With command line:
-    ```shell
-    $ curl -X PUT -d "receive a hello message" "http://localhost:8000?prompt=hello"
-    $ curl -X GET  "http://localhost:8000?prompt=hello"
-    "receive a hello message"
-    ```
-- With python client:
-    ```python
-    >>> from gptcache import Client
 
-    >>> client = Client(uri="http://localhost:8000")
-    >>> client.put("Hi", "Hi back")
-    200
-    >>> client.get("Hi")
-    'Hi back'
-    ```
+put the data to cache
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8000/put' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "prompt": "Hi",
+  "answer": "Hi back"
+}'
+```
+
+get the data from the cache
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8000/get' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "prompt": "Hi"
+}'
+```
+
+
+- With python client:
+
+```python
+ >>> from gptcache.client import Client
+
+ >>> client = Client(uri="http://localhost:8000")
+ >>> client.put("Hi", "Hi back")
+ 200
+ >>> client.get("Hi")
+ 'Hi back'
+ ```

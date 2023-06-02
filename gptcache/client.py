@@ -1,10 +1,14 @@
 import asyncio
+import json
 
 from gptcache.utils import import_httpx
 
 import_httpx()
 
 import httpx  # pylint: disable=C0413
+
+
+_CLIENT_HEADER = {"Content-Type": "application/json", "Accept": "application/json"}
 
 
 class Client:
@@ -28,20 +32,28 @@ class Client:
 
     async def _put(self, question: str, answer: str):
         async with httpx.AsyncClient() as client:
-            headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            params = {"prompt": question}
-            data = answer
+            data = {
+                "prompt": question,
+                "answer": answer,
+            }
 
-            response = await client.put(self._uri, params=params, headers=headers, data=data)
+            response = await client.post(
+                f"{self._uri}/put", headers=_CLIENT_HEADER, data=json.dumps(data)
+            )
 
         return response.status_code
 
     async def _get(self, question: str):
         async with httpx.AsyncClient() as client:
-            params = {"prompt": question}
-            response = await client.get(self._uri, params=params)
+            data = {
+                "prompt": question,
+            }
 
-        return response.json()
+            response = await client.post(
+                f"{self._uri}/get", headers=_CLIENT_HEADER, data=json.dumps(data)
+            )
+
+        return response.json().get("answer")
 
     def put(self, question: str, answer: str):
         """
