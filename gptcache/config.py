@@ -19,6 +19,8 @@ class Config:
     :type auto_flush: int
     :param enable_token_counter: enable token counter, default to False
     :type enable_token_counter: bool
+    :param input_summary_len: optional, summarize input to specified length.
+    :type input_summary_len: Optional[int]
 
     Example:
         .. code-block:: python
@@ -36,6 +38,7 @@ class Config:
             template: Optional[str] = None,
             auto_flush: int = 20,
             enable_token_counter: bool = True,
+            input_summary_len: Optional[int] = None
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError(
@@ -47,3 +50,4 @@ class Config:
         self.template = template
         self.auto_flush = auto_flush
         self.enable_token_counter = enable_token_counter
+        self.input_summary_len = input_summary_len

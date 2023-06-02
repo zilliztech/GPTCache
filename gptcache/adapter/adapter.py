@@ -20,6 +20,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     context = kwargs.pop("cache_context", {})
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
+
     if 0 < temperature < 2:
         cache_skip_options = [True, False]
         prob_cache_skip = [0, 1]
@@ -52,6 +53,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     else:
         pre_store_data = pre_embedding_res
         pre_embedding_data = pre_embedding_res
+
+    if chat_cache.config.input_summary_len is not None:
+        pre_embedding_data = summarize_input(pre_embedding_data, chat_cache.config.input_summary_len)
 
     if cache_enable:
         embedding_data = time_cal(
@@ -213,3 +217,16 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         except Exception as e:  # pylint: disable=W0703
             gptcache_log.warning("failed to save the data to cache, error: %s", e)
     return llm_data
+
+
+input_summarizer = None
+
+def summarize_input(text, text_length):
+    # pylint: disable=import-outside-toplevel
+    from gptcache.processor.context.summarization_context import SummarizationContextProcess
+    global input_summarizer
+    if input_summarizer is None:
+        input_summarizer = SummarizationContextProcess()
+    summarization = input_summarizer.summarize_to_sentence([text], text_length)
+    return summarization
+
