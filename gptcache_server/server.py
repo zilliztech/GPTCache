@@ -1,4 +1,5 @@
 import argparse
+from typing import Optional
 
 from gptcache import cache
 from gptcache.adapter.api import (
@@ -22,7 +23,7 @@ app = FastAPI()
 
 class CacheData(BaseModel):
     prompt: str
-    answer: str = ""
+    answer: Optional[str] = ""
 
 
 @app.get("/")
