@@ -35,8 +35,9 @@ __all__ = [
     "import_docarray",
     "softmax",
     "import_paddle",
-    "import_paddlenlp"
-]
+    "import_paddlenlp",
+    "import_tiktoken",
+    ]
 
 import importlib.util
 from typing import Optional
@@ -230,3 +231,7 @@ def import_paddle():
 
 def import_paddlenlp():
     _check_library("paddlenlp")
+
+
+def import_tiktoken():
+    _check_library("tiktoken")

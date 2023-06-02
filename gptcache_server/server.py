@@ -2,13 +2,20 @@ import argparse
 import http.server
 import json
 
-from gptcache.adapter.api import get, put, init_similar_cache, init_similar_cache_from_config
+from gptcache import cache
+from gptcache.adapter.api import (
+    get,
+    put,
+    init_similar_cache,
+    init_similar_cache_from_config,
+)
 
 
 class GPTCacheHandler(http.server.BaseHTTPRequestHandler):
     """
     HTTPServer handler for GPTCache Service.
     """
+
     # curl -X GET  "http://localhost:8000?prompt=hello"
     def do_GET(self):
         params = self.path.split("?")[1]
@@ -34,6 +41,21 @@ class GPTCacheHandler(http.server.BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.end_headers()
+        self.wfile.write(bytes("successfully update the cache", "utf-8"))
+
+    # curl -X POST "http://localhost:8000?flush=true"
+    def do_POST(self):
+        params = self.path.split("?")[1]
+        flush = params.split("=")[1]
+        back_message = "currently only be used to flush the cache, like: example.com?flush=true"
+        if flush == "true":
+            cache.flush()
+            self.send_response(200)
+            back_message = "successfully flush the cache"
+        else:
+            self.send_response(404)
+        self.end_headers()
+        self.wfile.write(bytes(back_message, "utf-8"))
 
 
 def start_server(host: str, port: int):
@@ -44,10 +66,18 @@ def start_server(host: str, port: int):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--host", default="localhost", help="the hostname to listen on")
-    parser.add_argument("-p", "--port", type=int, default=8000, help="the port to listen on")
-    parser.add_argument("-d", "--cache-dir", default="gptcache_data", help="the cache data dir")
-    parser.add_argument("-f", "--cache-config-file", default=None, help="the cache config file")
+    parser.add_argument(
+        "-s", "--host", default="localhost", help="the hostname to listen on"
+    )
+    parser.add_argument(
+        "-p", "--port", type=int, default=8000, help="the port to listen on"
+    )
+    parser.add_argument(
+        "-d", "--cache-dir", default="gptcache_data", help="the cache data dir"
+    )
+    parser.add_argument(
+        "-f", "--cache-config-file", default=None, help="the cache config file"
+    )
 
     args = parser.parse_args()
 

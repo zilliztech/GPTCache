@@ -17,6 +17,7 @@ from gptcache.embedding import (
     Cohere,
     Rwkv,
     PaddleNLP,
+    UForm,
 )
 from gptcache.embedding.base import BaseEmbedding
 from gptcache.manager import manager_factory
@@ -276,6 +277,8 @@ def _get_model(model_src, model_config=None):
         return Rwkv(**model_config)
     if model_src == "paddlenlp":
         return PaddleNLP(**model_config)
+    if model_src == "uform":
+        return UForm(**model_config)
 
 
 def _get_eval(strategy, kws=None):

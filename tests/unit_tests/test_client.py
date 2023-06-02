@@ -1,5 +1,7 @@
-from gptcache import Client
 from unittest.mock import patch, Mock
+
+from gptcache.client import Client
+
 
 def test_client():
     client = Client()
