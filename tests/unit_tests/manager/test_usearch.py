@@ -1,7 +1,8 @@
 import unittest
+
 import numpy as np
 
-from gptcache.manager.vector_data.usearch import USearch
+from gptcache.manager.vector_data import VectorBase
 from gptcache.manager.vector_data.base import VectorData
 
 
@@ -11,7 +12,8 @@ class TestUSearchDB(unittest.TestCase):
         dim = 512
         top_k = 10
 
-        db = USearch(
+        db = VectorBase(
+            "usearch",
             index_file_path='./index.usearch',
             dimension=dim,
             top_k=top_k,
