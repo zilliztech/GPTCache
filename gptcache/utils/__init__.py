@@ -37,6 +37,7 @@ __all__ = [
     "import_paddle",
     "import_paddlenlp",
     "import_tiktoken",
+    "import_fastapi",
     ]
 
 import importlib.util
@@ -235,3 +236,8 @@ def import_paddlenlp():
 
 def import_tiktoken():
     _check_library("tiktoken")
+
+
+def import_fastapi():
+    _check_library("uvicorn", package="'uvicorn[standard]'")
+    _check_library("fastapi")
