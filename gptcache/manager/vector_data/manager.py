@@ -16,11 +16,8 @@ MILVUS_INDEX_PARAMS = {
     "params": {"M": 8, "efConstruction": 64},
 }
 
-PGVECTOR_URL="postgresql://postgres:postgres@localhost:5432/postgres"
-PGVECTOR_INDEX_PARAMS = {
-    "index_type": "L2",
-    "params": {"lists": 100, "probes": 10}
-}
+PGVECTOR_URL = "postgresql://postgres:postgres@localhost:5432/postgres"
+PGVECTOR_INDEX_PARAMS = {"index_type": "L2", "params": {"lists": 100, "probes": 10}}
 
 COLLECTION_NAME = "gptcache"
 
@@ -169,6 +166,7 @@ class VectorBase:
             )
         elif name == "pgvector":
             from gptcache.manager.vector_data.pgvector import PGVector
+
             dimension = kwargs.get("dimension", DIMENSION)
             url = kwargs.get("url", PGVECTOR_URL)
             collection_name = kwargs.get("collection_name", COLLECTION_NAME)
@@ -178,13 +176,27 @@ class VectorBase:
                 top_k=top_k,
                 url=url,
                 collection_name=collection_name,
-                index_params=index_params
+                index_params=index_params,
             )
         elif name == "docarray":
             from gptcache.manager.vector_data.docarray_index import DocArrayIndex
 
             index_path = kwargs.pop("index_path", "./docarray_index.bin")
             vector_base = DocArrayIndex(index_file_path=index_path, top_k=top_k)
+        elif name == "usearch":
+            from gptcache.manager.vector_data.usearch import USearch
+
+            dimension = kwargs.get("dimension", DIMENSION)
+            index_path = kwargs.pop("index_path", "./index.usearch")
+            metric = kwargs.get("metric", "cos")
+            dtype = kwargs.get("dtype", "f32")
+            vector_base = USearch(
+                index_file_path=index_path,
+                dimension=dimension,
+                top_k=top_k,
+                metric=metric,
+                dtype=dtype,
+            )
         else:
             raise NotFoundError("vector store", name)
         return vector_base

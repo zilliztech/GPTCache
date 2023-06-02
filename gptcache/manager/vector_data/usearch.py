@@ -7,6 +7,7 @@ from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils import import_usearch
 
 import_usearch()
+
 from usearch.index import Index  # pylint: disable=C0413
 
 
@@ -33,11 +34,11 @@ class USearch(VectorBase):
 
     def __init__(
         self,
-        index_file_path: str = 'index.usearch',
+        index_file_path: str = "index.usearch",
         dimension: int = 64,
         top_k: int = 1,
-        metric: str = 'cos',
-        dtype: str = 'f32',
+        metric: str = "cos",
+        dtype: str = "f32",
         connectivity: int = 16,
         expansion_add: int = 128,
         expansion_search: int = 64,
@@ -57,16 +58,15 @@ class USearch(VectorBase):
             self._index.load(self._index_file_path)
 
     def mul_add(self, datas: List[VectorData]):
-        data_array, id_array = map(
-            list, zip(*((data.data, data.id) for data in datas)))
-        np_data = np.array(data_array).astype('float32')
+        data_array, id_array = map(list, zip(*((data.data, data.id) for data in datas)))
+        np_data = np.array(data_array).astype("float32")
         ids = np.array(id_array, dtype=np.longlong)
         self._index.add(ids, np_data)
 
     def search(self, data: np.ndarray, top_k: int = -1):
         if top_k == -1:
             top_k = self._top_k
-        np_data = np.array(data).astype('float32').reshape(1, -1)
+        np_data = np.array(data).astype("float32").reshape(1, -1)
         ids, dist, _ = self._index.search(np_data, top_k)
         return list(zip(dist[0], ids[0]))
 

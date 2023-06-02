@@ -5,6 +5,20 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.29 (2023.6.2)
+
+1. Improve the GPTCache server by using FASTAPI
+
+**NOTE**: The api struct has been optimized, details: [Use GPTCache server](https://github.com/zilliztech/GPTCache/blob/dev/docs/usage.md#use-gptcache-server)
+
+2. Add the usearch vector store
+
+```python
+from gptcache.manager import manager_factory
+
+data_manager = manager_factory("sqlite,usearch", vector_params={"dimension": 10})
+```
+
 ## v0.1.28 (2023.5.29)
 To handle a large prompt, there are currently two options available:
 
