@@ -103,7 +103,7 @@ class LangChainChat(BaseChatModel, BaseModel):
 
     async def _agenerate(self, messages: List[List[BaseMessage]], stop: Optional[List[str]] = None, **kwargs) -> LLMResult:
         session = self.session if "session" not in kwargs else kwargs.pop("session")
-        return adapt(
+        return await adapt(
             self.chat._agenerate,
             _cache_msg_data_convert,
             _update_cache_msg_callback,
