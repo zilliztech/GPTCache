@@ -18,6 +18,7 @@ def run():
         'milvus',
         'chromadb',
         'docarray',
+        'redis'
     ]
     for vector_store in vector_stores:
         cache_base = CacheBase('sqlite')
