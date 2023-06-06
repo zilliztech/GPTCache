@@ -24,7 +24,8 @@ class RedisVectorStore(VectorBase):
         top_k: int = 1,
         doc_prefix: str = "doc",
     ):
-        self._client = redis.Redis(host=host, port=port)
+        r = redis.Redis(host=host, port=port)
+        self._client = r
         self.top_k = top_k
         self.dimension = dimension
         self.doc_prefix = doc_prefix
@@ -70,7 +71,11 @@ class RedisVectorStore(VectorBase):
             )
 
     def mul_add(self, datas: List[VectorData]):
-        pass
+        pipe = self._client.pipeline()
+
+        for data in datas:
+            key: int = data.id
+            pipe.hset(key, mapping=data.data)
 
     def search(self, data: np.ndarray, top_k: int):
         query = (
@@ -81,11 +86,12 @@ class RedisVectorStore(VectorBase):
             .dialect(2)
         )
         query_params = {"vec": np.random.rand(self.dimension).astype(np.float32).tobytes()}
-        results = self._client.ft(self.collection_name).search(query, query_params).docs
+        results = self._client.search(query, query_params).docs
         return [(result.score, result.id) for result in results]
 
     def rebuild(self, ids=None) -> bool:
         pass
 
-    def delete(self, ids) -> bool:
-        pass
+    def delete(self, ids) -> None:
+        for id in ids:
+            self._client.delete_document(id)
