@@ -22,13 +22,11 @@ class RedisVectorStore(VectorBase):
         dimension: int = 0,
         collection_name: str = "gptcache",
         top_k: int = 1,
-        doc_prefix: str = "doc",
     ):
         r = redis.Redis(host=host, port=port)
         self._client = r
         self.top_k = top_k
         self.dimension = dimension
-        self.doc_prefix = doc_prefix
         self.collection_name = collection_name
 
         self._create_collection(collection_name)
