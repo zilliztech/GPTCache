@@ -55,7 +55,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         pre_embedding_data = pre_embedding_res
 
     if chat_cache.config.input_summary_len is not None:
-        pre_embedding_data = summarize_input(pre_embedding_data, chat_cache.config.input_summary_len)
+        pre_embedding_data = _summarize_input(pre_embedding_data, chat_cache.config.input_summary_len)
 
     if cache_enable:
         embedding_data = time_cal(
@@ -219,14 +219,18 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     return llm_data
 
 
-input_summarizer = None
+_input_summarizer = None
 
-def summarize_input(text, text_length):
+
+def _summarize_input(text, text_length):
+    if len(text) <= text_length:
+        return text
+
     # pylint: disable=import-outside-toplevel
     from gptcache.processor.context.summarization_context import SummarizationContextProcess
-    global input_summarizer
-    if input_summarizer is None:
-        input_summarizer = SummarizationContextProcess()
-    summarization = input_summarizer.summarize_to_sentence([text], text_length)
+    global _input_summarizer
+    if _input_summarizer is None:
+        _input_summarizer = SummarizationContextProcess()
+    summarization = _input_summarizer.summarize_to_sentence([text], text_length)
     return summarization
 
