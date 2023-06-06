@@ -9,6 +9,7 @@ from gptcache.utils import import_usearch
 import_usearch()
 
 from usearch.index import Index  # pylint: disable=C0413
+from usearch.compiled import MetricKind  # pylint: disable=C0413
 
 
 class USearch(VectorBase):
@@ -48,7 +49,7 @@ class USearch(VectorBase):
         self._top_k = top_k
         self._index = Index(
             ndim=self._dimension,
-            metric=metric,
+            metric=getattr(MetricKind, metric.lower().capitalize()),
             dtype=dtype,
             connectivity=connectivity,
             expansion_add=expansion_add,
