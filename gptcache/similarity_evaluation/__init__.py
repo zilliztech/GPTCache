@@ -7,6 +7,7 @@ __all__ = [
     "SearchDistanceEvaluation",
     "ExactMatchEvaluation",
     "KReciprocalEvaluation",
+    "CohereRerankEvaluation",
 ]
 
 from gptcache.utils.lazy_import import LazyImport
@@ -19,6 +20,9 @@ exact_match = LazyImport(
 )
 kreciprocal = LazyImport(
     "kreciprocal", globals(), "gptcache.similarity_evaluation.kreciprocal"
+)
+cohere = LazyImport(
+    "cohere", globals(), "gptcache.similarity_evaluation.cohere_rerank"
 )
 
 
@@ -40,3 +44,7 @@ def ExactMatchEvaluation():
 
 def KReciprocalEvaluation(vectordb, top_k=3, max_distance=4.0, positive=False):
     return kreciprocal.KReciprocalEvaluation(vectordb, top_k, max_distance, positive)
+
+
+def CohereRerankEvaluation(model: str = "rerank-english-v2.0", api_key: str = None):
+    return cohere.CohereRerank(model=model, api_key=api_key)
