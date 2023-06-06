@@ -1,4 +1,6 @@
 import argparse
+import os
+import zipfile
 from typing import Optional
 
 from gptcache import cache
@@ -13,12 +15,16 @@ from gptcache.utils import import_fastapi, import_pydantic
 import_fastapi()
 import_pydantic()
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 import uvicorn
 from pydantic import BaseModel
 
 
 app = FastAPI()
+
+cache_dir = ""
+cache_file_key = ""
 
 
 class CacheData(BaseModel):
@@ -49,6 +55,30 @@ async def get_cache() -> str:
     return "successfully flush the cache"
 
 
+@app.get("/cache_file")
+async def get_cache_file(key: str = "") -> FileResponse:
+    global cache_dir
+    global cache_file_key
+    if cache_dir == "":
+        raise HTTPException(
+            status_code=403,
+            detail="the cache_dir was not specified when the service was initialized",
+        )
+    if cache_file_key == "":
+        raise HTTPException(
+            status_code=403,
+            detail="the cache file can't be downloaded because the cache-file-key was not specified",
+        )
+    if cache_file_key != key:
+        raise HTTPException(status_code=403, detail="the cache file key is wrong")
+    zip_filename = cache_dir + ".zip"
+    with zipfile.ZipFile(zip_filename, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(cache_dir):
+            for file in files:
+                zipf.write(os.path.join(root, file))
+    return FileResponse(zip_filename)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -60,16 +90,22 @@ def main():
     parser.add_argument(
         "-d", "--cache-dir", default="gptcache_data", help="the cache data dir"
     )
+    parser.add_argument("-k", "--cache-file-key", default="", help="the cache file key")
     parser.add_argument(
         "-f", "--cache-config-file", default=None, help="the cache config file"
     )
 
     args = parser.parse_args()
+    global cache_dir
+    global cache_file_key
 
     if args.cache_config_file:
-        init_similar_cache_from_config(config_dir=args.cache_config_file)
+        init_conf = init_similar_cache_from_config(config_dir=args.cache_config_file)
+        cache_dir = init_conf.get("storage_config", {}).get("data_dir", "")
     else:
         init_similar_cache(args.cache_dir)
+        cache_dir = args.cache_dir
+    cache_file_key = args.cache_file_key
 
     uvicorn.run(app, host=args.host, port=args.port)
 

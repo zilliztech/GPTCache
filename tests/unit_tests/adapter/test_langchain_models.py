@@ -30,6 +30,7 @@ def test_langchain_llms():
     os.environ["OPENAI_API_KEY"] = "API"
     langchain_openai = OpenAI(model_name="text-ada-001")
     llm = LangChainLLMs(llm=langchain_openai)
+    assert str(langchain_openai) == str(llm)
 
     with patch("openai.Completion.create") as mock_create:
         mock_create.return_value = {
@@ -79,6 +80,10 @@ def test_langchain_chats():
     os.environ["OPENAI_API_KEY"] = "API"
     langchain_openai = ChatOpenAI(temperature=0)
     chat = LangChainChat(chat=langchain_openai)
+
+    assert chat.get_num_tokens("hello") == langchain_openai.get_num_tokens("hello")
+    assert chat.get_num_tokens_from_messages(messages=[HumanMessage(content="test_langchain_chats")]) \
+           == langchain_openai.get_num_tokens_from_messages(messages=[HumanMessage(content="test_langchain_chats")])
 
     with patch("openai.ChatCompletion.create") as mock_create:
         mock_create.return_value = {

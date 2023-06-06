@@ -250,6 +250,8 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
         config=config,
     )
 
+    return init_conf
+
 
 def _get_model(model_src, model_config=None):
     model_src = model_src.lower()

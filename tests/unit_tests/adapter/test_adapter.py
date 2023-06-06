@@ -1,14 +1,16 @@
 import os
+import random
 import time
+
 import numpy
 
-from gptcache.manager import get_data_manager, manager_factory
-from gptcache.utils.error import NotInitError
-from gptcache.adapter.adapter import adapt, summarize_input
+from gptcache import cache, Cache, Config
+from gptcache.adapter.adapter import adapt
 from gptcache.adapter.api import put, get
-from gptcache.processor.pre import get_prompt
+from gptcache.manager import get_data_manager, manager_factory
 from gptcache.processor.post import first, nop
-from gptcache import cache, Cache
+from gptcache.processor.pre import get_prompt
+from gptcache.utils.error import NotInitError
 from gptcache.utils.time import time_cal
 
 data_map_path = "data_map.txt"
@@ -63,7 +65,7 @@ def test_adapt():
         pre_embedding_func=pre_embedding,
         embedding_func=delay_embedding,
         data_manager=map_manager,
-        post_process_messages_func=first
+        post_process_messages_func=first,
     )
 
     def report_func(delta_time):
@@ -128,13 +130,15 @@ def test_cache_temperature():
         os.remove("faiss.index")
     if os.path.exists("sqlite.db"):
         os.remove("sqlite.db")
-    data_manager = manager_factory("sqlite,faiss", vector_params={"dimension": 3, "top_k": 2})
+    data_manager = manager_factory(
+        "sqlite,faiss", vector_params={"dimension": 3, "top_k": 2}
+    )
     cache.init(
         pre_embedding_func=get_prompt,
         embedding_func=lambda x, **_: numpy.ones((3,)).astype("float32"),
         data_manager=data_manager,
-        post_process_messages_func=nop
-        )
+        post_process_messages_func=nop,
+    )
     assert cache.data_manager.v._top_k == 2
     prompt = "test"
     answer = "test answer"
@@ -156,10 +160,32 @@ def test_cache_temperature():
     answers = get(prompt=prompt)
     assert len(answers) == 2
 
-def test_input_summarization():
-    text = "A large language model (LLM) is a language model consisting of a neural network with many parameters (typically billions of weights or more), trained on large quantities of unlabeled text using self-supervised learning or semi-supervised learning. LLMs emerged around 2018 and perform well at a wide variety of tasks. This has shifted the focus of natural language processing research away from the previous paradigm of training specialized supervised models for specific tasks."
-    summary = summarize_input(text, 40)
-    assert len(summary.split()) < 40
 
-if __name__ == "__main__":
-    test_cache_temperature()
+def test_input_summarization():
+    cache_obj = Cache()
+
+    def embedding_func(x, **_):
+        assert len(x.split()) < 40
+        return x
+
+    cache_obj.init(
+        pre_func=lambda x, **_: x.get("text"),
+        embedding_func=embedding_func,
+        data_manager=manager_factory(data_dir=str(random.random())),
+        config=Config(input_summary_len=40),
+    )
+    adapt(
+        lambda **_: 0,
+        lambda **_: 0,
+        lambda **_: 0,
+        text="A large language model (LLM) is a language model consisting of a neural network with many parameters (typically billions of weights or more), trained on large quantities of unlabeled text using self-supervised learning or semi-supervised learning. LLMs emerged around 2018 and perform well at a wide variety of tasks. This has shifted the focus of natural language processing research away from the previous paradigm of training specialized supervised models for specific tasks.",
+        cache_obj=cache_obj,
+    )
+
+    adapt(
+        lambda **_: 0,
+        lambda **_: 0,
+        lambda **_: 0,
+        text="A large language model (LLM)",
+        cache_obj=cache_obj,
+    )
