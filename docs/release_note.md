@@ -5,6 +5,27 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.30 (2023.6.7)
+
+1. Support to use the cohere rerank api to evaluate the similarity
+
+```python
+from gptcache.similarity_evaluation import CohereRerankEvaluation
+
+evaluation = CohereRerankEvaluation()
+score = evaluation.evaluation(
+    {
+        'question': 'What is the color of sky?'
+    },
+    {
+        'answer': 'the color of sky is blue'
+    }
+)
+```
+
+2. Improve the gptcache server api, refer to the "/docs" path after starting the server
+3. Fix the bug about the langchain track token usage
+
 ## v0.1.29 (2023.6.2)
 
 1. Improve the GPTCache server by using FASTAPI

@@ -21,7 +21,7 @@ class CohereRerank(SimilarityEvaluation):
     Example:
         .. code-block:: python
 
-            from gptcache.similarity_evaluation import CohereRerank
+            from gptcache.similarity_evaluation import CohereRerankEvaluation
 
             evaluation = CohereRerank()
             score = evaluation.evaluation(
