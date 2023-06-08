@@ -38,7 +38,8 @@ class Config:
             template: Optional[str] = None,
             auto_flush: int = 20,
             enable_token_counter: bool = True,
-            input_summary_len: Optional[int] = None
+            input_summary_len: Optional[int] = None,
+            context_len: Optional[int] = None
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError(
@@ -51,3 +52,4 @@ class Config:
         self.auto_flush = auto_flush
         self.enable_token_counter = enable_token_counter
         self.input_summary_len = input_summary_len
+        self.context_len = context_len
