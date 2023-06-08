@@ -349,3 +349,37 @@ def get_openai_moderation_input(data: Dict[str, Any], **_: Dict[str, Any]) -> st
     """
 
     return str(data.get("input"))
+
+
+def concat_all_queries(data: Dict[str, Any], **params: Dict[str, Any]) -> Any:
+    """
+
+    :param data: the user llm request data
+    :type data: Dict[str, Any]
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.processor.pre import concat_all_queries
+
+            content = concat_all_queries({"messages": [{"role": "system", "content": "hello"},
+                {"role": "user", "content": "world"},
+                {"role": "assistant", "content": "alice"}]})
+
+    """
+    cache_config = params.get("cache_config", None)
+    skip_list = cache_config.skip_list
+    context_len = cache_config.context_len
+    context_len = context_len * 2
+    s = ""
+    messages = data.get("messages")
+    length = min(context_len, len(messages))
+    messages = messages[len(messages) - length:]
+    for i, message in enumerate(messages):
+        if message["role"] in skip_list:
+            continue
+        if i == len(messages) - 1:
+            s += f'{message["role"].upper()}: "{message["content"]}"'
+        else:
+            s += f'{message["role"].upper()}: "{message["content"]}"\n'
+    return s

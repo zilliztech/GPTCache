@@ -37,6 +37,7 @@ from gptcache.similarity_evaluation import (
     KReciprocalEvaluation,
     SimilarityEvaluation,
     CohereRerankEvaluation,
+    SequenceMatchEvaluation
 )
 from gptcache.utils import import_ruamel
 
@@ -300,6 +301,8 @@ def _get_eval(strategy, kws=None):
         return KReciprocalEvaluation(**kws)
     if "cohere" in strategy:
         return CohereRerankEvaluation(**kws)
+    if "sequence_match" in strategy:
+        return SequenceMatchEvaluation(**kws)
 
 
 def _get_pre_func(pre_process):
