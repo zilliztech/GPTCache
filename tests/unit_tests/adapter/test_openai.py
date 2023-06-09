@@ -417,12 +417,33 @@ def test_base_llm_cache():
         }
         mock_create.return_value = datas
 
+        import openai as real_openai
+
+        def proxy_openai_chat_complete_exception(*args, **kwargs):
+            raise real_openai.error.APIConnectionError("connect fail")
+
+        openai.ChatCompletion.llm = proxy_openai_chat_complete_exception
+
+        is_openai_exception = False
+        try:
+            openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": question},
+                ],
+                cache_obj=cache_obj,
+            )
+        except real_openai.error.APIConnectionError:
+            is_openai_exception = True
+
+        assert is_openai_exception
+
         is_proxy = False
 
         def proxy_openai_chat_complete(*args, **kwargs):
             nonlocal is_proxy
             is_proxy = True
-            import openai as real_openai
             return real_openai.ChatCompletion.create(*args, **kwargs)
 
         openai.ChatCompletion.llm = proxy_openai_chat_complete

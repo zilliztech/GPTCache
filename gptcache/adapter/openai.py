@@ -10,7 +10,7 @@ from gptcache.adapter.adapter import adapt
 from gptcache.adapter.base import BaseCacheLLM
 from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.utils import import_openai, import_pillow
-from gptcache.utils.error import CacheError
+from gptcache.utils.error import wrap_error
 from gptcache.utils.response import (
     get_stream_message_from_openai_answer,
     get_message_from_openai_answer,
@@ -57,8 +57,8 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
             return super().create(*llm_args, **llm_kwargs) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
-        except openai.error.OpenAIError as e:
-            raise CacheError("openai error") from e
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
 
     @staticmethod
     def _update_cache_callback(
@@ -127,7 +127,10 @@ class Completion(openai.Completion, BaseCacheLLM):
 
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
-        return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
+        try:
+            return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
 
     @staticmethod
     def _cache_data_convert(cache_data):
@@ -178,9 +181,9 @@ class Audio(openai.Audio):
     def transcribe(cls, model: str, file: Any, *args, **kwargs):
         def llm_handler(*llm_args, **llm_kwargs):
             try:
-                return openai.Audio.transcribe(*llm_args, **llm_kwargs)
-            except Exception as e:
-                raise CacheError("openai error") from e
+                return super(Audio, cls).transcribe(*llm_args, **llm_kwargs)
+            except openai.OpenAIError as e:
+                raise wrap_error(e) from e
 
         def cache_data_convert(cache_data):
             return _construct_audio_text_from_cache(cache_data)
@@ -207,9 +210,9 @@ class Audio(openai.Audio):
     def translate(cls, model: str, file: Any, *args, **kwargs):
         def llm_handler(*llm_args, **llm_kwargs):
             try:
-                return openai.Audio.translate(*llm_args, **llm_kwargs)
-            except Exception as e:
-                raise CacheError("openai error") from e
+                return super(Audio, cls).translate(*llm_args, **llm_kwargs)
+            except openai.OpenAIError as e:
+                raise wrap_error(e) from e
 
         def cache_data_convert(cache_data):
             return _construct_audio_text_from_cache(cache_data)
@@ -256,15 +259,16 @@ class Image(openai.Image):
     """
 
     @classmethod
+    def _llm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return super().create(*llm_args, **llm_kwargs)
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
+
+    @classmethod
     def create(cls, *args, **kwargs):
         response_format = kwargs.pop("response_format", "url")
         size = kwargs.pop("size", "256x256")
-
-        def llm_handler(*llm_args, **llm_kwargs):
-            try:
-                return openai.Image.create(*llm_args, **llm_kwargs)
-            except Exception as e:
-                raise CacheError("openai error") from e
 
         def cache_data_convert(cache_data):
             return _construct_image_create_resp_from_cache(
@@ -286,7 +290,7 @@ class Image(openai.Image):
             return llm_data
 
         return adapt(
-            llm_handler,
+            cls._llm_handler,
             cache_data_convert,
             update_cache_callback,
             response_format=response_format,
@@ -316,8 +320,8 @@ class Moderation(openai.Moderation, BaseCacheLLM):
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
             return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
-        except openai.error.OpenAIError as e:
-            raise CacheError("openai error") from e
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
 
     @classmethod
     def _cache_data_convert(cls, cache_data):
