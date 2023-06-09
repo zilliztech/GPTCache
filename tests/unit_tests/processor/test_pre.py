@@ -4,8 +4,10 @@ from gptcache.processor.pre import (
     nop,
     last_content_without_prompt,
     get_prompt, get_openai_moderation_input,
+    concat_all_queries
 )
 
+from gptcache.config import Config
 
 def test_last_content():
     content = last_content({"messages": [{"content": "foo1"}, {"content": "foo2"}]})
@@ -54,3 +56,18 @@ def test_get_openai_moderation_input():
 def test_get_messages_last_content():
     content = last_content({"messages": [{"content": "foo1"}, {"content": "foo2"}]})
     assert content == "foo2"
+
+def test_concat_all_queries():
+    config = Config()
+    config.context_len = 2
+    content = concat_all_queries({"messages":[{"role": "system",   "content": "foo1"}, 
+                                        {"role": "user",     "content": "foo2"}, 
+                                        {"role": "assistant","content": "foo3"}, 
+                                        {"role": "user",     "content": "foo4"}, 
+                                        {"role": "assistant","content": "foo5"},
+                                        {"role": "user",     "content": "foo6"}]}, **{'cache_config':config})
+    assert content == 'USER: "foo4"\nUSER: "foo6"'
+
+    
+if __name__  == '__main__':   
+    test_concat_all_queries()

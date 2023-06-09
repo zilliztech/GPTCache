@@ -8,6 +8,7 @@ __all__ = [
     "ExactMatchEvaluation",
     "KReciprocalEvaluation",
     "CohereRerankEvaluation",
+    "SequenceMatchEvaluation"
 ]
 
 from gptcache.utils.lazy_import import LazyImport
@@ -24,7 +25,9 @@ kreciprocal = LazyImport(
 cohere = LazyImport(
     "cohere", globals(), "gptcache.similarity_evaluation.cohere_rerank"
 )
-
+sequence_match = LazyImport(
+    "sequence_match", globals(), "gptcache.similarity_evaluation.sequence_match"
+)
 
 def OnnxModelEvaluation(model="GPTCache/albert-duplicate-onnx"):
     return onnx.OnnxModelEvaluation(model)
@@ -48,3 +51,7 @@ def KReciprocalEvaluation(vectordb, top_k=3, max_distance=4.0, positive=False):
 
 def CohereRerankEvaluation(model: str = "rerank-english-v2.0", api_key: str = None):
     return cohere.CohereRerank(model=model, api_key=api_key)
+
+def SequenceMatchEvaluation(weights, embedding_extractor, **config):
+    return sequence_match.SequenceMatchEvaluation(weights, embedding_extractor, **config)
+
