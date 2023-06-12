@@ -379,7 +379,7 @@ def concat_all_queries(data: Dict[str, Any], **params: Dict[str, Any]) -> Any:
         if message["role"] in skip_list:
             continue
         if i == len(messages) - 1:
-            s += f'{message["role"].upper()}: "{message["content"]}"'
+            s += f'{message["role"].upper()}: {message["content"]}'
         else:
-            s += f'{message["role"].upper()}: "{message["content"]}"\n'
+            s += f'{message["role"].upper()}: {message["content"]}\n'
     return s
