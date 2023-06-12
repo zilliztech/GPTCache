@@ -236,7 +236,7 @@ class SQLStorage(CacheStorage):
         with self.Session() as session:
             qs = (
                 session.query(
-                    self._ques.id, self._ques.question, self._ques.embedding_data
+                    self._ques
                 )
                 .filter(self._ques.id == key)
                 .filter(self._ques.deleted == 0)
@@ -244,6 +244,8 @@ class SQLStorage(CacheStorage):
             )
             if qs is None:
                 return None
+            last_access = qs.last_access
+            qs.last_access = datetime.now()
             ans = (
                 session.query(self._answer.answer, self._answer.answer_type)
                 .filter(self._answer.question_id == qs.id)
@@ -268,11 +270,15 @@ class SQLStorage(CacheStorage):
                 QuestionDep(item.dep_name, item.dep_data, item.dep_type)
                 for item in deps
             ]
+            session.commit()
+
             return CacheData(
-                question=qs[1] if not deps else Question(qs[1], res_deps),
+                question=qs.question if not deps else Question(qs.question, res_deps),
                 answers=res_ans,
-                embedding_data=np.frombuffer(qs[2], dtype=np.float32),
+                embedding_data=np.frombuffer(qs.embedding_data, dtype=np.float32),
                 session_id=session_ids,
+                create_on=qs.create_on,
+                last_access=last_access,
             )
 
     def get_ids(self, deleted=True):
