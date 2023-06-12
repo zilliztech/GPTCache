@@ -66,7 +66,7 @@ def test_concat_all_queries():
                                         {"role": "user",     "content": "foo4"}, 
                                         {"role": "assistant","content": "foo5"},
                                         {"role": "user",     "content": "foo6"}]}, **{'cache_config':config})
-    assert content == 'USER: "foo4"\nUSER: "foo6"'
+    assert content == 'USER: foo4\nUSER: foo6'
 
     
 if __name__  == '__main__':   
