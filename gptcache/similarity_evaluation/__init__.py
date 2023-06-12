@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from gptcache.similarity_evaluation.similarity_evaluation import SimilarityEvaluation
 
 __all__ = [
@@ -8,7 +10,8 @@ __all__ = [
     "ExactMatchEvaluation",
     "KReciprocalEvaluation",
     "CohereRerankEvaluation",
-    "SequenceMatchEvaluation"
+    "SequenceMatchEvaluation",
+    "TimeEvaluation",
 ]
 
 from gptcache.utils.lazy_import import LazyImport
@@ -28,6 +31,10 @@ cohere = LazyImport(
 sequence_match = LazyImport(
     "sequence_match", globals(), "gptcache.similarity_evaluation.sequence_match"
 )
+time = LazyImport(
+    "time", globals(), "gptcache.similarity_evaluation.time"
+)
+
 
 def OnnxModelEvaluation(model="GPTCache/albert-duplicate-onnx"):
     return onnx.OnnxModelEvaluation(model)
@@ -52,6 +59,10 @@ def KReciprocalEvaluation(vectordb, top_k=3, max_distance=4.0, positive=False):
 def CohereRerankEvaluation(model: str = "rerank-english-v2.0", api_key: str = None):
     return cohere.CohereRerank(model=model, api_key=api_key)
 
+
 def SequenceMatchEvaluation(weights, embedding_extractor, **config):
     return sequence_match.SequenceMatchEvaluation(weights, embedding_extractor, **config)
 
+
+def TimeEvaluation(evaluation: str, evaluation_config: Dict[str, Any], time_range: float = 86400.0):
+    return time.TimeEvaluation(evaluation, evaluation_config=evaluation_config, time_range=time_range)

@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
+from datetime import datetime
 from enum import IntEnum
 from typing import Optional, Any, List, Union, Dict
 
@@ -36,11 +37,7 @@ class QuestionDep:
 
     @classmethod
     def from_dict(cls, d: Dict):
-        return cls(
-            name=d["name"],
-            data=d["data"],
-            dep_type=d["dep_type"]
-        )
+        return cls(name=d["name"], data=d["data"], dep_type=d["dep_type"])
 
 
 @dataclass
@@ -70,8 +67,12 @@ class CacheData:
     answers: List[Answer]
     embedding_data: Optional[np.ndarray] = None
     session_id: Optional[str] = None
+    create_on: Optional[datetime] = None
+    last_access: Optional[datetime] = None
 
-    def __init__(self, question, answers, embedding_data=None, session_id=None):
+    def __init__(
+        self, question, answers, embedding_data=None, session_id=None, create_on=None, last_access=None
+    ):
         self.question = question
         self.answers = []
         if isinstance(answers, (str, Answer)):
@@ -85,6 +86,8 @@ class CacheData:
                 self.answers.append(Answer(answer=data))
         self.embedding_data = embedding_data
         self.session_id = session_id
+        self.create_on = create_on
+        self.last_access = last_access
 
 
 class CacheStorage(metaclass=ABCMeta):

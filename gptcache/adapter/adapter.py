@@ -64,7 +64,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             report_func=chat_cache.report.embedding,
         )(pre_embedding_data, extra_param=context.get("embedding_func", None))
     if cache_enable and not cache_skip:
-        cache_data_list = time_cal(
+        search_data_list = time_cal(
             chat_cache.data_manager.search,
             func_name="search",
             report_func=chat_cache.report.search,
@@ -75,8 +75,8 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             if (user_temperature and not user_top_k)
             else kwargs.pop("top_k", -1),
         )
-        if cache_data_list is None:
-            cache_data_list = []
+        if search_data_list is None:
+            search_data_list = []
         cache_answers = []
         similarity_threshold = chat_cache.config.similarity_threshold
         min_rank, max_rank = chat_cache.similarity_evaluation.range()
@@ -88,28 +88,29 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             if rank_threshold < min_rank
             else rank_threshold
         )
-        for cache_data in cache_data_list:
-            ret = time_cal(
+        for search_data in search_data_list:
+            cache_data = time_cal(
                 chat_cache.data_manager.get_scalar_data,
                 func_name="get_data",
                 report_func=chat_cache.report.data,
             )(
-                cache_data,
+                search_data,
                 extra_param=context.get("get_scalar_data", None),
                 session=session,
             )
-            if ret is None:
+            if cache_data is None:
                 continue
 
-            if "deps" in context and hasattr(ret.question, "deps"):
+            if "deps" in context and hasattr(cache_data.question, "deps"):
                 eval_query_data = {
                     "question": context["deps"][0]["data"],
                     "embedding": None,
                 }
                 eval_cache_data = {
-                    "question": ret.question.deps[0].data,
-                    "answer": ret.answers[0].answer,
-                    "search_result": cache_data,
+                    "question": cache_data.question.deps[0].data,
+                    "answer": cache_data.answers[0].answer,
+                    "search_result": search_data,
+                    "cache_data": cache_data,
                     "embedding": None,
                 }
             else:
@@ -119,10 +120,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 }
 
                 eval_cache_data = {
-                    "question": ret.question,
-                    "answer": ret.answers[0].answer,
-                    "search_result": cache_data,
-                    "embedding": ret.embedding_data,
+                    "question": cache_data.question,
+                    "answer": cache_data.answers[0].answer,
+                    "search_result": search_data,
+                    "cache_data": cache_data,
+                    "embedding": cache_data.embedding_data,
                 }
             rank = time_cal(
                 chat_cache.similarity_evaluation.evaluation,
@@ -136,12 +138,12 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             gptcache_log.debug(
                 "similarity: [user question] %s, [cache question] %s, [value] %f",
                 pre_store_data,
-                ret.question,
+                cache_data.question,
                 rank,
             )
             if rank_threshold <= rank:
-                cache_answers.append((rank, ret.answers[0].answer, cache_data))
-                chat_cache.data_manager.hit_cache_callback(cache_data)
+                cache_answers.append((rank, cache_data.answers[0].answer, search_data))
+                chat_cache.data_manager.hit_cache_callback(search_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         answers_dict = dict((d[1], d[2]) for d in cache_answers)
         if len(cache_answers) != 0:
