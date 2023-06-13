@@ -102,7 +102,7 @@ class SequenceMatchEvaluation(SimilarityEvaluation):
         cache_embs = cache_embs[::-1]
         weighted_distance = 0
         for i in range(length):
-            weighted_distance += euclidean_distance_calculate(src_embs[i], cache_embs[i]) * ws[i]
+            weighted_distance += (4 - euclidean_distance_calculate(src_embs[i], cache_embs[i])) * ws[i]
         return  weighted_distance
 
 

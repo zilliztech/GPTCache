@@ -18,7 +18,7 @@ def run():
                pre_embedding_func = concat_all_queries,
                data_manager=data_manager,
                similarity_evaluation=SequenceMatchEvaluation([0.1, 0.2, 0.7], 'onnx'), 
-               config=Config(context_len=2, skip_list=['system', 'assistant'])
+               config=Config(context_len=3, skip_list=['system', 'assistant'])
                )
     cache.set_openai_key()
 
