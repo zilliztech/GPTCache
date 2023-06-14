@@ -5,6 +5,81 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.31 (2023.6.14)
+
+1. To improve the precision of cache hits, two similarity evaluation methods were added
+
+a. SBERT CrossEncoder Evaluation
+
+```python
+from gptcache.similarity_evaluation import SbertCrossencoderEvaluation
+evaluation = SbertCrossencoderEvaluation()
+score = evaluation.evaluation(
+    {
+        'question': 'What is the color of sky?'
+    },
+    {
+        'question': 'hello'
+    }
+)
+```
+
+b. Cohere rerank api (**Free accounts can make up to 100 calls per minute.**)
+
+```python
+from gptcache.similarity_evaluation import CohereRerankEvaluation
+
+evaluation = CohereRerankEvaluation()
+score = evaluation.evaluation(
+    {
+        'question': 'What is the color of sky?'
+    },
+    {
+        'answer': 'the color of sky is blue'
+    }
+)
+```
+
+c. Multi-round dialog similarity weight matching
+
+```python
+from gptcache.similarity_evaluation import SequenceMatchEvaluation
+
+weights = [0.5, 0.3, 0.2]
+evaluation = SequenceMatchEvaluation(weights, 'onnx')
+
+query = {
+    'question': 'USER: "foo2" USER: "foo4"',
+}
+
+cache = {
+    'question': 'USER: "foo6" USER: "foo8"',
+}
+
+score = evaluation.evaluation(query, cache)
+```
+
+d. Time Evaluation. For the cached answer, first check the time dimension, such as only using the generated cache for the past day
+
+```python
+from gptcache.similarity_evaluation import TimeEvaluation
+
+evaluation = TimeEvaluation(evaluation="distance", time_range=86400)
+
+similarity = eval.evaluation(
+    {},
+    {
+        "search_result": (3.5, None),
+        "cache_data": CacheData("a", "b", create_on=datetime.datetime.now()),
+    },
+)
+```
+
+2. Fix some bugs
+
+a. OpenAI exceptions type #416
+b. LangChainChat does work with _agenerate function #400
+
 ## v0.1.30 (2023.6.7)
 
 1. Support to use the cohere rerank api to evaluate the similarity

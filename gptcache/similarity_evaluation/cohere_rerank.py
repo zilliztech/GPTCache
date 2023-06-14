@@ -23,7 +23,7 @@ class CohereRerank(SimilarityEvaluation):
 
             from gptcache.similarity_evaluation import CohereRerankEvaluation
 
-            evaluation = CohereRerank()
+            evaluation = CohereRerankEvaluation()
             score = evaluation.evaluation(
                 {
                     'question': 'What is the color of sky?'
