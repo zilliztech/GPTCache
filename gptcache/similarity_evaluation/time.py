@@ -10,6 +10,29 @@ class TimeEvaluation(SimilarityEvaluation):
     for example, only use the cache within 1 day from the current time,
     and filter out the previous cache.
 
+    :param evaluation: Similarity evaluation, like distance/onnx.
+    :param evaluation_config: Similarity evaluation config.
+    :param time_range: Time range, time unit: s
+
+    Example:
+        .. code-block:: python
+
+            import datetime
+
+            from gptcache.manager.scalar_data.base import CacheData
+            from gptcache.similarity_evaluation import TimeEvaluation
+
+            evaluation = TimeEvaluation(evaluation="distance", time_range=86400)
+
+            similarity = eval.evaluation(
+                {},
+                {
+                    "search_result": (3.5, None),
+                    "cache_data": CacheData("a", "b", create_on=datetime.datetime.now()),
+                },
+            )
+            # 0.5
+
     """
 
     def __init__(self, evaluation: str, evaluation_config=None, time_range: float = 86400.0):
