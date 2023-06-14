@@ -60,8 +60,8 @@ def CohereRerankEvaluation(model: str = "rerank-english-v2.0", api_key: str = No
     return cohere.CohereRerank(model=model, api_key=api_key)
 
 
-def SequenceMatchEvaluation(weights, embedding_extractor, **config):
-    return sequence_match.SequenceMatchEvaluation(weights, embedding_extractor, **config)
+def SequenceMatchEvaluation(weights, embedding_extractor, embedding_config: Dict[str, Any] = None):
+    return sequence_match.SequenceMatchEvaluation(weights, embedding_extractor, embedding_config=embedding_config)
 
 
 def TimeEvaluation(evaluation: str, evaluation_config: Dict[str, Any], time_range: float = 86400.0):

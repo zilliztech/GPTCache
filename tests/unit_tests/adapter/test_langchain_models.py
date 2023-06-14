@@ -1,3 +1,4 @@
+import asyncio
 import os
 import random
 from unittest.mock import patch
@@ -65,6 +66,7 @@ def get_msg_func(data, **_):
 
 def test_langchain_chats():
     question = [HumanMessage(content="test_langchain_chats")]
+    question2 = [HumanMessage(content="test_langchain_chats2")]
     msg = "chat models"
     expect_answer = {
         "role": "assistant",
@@ -109,8 +111,38 @@ def test_langchain_chats():
         answer = chat(messages=question, cache_obj=llm_cache)
         assert answer == _cache_msg_data_convert(msg).generations[0].message
 
+    with patch("openai.ChatCompletion.acreate") as mock_create:
+        mock_create.return_value = {
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "index": 0,
+                    "message": expect_answer,
+                }
+            ],
+            "delta": {"role": "assistant"},
+            "created": 1677825456,
+            "id": "chatcmpl-6ptKqrhgRoVchm58Bby0UvJzq2ZuQ",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion",
+            "usage": {
+                "completion_tokens": 301,
+                "prompt_tokens": 36,
+                "total_tokens": 337
+            }
+        }
+
+        answer = asyncio.run(chat.agenerate([question2], cache_obj=llm_cache))
+        assert answer.generations[0][0].text == _cache_msg_data_convert(msg).generations[0].text
+
     answer = chat(messages=question, cache_obj=llm_cache)
     assert answer == _cache_msg_data_convert(msg).generations[0].message
+
+    answer = asyncio.run(chat.agenerate([question], cache_obj=llm_cache))
+    assert answer.generations[0][0].text == _cache_msg_data_convert(msg).generations[0].text
+
+    answer = asyncio.run(chat.agenerate([question2], cache_obj=llm_cache))
+    assert answer.generations[0][0].text == _cache_msg_data_convert(msg).generations[0].text
 
 
 def test_last_content_without_template():
