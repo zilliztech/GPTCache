@@ -1,11 +1,14 @@
 from typing import Tuple, Dict, Any, List
+
 import numpy as np
 
-from gptcache.similarity_evaluation import SimilarityEvaluation
 from gptcache.adapter.api import _get_model
+from gptcache.similarity_evaluation import SimilarityEvaluation
+
 
 def euclidean_distance_calculate(vec_l: np.array, vec_r: np.array):
-    return np.sum((vec_l - vec_r)**2)
+    return np.sum((vec_l - vec_r) ** 2)
+
 
 def reweight(weights, length):
     if length >= len(weights):
@@ -16,7 +19,7 @@ def reweight(weights, length):
         for i in range(length):
             sum_ws += weights[i]
         for i in range(length):
-            reweighted_ws.append(weights[i] * (1/sum_ws))
+            reweighted_ws.append(weights[i] * (1 / sum_ws))
         return reweighted_ws
 
 
@@ -50,10 +53,10 @@ class SequenceMatchEvaluation(SimilarityEvaluation):
             score = evaluation.evaluation(query, cache)
     """
 
-
-    def __init__(self, weights: List[float], embedding_extractor: str, **config):
-        super().__init__()
-        self.embedding_extractor = _get_model(embedding_extractor, config)
+    def __init__(
+        self, weights: List[float], embedding_extractor: str, embedding_config=None
+    ):
+        self.embedding_extractor = _get_model(embedding_extractor, embedding_config)
         self.weights = weights
 
     @staticmethod
@@ -81,18 +84,22 @@ class SequenceMatchEvaluation(SimilarityEvaluation):
 
         :return: evaluation score.
         """
-        src_question = src_dict['question']
-        cache_question = cache_dict['question']
-        src_contents = src_question.split('USER: ')
-        cache_contents = cache_question.split('USER: ')
+        src_question = src_dict["question"]
+        cache_question = cache_dict["question"]
+        src_contents = src_question.split("USER: ")
+        cache_contents = cache_question.split("USER: ")
         src_contents = [content for content in src_contents if len(content) > 0]
         cache_contents = [content for content in cache_contents if len(content) > 0]
         src_embs = []
         cache_embs = []
         for content in src_contents:
-            src_embs.append(self.normalize(self.embedding_extractor.to_embeddings(content)))
+            src_embs.append(
+                self.normalize(self.embedding_extractor.to_embeddings(content))
+            )
         for content in cache_contents:
-            cache_embs.append(self.normalize(self.embedding_extractor.to_embeddings(content)))
+            cache_embs.append(
+                self.normalize(self.embedding_extractor.to_embeddings(content))
+            )
         length = min([len(src_contents), len(cache_contents), len(self.weights)])
         assert length > 0
         ws = self.weights
@@ -102,9 +109,10 @@ class SequenceMatchEvaluation(SimilarityEvaluation):
         cache_embs = cache_embs[::-1]
         weighted_distance = 0
         for i in range(length):
-            weighted_distance += (4 - euclidean_distance_calculate(src_embs[i], cache_embs[i])) * ws[i]
-        return  weighted_distance
-
+            weighted_distance += (
+                4 - euclidean_distance_calculate(src_embs[i], cache_embs[i])
+            ) * ws[i]
+        return weighted_distance
 
     def range(self) -> Tuple[float, float]:
         """Range of similarity score.
