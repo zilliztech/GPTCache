@@ -39,6 +39,7 @@ from gptcache.similarity_evaluation import (
     CohereRerankEvaluation,
     SequenceMatchEvaluation,
     TimeEvaluation,
+    SbertCrossencoderEvaluation
 )
 from gptcache.utils import import_ruamel
 
@@ -306,6 +307,8 @@ def _get_eval(strategy, kws=None):
         return SequenceMatchEvaluation(**kws)
     if "time" in strategy:
         return TimeEvaluation(**kws)
+    if "sbert_crossencoder" in strategy:
+        return SbertCrossencoderEvaluation(**kws)
 
 
 def _get_pre_func(pre_process):
