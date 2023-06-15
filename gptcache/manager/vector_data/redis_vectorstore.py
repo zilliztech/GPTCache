@@ -32,6 +32,13 @@ class RedisVectorStore(VectorBase):
     :type collection_name: str
     :param top_k: the number of the vectors results to return, defaults to 1.
     :type top_k: int
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.manager import VectorBase
+
+            vector_base = VectorBase("redis", dimension=10)
     """
     def __init__(
         self,

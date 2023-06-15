@@ -5,6 +5,18 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.32 (2023.6.15)
+
+1. Support the redis as vector store
+
+```python
+from gptcache.manager import VectorBase
+
+vector_base = VectorBase("redis", dimension=10)
+```
+
+2. Fix the context len config bug
+
 ## v0.1.31 (2023.6.14)
 
 1. To improve the precision of cache hits, two similarity evaluation methods were added
