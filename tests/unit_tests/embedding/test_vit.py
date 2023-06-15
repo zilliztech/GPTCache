@@ -1,13 +1,11 @@
 from io import BytesIO
 
-import pytest
 import requests
 
 from gptcache.adapter.api import _get_model
 from gptcache.utils import import_pillow, import_vit
 
 
-@pytest.mark.tags("L2")
 def test_timm():
     import_vit()
     import_pillow()

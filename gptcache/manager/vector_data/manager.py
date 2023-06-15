@@ -197,6 +197,24 @@ class VectorBase:
                 metric=metric,
                 dtype=dtype,
             )
+        elif name == "redis":
+            from gptcache.manager.vector_data.redis_vectorstore import RedisVectorStore
+            host = kwargs.get("host", "localhost")
+            port = kwargs.get("port", "6379")
+            user = kwargs.get("user")
+            password = kwargs.get("password")
+            dimension = kwargs.get("dimension", DIMENSION)
+            collection_name = kwargs.get("collection_name", COLLECTION_NAME)
+
+            vector_base = RedisVectorStore(
+                host=host,
+                port=port,
+                username=user,
+                password=password,
+                dimension=dimension,
+                collection_name=collection_name,
+                top_k=top_k,
+            )
         else:
             raise NotFoundError("vector store", name)
         return vector_base

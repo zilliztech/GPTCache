@@ -1,10 +1,8 @@
-import pytest
-from transformers import pipeline, RobertaTokenizer
+from transformers import RobertaTokenizer
 
 from gptcache.adapter.api import _get_pre_context_function
 
 
-@pytest.mark.tags("L2")
 def test_summarization_context_process():
     #summarizer = pipeline(task="summarization", model="ainize/bart-base-cnn")
     context_process = _get_pre_context_function("summarization", kws={"model_name": "facebook/bart-large-cnn", "target_length": 512})

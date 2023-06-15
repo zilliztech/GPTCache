@@ -4,7 +4,6 @@ from io import BytesIO
 from unittest.mock import patch
 
 import numpy as np
-import pytest
 
 from gptcache import cache
 from gptcache.adapter import stability_sdk as cache_stability
@@ -23,7 +22,6 @@ import stability_sdk
 from PIL import ImageChops, Image
 
 
-@pytest.mark.tags("L2")
 def test_stability_inference_map():
     cache.init(pre_embedding_func=get_prompt)
     expected_img = Image.new("RGB", (1, 1))
@@ -60,7 +58,6 @@ def test_stability_inference_map():
     assert not diff.getbbox()
 
 
-@pytest.mark.tags("L2")
 def test_stability_inference_faiss():
     faiss_file = "faiss.index"
     if os.path.isfile(faiss_file):
