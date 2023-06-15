@@ -61,4 +61,3 @@ class Config:
         if skip_list is None:
             skip_list = ["system", "assistant"]
         self.skip_list = skip_list
-        self.context_len = 2
