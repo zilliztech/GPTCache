@@ -199,8 +199,8 @@ class VectorBase:
             )
         elif name == "redis":
             from gptcache.manager.vector_data.redis_vectorstore import RedisVectorStore
-            host = kwargs.get("host")
-            port = kwargs.get("port")
+            host = kwargs.get("host", "localhost")
+            port = kwargs.get("port", "6379")
             user = kwargs.get("user")
             password = kwargs.get("password")
             dimension = kwargs.get("dimension", DIMENSION)

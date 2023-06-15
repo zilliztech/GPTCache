@@ -1,5 +1,3 @@
-import pytest
-
 from gptcache import cache
 from gptcache.adapter import diffusers as cache_diffusers
 from gptcache.processor.pre import get_prompt
@@ -77,7 +75,6 @@ def get_dummy_components():
     return components
 
 
-@pytest.mark.tags("L2")
 def test_stable_diffusion():
     cache.init(pre_embedding_func=get_prompt)
     prompt = "test"

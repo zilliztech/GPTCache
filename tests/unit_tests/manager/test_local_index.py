@@ -4,7 +4,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import numpy as np
-import pytest
 
 from gptcache.manager.vector_data import VectorBase
 from gptcache.manager.vector_data.base import VectorData
@@ -32,7 +31,6 @@ class TestLocalIndex(unittest.TestCase):
                 name='faiss', top_k=3, dimension=DIM, index_path=index_path
             )
 
-    @pytest.mark.tags("L2")
     def test_hnswlib(self):
         cls = partial(Hnswlib, max_elements=MAX_ELEMENTS, dimension=DIM)
         self._internal_test_normal(cls)

@@ -43,6 +43,10 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def search(self, embedding_data, **kwargs):
+        """ search the data in the cache store accrodding to the embedding data
+
+        :return: a list of search result, [[score, id], [score, id], ...]
+        """
         pass
 
     def flush(self):

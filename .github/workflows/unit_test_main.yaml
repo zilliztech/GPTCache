@@ -36,6 +36,10 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis/redis-stack-server
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@main
 
@@ -95,15 +99,6 @@ jobs:
           export IS_CI=true
           export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
           python3 -m pytest --cov=gptcache --cov-append --cov-report xml:coverage.xml ./tests/unit_tests/processor/
-
-#      - name: Generate coverage report
-#        run: |
-#          rm -rf ./coverage.xml
-#          coverage erase
-#          coverage run --source=gptcache  -m pytest -k "not embedding and not processor" ./tests
-#          coverage run --source=gptcache  -m pytest ./tests/unit_tests/embedding/
-#          coverage run --source=gptcache  -m pytest ./tests/unit_tests/processor/
-#          coverage xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0

@@ -1,10 +1,7 @@
-import pytest
-
 from gptcache.adapter.api import _get_pre_context_function
 from gptcache.utils import import_selective_context
 
 
-@pytest.mark.tags("L2")
 def test_selective_context_process():
     import_selective_context()
     context_process = _get_pre_context_function("selective")

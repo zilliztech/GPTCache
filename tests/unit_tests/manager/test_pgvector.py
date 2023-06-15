@@ -2,13 +2,11 @@ import os
 import unittest
 
 import numpy as np
-import pytest
 
 from gptcache.manager.vector_data import VectorBase
 from gptcache.manager.vector_data.base import VectorData
 
 
-@pytest.mark.tags("L2")
 class TestPgvector(unittest.TestCase):
     def test_normal(self):
         size = 1000
