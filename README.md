@@ -8,7 +8,7 @@ Slash Your LLM API Costs by 10x 💰, Boost Speed by 100x ⚡
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/zilliz_universe.svg?style=social&label=Follow%20%40Zilliz)](https://twitter.com/zilliz_universe)
 [![Discord](https://img.shields.io/discord/1092648432495251507?label=Discord&logo=discord)](https://discord.gg/Q8C6WEjSWV)
 
-🎉 GPTCache has been fully integrated with 🦜️🔗[LangChain](https://github.com/hwchase17/langchain) ! Here are detailed [usage instructions](https://python.langchain.com/en/latest/modules/models/llms/examples/llm_caching.html?highlight=cache#gptcache).
+🎉 GPTCache has been fully integrated with 🦜️🔗[LangChain](https://github.com/hwchase17/langchain) ! Here are detailed [usage instructions](https://python.langchain.com/docs/modules/model_io/models/llms/integrations/llm_caching#gptcache).
 
 🐳 [The GPTCache server docker image](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md#Use-GPTCache-server) has been released, which means that **any language** will be able to use GPTCache!
 
