@@ -13,6 +13,7 @@ def popitem_wrapper(func, wrapper_func, clean_size):
         except KeyError:
             pass
         wrapper_func(keys)
+
     return wrapper
 
 
@@ -30,7 +31,15 @@ class MemoryCacheEviction(EvictionBase):
 
 
     """
-    def __init__(self, policy: str, maxsize: int, clean_size: int, on_evict: Callable[[List[Any]], None], **kwargs):
+
+    def __init__(
+        self,
+        policy: str,
+        maxsize: int,
+        clean_size: int = 0,
+        on_evict: Callable[[List[Any]], None] = None,
+        **kwargs,
+    ):
         self._policy = policy.upper()
         if self._policy == "LRU":
             self._cache = cachetools.LRUCache(maxsize=maxsize, **kwargs)
