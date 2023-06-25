@@ -1,8 +1,8 @@
 import unittest
 
-from gptcache.utils.error import NotFoundError
-
+import gptcache
 from gptcache.manager.eviction.manager import EvictionBase
+from gptcache.utils.error import NotFoundError
 
 
 class TestEviction(unittest.TestCase):
@@ -51,6 +51,32 @@ class TestEviction(unittest.TestCase):
         eviction_base.get(1)
         add_data(5)
         self.assertEqual(3, len(datas))
+        self.assertTrue(datas.index(1) != -1)
+
+    def test_lru_no_clean_size(self):
+        datas = []
+
+        def on_evict(deletes):
+            for delete in deletes:
+                datas.remove(delete)
+            return
+
+        eviction_base = gptcache.manager.eviction.EvictionBase(
+            name="memory", policy="lru", maxsize=5, on_evict=on_evict
+        )
+
+        def add_data(data):
+            datas.append(data)
+            eviction_base.put([data])
+
+        add_data(1)
+        add_data(2)
+        add_data(3)
+        add_data(4)
+        add_data(5)
+        eviction_base.get(1)
+        add_data(6)
+        self.assertEqual(5, len(datas))
         self.assertTrue(datas.index(1) != -1)
 
     def test_lfu(self):
