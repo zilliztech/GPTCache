@@ -5,6 +5,7 @@ __all__ = [
     "import_cohere",
     "import_fasttext",
     "import_huggingface",
+    "import_ustore",
     "import_uform",
     "import_usearch",
     "import_torch",
@@ -78,6 +79,10 @@ def import_fasttext():
 
 def import_huggingface():
     _check_library("transformers")
+
+
+def import_ustore():
+    _check_library("ukv")
 
 
 def import_uform():
