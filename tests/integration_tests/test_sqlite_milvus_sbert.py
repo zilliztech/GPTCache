@@ -84,13 +84,10 @@ class TestSqliteMilvus(Base):
             search_only=True,
             stream=True,
         )
-        try:
-            assert answer[1] == get_text_response(response), "Incorrect response returned to user..."
-        except Exception as e:
-            log.info(e)
-            is_exception = True
-        
-        assert is_exception
+        # Incorrect response "apple" returned to user
+        resp_txt = get_text_response(response)
+        # log.info(f"Inccorect response = {resp_txt} is returned")
+        assert answer[0] == resp_txt
 
     @pytest.mark.tags("L1")
     def test_cache_health_check(self):
