@@ -15,6 +15,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     :param kwargs: llm kwargs
     :return: llm result
     """
+    search_only_flag = kwargs.pop("search_only", False)
     user_temperature = "temperature" in kwargs
     user_top_k = "top_k" in kwargs
     temperature = kwargs.pop("temperature", 0.0)
@@ -191,6 +192,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
     else:
+        if search_only_flag:
+            # cache miss
+            return None
         llm_data = time_cal(
             llm_handler, func_name="llm_request", report_func=chat_cache.report.llm
         )(*args, **kwargs)
