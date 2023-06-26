@@ -42,7 +42,7 @@ class TestSqliteMilvus(Base):
         if os.path.isdir('./milvus_data'):
             shutil.rmtree('./milvus_data')
 
-        onnx = SBERT("/home/bryan/Projects/Github/PayPal/ModelZoo/transformers/all-MiniLM-L6-v2")
+        onnx = SBERT()
         vector_base = VectorBase("milvus", dimension=onnx.dimension, local_mode=True)
         data_manager = get_data_manager("sqlite", vector_base, max_size=2000)
         cache.init(
@@ -104,7 +104,7 @@ class TestSqliteMilvus(Base):
         if os.path.isdir('./milvus_data'):
             shutil.rmtree('./milvus_data')
 
-        onnx = SBERT("/home/bryan/Projects/Github/PayPal/ModelZoo/transformers/all-MiniLM-L6-v2")
+        onnx = SBERT()
         vector_base = VectorBase("milvus", dimension=onnx.dimension, local_mode=True)
         data_manager = get_data_manager("sqlite", vector_base, max_size=2000)
         cache.init(
@@ -180,10 +180,3 @@ class TestSqliteMilvus(Base):
             stream=True,
         )
         assert get_text_response(response) == answer[0]
-
-       
-
-
-
-a = TestSqliteMilvus()
-a.test_cache_health_check()
