@@ -97,7 +97,7 @@ class TestSqliteMilvus(Base):
         """
         target: test hit the cache function
         method: keep default similarity_threshold
-        expected: hit successfully but return wrong reponse to user
+        expected: cache hit with cache check enabled
         """
         if os.path.isfile("./sqlite.db"):
             os.remove("./sqlite.db")
