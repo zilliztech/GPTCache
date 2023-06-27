@@ -49,6 +49,7 @@ class RedisVectorStore(VectorBase):
         dimension: int = 0,
         collection_name: str = "gptcache",
         top_k: int = 1,
+        namespace: str = "",
     ):
         self._client = Redis(
             host=host, port=int(port), username=username, password=password
@@ -56,7 +57,8 @@ class RedisVectorStore(VectorBase):
         self.top_k = top_k
         self.dimension = dimension
         self.collection_name = collection_name
-        self.doc_prefix = "doc:"
+        self.namespace = namespace
+        self.doc_prefix = f"{self.namespace}doc:"  # Prefix with the specified namespace
         self._create_collection(collection_name)
 
     def _check_index_exists(self, index_name: str) -> bool:
