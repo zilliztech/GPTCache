@@ -188,6 +188,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         kwargs["cache_context"] = context
         kwargs["cache_skip"] = cache_skip
         kwargs["cache_factor"] = cache_factor
+        kwargs["search_only_flag"] = search_only_flag
         llm_data = adapt(
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
@@ -198,6 +199,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         llm_data = time_cal(
             llm_handler, func_name="llm_request", report_func=chat_cache.report.llm
         )(*args, **kwargs)
+
+    if not llm_data:
+        return None
 
     if cache_enable:
         try:
