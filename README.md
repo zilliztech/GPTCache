@@ -162,7 +162,7 @@ cache.set_openai_key()
 questions = [
     "what's github",
     "can you explain what GitHub is",
-    "can you tell me more about GitHub"
+    "can you tell me more about GitHub",
     "what is the purpose of GitHub"
 ]
 
