@@ -8,8 +8,8 @@ from gptcache.manager.vector_data.base import VectorBase, VectorData
 import_qdrant()
 
 from qdrant_client import QdrantClient  # pylint: disable=C0413
-from qdrant_client.conversions import common_types as types  # pylint: disable=C0413
-from qdrant_client.models import PointStruct  # pylint: disable=C0413
+from qdrant_client.models import PointStruct, HnswConfigDiff, VectorParams, OptimizersConfigDiff, \
+    Distance  # pylint: disable=C0413
 
 
 class QdrantVectorStore(VectorBase):
@@ -39,7 +39,6 @@ class QdrantVectorStore(VectorBase):
         self._client: QdrantClient
         self._collection_name = collection_name
         self._in_memory = location == ":memory:"
-        self._closeable = self._in_memory or location is not None
         self.dimension = dimension
         self.top_k = top_k
         if self._in_memory or location is not None:
@@ -65,46 +64,44 @@ class QdrantVectorStore(VectorBase):
         )
 
     def _create_collection(self, collection_name: str, flush_interval_sec: int, index_params: Optional[dict] = None):
-        hnsw_config = types.HnswConfigDiff(**(index_params or {}))
-        vectors_config = types.VectorParams(size=self.dimension, distance=types.Distance.COSINE,
-                                            hnsw_config=hnsw_config)
-        optimizers_config = types.OptimizersConfigDiff(deleted_threshold=0.2, vacuum_min_vector_number=1000,
-                                                       flush_interval_sec=flush_interval_sec)
+        hnsw_config = HnswConfigDiff(**(index_params or {}))
+        vectors_config = VectorParams(size=self.dimension, distance=Distance.COSINE,
+                                      hnsw_config=hnsw_config)
+        optimizers_config = OptimizersConfigDiff(deleted_threshold=0.2, vacuum_min_vector_number=1000,
+                                                 flush_interval_sec=flush_interval_sec)
         # check if the collection exists
-        existing_collection = self._client.get_collection(collection_name=collection_name)
-        if existing_collection:
-            gptcache_log.warning("The %s collection already exists, and it will be used directly.", collection_name)
-            self.col = existing_collection
+        existing_collections = self._client.get_collections()
+        for existing_collection in existing_collections.collections:
+            if existing_collection.name == collection_name:
+                gptcache_log.warning("The %s collection already exists, and it will be used directly.", collection_name)
+                break
         else:
-            self.col = self._client.create_collection(collection_name=collection_name, vectors_config=vectors_config,
-                                                      optimizers_config=optimizers_config)
+            self._client.create_collection(collection_name=collection_name, vectors_config=vectors_config,
+                                           optimizers_config=optimizers_config)
 
     def mul_add(self, datas: List[VectorData]):
-        data_array, id_array = map(list, zip(*((data.data, data.id) for data in datas)))
-        np_data = np.array(data_array).astype("float32")
-        entities = [id_array, np_data]
-        points = [PointStruct(id=_id, vector=vector) for _id, vector in zip(*entities)]
+        points = [PointStruct(id=d.id, vector=d.data.reshape(-1).tolist()) for d in datas]
         self._client.upsert(collection_name=self._collection_name, points=points, wait=False)
 
     def search(self, data: np.ndarray, top_k: int = -1):
         if top_k == -1:
             top_k = self.top_k
-        reshaped_data = data.reshape(1, -1).tolist()
+        reshaped_data = data.reshape(-1).tolist()
         search_result = self._client.search(collection_name=self._collection_name, query_vector=reshaped_data,
                                             limit=top_k)
-        return list(map(lambda x: (x.id, x.score), search_result))
+        return list(map(lambda x: (x.score, x.id), search_result))
 
     def delete(self, ids: List[str]):
-        self._client.delete_vectors(collection_name=self._collection_name, vectors=ids)
+        self._client.delete(collection_name=self._collection_name, points_selector=ids)
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
-        optimizers_config = types.OptimizersConfigDiff(deleted_threshold=0.2, vacuum_min_vector_number=1000)
+        optimizers_config = OptimizersConfigDiff(deleted_threshold=0.2, vacuum_min_vector_number=1000)
         self._client.update_collection(collection_name=self._collection_name, optimizer_config=optimizers_config)
 
     def flush(self):
         # no need to flush manually as qdrant flushes automatically based on the optimizers_config for remote Qdrant
-        if self._closeable:
-            self._client._save()  # pylint: disable=protected-access
+        pass
+
 
     def close(self):
         self.flush()
