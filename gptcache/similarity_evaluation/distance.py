@@ -1,5 +1,4 @@
 from typing import Tuple, Dict, Any
-import numpy as np
 from gptcache.similarity_evaluation import SimilarityEvaluation
 
 
