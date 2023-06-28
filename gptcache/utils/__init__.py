@@ -38,7 +38,8 @@ __all__ = [
     "import_paddlenlp",
     "import_tiktoken",
     "import_fastapi",
-    "import_redis"
+    "import_redis",
+    "import_qdrant"
     ]
 
 import importlib.util
