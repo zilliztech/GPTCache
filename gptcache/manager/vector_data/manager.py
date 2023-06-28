@@ -19,6 +19,12 @@ MILVUS_INDEX_PARAMS = {
 PGVECTOR_URL = "postgresql://postgres:postgres@localhost:5432/postgres"
 PGVECTOR_INDEX_PARAMS = {"index_type": "L2", "params": {"lists": 100, "probes": 10}}
 
+QDRANT_GRPC_PORT = 6334
+QDRANT_HTTP_PORT = 6333
+QDRANT_INDEX_PARAMS = {"ef_construct": 100, "m": 16}
+QDRANT_DEFAULT_LOCATION = "./qdrant_data"
+QDRANT_FLUSH_INTERVAL_SEC = 5
+
 COLLECTION_NAME = "gptcache"
 
 
@@ -216,6 +222,40 @@ class VectorBase:
                 dimension=dimension,
                 collection_name=collection_name,
                 top_k=top_k,
+            )
+        elif name == "qdrant":
+            from gptcache.manager.vector_data.qdrant import QdrantVectorStore
+            url = kwargs.get("url", None)
+            port = kwargs.get("port", QDRANT_HTTP_PORT)
+            grpc_port = kwargs.get("grpc_port", QDRANT_GRPC_PORT)
+            prefer_grpc = kwargs.get("prefer_grpc", False)
+            https = kwargs.get("https", False)
+            api_key = kwargs.get("api_key", None)
+            prefix = kwargs.get("prefix", None)
+            timeout = kwargs.get("timeout", None)
+            host = kwargs.get("host", None)
+            collection_name = kwargs.get("collection_name", COLLECTION_NAME)
+            location = kwargs.get("location", QDRANT_DEFAULT_LOCATION)
+            dimension = kwargs.get("dimension", DIMENSION)
+            top_k: int = kwargs.get("top_k", TOP_K)
+            flush_interval_sec = kwargs.get("flush_interval_sec", QDRANT_FLUSH_INTERVAL_SEC)
+            index_params = kwargs.get("index_params", QDRANT_INDEX_PARAMS)
+            vector_base = QdrantVectorStore(
+                url=url,
+                port=port,
+                grpc_port=grpc_port,
+                prefer_grpc=prefer_grpc,
+                https=https,
+                api_key=api_key,
+                prefix=prefix,
+                timeout=timeout,
+                host=host,
+                collection_name=collection_name,
+                location=location,
+                dimension=dimension,
+                top_k=top_k,
+                flush_interval_sec=flush_interval_sec,
+                index_params=index_params,
             )
         else:
             raise NotFoundError("vector store", name)
