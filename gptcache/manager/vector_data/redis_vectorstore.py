@@ -126,7 +126,7 @@ class RedisVectorStore(VectorBase):
             .search(query, query_params=query_params)
             .docs
         )
-        return [(result.score, result.id) for result in results]
+        return [(float(result.score), int(result.id[len(self.doc_prefix):])) for result in results]
 
     def rebuild(self, ids=None) -> bool:
         pass
