@@ -65,6 +65,10 @@ def import_milvus_lite():
     _check_library("milvus")
 
 
+def import_qdrant():
+    _check_library("qdrant_client")
+
+
 def import_sbert():
     _check_library("sentence_transformers", package="sentence-transformers")
 
