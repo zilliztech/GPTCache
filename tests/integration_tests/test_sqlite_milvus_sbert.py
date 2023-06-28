@@ -107,10 +107,7 @@ class TestSqliteMilvus(Base):
         cache.init(
             embedding_func=onnx.to_embeddings,
             data_manager=data_manager,
-            similarity_evaluation=SearchDistanceEvaluation(
-                vectordb=vector_base,
-                cache_check=True,
-            ),
+            similarity_evaluation=SearchDistanceEvaluation(),
             config=Config(
                 log_time_func=cf.log_time_func,
                 enable_token_counter=False,
@@ -147,13 +144,13 @@ class TestSqliteMilvus(Base):
                 {"role": "user", "content": touble_query},
             ],
             search_only=True,
+            health_check=True,
             stream=True,
         )
         assert response is None
         
         # disable cache check, and verify
         # cache is now consistent
-        cache.similarity_evaluation.cache_check = False
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -166,7 +163,6 @@ class TestSqliteMilvus(Base):
         assert response is None
 
         # verify self-heal took place
-        cache.similarity_evaluation.cache_check = False
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
