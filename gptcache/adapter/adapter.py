@@ -166,7 +166,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 rank,
             )
             if rank_threshold <= rank:
-                cache_answers.append((rank, cache_data.answers[0].answer, search_data))
+                cache_answers.append((float(rank), cache_data.answers[0].answer, search_data))
                 chat_cache.data_manager.hit_cache_callback(search_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         answers_dict = dict((d[1], d[2]) for d in cache_answers)
@@ -397,7 +397,7 @@ async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, 
                 rank,
             )
             if rank_threshold <= rank:
-                cache_answers.append((rank, cache_data.answers[0].answer, search_data))
+                cache_answers.append((float(rank), cache_data.answers[0].answer, search_data))
                 chat_cache.data_manager.hit_cache_callback(search_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         answers_dict = dict((d[1], d[2]) for d in cache_answers)
