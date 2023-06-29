@@ -36,8 +36,8 @@ class VectorBase(ABC):
     def close(self):
         pass
 
-    def get_embeddings(self, id: Union[int, str]) -> Optional[np.ndarray]:
+    def get_embeddings(self, data_id: Union[int, str]) -> Optional[np.ndarray]:
         raise NotImplementedError
 
-    def update_embeddings(self, id: Union[int, str], emb: np.ndarray):
+    def update_embeddings(self, data_id: Union[int, str], emb: np.ndarray):
         pass

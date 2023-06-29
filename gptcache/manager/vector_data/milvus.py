@@ -195,9 +195,9 @@ class Milvus(VectorBase):
         if self._local_mode:
             self._server.stop()
 
-    def get_embeddings(self, id: int):
+    def get_embeddings(self, data_id: int):
         vec_emb = self.col.query(
-            expr=f"id == {id}",
+            expr=f"id == {data_id}",
             output_fields=["embedding"],
         )
         if len(vec_emb) < 1:
@@ -205,10 +205,10 @@ class Milvus(VectorBase):
         vec_emb = np.asarray(vec_emb[0]["embedding"], dtype="float32")
         return vec_emb
 
-    def update_embeddings(self, id: int, emb: np.ndarray):
-        self.col.delete(f"id in [{id}]")
+    def update_embeddings(self, data_id: int, emb: np.ndarray):
+        self.col.delete(f"id in [{data_id}]")
         data = [
-            [id],
+            [data_id],
             np.expand_dims(emb, axis=0),
         ]
         self.col.insert(data)
