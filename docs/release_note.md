@@ -5,6 +5,13 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.33 (2023.6.27)
+
+1. Fix the eviction error
+2. Add a flag for search only operation
+3. Support to change the redis namespace
+4. Add `How to better configure your cache` document
+
 ## v0.1.32 (2023.6.15)
 
 1. Support the redis as vector store

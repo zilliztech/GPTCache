@@ -1,5 +1,5 @@
 from typing import List
-
+import numpy as np
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils import import_chromadb, import_torch
 
@@ -65,3 +65,19 @@ class Chromadb(VectorBase):
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
         return True
+
+    def get_embeddings(self, data_id: str):
+        vec_emb = self._collection.get(
+                data_id,
+                include=["embeddings"],
+            )["embeddings"]
+        if vec_emb is None or len(vec_emb) < 1:
+            return None
+        vec_emb = np.asarray(vec_emb[0], dtype="float32")
+        return vec_emb
+
+    def update_embeddings(self, data_id: str, emb: np.ndarray):
+        self._collection.update(
+            ids=data_id,
+            embeddings=emb.tolist(),
+        )

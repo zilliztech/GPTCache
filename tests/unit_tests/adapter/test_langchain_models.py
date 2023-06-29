@@ -7,7 +7,7 @@ from gptcache import Cache, Config
 from gptcache.adapter import openai
 from gptcache.adapter.api import init_similar_cache, get
 from gptcache.adapter.langchain_models import LangChainLLMs, LangChainChat, _cache_msg_data_convert
-from gptcache.processor.pre import get_prompt, last_content_without_template
+from gptcache.processor.pre import get_prompt, last_content_without_template, get_messages_last_content
 from gptcache.utils import import_pydantic, import_langchain
 from gptcache.utils.response import get_message_from_openai_answer
 
@@ -60,10 +60,6 @@ def test_langchain_llms():
     assert expect_answer == answer
 
 
-def get_msg_func(data, **_):
-    return data.get("messages")[-1].content
-
-
 def test_langchain_chats():
     question = [HumanMessage(content="test_langchain_chats")]
     question2 = [HumanMessage(content="test_langchain_chats2")]
@@ -76,7 +72,7 @@ def test_langchain_chats():
 
     llm_cache = Cache()
     llm_cache.init(
-        pre_embedding_func=get_msg_func,
+        pre_embedding_func=get_messages_last_content,
     )
 
     os.environ["OPENAI_API_KEY"] = "API"

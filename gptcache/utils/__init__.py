@@ -39,8 +39,9 @@ __all__ = [
     "import_paddlenlp",
     "import_tiktoken",
     "import_fastapi",
-    "import_redis"
-]
+    "import_redis",
+    "import_qdrant",
+    ]
 
 import importlib.util
 from typing import Optional
@@ -64,6 +65,10 @@ def import_pymilvus():
 
 def import_milvus_lite():
     _check_library("milvus")
+
+
+def import_qdrant():
+    _check_library("qdrant_client")
 
 
 def import_sbert():
