@@ -12,3 +12,13 @@ def test_sbert():
     dimension = t.dimension
     data = t.to_embeddings("foo")
     assert len(data) == dimension, f"{len(data)}, {t.dimension}"
+
+    question = [
+        "what is apple?",
+        "what is intel?",
+        "what is openai?",
+    ]
+    answer = ["apple", "intel", "openai"]
+    for q, _ in zip(question, answer):
+        data = t.to_embeddings(q)
+        assert len(data) == dimension, f"{len(data)}, {t.dimension}"
