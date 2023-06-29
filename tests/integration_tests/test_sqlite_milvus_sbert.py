@@ -136,3 +136,5 @@ class TestSqliteMilvus(Base):
                 stream=True,
             )
             assert get_text_response(response) == answer[0]
+            if os.path.isfile("./sqlite.db"):
+                os.remove("./sqlite.db")
