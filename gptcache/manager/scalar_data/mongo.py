@@ -36,6 +36,10 @@ def get_models():
         embedding_data = fields.BinaryField()
         deleted = fields.IntField(default=0)
 
+        @property
+        def oid(self):
+            return self._id
+
     class Answers(Document):
         """
         answer collection
@@ -51,9 +55,13 @@ def get_models():
         answer_type = fields.IntField()
         question_id = fields.IntField()
 
+        @property
+        def oid(self):
+            return self._id
+
     class Sessions(Document):
         meta = {
-            "collection": "_sessions",
+            "collection": "sessions",
             "indexes": [
                 "question_id"
             ]
@@ -63,6 +71,10 @@ def get_models():
         session_id = fields.StringField()
         session_question = fields.StringField()
         question_id = fields.IntField()
+
+        @property
+        def oid(self):
+            return self._id
 
     class QuestionDeps(Document):
         meta = {
@@ -76,6 +88,10 @@ def get_models():
         dep_name = fields.StringField()
         dep_data = fields.StringField()
         dep_type = fields.IntField()
+
+        @property
+        def oid(self):
+            return self._id
 
     return Questions, Answers, QuestionDeps, Sessions
 
@@ -138,11 +154,11 @@ class MongoStorage(CacheStorage):
         )
         ques_data.save()
         if isinstance(data.question, Question) and data.question.deps is not None:
-            all_deps = list()
+            all_deps = []
             for dep in data.question.deps:
                 all_deps.append(
                     self._ques_dep(
-                        question_id=ques_data._id,
+                        question_id=ques_data.oid,
                         dep_name=dep.name,
                         dep_data=dep.data,
                         dep_type=dep.dep_type,
@@ -154,7 +170,7 @@ class MongoStorage(CacheStorage):
         all_data = []
         for answer in answers:
             answer_data = self._answer(
-                question_id=ques_data._id,
+                question_id=ques_data.oid,
                 answer=answer.answer,
                 answer_type=int(answer.answer_type),
             )
@@ -163,7 +179,7 @@ class MongoStorage(CacheStorage):
 
         if data.session_id:
             session_data = self._session(
-                question_id=ques_data._id,
+                question_id=ques_data.oid,
                 session_id=data.session_id,
                 session_question=data.question
                 if isinstance(data.question, str)
@@ -171,10 +187,10 @@ class MongoStorage(CacheStorage):
             )
             self._session.objects.insert(session_data)
 
-        return ques_data._id
+        return ques_data.oid
 
     def batch_insert(self, all_data: List[CacheData]):
-        ids = list()
+        ids = []
         for data in all_data:
             ids.append(self._insert(data))
         return ids
@@ -186,9 +202,9 @@ class MongoStorage(CacheStorage):
         last_access = qs.last_access
         qs.last_access = datetime.now()
         qs.save()
-        answers = self._answer.objects(question_id=qs._id)
-        deps = self._ques_dep.objects(question_id=qs._id)
-        session_ids = self._session.objects(question_id=qs._id)
+        answers = self._answer.objects(question_id=qs.oid)
+        deps = self._ques_dep.objects(question_id=qs.oid)
+        session_ids = self._session.objects(question_id=qs.oid)
 
         res_ans = [(item.answer, item.answer_type) for item in answers]
         res_deps = [
@@ -209,7 +225,7 @@ class MongoStorage(CacheStorage):
 
     def clear_deleted_data(self):
         questions = self._ques.objects(deleted=-1).only("_id")
-        q_ids = [obj._id for obj in questions]
+        q_ids = [obj.oid for obj in questions]
         self._answer.objects(question_id__in=q_ids).delete()
         self._ques_dep.objects(question_id__in=q_ids).delete()
         self._session.objects(question_id__in=q_ids).delete()
@@ -217,7 +233,7 @@ class MongoStorage(CacheStorage):
 
     def get_ids(self, deleted: bool = True):
         state = -1 if deleted else 0
-        res = [obj._id for obj in self._ques.objects(deleted=state).only("_id")]
+        res = [obj.oid for obj in self._ques.objects(deleted=state).only("_id")]
         return res
 
     def count(self, state: int = 0, is_all: bool = False):
