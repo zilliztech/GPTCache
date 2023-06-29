@@ -15,6 +15,7 @@ __all__ = [
     "import_chromadb",
     "import_sqlalchemy",
     "import_sql_client",
+    "import_mongodb",
     "import_pydantic",
     "import_langchain",
     "import_pillow",
@@ -39,7 +40,7 @@ __all__ = [
     "import_tiktoken",
     "import_fastapi",
     "import_redis",
-    "import_qdrant"
+    "import_qdrant",
     ]
 
 import importlib.util
@@ -159,6 +160,11 @@ def import_sql_client(db_name):
         import_duckdb()
 
 
+def import_mongodb():
+    _check_library("pymongo")
+    _check_library("mongoengine")
+
+
 def import_pydantic():
     _check_library("pydantic")
 
@@ -247,6 +253,7 @@ def import_tiktoken():
 def import_fastapi():
     _check_library("uvicorn", package="'uvicorn[standard]'")
     _check_library("fastapi")
+
 
 def import_redis():
     _check_library("redis")

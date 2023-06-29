@@ -40,6 +40,10 @@ jobs:
         image: redis/redis-stack-server
         ports:
           - 6379:6379
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017
     steps:
       - uses: actions/checkout@main
 

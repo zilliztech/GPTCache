@@ -1,6 +1,6 @@
+from gptcache.manager.scalar_data.mongo import MongoStorage
 from gptcache.utils import import_sql_client
 from gptcache.utils.error import NotFoundError
-
 
 SQL_URL = {
     "sqlite": "sqlite:///./sqlite.db",
@@ -83,6 +83,14 @@ class CacheBase:
                 url=sql_url,
                 table_name=table_name,
                 table_len_config=table_len_config,
+            )
+        elif name == "mongo":
+            return MongoStorage(
+                host=kwargs.get("mongo_host", "localhost"),
+                port=kwargs.get("mongo_port", 27017),
+                dbname=kwargs.get("dbname", TABLE_NAME),
+                username=kwargs.get("username"),
+                password=kwargs.get("password")
             )
         else:
             raise NotFoundError("cache store", name)
