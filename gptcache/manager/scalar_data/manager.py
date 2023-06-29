@@ -1,4 +1,3 @@
-from gptcache.manager.scalar_data.mongo import MongoStorage
 from gptcache.utils import import_sql_client
 from gptcache.utils.error import NotFoundError
 
@@ -85,6 +84,8 @@ class CacheBase:
                 table_len_config=table_len_config,
             )
         elif name == "mongo":
+            from gptcache.manager.scalar_data.mongo import MongoStorage
+
             return MongoStorage(
                 host=kwargs.get("mongo_host", "localhost"),
                 port=kwargs.get("mongo_port", 27017),
