@@ -201,8 +201,9 @@ class VectorBase:
             from gptcache.manager.vector_data.redis_vectorstore import RedisVectorStore
             host = kwargs.get("host", "localhost")
             port = kwargs.get("port", "6379")
-            user = kwargs.get("user")
-            password = kwargs.get("password")
+            user = kwargs.get("user", "")
+            password = kwargs.get("password", "")
+            namespace = kwargs.get("namespace", "")
             dimension = kwargs.get("dimension", DIMENSION)
             collection_name = kwargs.get("collection_name", COLLECTION_NAME)
 
@@ -211,6 +212,7 @@ class VectorBase:
                 port=port,
                 username=user,
                 password=password,
+                namespace=namespace,
                 dimension=dimension,
                 collection_name=collection_name,
                 top_k=top_k,
