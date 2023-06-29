@@ -8,14 +8,9 @@ from gptcache.utils import import_mongodb
 
 import_mongodb()
 
-from mongoengine import Document
-from mongoengine import fields
-import mongoengine as me
-
-
-class Constants:
-    id = "_id"
-    deleted = "deleted"
+from mongoengine import Document  # pylint: disable=wrong-import-position
+from mongoengine import fields  # pylint: disable=wrong-import-position
+import mongoengine as me  # pylint: disable=wrong-import-position
 
 
 def get_models():
@@ -60,6 +55,9 @@ def get_models():
             return self._id
 
     class Sessions(Document):
+        """
+        session collection
+        """
         meta = {
             "collection": "sessions",
             "indexes": [
@@ -77,6 +75,9 @@ def get_models():
             return self._id
 
     class QuestionDeps(Document):
+        """
+        Question Dep collection
+        """
         meta = {
             "collection": "question_deps",
             "indexes": [
