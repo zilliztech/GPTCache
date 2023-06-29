@@ -1,4 +1,5 @@
 import numpy as np
+
 from gptcache import cache
 from gptcache.processor.post import temperature_softmax
 from gptcache.utils.error import NotInitError
@@ -16,7 +17,6 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     :param kwargs: llm kwargs
     :return: llm result
     """
-    health_check_flag = kwargs.pop("health_check", False)
     search_only_flag = kwargs.pop("search_only", False)
     user_temperature = "temperature" in kwargs
     user_top_k = "top_k" in kwargs
@@ -114,7 +114,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 continue
 
             # cache consistency check
-            if health_check_flag:
+            if chat_cache.config.data_check:
                 is_healthy = cache_health_check(
                     chat_cache.data_manager.v,
                     {
@@ -202,7 +202,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         kwargs["cache_context"] = context
         kwargs["cache_skip"] = cache_skip
         kwargs["cache_factor"] = cache_factor
-        kwargs["search_only_flag"] = search_only_flag
+        kwargs["search_only"] = search_only_flag
         llm_data = adapt(
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
@@ -467,8 +467,8 @@ async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, 
             llm_data = update_cache_callback(
                 llm_data, update_cache_func, *args, **kwargs
             )
-        except Exception as e:  # pylint: disable=W0703
-            gptcache_log.warning("failed to save the data to cache, error: %s", e)
+        except Exception:  # pylint: disable=W0703
+            gptcache_log.error("failed to save the data to cache", exc_info=True)
     return llm_data
 
 
