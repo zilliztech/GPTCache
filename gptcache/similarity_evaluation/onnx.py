@@ -1,11 +1,13 @@
 from typing import Dict, List, Tuple, Any
+
 import numpy as np
+
+from gptcache.similarity_evaluation import SimilarityEvaluation
 from gptcache.utils import (
     import_onnxruntime,
     import_huggingface_hub,
     import_huggingface,
 )
-from gptcache.similarity_evaluation import SimilarityEvaluation
 
 import_onnxruntime()
 import_huggingface_hub()
@@ -130,4 +132,4 @@ class OnnxModelEvaluation(SimilarityEvaluation):
         }
         ort_outputs = self.ort_session.run(None, ort_inputs)
         scores = ort_outputs[0][:, 1]
-        return scores
+        return float(scores[0])
