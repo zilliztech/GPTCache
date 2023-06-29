@@ -47,6 +47,7 @@ class TestSqliteMilvus(Base):
                 "milvus",
                 dimension=onnx.dimension,
                 local_mode=True,
+                port="10086",
                 local_data=str(root),
             )
             data_manager = get_data_manager("sqlite", vector_base, max_size=2000)
@@ -135,5 +136,3 @@ class TestSqliteMilvus(Base):
                 stream=True,
             )
             assert get_text_response(response) == answer[0]
-            vector_base.rebuild()
-            vector_base.close()
