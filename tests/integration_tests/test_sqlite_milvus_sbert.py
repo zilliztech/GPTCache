@@ -29,13 +29,12 @@ class TestSqliteMilvus(Base):
     #  The followings are general cases
     ******************************************************************
     """
-
     @pytest.mark.tags("L1")
-    def test_hit_cache_out_of_sync(self):
+    def test_cache_health_check(self):
         """
         target: test hit the cache function
         method: keep default similarity_threshold
-        expected: hit successfully but return wrong reponse to user
+        expected: cache health detection & correction
         """
         if os.path.isfile("./sqlite.db"):
             os.remove("./sqlite.db")
@@ -74,7 +73,8 @@ class TestSqliteMilvus(Base):
         touble_query = "what is google?"
         cache.data_manager.v.update_embeddings(1, cache.embedding_func(touble_query))
 
-        is_exception = False
+        # without cache health check
+        # respons is incorrect
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -88,50 +88,6 @@ class TestSqliteMilvus(Base):
         resp_txt = get_text_response(response)
         # log.info(f"Inccorect response = {resp_txt} is returned")
         assert answer[0] == resp_txt
-
-    @pytest.mark.tags("L1")
-    def test_cache_health_check(self):
-        """
-        target: test hit the cache function
-        method: keep default similarity_threshold
-        expected: cache hit with cache check enabled
-        """
-        if os.path.isfile("./sqlite.db"):
-            os.remove("./sqlite.db")
-        if os.path.isdir('./milvus_data'):
-            shutil.rmtree('./milvus_data')
-
-        onnx = SBERT()
-        vector_base = VectorBase("milvus", dimension=onnx.dimension, local_mode=True)
-        data_manager = get_data_manager("sqlite", vector_base, max_size=2000)
-        cache.init(
-            embedding_func=onnx.to_embeddings,
-            data_manager=data_manager,
-            similarity_evaluation=SearchDistanceEvaluation(),
-            config=Config(
-                log_time_func=cf.log_time_func,
-                enable_token_counter=False,
-            ),
-        )
-
-        question = [
-            "what is apple?",
-            "what is intel?",
-            "what is openai?",
-
-        ]
-        answer = [
-            "apple",
-            "intel",
-            "openai"
-        ]
-        for q, a in zip(question, answer):
-            cache.data_manager.save(q, a, cache.embedding_func(q))
-
-        # let's simulate cache out-of-sync
-        # situation.
-        touble_query = "what is google?"
-        cache.data_manager.v.update_embeddings(1, cache.embedding_func(touble_query))
 
         # cache health enabled
         # stop returning incorrect answer
