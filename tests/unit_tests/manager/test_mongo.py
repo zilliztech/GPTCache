@@ -1,5 +1,4 @@
 import time
-import unittest
 
 import numpy as np
 from mongoengine import connect, disconnect
