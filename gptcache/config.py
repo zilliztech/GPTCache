@@ -44,7 +44,8 @@ class Config:
             enable_token_counter: bool = True,
             input_summary_len: Optional[int] = None,
             context_len: Optional[int] = None,
-            skip_list: List[str] = None
+            skip_list: List[str] = None,
+            data_check: bool = False,
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError(
@@ -61,3 +62,4 @@ class Config:
         if skip_list is None:
             skip_list = ["system", "assistant"]
         self.skip_list = skip_list
+        self.data_check = data_check

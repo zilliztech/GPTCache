@@ -1,5 +1,7 @@
 from typing import List
+
 import numpy as np
+
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils import import_chromadb, import_torch
 
@@ -45,7 +47,7 @@ class Chromadb(VectorBase):
         self._collection = self._client.get_or_create_collection(name=collection_name)
 
     def mul_add(self, datas: List[VectorData]):
-        data_array, id_array = map(list, zip(*((list(data.data), str(data.id)) for data in datas)))
+        data_array, id_array = map(list, zip(*((data.data.tolist(), str(data.id)) for data in datas)))
         self._collection.add(embeddings=data_array, ids=id_array)
 
     def search(self, data, top_k: int = -1):
@@ -54,21 +56,21 @@ class Chromadb(VectorBase):
         if top_k == -1:
             top_k = self.top_k
         results = self._collection.query(
-            query_embeddings=[list(data)],
+            query_embeddings=[data.tolist()],
             n_results=top_k,
             include=["distances"],
         )
-        return list(zip(results["distances"][0], results["ids"][0]))
+        return list(zip(results["distances"][0], [int(x) for x in results["ids"][0]]))
 
     def delete(self, ids):
-        self._collection.delete(ids)
+        self._collection.delete([str(x) for x in ids])
 
     def rebuild(self, ids=None):  # pylint: disable=unused-argument
         return True
 
     def get_embeddings(self, data_id: str):
         vec_emb = self._collection.get(
-                data_id,
+                str(data_id),
                 include=["embeddings"],
             )["embeddings"]
         if vec_emb is None or len(vec_emb) < 1:
@@ -78,6 +80,6 @@ class Chromadb(VectorBase):
 
     def update_embeddings(self, data_id: str, emb: np.ndarray):
         self._collection.update(
-            ids=data_id,
+            ids=str(data_id),
             embeddings=emb.tolist(),
         )
