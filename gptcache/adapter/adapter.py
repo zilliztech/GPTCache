@@ -512,7 +512,7 @@ def cache_health_check(vectordb, cache_dict):
         # from cache store by the same
         # entry_id.
         vectordb.update_embeddings(
-            id=data_id,
+            data_id,
             emb=cache_dict["embedding"],
         )
     return flag
