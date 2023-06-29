@@ -1,3 +1,4 @@
+import numpy as np
 from gptcache import cache
 from gptcache.processor.post import temperature_softmax
 from gptcache.utils.error import NotInitError
@@ -15,6 +16,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     :param kwargs: llm kwargs
     :return: llm result
     """
+    health_check_flag = kwargs.pop("health_check", False)
     search_only_flag = kwargs.pop("search_only", False)
     user_temperature = "temperature" in kwargs
     user_top_k = "top_k" in kwargs
@@ -110,6 +112,18 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             )
             if cache_data is None:
                 continue
+
+            # cache consistency check
+            if health_check_flag:
+                is_healthy = cache_health_check(
+                    chat_cache.data_manager.v,
+                    {
+                        "embedding": cache_data.embedding_data,
+                        "search_result": search_data,
+                    }
+                )
+                if not is_healthy:
+                    continue
 
             if "deps" in context and hasattr(cache_data.question, "deps"):
                 eval_query_data = {
@@ -473,3 +487,32 @@ def _summarize_input(text, text_length):
     summarization = _input_summarizer.summarize_to_sentence([text], text_length)
     return summarization
 
+def cache_health_check(vectordb, cache_dict):
+    """This function checks if the embedding
+        from vector store matches one in cache store.
+        If cache store and vector store are out of
+        sync with each other, cache retrieval can
+        be incorrect.
+        If this happens, force the similary score
+        to the lowerest possible value.
+    """
+    emb_in_cache = cache_dict["embedding"]
+    _, data_id = cache_dict["search_result"]
+    emb_in_vec = vectordb.get_embeddings(data_id)
+    flag = np.all(emb_in_cache == emb_in_vec)
+    if not flag:
+        gptcache_log.critical("Cache Store and Vector Store are out of sync!!!")
+        # 0: identical, inf: different
+        cache_dict["search_result"] = (
+            np.inf,
+            data_id,
+        )
+        # self-healing by replacing entry
+        # in the vec store with the one
+        # from cache store by the same
+        # entry_id.
+        vectordb.update_embeddings(
+            data_id,
+            emb=cache_dict["embedding"],
+        )
+    return flag

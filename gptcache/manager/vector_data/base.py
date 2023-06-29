@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional, Union
 
 import numpy as np
 
@@ -34,4 +34,10 @@ class VectorBase(ABC):
         pass
 
     def close(self):
+        pass
+
+    def get_embeddings(self, data_id: Union[int, str]) -> Optional[np.ndarray]:
+        raise NotImplementedError
+
+    def update_embeddings(self, data_id: Union[int, str], emb: np.ndarray):
         pass
