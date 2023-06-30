@@ -5,6 +5,12 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.34 (2023.6.30)
+
+1. Add support for Qdrant Vector Store
+2. Add support for Mongodb Cache Store
+3. Fix bug about the redis vector and onnx similarity evaluation
+
 ## v0.1.33 (2023.6.27)
 
 1. Fix the eviction error
