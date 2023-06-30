@@ -21,6 +21,8 @@ def _test_evaluation_config(evaluation):
     assert math.isclose(range_min, 0.0)
     assert math.isclose(range_max, 10.0)
 
+    score = evaluation.evaluation({}, {"search_result": ('2.5', None)})
+    assert math.isclose(score, 5.0)
     score = evaluation.evaluation({}, {"search_result": (5, None)})
     assert math.isclose(score, 5.0)
     score = evaluation.evaluation({}, {"search_result": (20, None)})
