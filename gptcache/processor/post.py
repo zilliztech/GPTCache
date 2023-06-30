@@ -1,5 +1,6 @@
 import random
 from typing import List, Any
+
 import numpy
 
 from gptcache.utils import softmax

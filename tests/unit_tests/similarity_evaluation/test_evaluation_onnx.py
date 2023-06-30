@@ -17,6 +17,7 @@ def _test_evaluation(evaluation):
     candidate_2 = "how old are you?"
 
     score = evaluation.evaluation({"question": query}, {"question": candidate_1})
+    assert isinstance(score, float), type(score)
     assert score > 0.8
 
     score = evaluation.evaluation({"question": query}, {"question": candidate_2})
