@@ -9,14 +9,15 @@ from gptcache.manager.scalar_data.base import CacheStorage, CacheData, Question,
 from gptcache.utils import import_redis
 
 import_redis()
-from redis_om import get_redis_connection  # pylint: disable=wrong-import-position
-from redis_om import (  # pylint: disable=C0413
+
+# pylint: disable=C0413
+from redis_om import get_redis_connection
+from redis_om import (
     JsonModel,
     EmbeddedJsonModel,
     NotFoundError,
     Field,
     Migrator
-
 )
 
 
