@@ -93,6 +93,15 @@ class CacheBase:
                 username=kwargs.get("username"),
                 password=kwargs.get("password")
             )
+        elif name == "redis":
+            from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
+
+            return RedisCacheStorage(
+                host=kwargs.get("redis_host", "localhost"),
+                port=kwargs.get("redis_port", 6379),
+                global_key_prefix=kwargs.get("global_key_prefix", TABLE_NAME),
+                **kwargs
+            )
         else:
             raise NotFoundError("cache store", name)
         return cache_base
