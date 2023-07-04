@@ -81,7 +81,7 @@ def get_models(global_key):
         create_on: datetime.datetime
         last_access: datetime.datetime
         deleted: int = Field(index=True)
-        answers: list[Answers]
+        answers: List[Answers]
 
         class Meta:
             global_key_prefix = global_key
@@ -223,7 +223,7 @@ class RedisCacheStorage(CacheStorage):
         key = str(key)
         try:
             qs = self._ques.get(pk=key)
-        except NotFoundError as e:
+        except NotFoundError:
             return None
 
         qs.update(last_access=datetime.datetime.utcnow())
@@ -238,7 +238,7 @@ class RedisCacheStorage(CacheStorage):
         session_ids = [obj.session_id
                        for obj in self._session.find(self._session.question_id == key).all()]
 
-        res_embedding = self._embedding.get(qs.pk, self.con_encoded)['embedding']
+        res_embedding = self._embedding.get(qs.pk, self.con_encoded)["embedding"]
         return CacheData(
             question=qs.question if not deps else Question(qs.question, res_deps),
             answers=res_ans,
