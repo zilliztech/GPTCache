@@ -2,23 +2,22 @@ import datetime
 from typing import List
 
 import numpy as np
-from redis import Redis
-from redis.client import Pipeline
 
-from gptcache.manager.scalar_data.base import CacheStorage, CacheData, Question, QuestionDep
+from gptcache.manager.scalar_data.base import (
+    CacheStorage,
+    CacheData,
+    Question,
+    QuestionDep,
+)
 from gptcache.utils import import_redis
 
 import_redis()
 
 # pylint: disable=C0413
+from redis import Redis
+from redis.client import Pipeline
 from redis_om import get_redis_connection
-from redis_om import (
-    JsonModel,
-    EmbeddedJsonModel,
-    NotFoundError,
-    Field,
-    Migrator
-)
+from redis_om import JsonModel, EmbeddedJsonModel, NotFoundError, Field, Migrator
 
 
 def get_models(global_key):
@@ -47,6 +46,7 @@ def get_models(global_key):
             and successfully retrieve it without corruption.
             In addition to that, decoding while getting the response is disabled as well.
         """
+
         prefix = global_key + ":embedding"
 
         def __init__(self, pk: str, embedding: bytes):
@@ -71,6 +71,7 @@ def get_models(global_key):
         """
         answer collection
         """
+
         answer: str
         answer_type: int
 
@@ -78,6 +79,7 @@ def get_models(global_key):
         """
         questions collection
         """
+
         question: str = Field(index=True)
         create_on: datetime.datetime
         last_access: datetime.datetime
@@ -120,39 +122,44 @@ def get_models(global_key):
 
 class RedisCacheStorage(CacheStorage):
     """
-    Using redis-om as OM to store data in redis cache storage
+     Using redis-om as OM to store data in redis cache storage
 
-   :param host: redis host, default value 'localhost'
-    :type host: str
+    :param host: redis host, default value 'localhost'
+     :type host: str
 
-    :param port: redis port, default value 27017
-    :type port: int
+     :param port: redis port, default value 27017
+     :type port: int
 
-    :param global_key_prefix: A global prefix for keys against which data is stored.
-    For example, for a global_key_prefix ='gptcache', keys would be constructed would look like this:
-    gptcache:questions:abc123
+     :param global_key_prefix: A global prefix for keys against which data is stored.
+     For example, for a global_key_prefix ='gptcache', keys would be constructed would look like this:
+     gptcache:questions:abc123
 
-    :type global_key_prefix: str
+     :type global_key_prefix: str
 
-    :param kwargs: Additional parameters to provide in order to create redis om connection
+     :param kwargs: Additional parameters to provide in order to create redis om connection
     """
 
-    def __init__(self,
-                 global_key_prefix="gptcache",
-                 host: str = "localhost",
-                 port: int = 6379,
-                 **kwargs):
-        self.con = get_redis_connection(host=host,
-                                        port=port,
-                                        **kwargs)
+    def __init__(
+        self,
+        global_key_prefix="gptcache",
+        host: str = "localhost",
+        port: int = 6379,
+        **kwargs
+    ):
+        self.con = get_redis_connection(host=host, port=port, **kwargs)
 
-        self.con_encoded = get_redis_connection(host=host,
-                                                port=port,
-                                                decode_responses=False,
-                                                **kwargs)
+        self.con_encoded = get_redis_connection(
+            host=host, port=port, decode_responses=False, **kwargs
+        )
 
-        self._ques, self._embedding, self._answer, \
-            self._ques_dep, self._session, self._counter = get_models(global_key_prefix)
+        (
+            self._ques,
+            self._embedding,
+            self._answer,
+            self._ques_dep,
+            self._session,
+            self._counter,
+        ) = get_models(global_key_prefix)
 
         Migrator().run()
 
@@ -179,12 +186,16 @@ class RedisCacheStorage(CacheStorage):
             create_on=datetime.datetime.utcnow(),
             last_access=datetime.datetime.utcnow(),
             deleted=0,
-            answers=answers
+            answers=answers,
         )
 
         ques_data.save(pipeline)
 
-        embedding_data = data.embedding_data.astype(np.float32).tobytes() if data.embedding_data is not None else None
+        embedding_data = (
+            data.embedding_data.astype(np.float32).tobytes()
+            if data.embedding_data is not None
+            else None
+        )
         self._embedding(pk=ques_data.pk, embedding=embedding_data).save(pipeline)
 
         if isinstance(data.question, Question) and data.question.deps is not None:
@@ -232,12 +243,13 @@ class RedisCacheStorage(CacheStorage):
 
         deps = self._ques_dep.find(self._ques_dep.question_id == key).all()
         res_deps = [
-            QuestionDep(item.dep_name, item.dep_data, item.dep_type)
-            for item in deps
+            QuestionDep(item.dep_name, item.dep_data, item.dep_type) for item in deps
         ]
 
-        session_ids = [obj.session_id
-                       for obj in self._session.find(self._session.question_id == key).all()]
+        session_ids = [
+            obj.session_id
+            for obj in self._session.find(self._session.question_id == key).all()
+        ]
 
         res_embedding = self._embedding.get(qs.pk, self.con_encoded)["embedding"]
         return CacheData(
@@ -260,17 +272,23 @@ class RedisCacheStorage(CacheStorage):
             self._ques.delete_many(qs_to_delete, pipeline)
 
             q_ids = [qs.pk for qs in qs_to_delete]
-            sessions_to_delete = self._session.find(self._session.question_id << q_ids).all()
+            sessions_to_delete = self._session.find(
+                self._session.question_id << q_ids
+            ).all()
             self._session.delete_many(sessions_to_delete, pipeline)
 
-            deps_to_delete = self._ques_dep.find(self._ques_dep.question_id << q_ids).all()
+            deps_to_delete = self._ques_dep.find(
+                self._ques_dep.question_id << q_ids
+            ).all()
             self._ques_dep.delete_many(deps_to_delete, pipeline)
 
             pipeline.execute()
 
     def get_ids(self, deleted=True):
         state = -1 if deleted else 0
-        res = [int(obj.pk) for obj in self._ques.find(self._ques.deleted == state).all()]
+        res = [
+            int(obj.pk) for obj in self._ques.find(self._ques.deleted == state).all()
+        ]
         return res
 
     def count(self, state: int = 0, is_all: bool = False):
@@ -279,14 +297,18 @@ class RedisCacheStorage(CacheStorage):
         return self._ques.find(self._ques.deleted == state).count()
 
     def add_session(self, question_id, session_id, session_question):
-        self._session(question_id=question_id,
-                      session_id=session_id,
-                      session_question=session_question
-                      ).save()
+        self._session(
+            question_id=question_id,
+            session_id=session_id,
+            session_question=session_question,
+        ).save()
 
     def list_sessions(self, session_id=None, key=None):
         if session_id and key:
-            self._session.find(self._session.session_id == session_id and self._session.question_id == key).all()
+            self._session.find(
+                self._session.session_id == session_id
+                and self._session.question_id == key
+            ).all()
         if key:
             key = str(key)
             return self._session.find(self._session.question_id == key).all()
@@ -297,7 +319,9 @@ class RedisCacheStorage(CacheStorage):
     def delete_session(self, keys: List[str]):
         keys = [str(key) for key in keys]
         with self.con.pipeline() as pipeline:
-            sessions_to_delete = self._session.find(self._session.question_id << keys).all()
+            sessions_to_delete = self._session.find(
+                self._session.question_id << keys
+            ).all()
             self._session.delete_many(sessions_to_delete, pipeline)
             pipeline.execute()
 
