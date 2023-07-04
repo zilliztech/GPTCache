@@ -97,9 +97,9 @@ class CacheBase:
             from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 
             return RedisCacheStorage(
-                host=kwargs.get("redis_host", "localhost"),
-                port=kwargs.get("redis_port", 6379),
-                global_key_prefix=kwargs.get("global_key_prefix", TABLE_NAME),
+                host=kwargs.pop("redis_host", "localhost"),
+                port=kwargs.pop("redis_port", 6379),
+                global_key_prefix=kwargs.pop("global_key_prefix", TABLE_NAME),
                 **kwargs
             )
         else:

@@ -2,10 +2,13 @@ import time
 import unittest
 
 import numpy as np
-from redis_om import get_redis_connection
 
 from gptcache.manager.scalar_data.base import CacheData, Question
 from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
+from gptcache.utils import import_redis
+
+import_redis()
+from redis_om import get_redis_connection
 
 
 class TestRedisStorage(unittest.TestCase):
