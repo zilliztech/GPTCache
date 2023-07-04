@@ -145,7 +145,10 @@ class RedisCacheStorage(CacheStorage):
                                         port=port,
                                         **kwargs)
 
-        self.con_encoded = get_redis_connection(decode_responses=False)
+        self.con_encoded = get_redis_connection(host=host,
+                                                port=port,
+                                                decode_responses=False,
+                                                **kwargs)
 
         self._ques, self._embedding, self._answer, \
             self._ques_dep, self._session, self._counter = get_models(global_key_prefix)
