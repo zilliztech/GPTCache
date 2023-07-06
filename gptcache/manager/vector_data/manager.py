@@ -258,7 +258,7 @@ class VectorBase:
                 index_params=index_params,
             )
         elif name == "weaviate":
-            from .. vector_data.weaviate import Weaviate
+            from gptcache.manager.vector_data.weaviate import Weaviate
             url = kwargs.get("url", None)
             auth_client_secret = kwargs.get('auth_client_secret', None),
             timeout_config = kwargs.get("timeout_config", (10, 60))

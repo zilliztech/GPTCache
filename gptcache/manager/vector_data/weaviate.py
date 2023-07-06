@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 
 from gptcache.manager.vector_data.base import VectorBase, VectorData
-from ... utils import import_weaviate
+from gptcache.utils import import_weaviate
 from gptcache.utils.log import gptcache_log
 
 from weaviate import Client, EmbeddedOptions, Config
