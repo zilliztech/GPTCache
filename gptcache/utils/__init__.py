@@ -41,6 +41,7 @@ __all__ = [
     "import_fastapi",
     "import_redis",
     "import_qdrant",
+    "import_weaviate"
     ]
 
 import importlib.util
@@ -257,3 +258,7 @@ def import_fastapi():
 
 def import_redis():
     _check_library("redis")
+
+
+def import_weaviate():
+    _check_library("weaviate-client")
