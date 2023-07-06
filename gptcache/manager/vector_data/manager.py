@@ -257,6 +257,32 @@ class VectorBase:
                 flush_interval_sec=flush_interval_sec,
                 index_params=index_params,
             )
+        elif name == "weaviate":
+            from .. vector_data.weaviate import Weaviate
+            url = kwargs.get("url", None)
+            auth_client_secret = kwargs.get('auth_client_secret', None),
+            timeout_config = kwargs.get("timeout_config", (10, 60))
+            proxies = kwargs.get("proxies", None)
+            trust_env = kwargs.get("trust_env", False)
+            additional_headers = kwargs.get("additional_headers", None)
+            startup_period = kwargs.get("startup_period", 5)
+            embedded_options = kwargs.get("embedded_options", None)
+            additional_config = kwargs.get("additional_config", None)
+            class_name = kwargs.get("class_name", "Gptcache")
+            top_k = kwargs.get("top_k", 1)
+            vector_base = Weaviate(
+                url= url, 
+                auth_client_secret = auth_client_secret,
+                timeout_config = timeout_config,
+                proxies = proxies,
+                trust_env = trust_env,
+                additional_headers = additional_headers,
+                startup_period = startup_period,
+                embedded_options = embedded_options,
+                additional_config = additional_config,
+                class_name = class_name,
+                top_k = top_k,
+            )  
         else:
             raise NotFoundError("vector store", name)
         return vector_base
