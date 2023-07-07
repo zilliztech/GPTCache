@@ -6,9 +6,10 @@ from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils import import_weaviate
 from gptcache.utils.log import gptcache_log
 
+import_weaviate()
+
 from weaviate import Client, EmbeddedOptions, Config
 
-import_weaviate()
 
 class Weaviate(VectorBase):
     """Weaviate Vector store"""
