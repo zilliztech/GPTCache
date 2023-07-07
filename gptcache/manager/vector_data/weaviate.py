@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional, Union
 
 import numpy as np
 
@@ -14,13 +14,13 @@ from weaviate import Client, EmbeddedOptions, Config
 class Weaviate(VectorBase):
     """Weaviate Vector store"""
     def __init__(self, 
-                 url: str | None = None,
+                 url: Optional[str] = None,
                  auth_client_secret: None = None,
                  timeout_config = (10, 60),
-                 proxies: dict | str | None = None,
+                 proxies:  Union[dict, str, None] = None,
                  trust_env: bool = False,
-                 additional_headers: dict | None = None,
-                 startup_period: int | None = 5,
+                 additional_headers: Optional[dict]= None,
+                 startup_period: int = 5,
                  embedded_options: None = None,
                  additional_config: None = None,
                  top_k: int = 1,
