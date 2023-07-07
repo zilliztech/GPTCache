@@ -30,7 +30,7 @@ class Weaviate(VectorBase):
         self.class_name = collection_name
         self.top_k = top_k
         self.distance = distance
-        if embedded_options:
+        if not url:
             self.client = Client(embedded_options = EmbeddedOptions(),
                                  startup_period = startup_period,
                                  timeout_config = timeout_config,
@@ -100,7 +100,7 @@ class Weaviate(VectorBase):
     def get_uuids(self, ids: List[str]):
         uuid_list = []
         for id_ in ids:
-            res = self.client.query.get(class_name=self.class_name, properties=['id_']).\
+            res = self.client.query.get(class_name = self.class_name, properties = ['id_']).\
                                     with_where({"path": ["id_"], "operator":"Equal", "valueNumber":id_}).\
                                     with_additional(["id"]).do()
             uuid_list.append(res['data']['Get'][self.class_name][0]['_additional']['id'])
@@ -109,7 +109,7 @@ class Weaviate(VectorBase):
     def delete(self, ids: List[str]):
         uuids = self.get_uuids(ids)
         for uuid_ in uuids:
-            self.client.data_object.delete(class_name='example', uuid=uuid_)
+            self.client.data_object.delete(class_name = self.class_name, uuid = uuid_)
 
     def rebuild(self, ids=None) :
         return 
