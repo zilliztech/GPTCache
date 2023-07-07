@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from gptcache import cache
@@ -17,6 +19,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     :param kwargs: llm kwargs
     :return: llm result
     """
+    start_time = time.time()
     search_only_flag = kwargs.pop("search_only", False)
     user_temperature = "temperature" in kwargs
     user_top_k = "top_k" in kwargs
@@ -67,7 +70,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         pre_embedding_data = pre_embedding_res
 
     if chat_cache.config.input_summary_len is not None:
-        pre_embedding_data = _summarize_input(pre_embedding_data, chat_cache.config.input_summary_len)
+        pre_embedding_data = _summarize_input(
+            pre_embedding_data, chat_cache.config.input_summary_len
+        )
 
     if cache_enable:
         embedding_data = time_cal(
@@ -120,7 +125,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     {
                         "embedding": cache_data.embedding_data,
                         "search_result": search_data,
-                    }
+                    },
                 )
                 if not is_healthy:
                     continue
@@ -166,11 +171,14 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 rank,
             )
             if rank_threshold <= rank:
-                cache_answers.append((float(rank), cache_data.answers[0].answer, search_data))
+                cache_answers.append(
+                    (float(rank), cache_data.answers[0].answer, search_data, cache_data)
+                )
                 chat_cache.data_manager.hit_cache_callback(search_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
-        answers_dict = dict((d[1], d[2]) for d in cache_answers)
+        answers_dict = dict((d[1], d) for d in cache_answers)
         if len(cache_answers) != 0:
+
             def post_process():
                 if chat_cache.post_process_messages_func is temperature_softmax:
                     return_message = chat_cache.post_process_messages_func(
@@ -190,9 +198,26 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 report_func=chat_cache.report.post,
             )()
             chat_cache.report.hint_cache()
-            if session:
+            cache_whole_data = answers_dict.get(str(return_message))
+            if session and cache_whole_data:
                 chat_cache.data_manager.add_session(
-                    answers_dict[return_message], session.name, pre_embedding_data
+                    cache_whole_data[2], session.name, pre_embedding_data
+                )
+            if cache_whole_data:
+                # user_question / cache_question / cache_question_id / cache_answer / similarity / consume time/ time
+                report_cache_data = cache_whole_data[3]
+                report_search_data = cache_whole_data[2]
+                chat_cache.data_manager.report_cache(
+                    pre_store_data if isinstance(pre_store_data, str) else "",
+                    report_cache_data.question
+                    if isinstance(report_cache_data.question, str)
+                    else "",
+                    report_search_data[1],
+                    report_cache_data.answers[0].answer
+                    if isinstance(report_cache_data.answers[0].answer, str)
+                    else "",
+                    cache_whole_data[0],
+                    round(time.time() - start_time, 6),
                 )
             return cache_data_convert(return_message)
 
@@ -219,6 +244,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
 
     if cache_enable:
         try:
+
             def update_cache_func(handled_llm_data, question=None):
                 if question is None:
                     question = pre_store_data
@@ -250,7 +276,9 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     return llm_data
 
 
-async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs):
+async def aadapt(
+    llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+):
     """Simple copy of the 'adapt' method to different llm for 'async llm function'
 
     :param llm_handler: Async LLM calling method, when the cache misses, this function will be called
@@ -260,7 +288,7 @@ async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, 
     :param kwargs: llm kwargs
     :return: llm result
     """
-
+    start_time = time.time()
     user_temperature = "temperature" in kwargs
     user_top_k = "top_k" in kwargs
     temperature = kwargs.pop("temperature", 0.0)
@@ -310,7 +338,9 @@ async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, 
         pre_embedding_data = pre_embedding_res
 
     if chat_cache.config.input_summary_len is not None:
-        pre_embedding_data = _summarize_input(pre_embedding_data, chat_cache.config.input_summary_len)
+        pre_embedding_data = _summarize_input(
+            pre_embedding_data, chat_cache.config.input_summary_len
+        )
 
     if cache_enable:
         embedding_data = time_cal(
@@ -397,10 +427,12 @@ async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, 
                 rank,
             )
             if rank_threshold <= rank:
-                cache_answers.append((float(rank), cache_data.answers[0].answer, search_data))
+                cache_answers.append(
+                    (float(rank), cache_data.answers[0].answer, search_data, cache_data)
+                )
                 chat_cache.data_manager.hit_cache_callback(search_data)
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
-        answers_dict = dict((d[1], d[2]) for d in cache_answers)
+        answers_dict = dict((d[1], d) for d in cache_answers)
         if len(cache_answers) != 0:
             def post_process():
                 if chat_cache.post_process_messages_func is temperature_softmax:
@@ -421,9 +453,26 @@ async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, 
                 report_func=chat_cache.report.post,
             )()
             chat_cache.report.hint_cache()
-            if session:
+            cache_whole_data = answers_dict.get(str(return_message))
+            if session and cache_whole_data:
                 chat_cache.data_manager.add_session(
-                    answers_dict[return_message], session.name, pre_embedding_data
+                    cache_whole_data[2], session.name, pre_embedding_data
+                )
+            if cache_whole_data:
+                # user_question / cache_question / cache_question_id / cache_answer / similarity / consume time/ time
+                report_cache_data = cache_whole_data[3]
+                report_search_data = cache_whole_data[2]
+                chat_cache.data_manager.report_cache(
+                    pre_store_data if isinstance(pre_store_data, str) else "",
+                    report_cache_data.question
+                    if isinstance(report_cache_data.question, str)
+                    else "",
+                    report_search_data[1],
+                    report_cache_data.answers[0].answer
+                    if isinstance(report_cache_data.answers[0].answer, str)
+                    else "",
+                    cache_whole_data[0],
+                    round(time.time() - start_time, 6),
                 )
             return cache_data_convert(return_message)
 
@@ -441,6 +490,7 @@ async def aadapt(llm_handler, cache_data_convert, update_cache_callback, *args, 
 
     if cache_enable:
         try:
+
             def update_cache_func(handled_llm_data, question=None):
                 if question is None:
                     question = pre_store_data
@@ -480,21 +530,25 @@ def _summarize_input(text, text_length):
         return text
 
     # pylint: disable=import-outside-toplevel
-    from gptcache.processor.context.summarization_context import SummarizationContextProcess
+    from gptcache.processor.context.summarization_context import (
+        SummarizationContextProcess,
+    )
+
     global _input_summarizer
     if _input_summarizer is None:
         _input_summarizer = SummarizationContextProcess()
     summarization = _input_summarizer.summarize_to_sentence([text], text_length)
     return summarization
 
+
 def cache_health_check(vectordb, cache_dict):
     """This function checks if the embedding
-        from vector store matches one in cache store.
-        If cache store and vector store are out of
-        sync with each other, cache retrieval can
-        be incorrect.
-        If this happens, force the similary score
-        to the lowerest possible value.
+    from vector store matches one in cache store.
+    If cache store and vector store are out of
+    sync with each other, cache retrieval can
+    be incorrect.
+    If this happens, force the similary score
+    to the lowerest possible value.
     """
     emb_in_cache = cache_dict["embedding"]
     _, data_id = cache_dict["search_result"]

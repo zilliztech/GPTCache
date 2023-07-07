@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 
@@ -117,7 +117,25 @@ def get_models(global_key):
         dep_data: str
         dep_type: int
 
-    return Questions, Embedding, Answers, QuestionDeps, Sessions, Counter
+    class Report(JsonModel):
+        """
+        Report collection
+        """
+
+        class Meta:
+            global_key_prefix = global_key
+            model_key_prefix = "report"
+
+        user_question: str
+        cache_question_id: int = Field(index=True)
+        cache_question: str
+        cache_answer: str
+        similarity: float = Field(index=True)
+        cache_delta_time: float = Field(index=True)
+        cache_time: datetime.datetime = Field(index=True)
+        extra: Optional[str]
+
+    return Questions, Embedding, Answers, QuestionDeps, Sessions, Counter, Report
 
 
 class RedisCacheStorage(CacheStorage):
@@ -140,11 +158,11 @@ class RedisCacheStorage(CacheStorage):
     """
 
     def __init__(
-        self,
-        global_key_prefix="gptcache",
-        host: str = "localhost",
-        port: int = 6379,
-        **kwargs
+            self,
+            global_key_prefix="gptcache",
+            host: str = "localhost",
+            port: int = 6379,
+            **kwargs
     ):
         self.con = get_redis_connection(host=host, port=port, **kwargs)
 
@@ -159,6 +177,7 @@ class RedisCacheStorage(CacheStorage):
             self._ques_dep,
             self._session,
             self._counter,
+            self._report,
         ) = get_models(global_key_prefix)
 
         Migrator().run()
@@ -324,6 +343,17 @@ class RedisCacheStorage(CacheStorage):
             ).all()
             self._session.delete_many(sessions_to_delete, pipeline)
             pipeline.execute()
+
+    def report_cache(self, user_question, cache_question, cache_question_id, cache_answer, similarity_value, cache_delta_time):
+        self._report(
+            user_question=user_question,
+            cache_question=cache_question,
+            cache_question_id=cache_question_id,
+            cache_answer=cache_answer,
+            similarity=similarity_value,
+            cache_delta_time=cache_delta_time,
+            cache_time=datetime.datetime.utcnow(),
+        ).save()
 
     def close(self):
         self.con.close()
