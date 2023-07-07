@@ -8,9 +8,10 @@ from gptcache.utils import import_mongodb
 
 import_mongodb()
 
-from mongoengine import Document  # pylint: disable=wrong-import-position
-from mongoengine import fields  # pylint: disable=wrong-import-position
-import mongoengine as me  # pylint: disable=wrong-import-position
+# pylint: disable=C0413
+from mongoengine import Document
+from mongoengine import fields
+import mongoengine as me
 
 
 def get_models():
@@ -253,7 +254,7 @@ class MongoStorage(CacheStorage):
         if session_id:
             query["session_id"] = session_id
         if key:
-            query["_id"] = key
+            query["question_id"] = key
 
         return self._session.objects(__raw__=query)
 

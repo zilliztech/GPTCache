@@ -26,5 +26,3 @@ grpcio==1.53.0
 protobuf==3.20.0
 milvus==2.2.8
 pymilvus==2.2.8
-pymongo
-mongoengine

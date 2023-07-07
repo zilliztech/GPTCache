@@ -13,16 +13,17 @@ from gptcache.utils import import_sqlalchemy
 
 import_sqlalchemy()
 
-import sqlalchemy  # pylint: disable=wrong-import-position
-from sqlalchemy import func, create_engine, Column, Sequence  # pylint: disable=C0413
-from sqlalchemy.types import (  # pylint: disable=C0413
+# pylint: disable=C0413
+import sqlalchemy
+from sqlalchemy import func, create_engine, Column, Sequence
+from sqlalchemy.types import (
     String,
     DateTime,
     LargeBinary,
     Integer,
 )
-from sqlalchemy.orm import sessionmaker  # pylint: disable=C0413
-from sqlalchemy.ext.declarative import declarative_base  # pylint: disable=C0413
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 DEFAULT_LEN_DOCT = {
     "question_question": 3000,

@@ -120,7 +120,7 @@ class CacheStorage(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def count(self):
+    def count(self, state: int = 0, is_all: bool = False):
         pass
 
     def flush(self):
