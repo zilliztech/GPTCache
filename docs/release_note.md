@@ -5,6 +5,11 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.35 (2023.6.30)
+
+1. Support the redis as the cache store, usage example: [redis+onnx](https://github.com/zilliztech/GPTCache/blob/main/tests/integration_tests/test_redis_onnx.py)
+2. Add report table for easy analysis of cache data
+
 ## v0.1.34 (2023.6.30)
 
 1. Add support for Qdrant Vector Store
