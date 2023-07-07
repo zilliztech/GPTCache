@@ -3,7 +3,12 @@ from typing import List, Optional
 
 import numpy as np
 
-from gptcache.manager.scalar_data.base import CacheStorage, CacheData, Question, QuestionDep
+from gptcache.manager.scalar_data.base import (
+    CacheStorage,
+    CacheData,
+    Question,
+    QuestionDep,
+)
 from gptcache.utils import import_mongodb
 
 import_mongodb()
@@ -19,12 +24,8 @@ def get_models():
         """
         questions collection
         """
-        meta = {
-            "collection": "questions",
-            "indexes": [
-                "deleted"
-            ]
-        }
+
+        meta = {"collection": "questions", "indexes": ["deleted"]}
         _id = fields.SequenceField()
         question = fields.StringField()
         create_on = fields.DateTimeField(default=datetime.now())
@@ -40,13 +41,9 @@ def get_models():
         """
         answer collection
         """
+
         _id = fields.SequenceField()
-        meta = {
-            "collection": "answers",
-            "indexes": [
-                "question_id"
-            ]
-        }
+        meta = {"collection": "answers", "indexes": ["question_id"]}
         answer = fields.StringField()
         answer_type = fields.IntField()
         question_id = fields.IntField()
@@ -59,13 +56,8 @@ def get_models():
         """
         session collection
         """
-        meta = {
-            "collection": "sessions",
-            "indexes": [
-                "question_id"
-            ]
 
-        }
+        meta = {"collection": "sessions", "indexes": ["question_id"]}
         _id = fields.SequenceField()
         session_id = fields.StringField()
         session_question = fields.StringField()
@@ -79,12 +71,8 @@ def get_models():
         """
         Question Dep collection
         """
-        meta = {
-            "collection": "question_deps",
-            "indexes": [
-                "question_id"
-            ]
-        }
+
+        meta = {"collection": "question_deps", "indexes": ["question_id"]}
         _id = fields.SequenceField()
         question_id = fields.IntField()
         dep_name = fields.StringField()
@@ -95,7 +83,30 @@ def get_models():
         def oid(self):
             return self._id
 
-    return Questions, Answers, QuestionDeps, Sessions
+    class Report(Document):
+        """
+        Report
+        """
+
+        meta = {
+            "collection": "report",
+            "indexes": ["cache_question_id", "similarity", "cache_delta_time"],
+        }
+        _id = fields.SequenceField()
+        user_question = fields.StringField()
+        cache_question_id = fields.IntField()
+        cache_question = fields.StringField()
+        cache_answer = fields.StringField()
+        similarity = fields.FloatField()
+        cache_delta_time = fields.FloatField()
+        cache_time = fields.DateTimeField(default=datetime.now())
+        extra = fields.StringField()
+
+        @property
+        def oid(self):
+            return self._id
+
+    return Questions, Answers, QuestionDeps, Sessions, Report
 
 
 class MongoStorage(CacheStorage):
@@ -127,20 +138,29 @@ class MongoStorage(CacheStorage):
     """
 
     def __init__(
-            self,
-            host: str = "localhost",
-            port: int = 27017,
-            dbname: str = "gptcache",
-            username: str = None,
-            password: str = None,
-            **kwargs):
-        self.con = me.connect(host=host,
-                              port=port,
-                              db=dbname,
-                              username=username,
-                              password=password,
-                              **kwargs)
-        self._ques, self._answer, self._ques_dep, self._session = get_models()
+        self,
+        host: str = "localhost",
+        port: int = 27017,
+        dbname: str = "gptcache",
+        username: str = None,
+        password: str = None,
+        **kwargs
+    ):
+        self.con = me.connect(
+            host=host,
+            port=port,
+            db=dbname,
+            username=username,
+            password=password,
+            **kwargs
+        )
+        (
+            self._ques,
+            self._answer,
+            self._ques_dep,
+            self._session,
+            self._report,
+        ) = get_models()
 
     def create(self):
         pass
@@ -152,7 +172,7 @@ class MongoStorage(CacheStorage):
             else data.question.content,
             embedding_data=data.embedding_data.tobytes()
             if data.embedding_data is not None
-            else None
+            else None,
         )
         ques_data.save()
         if isinstance(data.question, Question) and data.question.deps is not None:
@@ -210,8 +230,7 @@ class MongoStorage(CacheStorage):
 
         res_ans = [(item.answer, item.answer_type) for item in answers]
         res_deps = [
-            QuestionDep(item.dep_name, item.dep_data, item.dep_type)
-            for item in deps
+            QuestionDep(item.dep_name, item.dep_data, item.dep_type) for item in deps
         ]
         return CacheData(
             question=qs.question if not deps else Question(qs.question, res_deps),
@@ -244,10 +263,11 @@ class MongoStorage(CacheStorage):
         return self._ques.objects(deleted=state).count()
 
     def add_session(self, question_id, session_id, session_question):
-        self._session(question_id=question_id,
-                      session_id=session_id,
-                      session_question=session_question
-                      ).save()
+        self._session(
+            question_id=question_id,
+            session_id=session_id,
+            session_question=session_question,
+        ).save()
 
     def list_sessions(self, session_id=None, key=None):
         query = {}
@@ -263,6 +283,25 @@ class MongoStorage(CacheStorage):
 
     def count_answers(self):
         return self._answer.objects.count()
+
+    def report_cache(
+        self,
+        user_question,
+        cache_question,
+        cache_question_id,
+        cache_answer,
+        similarity_value,
+        cache_delta_time,
+    ):
+        report_data = self._report(
+            user_question=user_question,
+            cache_question=cache_question,
+            cache_question_id=cache_question_id,
+            cache_answer=cache_answer,
+            similarity=similarity_value,
+            cache_delta_time=cache_delta_time,
+        )
+        report_data.save()
 
     def close(self):
         me.disconnect()
