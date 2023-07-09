@@ -234,10 +234,14 @@ For the similar cache of text, only cache store and vector store are needed. If 
 
 - Use factory to get it by the store name
 
+`vector_params` is the parameter required to build the vector store；
+
+`scalar_params` is the parameter required to build the cache store；
+
 ```python
 from gptcache.manager import manager_factory
 
-data_manager = manager_factory("sqlite,faiss", data_dir="./workspace", vector_params={"dimension": 128})
+data_manager = manager_factory("sqlite,faiss", data_dir="./workspace", scalar_params={}, vector_params={"dimension": 128})
 ```
 
 - Combining each store object through get_data_manager method
@@ -411,7 +415,7 @@ Understand the initialization methods of all caches, and try different component
 1. Different llms require different preprocessing functions, and the usage scenarios of llm also need to be considered
 2. The number of tokens and languages supported when using the model, such as embedding and similarity evaluation
 3. Don’t forget to pass the dimension parameter during the vector database initialization process
-4. There are many examples in the source code, which can be found in the bootcamp/example/test directory
+4. There are **many examples** in the source code, which can be found in the **bootcamp/example/test** directory
 5. If there are multiple llms in a program that need to use cache, multiple Cache objects need to be created
 
 <details>
