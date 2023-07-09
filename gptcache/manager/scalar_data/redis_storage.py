@@ -144,17 +144,33 @@ class RedisCacheStorage(CacheStorage):
 
     :param host: redis host, default value 'localhost'
      :type host: str
-
      :param port: redis port, default value 27017
      :type port: int
-
      :param global_key_prefix: A global prefix for keys against which data is stored.
      For example, for a global_key_prefix ='gptcache', keys would be constructed would look like this:
      gptcache:questions:abc123
-
      :type global_key_prefix: str
-
      :param kwargs: Additional parameters to provide in order to create redis om connection
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.manager import CacheBase, manager_factory
+
+            cache_store = CacheBase('redis',
+                redis_host="localhost",
+                redis_port=6379,
+                global_key_prefix="gptcache",
+            )
+            # or
+            data_manager = manager_factory("mongo,faiss", data_dir="./workspace",
+                scalar_params={
+                    "redis_host"="localhost",
+                    "redis_port"=6379,
+                    "global_key_prefix"="gptcache",
+                },
+                vector_params={"dimension": 128},
+            )
     """
 
     def __init__(

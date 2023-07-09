@@ -120,21 +120,40 @@ class MongoStorage(CacheStorage):
 
     :param host: mongodb host, default value 'localhost'
     :type host: str
-
     :param port: mongodb port, default value 27017
     :type host: int
-
-    :param dbname: Mongo database name, default value 'gptcache'
+    :param dbname: database name, default value 'gptcache'
     :type host: str
-
     :param : Mongo database name, default value 'gptcache'
     :type host: str
-
     :param username: username for authentication, default value None
     :type host: str
-
     :param password: password for authentication, default value None
     :type host: str
+
+    Example:
+        .. code-block:: python
+
+            from gptcache.manager import CacheBase, manager_factory
+
+            cache_store = CacheBase('mongo',
+                mongo_host="localhost",
+                mongo_port=27017,
+                dbname="gptcache",
+                username=None,
+                password=None,
+            )
+            # or
+            data_manager = manager_factory("mongo,faiss", data_dir="./workspace",
+                scalar_params={
+                    "mongo_host": "localhost",
+                    "mongo_port": 27017,
+                    "dbname"="gptcache",
+                    "username"="",
+                    "password"="",
+                },
+                vector_params={"dimension": 128},
+            )
     """
 
     def __init__(
