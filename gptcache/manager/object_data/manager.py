@@ -8,10 +8,16 @@ class ObjectBase:
     Generate specific ObjectStorage with the configuration. For example, setting for
        `ObjectBase` (with `name`) to manage LocalObjectStorage, S3 object storage.
 
-    :param name: the name of the object storage, it is support 'local', 's3'.
+    :param name: the name of the object storage, it is support 'local', 'ustore', 's3'.
     :type name: str
+
     :param path: the cache root of the LocalObjectStorage.
     :type path: str
+
+    :param type: the engine type of 'UStore'.
+    :type type: str
+    :param config: the engine config of 'UStore'.
+    :type config: str
 
     :param bucket: the bucket of s3.
     :type bucket: str
@@ -42,6 +48,9 @@ class ObjectBase:
         if name == "local":
             from gptcache.manager.object_data.local_storage import LocalObjectStorage  # pylint: disable=import-outside-toplevel
             object_base = LocalObjectStorage(kwargs.get("path", "./local_obj"))
+        elif name == "ustore":
+            from gptcache.manager.object_data.ustore import UStore  # pylint: disable=import-outside-toplevel
+            object_base = UStore(kwargs.get("type", "ucset"), kwargs.get("config", None))
         elif name == "s3":
             from gptcache.manager.object_data.s3_storage import S3Storage  # pylint: disable=import-outside-toplevel
             object_base = S3Storage(kwargs.get("path_prefix"), kwargs.get("bucket"),

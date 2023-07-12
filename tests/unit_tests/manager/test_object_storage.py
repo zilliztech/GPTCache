@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 
 from gptcache.manager.object_data.local_storage import LocalObjectStorage
 from gptcache.manager.object_data.s3_storage import S3Storage
+from gptcache.manager.object_data.ustore import UStore
 from gptcache.manager import ObjectBase
 
 
@@ -22,6 +23,17 @@ class TestLocal(unittest.TestCase):
             self.assertEqual(o.get_access_link(fp), fp)
             o.delete([fp])
             self.assertFalse(Path(fp).is_file())
+
+
+class TestUStore(unittest.TestCase):
+    def test_normal(self):
+        o = UStore()
+        data = b'My test'
+        fp = o.put(data)
+        self.assertEqual(o.get(fp), data)
+        self.assertEqual(o.get_access_link(fp), fp)
+        o.delete([fp])
+        self.assertIsNone(o.get(fp))
 
 
 class TestS3(unittest.TestCase):
@@ -40,6 +52,7 @@ class TestS3(unittest.TestCase):
         self.assertEqual(requests.get(link, verify=False).content, data)
         o.delete([fp])
         self.assertIsNone(o.get(fp))
+
 
 class TestBase(unittest.TestCase):
     def test_local(self):
