@@ -143,7 +143,7 @@ def test_cache_temperature():
     prompt = "test"
     answer = "test answer"
     for _ in range(5):
-        put(prompt=prompt, data=answer, skip_cache=True)
+        put(prompt=prompt, data=answer)
 
     answers = get(prompt=prompt, temperature=2.0)
     assert answers is None

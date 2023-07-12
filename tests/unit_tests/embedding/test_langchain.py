@@ -1,7 +1,8 @@
 from gptcache.embedding import LangChain
-from gptcache.utils import import_langchain
+from gptcache.utils import import_langchain, prompt_install
 
 import_langchain()
+prompt_install("pydantic==1.10.8")
 from langchain.embeddings import FakeEmbeddings
 
 
