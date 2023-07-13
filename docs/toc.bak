@@ -20,6 +20,7 @@
    bootcamp/openai/index
    bootcamp/replicate/index
    bootcamp/temperature/index
+   bootcamp/vertex/index
 
 .. toctree::
    :maxdepth: 1
