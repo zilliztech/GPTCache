@@ -35,6 +35,7 @@ class DataManager(metaclass=ABCMeta):
         answers: List[Any],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        **kwargs
     ):
         pass
 
@@ -135,6 +136,7 @@ class MapDataManager(DataManager):
         answers: List[Any],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        **kwargs
     ):
         if (
             len(questions) != len(answers)
@@ -302,6 +304,7 @@ class SSDataManager(DataManager):
         answers: List[Answer],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        **kwargs,
     ):
         if (
             len(questions) != len(answers)
