@@ -21,6 +21,17 @@ from redis_om import JsonModel, EmbeddedJsonModel, NotFoundError, Field, Migrato
 
 
 def get_models(global_key: str, redis_connection: Redis):
+    """
+    Get all the models for the given global key and redis connection.
+    :param global_key: Global key will be used as a prefix for all the keys
+    :type global_key: str
+
+    :param redis_connection: Redis connection to use for all the models.
+    Note: This needs to be explicitly mentioned in `Meta` class for each Object Model,
+    otherwise it will use the default connection from the pool.
+    :type redis_connection: Redis
+    """
+
     class Counter:
         key_name = global_key + ":counter"
         database = redis_connection
