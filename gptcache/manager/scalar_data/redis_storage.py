@@ -87,6 +87,9 @@ def get_models(global_key: str, redis_connection: Redis):
         answer: str
         answer_type: int
 
+        class Meta:
+            database = redis_connection
+
     class Questions(JsonModel):
         """
         questions collection
