@@ -20,17 +20,32 @@ from redis_om import get_redis_connection
 from redis_om import JsonModel, EmbeddedJsonModel, NotFoundError, Field, Migrator
 
 
-def get_models(global_key):
+def get_models(global_key: str, redis_connection: Redis):
+    """
+    Get all the models for the given global key and redis connection.
+    :param global_key: Global key will be used as a prefix for all the keys
+    :type global_key: str
+
+    :param redis_connection: Redis connection to use for all the models.
+    Note: This needs to be explicitly mentioned in `Meta` class for each Object Model,
+    otherwise it will use the default connection from the pool.
+    :type redis_connection: Redis
+    """
+
     class Counter:
+        """
+        counter collection
+        """
         key_name = global_key + ":counter"
+        database = redis_connection
 
         @classmethod
-        def incr(cls, con: Redis):
-            con.incr(cls.key_name)
+        def incr(cls):
+            cls.database.incr(cls.key_name)
 
         @classmethod
-        def get(cls, con: Redis):
-            return con.get(cls.key_name)
+        def get(cls):
+            return cls.database.get(cls.key_name)
 
     class Embedding:
         """
@@ -75,6 +90,9 @@ def get_models(global_key):
         answer: str
         answer_type: int
 
+        class Meta:
+            database = redis_connection
+
     class Questions(JsonModel):
         """
         questions collection
@@ -89,6 +107,7 @@ def get_models(global_key):
         class Meta:
             global_key_prefix = global_key
             model_key_prefix = "questions"
+            database = redis_connection
 
     class Sessions(JsonModel):
         """
@@ -98,6 +117,7 @@ def get_models(global_key):
         class Meta:
             global_key_prefix = global_key
             model_key_prefix = "sessions"
+            database = redis_connection
 
         session_id: str = Field(index=True)
         session_question: str
@@ -111,6 +131,7 @@ def get_models(global_key):
         class Meta:
             global_key_prefix = global_key
             model_key_prefix = "ques_deps"
+            database = redis_connection
 
         question_id: str = Field(index=True)
         dep_name: str
@@ -125,6 +146,7 @@ def get_models(global_key):
         class Meta:
             global_key_prefix = global_key
             model_key_prefix = "report"
+            database = redis_connection
 
         user_question: str
         cache_question_id: int = Field(index=True)
@@ -194,7 +216,7 @@ class RedisCacheStorage(CacheStorage):
             self._session,
             self._counter,
             self._report,
-        ) = get_models(global_key_prefix)
+        ) = get_models(global_key_prefix, redis_connection=self.con)
 
         Migrator().run()
 
@@ -202,8 +224,8 @@ class RedisCacheStorage(CacheStorage):
         pass
 
     def _insert(self, data: CacheData, pipeline: Pipeline = None):
-        self._counter.incr(self.con)
-        pk = str(self._counter.get(self.con))
+        self._counter.incr()
+        pk = str(self._counter.get())
         answers = data.answers if isinstance(data.answers, list) else [data.answers]
         all_data = []
         for answer in answers:
@@ -360,7 +382,8 @@ class RedisCacheStorage(CacheStorage):
             self._session.delete_many(sessions_to_delete, pipeline)
             pipeline.execute()
 
-    def report_cache(self, user_question, cache_question, cache_question_id, cache_answer, similarity_value, cache_delta_time):
+    def report_cache(self, user_question, cache_question, cache_question_id, cache_answer, similarity_value,
+                     cache_delta_time):
         self._report(
             user_question=user_question,
             cache_question=cache_question,
