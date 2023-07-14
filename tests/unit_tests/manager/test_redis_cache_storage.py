@@ -4,28 +4,30 @@ import unittest
 import numpy as np
 
 from gptcache.manager.scalar_data.base import CacheData, Question
-from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
+from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage, get_models
 from gptcache.utils import import_redis
 
 import_redis()
-from redis_om import get_redis_connection
+from redis_om import get_redis_connection, RedisModel
 
 
 class TestRedisStorage(unittest.TestCase):
     test_dbname = "gptcache_test"
+    url = "redis://default:default@localhost:6379"
 
     def setUp(cls) -> None:
         cls._clear_test_db()
 
     @staticmethod
     def _clear_test_db():
-        r = get_redis_connection()
+        r = get_redis_connection(url=TestRedisStorage.url)
         r.flushall()
         r.flushdb()
         time.sleep(1)
 
     def test_normal(self):
-        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname)
+        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname,
+                                          url=self.url)
         data = []
         for i in range(1, 10):
             data.append(
@@ -61,7 +63,8 @@ class TestRedisStorage(unittest.TestCase):
         assert redis_storage.count(is_all=True) == 7
 
     def test_with_deps(self):
-        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname)
+        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname,
+                                          url=self.url)
         data_id = redis_storage.batch_insert(
             [
                 CacheData(
@@ -98,7 +101,8 @@ class TestRedisStorage(unittest.TestCase):
         assert ret.question.deps[1].dep_type == 1
 
     def test_create_on(self):
-        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname)
+        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname,
+                                          url=self.url)
         redis_storage.create()
         data = []
         for i in range(1, 10):
@@ -124,7 +128,8 @@ class TestRedisStorage(unittest.TestCase):
         assert last_access1 < last_access2
 
     def test_session(self):
-        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname)
+        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname,
+                                          url=self.url)
         data = []
         for i in range(1, 11):
             data.append(
