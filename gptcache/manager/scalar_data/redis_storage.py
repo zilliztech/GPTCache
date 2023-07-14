@@ -33,6 +33,9 @@ def get_models(global_key: str, redis_connection: Redis):
     """
 
     class Counter:
+        """
+        counter collection
+        """
         key_name = global_key + ":counter"
         database = redis_connection
 
