@@ -27,6 +27,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     chat_cache = kwargs.pop("cache_obj", cache)
     session = kwargs.pop("session", None)
     require_object_store = kwargs.pop("require_object_store", False)
+    # metadata = kwargs.pop("metadata", {})
     if require_object_store:
         assert chat_cache.data_manager.o, "Object store is required for adapter."
     if not chat_cache.has_init:
@@ -91,6 +92,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             top_k=kwargs.pop("top_k", 5)
             if (user_temperature and not user_top_k)
             else kwargs.pop("top_k", -1),
+            **kwargs,
         )
         if search_data_list is None:
             search_data_list = []
@@ -245,7 +247,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
     if cache_enable:
         try:
 
-            def update_cache_func(handled_llm_data, question=None):
+            def update_cache_func(handled_llm_data, question=None, **kwargs):
                 if question is None:
                     question = pre_store_data
                 else:
@@ -260,6 +262,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     embedding_data,
                     extra_param=context.get("save_func", None),
                     session=session,
+                    **kwargs
                 )
                 if (
                     chat_cache.report.op_save.count > 0
@@ -267,7 +270,6 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     == 0
                 ):
                     chat_cache.flush()
-
             llm_data = update_cache_callback(
                 llm_data, update_cache_func, *args, **kwargs
             )
@@ -359,6 +361,7 @@ async def aadapt(
             top_k=kwargs.pop("top_k", 5)
             if (user_temperature and not user_top_k)
             else kwargs.pop("top_k", -1),
+            **kwargs
         )
         if search_data_list is None:
             search_data_list = []

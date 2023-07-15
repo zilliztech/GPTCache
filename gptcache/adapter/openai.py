@@ -56,6 +56,7 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
+            _ = llm_kwargs.pop('metadata',{})
             return super().create(*llm_args, **llm_kwargs) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
@@ -66,7 +67,7 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     ):  # pylint: disable=unused-argument
         if not isinstance(llm_data, Iterator):
             update_cache_func(
-                Answer(get_message_from_openai_answer(llm_data), DataType.STR)
+                Answer(get_message_from_openai_answer(llm_data), DataType.STR), **kwargs
             )
             return llm_data
         else:
@@ -76,7 +77,7 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
                 for item in it:
                     total_answer += get_stream_message_from_openai_answer(item)
                     yield item
-                update_cache_func(Answer(total_answer, DataType.STR))
+                update_cache_func(Answer(total_answer, DataType.STR), **kwargs)
 
             return hook_openai_data(llm_data)
 
