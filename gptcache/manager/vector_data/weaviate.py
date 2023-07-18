@@ -6,9 +6,10 @@ from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils import import_weaviate
 from gptcache.utils.log import gptcache_log
 
+import_weaviate()
+
 from weaviate import Client, EmbeddedOptions, Config
 
-import_weaviate()
 
 class Weaviate(VectorBase):
     """Weaviate Vector store"""
@@ -24,27 +25,30 @@ class Weaviate(VectorBase):
                  additional_config: None = None,
                  top_k: int = 1,
                  distance: str = "cosine",
-                 collection_name: str = "Gptcache",
+                 class_name: str = "Gptcache",
                  ):
-        self.class_name = collection_name
+        self.class_name = class_name
         self.top_k = top_k
         self.distance = distance
-        if embedded_options:
-            self.client = Client(embedded_options = EmbeddedOptions(),
-                                 startup_period = startup_period,
-                                 timeout_config = timeout_config,
-                                 additional_config=additional_config)
+        if not url:
+            self.client = Client(
+                embedded_options = EmbeddedOptions(),
+                startup_period = startup_period,
+                timeout_config = timeout_config,
+                additional_config = additional_config
+            )
         else:
-            self.client = Client(url, 
-                                 auth_client_secret,
-                                 timeout_config,
-                                 proxies,
-                                 trust_env,
-                                 additional_headers,
-                                 startup_period,
-                                 embedded_options,
-                                 additional_config,
-                                 )        
+            self.client = Client(
+                url, 
+                auth_client_secret,
+                timeout_config,
+                proxies,
+                trust_env,
+                additional_headers,
+                startup_period,
+                embedded_options,
+                additional_config,
+                )        
     
     def _create_collection(self, class_name: str):
         if not class_name:
