@@ -1,5 +1,5 @@
-from abc import abstractmethod, ABCMeta
 import pickle
+from abc import abstractmethod, ABCMeta
 from typing import List, Any, Optional, Union
 
 import cachetools
@@ -7,17 +7,17 @@ import numpy as np
 import requests
 
 from gptcache.manager.eviction import EvictionBase
-from gptcache.utils.error import CacheError, ParamError
+from gptcache.manager.eviction_manager import EvictionManager
+from gptcache.manager.object_data.base import ObjectBase
 from gptcache.manager.scalar_data.base import (
     CacheStorage,
     CacheData,
     DataType,
     Answer,
-    Question
+    Question,
 )
 from gptcache.manager.vector_data.base import VectorBase, VectorData
-from gptcache.manager.object_data.base import ObjectBase
-from gptcache.manager.eviction_manager import EvictionManager
+from gptcache.utils.error import CacheError, ParamError
 from gptcache.utils.log import gptcache_log
 
 
@@ -30,7 +30,11 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def import_data(
-        self, questions: List[Any], answers: List[Any], embedding_datas: List[Any], session_ids: List[Optional[str]]
+        self,
+        questions: List[Any],
+        answers: List[Any],
+        embedding_datas: List[Any],
+        session_ids: List[Optional[str]],
     ):
         pass
 
@@ -43,7 +47,7 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def search(self, embedding_data, **kwargs):
-        """ search the data in the cache store accrodding to the embedding data
+        """search the data in the cache store accrodding to the embedding data
 
         :return: a list of search result, [[score, id], [score, id], ...]
         """
@@ -62,6 +66,17 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def delete_session(self, session_id):
+        pass
+
+    def report_cache(
+        self,
+        user_question,
+        cache_question,
+        cache_question_id,
+        cache_answer,
+        similarity_value,
+        cache_delta_time,
+    ):
         pass
 
     @abstractmethod
@@ -115,18 +130,35 @@ class MapDataManager(DataManager):
         self.data[embedding_data] = (question, answer, embedding_data, session_id)
 
     def import_data(
-        self, questions: List[Any], answers: List[Any], embedding_datas: List[Any], session_ids: List[Optional[str]]
+        self,
+        questions: List[Any],
+        answers: List[Any],
+        embedding_datas: List[Any],
+        session_ids: List[Optional[str]],
     ):
-        if len(questions) != len(answers) or len(questions) != len(embedding_datas) or len(questions) != len(session_ids):
+        if (
+            len(questions) != len(answers)
+            or len(questions) != len(embedding_datas)
+            or len(questions) != len(session_ids)
+        ):
             raise ParamError("Make sure that all parameters have the same length")
         for i, embedding_data in enumerate(embedding_datas):
-            self.data[embedding_data] = (questions[i], answers[i], embedding_datas[i], {session_ids[i]} if session_ids[i] else set())
+            self.data[embedding_data] = (
+                questions[i],
+                answers[i],
+                embedding_datas[i],
+                {session_ids[i]} if session_ids[i] else set(),
+            )
 
     def get_scalar_data(self, res_data, **kwargs) -> CacheData:
         session = kwargs.get("session", None)
         if session:
-            answer = res_data[1].answer if isinstance(res_data[1], Answer) else res_data[1]
-            if not session.check_hit_func(session.name, list(res_data[3]), [res_data[0]], answer):
+            answer = (
+                res_data[1].answer if isinstance(res_data[1], Answer) else res_data[1]
+            )
+            if not session.check_hit_func(
+                session.name, list(res_data[3]), [res_data[0]], answer
+            ):
                 return None
         return CacheData(question=res_data[0], answers=res_data[1])
 
@@ -265,9 +297,17 @@ class SSDataManager(DataManager):
         return Question(question)
 
     def import_data(
-        self, questions: List[Any], answers: List[Answer], embedding_datas: List[Any], session_ids: List[Optional[str]]
+        self,
+        questions: List[Any],
+        answers: List[Answer],
+        embedding_datas: List[Any],
+        session_ids: List[Optional[str]],
     ):
-        if len(questions) != len(answers) or len(questions) != len(embedding_datas) or len(questions) != len(session_ids):
+        if (
+            len(questions) != len(answers)
+            or len(questions) != len(embedding_datas)
+            or len(questions) != len(session_ids)
+        ):
             raise ParamError("Make sure that all parameters have the same length")
         cache_datas = []
         embedding_datas = [
@@ -284,7 +324,7 @@ class SSDataManager(DataManager):
                     question=self._process_question_data(questions[i]),
                     answers=ans,
                     embedding_data=embedding_data.astype("float32"),
-                    session_id=session_ids[i]
+                    session_id=session_ids[i],
                 )
             )
         ids = self.s.batch_insert(cache_datas)
@@ -303,10 +343,18 @@ class SSDataManager(DataManager):
             return None
 
         if session:
-            cache_answer = cache_data.answers[0].answer if isinstance(cache_data.answers[0], Answer) else cache_data.answers[0]
+            cache_answer = (
+                cache_data.answers[0].answer
+                if isinstance(cache_data.answers[0], Answer)
+                else cache_data.answers[0]
+            )
             res_list = self.list_sessions(key=res_data[1])
-            cache_session_ids, cache_questions = [r.session_id for r in res_list], [r.session_question for r in res_list]
-            if not session.check_hit_func(session.name, cache_session_ids, cache_questions, cache_answer):
+            cache_session_ids, cache_questions = [r.session_id for r in res_list], [
+                r.session_question for r in res_list
+            ]
+            if not session.check_hit_func(
+                session.name, cache_session_ids, cache_questions, cache_answer
+            ):
                 return None
 
         for ans in cache_data.answers:
@@ -340,6 +388,24 @@ class SSDataManager(DataManager):
     def delete_session(self, session_id):
         keys = self.list_sessions(session_id=session_id)
         self.s.delete_session(keys)
+
+    def report_cache(
+        self,
+        user_question,
+        cache_question,
+        cache_question_id,
+        cache_answer,
+        similarity_value,
+        cache_delta_time,
+    ):
+        self.s.report_cache(
+            user_question,
+            cache_question,
+            cache_question_id,
+            cache_answer,
+            similarity_value,
+            cache_delta_time,
+        )
 
     def close(self):
         self.s.close()

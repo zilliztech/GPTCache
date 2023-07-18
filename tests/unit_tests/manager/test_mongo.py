@@ -1,10 +1,13 @@
 import time
 
 import numpy as np
-from mongoengine import connect, disconnect
 
 from gptcache.manager.scalar_data.base import CacheData, Question
 from gptcache.manager.scalar_data.mongo import MongoStorage
+from gptcache.utils import import_mongodb
+
+import_mongodb()
+from mongoengine import connect, disconnect
 
 
 def test_mongo():

@@ -13,16 +13,18 @@ from gptcache.utils import import_sqlalchemy
 
 import_sqlalchemy()
 
-import sqlalchemy  # pylint: disable=wrong-import-position
-from sqlalchemy import func, create_engine, Column, Sequence  # pylint: disable=C0413
-from sqlalchemy.types import (  # pylint: disable=C0413
+# pylint: disable=C0413
+import sqlalchemy
+from sqlalchemy import func, create_engine, Column, Sequence
+from sqlalchemy.types import (
     String,
     DateTime,
     LargeBinary,
     Integer,
+    Float,
 )
-from sqlalchemy.orm import sessionmaker  # pylint: disable=C0413
-from sqlalchemy.ext.declarative import declarative_base  # pylint: disable=C0413
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 DEFAULT_LEN_DOCT = {
     "question_question": 3000,
@@ -134,7 +136,46 @@ def get_models(table_prefix, db_type, table_len_config):
         )
         dep_type = Column(Integer, nullable=False)
 
-    return QuestionTable, AnswerTable, QuestionDepTable, SessionTable
+    class ReportTable(DynamicBase):
+        """
+        report table
+        """
+
+        __tablename__ = table_prefix + "_report"
+        __table_args__ = {"extend_existing": True}
+
+        if db_type in ("oracle", "duckdb"):
+            question_dep_id_seq = Sequence(f"{__tablename__}_id_seq", start=1)
+            id = Column(
+                Integer, question_dep_id_seq, primary_key=True, autoincrement=True
+            )
+        else:
+            id = Column(Integer, primary_key=True, autoincrement=True)
+
+        user_question = Column(
+            String(_get_table_len(table_len_config, "question_question")),
+            nullable=False,
+        )
+        cache_question_id = Column(
+            Integer,
+            nullable=False,
+        )
+        cache_question = Column(
+            String(_get_table_len(table_len_config, "question_question")),
+            nullable=False,
+        )
+        cache_answer = Column(
+            String(_get_table_len(table_len_config, "answer_answer")), nullable=False
+        )
+        similarity = Column(Float, nullable=False)
+        cache_delta_time = Column(Float, nullable=False)
+        cache_time = Column(DateTime, default=datetime.now)
+        extra = Column(
+            String(_get_table_len(table_len_config, "question_question")),
+            nullable=True,
+        )
+
+    return QuestionTable, AnswerTable, QuestionDepTable, SessionTable, ReportTable
 
 
 class SQLStorage(CacheStorage):
@@ -167,7 +208,7 @@ class SQLStorage(CacheStorage):
         if table_len_config is None:
             table_len_config = {}
         self._url = url
-        self._ques, self._answer, self._ques_dep, self._session = get_models(
+        self._ques, self._answer, self._ques_dep, self._session, self._report = get_models(
             table_name, db_type, table_len_config
         )
         self._engine = create_engine(self._url)
@@ -179,6 +220,7 @@ class SQLStorage(CacheStorage):
         self._answer.__table__.create(bind=self._engine, checkfirst=True)
         self._ques_dep.__table__.create(bind=self._engine, checkfirst=True)
         self._session.__table__.create(bind=self._engine, checkfirst=True)
+        self._report.__table__.create(bind=self._engine, checkfirst=True)
 
     def _insert(self, data: CacheData, session: sqlalchemy.orm.Session) -> Column:
         ques_data = self._ques(
@@ -235,9 +277,7 @@ class SQLStorage(CacheStorage):
     def get_data_by_id(self, key: int) -> Optional[CacheData]:
         with self.Session() as session:
             qs = (
-                session.query(
-                    self._ques
-                )
+                session.query(self._ques)
                 .filter(self._ques.id == key)
                 .filter(self._ques.deleted == 0)
                 .first()
@@ -343,6 +383,19 @@ class SQLStorage(CacheStorage):
             elif key:
                 query = query.filter(self._session.question_id == key)
             return query.all()
+
+    def report_cache(self, user_question, cache_question, cache_question_id, cache_answer, similarity_value, cache_delta_time):
+        with self.Session() as session:
+            report_data = self._report(
+                user_question=user_question,
+                cache_question=cache_question,
+                cache_question_id=cache_question_id,
+                cache_answer=cache_answer,
+                similarity=similarity_value,
+                cache_delta_time=cache_delta_time,
+            )
+            session.add(report_data)
+            session.commit()
 
     def close(self):
         pass
