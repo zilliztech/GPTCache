@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional, Union
 
 import numpy as np
 
@@ -13,20 +13,21 @@ from weaviate import Client, EmbeddedOptions, Config
 
 class Weaviate(VectorBase):
     """Weaviate Vector store"""
-    def __init__(self, 
-                 url: str | None = None,
-                 auth_client_secret: None = None,
-                 timeout_config = (10, 60),
-                 proxies: dict | str | None = None,
-                 trust_env: bool = False,
-                 additional_headers: dict | None = None,
-                 startup_period: int | None = 5,
-                 embedded_options: None = None,
-                 additional_config: None = None,
-                 top_k: int = 1,
-                 distance: str = "cosine",
-                 class_name: str = "Gptcache",
-                 ):
+    def __init__(
+            self, 
+            url: str = None,
+            auth_client_secret = None,
+            timeout_config = (10, 60),
+            proxies: Optional[Union[dict, str]] = None,
+            trust_env: bool = False,
+            additional_headers: Optional[dict] = None,
+            startup_period: Optional[int] = 5,
+            embedded_options = None,
+            additional_config = None,
+            top_k: int = 1,
+            distance: str = "cosine",
+            class_name: str = "Gptcache",
+        ):
         self.class_name = class_name
         self.top_k = top_k
         self.distance = distance
@@ -112,7 +113,7 @@ class Weaviate(VectorBase):
     def delete(self, ids: List[str]):
         uuids = self.get_uuids(ids)
         for uuid_ in uuids:
-            self.client.data_object.delete(class_name='example', uuid=uuid_)
+            self.client.data_object.delete(class_name = self.class_name, uuid=uuid_)
 
     def rebuild(self, ids=None) :
         return 
