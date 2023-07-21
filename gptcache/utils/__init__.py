@@ -117,7 +117,7 @@ def import_hnswlib():
 
 
 def import_chromadb():
-    _check_library("chromadb")
+    _check_library("chromadb", package="chromadb==0.3.26")
 
 
 def import_sqlalchemy():
