@@ -29,5 +29,5 @@ class TestWeaviateDB(unittest.TestCase):
         db.rebuild()
         db.update_embeddings(6, data[7])
         emb = db.get_embeddings(6)
-        self.assertEqual(emb, data[7])
+        self.assertEqual(emb.tolist(), data[7].tolist())
         db.close()
