@@ -205,8 +205,9 @@ class LangChainChat(BaseChatModel, BaseModel):
         callbacks: Callbacks = None,
         **kwargs,
     ) -> LLMResult:
+        print("kwargs inside generate: ",kwargs)
         self.tmp_args = kwargs
-        return super().generate(messages, stop=stop, callbacks=callbacks)
+        return super().generate(messages, stop=stop, callbacks=callbacks, **kwargs)
 
     async def agenerate(
         self,
@@ -232,6 +233,7 @@ class LangChainChat(BaseChatModel, BaseModel):
         return self.chat.get_num_tokens_from_messages(messages)
 
     def __call__(self, messages: Any, stop: Optional[List[str]] = None, **kwargs):
+        print("kwargs in __call__: ", kwargs)
         generation = self.generate([messages], stop=stop, **kwargs).generations[0][0]
         if isinstance(generation, ChatGeneration):
             return generation.message

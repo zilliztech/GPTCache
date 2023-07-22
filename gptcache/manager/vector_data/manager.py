@@ -1,4 +1,5 @@
 from gptcache.utils.error import NotFoundError, ParamError
+import pinecone
 
 TOP_K = 1
 
@@ -257,6 +258,16 @@ class VectorBase:
                 flush_interval_sec=flush_interval_sec,
                 index_params=index_params,
             )
+        elif name == "pinecone":
+            from gptcache.manager.vector_data.pinecone import Pinecone
+            api_key = kwargs.get("api_key", None)
+            metric = kwargs.get("metric",'cosine')
+            environment = kwargs.get("environment",None)
+            dimension = kwargs.get("dimension", DIMENSION)
+            top_k: int = kwargs.get("top_k", TOP_K)
+            index_name = kwargs.get("index_name", "caching")
+            pinecone.init(api_key=api_key, environment=environment)
+            vector_base = Pinecone(index_file_path=index_name,dimension=dimension,top_k=top_k, metric=metric)
         else:
             raise NotFoundError("vector store", name)
         return vector_base

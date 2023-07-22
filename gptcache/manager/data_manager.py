@@ -1,3 +1,4 @@
+from importlib.metadata import metadata
 import pickle
 from abc import abstractmethod, ABCMeta
 from typing import List, Any, Optional, Union
@@ -35,6 +36,7 @@ class DataManager(metaclass=ABCMeta):
         answers: List[Any],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        **kwargs
     ):
         pass
 
@@ -135,6 +137,7 @@ class MapDataManager(DataManager):
         answers: List[Any],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        **kwargs
     ):
         if (
             len(questions) != len(answers)
@@ -271,7 +274,7 @@ class SSDataManager(DataManager):
         """
         session = kwargs.get("session", None)
         session_id = session.name if session else None
-        self.import_data([question], [answer], [embedding_data], [session_id])
+        self.import_data([question], [answer], [embedding_data], [session_id], **kwargs)
 
     def _process_answer_data(self, answers: Union[Answer, List[Answer]]):
         if isinstance(answers, Answer):
@@ -302,6 +305,7 @@ class SSDataManager(DataManager):
         answers: List[Answer],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        **kwargs,
     ):
         if (
             len(questions) != len(answers)
@@ -332,7 +336,7 @@ class SSDataManager(DataManager):
             [
                 VectorData(id=ids[i], data=embedding_data)
                 for i, embedding_data in enumerate(embedding_datas)
-            ]
+            ], kwargs=kwargs
         )
         self.eviction_base.put(ids)
 
@@ -367,8 +371,8 @@ class SSDataManager(DataManager):
 
     def search(self, embedding_data, **kwargs):
         embedding_data = normalize(embedding_data)
-        top_k = kwargs.get("top_k", -1)
-        return self.v.search(data=embedding_data, top_k=top_k)
+        top_k = kwargs.pop("top_k", -1)
+        return self.v.search(data=embedding_data, top_k=top_k, **kwargs)
 
     def flush(self):
         self.s.flush()
