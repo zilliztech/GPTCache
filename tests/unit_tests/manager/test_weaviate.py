@@ -16,6 +16,7 @@ class TestWeaviateDB(unittest.TestCase):
             top_k=top_k
         )
 
+        db._create_class()
         data = np.random.randn(size, dim).astype(np.float32)
         db.mul_add([VectorData(id=i, data=v) for v, i in zip(data, range(size))])
         self.assertEqual(len(db.search(data[0])), top_k)
@@ -30,4 +31,6 @@ class TestWeaviateDB(unittest.TestCase):
         db.update_embeddings(6, data[7])
         emb = db.get_embeddings(6)
         self.assertEqual(emb.tolist(), data[7].tolist())
+        emb = db.get_embeddings(0)
+        self.assertIsNone(emb)
         db.close()

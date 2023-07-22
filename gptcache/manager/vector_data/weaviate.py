@@ -13,13 +13,13 @@ from weaviate.config import Config
 from weaviate.embedded import EmbeddedOptions
 from weaviate.types import NUMBERS
 
-TIMEOUT_TYPE = Union[Tuple[NUMBERS, NUMBERS], NUMBERS]
-
 
 class Weaviate(VectorBase):
     """
     vector store: Weaviate
     """
+
+    TIMEOUT_TYPE = Union[Tuple[NUMBERS, NUMBERS], NUMBERS]
 
     def __init__(
         self,
