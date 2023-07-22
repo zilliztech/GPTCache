@@ -27,6 +27,9 @@ QDRANT_FLUSH_INTERVAL_SEC = 5
 
 COLLECTION_NAME = "gptcache"
 
+WEAVIATE_TIMEOUT_CONFIG = (10, 60)
+WEAVIATE_STARTUP_PERIOD = 5
+
 
 # pylint: disable=import-outside-toplevel
 class VectorBase:
@@ -256,6 +259,31 @@ class VectorBase:
                 top_k=top_k,
                 flush_interval_sec=flush_interval_sec,
                 index_params=index_params,
+            )
+        elif name == "weaviate":
+            from gptcache.manager.vector_data.weaviate import Weaviate
+
+            url = kwargs.get("url", None)
+            auth_client_secret = kwargs.get("auth_client_secret", None)
+            timeout_config = kwargs.get("timeout_config", WEAVIATE_TIMEOUT_CONFIG)
+            proxies = kwargs.get("proxies", None)
+            trust_env = kwargs.get("trust_env", False)
+            additional_headers = kwargs.get("additional_headers", None)
+            startup_period = kwargs.get("startup_period", WEAVIATE_STARTUP_PERIOD)
+            embedded_options = kwargs.get("embedded_options", None)
+            additional_config = kwargs.get("additional_config", None)
+
+            vector_base = Weaviate(
+                url=url,
+                auth_client_secret=auth_client_secret,
+                timeout_config=timeout_config,
+                proxies=proxies,
+                trust_env=trust_env,
+                additional_headers=additional_headers,
+                startup_period=startup_period,
+                embedded_options=embedded_options,
+                additional_config=additional_config,
+                top_k=top_k,
             )
         else:
             raise NotFoundError("vector store", name)
