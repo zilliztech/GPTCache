@@ -34,6 +34,10 @@ class Weaviate(VectorBase):
         additional_config: Optional[Config] = None,
         top_k: Optional[int] = 1,
     ) -> None:
+
+        if url is None and embedded_options is None:
+            embedded_options = EmbeddedOptions()
+
         self.client = Client(
             url=url,
             auth_client_secret=auth_client_secret,
