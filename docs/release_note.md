@@ -5,6 +5,10 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.37 (2023.7.23)
+
+1. Support the weaviate vector databse
+
 ## v0.1.36 (2023.7.14)
 
 1. Fix the connection error of the remote redis cache store
