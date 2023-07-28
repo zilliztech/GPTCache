@@ -38,9 +38,9 @@ class TestWeaviateDB(unittest.TestCase):
         self.assertIsNone(emb)
         db.close()
 
-        custom_class = "Customcache"
+        custom_class_name = "Customcache"
         class_schema = {
-            "class": custom_class,
+            "class": custom_class_name,
             "description": "LLM response cache",
             "properties": [
                 {
@@ -58,5 +58,5 @@ class TestWeaviateDB(unittest.TestCase):
             top_k=top_k
         )
         created_class_name = db._create_class()
-        self.assertEqual(custom_class, created_class_name)
+        self.assertEqual(custom_class_name, created_class_name)
         db.close()
