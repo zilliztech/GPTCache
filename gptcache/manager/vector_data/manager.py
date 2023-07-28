@@ -272,6 +272,8 @@ class VectorBase:
             startup_period = kwargs.get("startup_period", WEAVIATE_STARTUP_PERIOD)
             embedded_options = kwargs.get("embedded_options", None)
             additional_config = kwargs.get("additional_config", None)
+            class_name = kwargs.get("class_name", "GPTCache")
+            class_schema = kwargs.get("class_schema", None)
 
             vector_base = Weaviate(
                 url=url,
@@ -283,6 +285,8 @@ class VectorBase:
                 startup_period=startup_period,
                 embedded_options=embedded_options,
                 additional_config=additional_config,
+                class_name=class_name,
+                class_schema=class_schema,
                 top_k=top_k,
             )
         else:
