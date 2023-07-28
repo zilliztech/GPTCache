@@ -32,6 +32,8 @@ class Weaviate(VectorBase):
         startup_period: Optional[int] = 5,
         embedded_options: Optional[EmbeddedOptions] = None,
         additional_config: Optional[Config] = None,
+        class_name: str = "GPTCache",
+        class_schema: dict = None,
         top_k: Optional[int] = 1,
     ) -> None:
 
@@ -50,26 +52,29 @@ class Weaviate(VectorBase):
             additional_config=additional_config,
         )
 
+        if class_schema:
+            self.class_schema = class_schema
+            self.class_name = class_schema.get("class")
+        else:
+            self.class_name = class_name
+            self.class_schema = self._get_default_class_schema()
+
         self._create_class()
         self.top_k = top_k
 
     def _create_class(self):
-        class_schema = self._get_default_class_schema()
-
-        self.class_name = class_schema.get("class")
-
         if self.client.schema.exists(self.class_name):
             gptcache_log.warning(
                 "The %s collection already exists, and it will be used directly.",
                 self.class_name,
             )
         else:
-            self.client.schema.create_class(class_schema)
+            self.client.schema.create_class(self.class_schema)
+        return self.class_name
 
-    @staticmethod
-    def _get_default_class_schema() -> dict:
+    def _get_default_class_schema(self) -> dict:
         return {
-            "class": "GPTCache",
+            "class": self.class_name,
             "description": "LLM response cache",
             "properties": [
                 {
