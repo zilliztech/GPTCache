@@ -235,6 +235,7 @@ class SSDataManager(DataManager):
         self.s = s
         self.v = v
         self.o = o
+        self.eviction_manager = EvictionManager(self.s, self.v)
         self.eviction_base = EvictionBase(
             name="memory",
             policy=policy,
@@ -243,7 +244,6 @@ class SSDataManager(DataManager):
             on_evict=self._clear,
         )
         self.eviction_base.put(self.s.get_ids(deleted=False))
-        self.eviction_manager = EvictionManager(self.s, self.v)
 
     def _clear(self, marked_keys):
         self.eviction_manager.soft_evict(marked_keys)
