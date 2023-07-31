@@ -5,6 +5,13 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.38 (2023.7.31)
+
+Some improvements:
+1. Handle openai change of api base for just embeddings
+2. Support for custom class schema in weaviate vector store
+3. Fix the error: 'SSDataManager' object has no attribute 'eviction_manager'
+
 ## v0.1.37 (2023.7.23)
 
 1. Support the weaviate vector databse
