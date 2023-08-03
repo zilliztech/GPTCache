@@ -14,7 +14,7 @@ git+https://github.com/Projectplace/pytest-tags
 pytest-html==3.1.1
 pytest-sugar==0.9.5
 pytest-parallel
-psycopg2
+psycopg2-binary
 transformers==4.29.2
 torch
 mock
