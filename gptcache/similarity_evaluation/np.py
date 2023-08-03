@@ -68,7 +68,7 @@ class NumpyNormEvaluation(SimilarityEvaluation):
         if 'question' in src_dict and 'question' in cache_dict:
             if src_dict['question'].lower() == cache_dict['question'].lower():
                 return self.range()[1]
-            if 'embedding' not in src_dict or 'embedding' not in cache_dict or not src_dict['embedding'] or not cache_dict['embedding']:
+            if 'embedding' not in src_dict or 'embedding' not in cache_dict or src_dict['embedding'] is None or cache_dict['embedding'] is None:
                 assert self.question_encoder, 'You need to a valid question_embedding_function to generate question embedding in the evaluator.'
                 src_dict['embedding'] = self.question_encoder(src_dict['question'])
                 cache_dict['embedding'] = self.question_encoder(cache_dict['question'])
