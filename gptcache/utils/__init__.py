@@ -89,7 +89,7 @@ def import_huggingface():
 
 
 def import_uform():
-    _check_library("uform")
+    _check_library("uform", package="uform==0.2.1")
 
 
 def import_usearch():
