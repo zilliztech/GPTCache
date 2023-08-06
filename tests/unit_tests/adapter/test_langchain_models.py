@@ -30,7 +30,7 @@ def test_langchain_llms():
 
     os.environ["OPENAI_API_KEY"] = "API"
     langchain_openai = OpenAI(model_name="text-ada-001")
-    llm = LangChainLLMs(llm=langchain_openai)
+    llm = LangChainLLMs(llm=langchain_openai,cache_obj=llm_cache)
     assert str(langchain_openai) == str(llm)
 
     with patch("openai.Completion.create") as mock_create:
@@ -53,10 +53,10 @@ def test_langchain_llms():
               }
             }
 
-        answer = llm(prompt=question, cache_obj=llm_cache)
+        answer = llm(prompt=question)
         assert expect_answer == answer
 
-    answer = llm(prompt=question, cache_obj=llm_cache)
+    answer = llm(prompt=question)
     assert expect_answer == answer
 
 
@@ -77,7 +77,7 @@ def test_langchain_chats():
 
     os.environ["OPENAI_API_KEY"] = "API"
     langchain_openai = ChatOpenAI(temperature=0)
-    chat = LangChainChat(chat=langchain_openai)
+    chat = LangChainChat(chat=langchain_openai,cache_obj=llm_cache)
 
     assert chat.get_num_tokens("hello") == langchain_openai.get_num_tokens("hello")
     assert chat.get_num_tokens_from_messages(messages=[HumanMessage(content="test_langchain_chats")]) \
@@ -104,7 +104,7 @@ def test_langchain_chats():
             }
         }
 
-        answer = chat(messages=question, cache_obj=llm_cache)
+        answer = chat(messages=question)
         assert answer == _cache_msg_data_convert(msg).generations[0].message
 
     with patch("openai.ChatCompletion.acreate") as mock_create:
@@ -128,16 +128,16 @@ def test_langchain_chats():
             }
         }
 
-        answer = asyncio.run(chat.agenerate([question2], cache_obj=llm_cache))
+        answer = asyncio.run(chat.agenerate([question2]))
         assert answer.generations[0][0].text == _cache_msg_data_convert(msg).generations[0].text
 
-    answer = chat(messages=question, cache_obj=llm_cache)
+    answer = chat(messages=question)
     assert answer == _cache_msg_data_convert(msg).generations[0].message
 
-    answer = asyncio.run(chat.agenerate([question], cache_obj=llm_cache))
+    answer = asyncio.run(chat.agenerate([question]))
     assert answer.generations[0][0].text == _cache_msg_data_convert(msg).generations[0].text
 
-    answer = asyncio.run(chat.agenerate([question2], cache_obj=llm_cache))
+    answer = asyncio.run(chat.agenerate([question2]))
     assert answer.generations[0][0].text == _cache_msg_data_convert(msg).generations[0].text
 
 
