@@ -16,6 +16,7 @@ from gptcache.manager.scalar_data.base import (
     Answer,
     Question,
 )
+from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils.error import CacheError, ParamError
 from gptcache.utils.log import gptcache_log
@@ -228,6 +229,7 @@ class SSDataManager(DataManager):
         o: Optional[ObjectBase],
         max_size,
         clean_size,
+        eviction_manager="memory",
         policy="LRU",
     ):
         self.max_size = max_size
@@ -237,13 +239,14 @@ class SSDataManager(DataManager):
         self.o = o
         self.eviction_manager = EvictionManager(self.s, self.v)
         self.eviction_base = EvictionBase(
-            name="memory",
+            name=eviction_manager,
             policy=policy,
             maxsize=max_size,
             clean_size=clean_size,
             on_evict=self._clear,
         )
-        self.eviction_base.put(self.s.get_ids(deleted=False))
+        if type(self.s) is not RedisCacheStorage:
+            self.eviction_base.put(self.s.get_ids(deleted=False))
 
     def _clear(self, marked_keys):
         self.eviction_manager.soft_evict(marked_keys)

@@ -10,6 +10,7 @@ def manager_factory(manager="map",
                     data_dir="./",
                     max_size=1000,
                     clean_size=None,
+                    eviction_manager:str = "memory",
                     eviction: str = "LRU",
                     get_data_container: Callable = None,
                     scalar_params=None,
@@ -87,7 +88,7 @@ def manager_factory(manager="map",
     if obj == "local":
         object_params["path"] = os.path.join(data_dir, "local_obj")
     o = ObjectBase(name=obj, **object_params) if obj else None
-    return get_data_manager(s, v, o, max_size, clean_size, eviction)
+    return get_data_manager(s, v, o, max_size, clean_size, eviction_manager, eviction)
 
 
 def get_data_manager(
@@ -96,6 +97,7 @@ def get_data_manager(
     object_base: Union[ObjectBase, str] = None,
     max_size: int = 1000,
     clean_size: int = None,
+    eviction_manager="memory",
     eviction: str = "LRU",
     data_path: str = "data_map.txt",
     get_data_container: Callable = None,
@@ -121,6 +123,8 @@ def get_data_manager(
     :type data_path:  str
     :param get_data_container: a Callable to get the data container, defaults to None.
     :type get_data_container:  Callable
+    :param eviction_manager: the eviction manager, defaults to "memory".
+    :type eviction_manager:  str
 
 
     :return: SSDataManager or MapDataManager.
@@ -142,4 +146,5 @@ def get_data_manager(
     if isinstance(object_base, str):
         object_base = ObjectBase(name=object_base)
     assert cache_base and vector_base
-    return SSDataManager(cache_base, vector_base, object_base, max_size, clean_size, eviction)
+    return SSDataManager(cache_base, vector_base, object_base, max_size, clean_size,
+                         eviction_manager=eviction_manager, policy=eviction)

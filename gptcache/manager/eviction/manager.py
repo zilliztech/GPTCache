@@ -32,6 +32,9 @@ class EvictionBase:
             eviction_base = MemoryCacheEviction(
                 policy, maxsize, clean_size, on_evict, **kwargs
             )
+        if name in "distributed":
+            from gptcache.manager.eviction.distributed_cache import DistributedCacheEviction
+            eviction_base = DistributedCacheEviction(**kwargs)
         else:
             raise NotFoundError("eviction base", name)
         return eviction_base
