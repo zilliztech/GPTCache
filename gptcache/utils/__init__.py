@@ -93,7 +93,7 @@ def import_uform():
 
 
 def import_usearch():
-    _check_library("usearch")
+    _check_library("usearch", package="usearch==0.22.3")
 
 
 def import_torch():
