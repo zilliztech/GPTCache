@@ -4,6 +4,7 @@ from gptcache.adapter.adapter import adapt, aadapt
 from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.session import Session
 from gptcache.utils import import_pydantic, import_langchain
+from gptcache.core import Cache,cache
 
 import_pydantic()
 import_langchain()
@@ -50,6 +51,7 @@ class LangChainLLMs(LLM, BaseModel):
 
     llm: Any
     session: Session = None
+    cache_obj: Cache = cache
     tmp_args: Any = None
 
     @property
@@ -80,6 +82,7 @@ class LangChainLLMs(LLM, BaseModel):
             _update_cache_callback,
             prompt=prompt,
             stop=stop,
+            cache_obj=self.cache_obj,
             session=session,
             **self.tmp_args,
         )
@@ -151,6 +154,7 @@ class LangChainChat(BaseChatModel, BaseModel):
 
     chat: Any
     session: Session = None
+    cache_obj: Cache = cache
     tmp_args: Any = None
 
     def _generate(
@@ -170,6 +174,7 @@ class LangChainChat(BaseChatModel, BaseModel):
             _update_cache_msg_callback,
             messages=messages,
             stop=stop,
+            cache_obj=self.cache_obj,
             session=session,
             run_manager=run_manager,
             **self.tmp_args,
@@ -193,6 +198,7 @@ class LangChainChat(BaseChatModel, BaseModel):
             _update_cache_msg_callback,
             messages=messages,
             stop=stop,
+            cache_obj=self.cache_obj,
             session=session,
             run_manager=run_manager,
             **self.tmp_args,
