@@ -6,7 +6,7 @@ from io import BytesIO
 from typing import Iterator, Any, List
 
 from gptcache import cache
-from gptcache.adapter.adapter import adapt
+from gptcache.adapter.adapter import aadapt, adapt
 from gptcache.adapter.base import BaseCacheLLM
 from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.utils import import_openai, import_pillow
@@ -59,6 +59,13 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             return super().create(*llm_args, **llm_kwargs) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
+        
+    @classmethod
+    async def _allm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
 
     @staticmethod
     def _update_cache_callback(
@@ -105,6 +112,36 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             **kwargs,
         )
 
+    
+    @classmethod
+    async def acreate(cls, *args, **kwargs):
+        chat_cache = kwargs.get("cache_obj", cache)
+        enable_token_counter = chat_cache.config.enable_token_counter
+
+        def cache_data_convert(cache_data):
+            if enable_token_counter:
+                input_token = _num_tokens_from_messages(kwargs.get("messages"))
+                output_token = token_counter(cache_data)
+                saved_token = [input_token, output_token]
+            else:
+                saved_token = [0, 0]
+            if kwargs.get("stream", False):
+                return async_iter(_construct_stream_resp_from_cache(cache_data, saved_token))
+            return _construct_resp_from_cache(cache_data, saved_token)
+
+        kwargs = cls.fill_base_args(**kwargs)
+        return await aadapt(
+            cls._allm_handler,
+            cache_data_convert,
+            cls._update_cache_callback,
+            *args,
+            **kwargs,
+        )
+
+async def async_iter(input_list):
+    for item in input_list:
+        yield item
+
 
 class Completion(openai.Completion, BaseCacheLLM):
     """Openai Completion Wrapper
@@ -131,6 +168,13 @@ class Completion(openai.Completion, BaseCacheLLM):
             return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
+        
+    @classmethod
+    async def _allm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
 
     @staticmethod
     def _cache_data_convert(cache_data):
@@ -148,6 +192,17 @@ class Completion(openai.Completion, BaseCacheLLM):
         kwargs = cls.fill_base_args(**kwargs)
         return adapt(
             cls._llm_handler,
+            cls._cache_data_convert,
+            cls._update_cache_callback,
+            *args,
+            **kwargs,
+        )
+    
+    @classmethod
+    async def acreate(cls, *args, **kwargs):
+        kwargs = cls.fill_base_args(**kwargs)
+        return await aadapt(
+            cls._allm_handler,
             cls._cache_data_convert,
             cls._update_cache_callback,
             *args,

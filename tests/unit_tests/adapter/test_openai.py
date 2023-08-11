@@ -1,9 +1,12 @@
+import asyncio
 import base64
 import os
 import random
 from io import BytesIO
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 from urllib.request import urlopen
+
+import pytest
 
 from gptcache import cache, Cache
 from gptcache.adapter import openai
@@ -74,6 +77,46 @@ def test_normal_openai():
     answer_text = get_message_from_openai_answer(response)
     assert answer_text == expect_answer, answer_text
 
+@pytest.mark.asyncio
+async def test_normal_openai_async():
+    cache.init()
+    question = "calculate 1+3"
+    expect_answer = "the result is 4"
+    with patch("openai.ChatCompletion.acreate", new_callable=AsyncMock) as mock_acreate:
+        datas = {
+            "choices": [
+                {
+                    "message": {"content": expect_answer, "role": "assistant"},
+                    "finish_reason": "stop",
+                    "index": 0,
+                }
+            ],
+            "created": 1677825464,
+            "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion.chunk",
+        }
+        mock_acreate.return_value = datas
+
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+        )
+
+        assert get_message_from_openai_answer(response) == expect_answer, response
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": question},
+        ],
+    )
+    answer_text = get_message_from_openai_answer(response)
+    assert answer_text == expect_answer, answer_text
 
 def test_stream_openai():
     cache.init()
@@ -147,6 +190,89 @@ def test_stream_openai():
     answer_text = get_message_from_openai_answer(response)
     assert answer_text == expect_answer, answer_text
 
+@pytest.mark.asyncio
+async def test_stream_openai_async():
+    cache.init()
+    question = "calculate 1+1"
+    expect_answer = "the result is 2"
+
+    with patch("openai.ChatCompletion.acreate", new_callable=AsyncMock) as mock_acreate:
+        datas = [
+            {
+                "choices": [
+                    {"delta": {"role": "assistant"}, "finish_reason": None, "index": 0}
+                ],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+            {
+                "choices": [
+                    {
+                        "delta": {"content": "the result"},
+                        "finish_reason": None,
+                        "index": 0,
+                    }
+                ],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+            {
+                "choices": [
+                    {"delta": {"content": " is 2"}, "finish_reason": None, "index": 0}
+                ],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+            {
+                "choices": [{"delta": {}, "finish_reason": "stop", "index": 0}],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+        ]
+        async def acreate(*args, **kwargs):
+            async def async_generator(input_list):
+                for item in input_list:
+                    yield item
+                    breakpoint()
+                    await asyncio.sleep(0)  # this makes the function asynchronous
+            yield async_generator(datas)
+        mock_acreate.return_value = acreate()
+
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+            stream=True,
+        )
+        breakpoint()
+        all_text = ""
+        async for res in response:
+            all_text += get_stream_message_from_openai_answer(res)
+        assert all_text == expect_answer, all_text
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": question},
+        ],
+        stream=True
+    )
+    answer_text = ""
+    async for res in response:
+        answer_text += get_stream_message_from_openai_answer(res)
+    assert answer_text == expect_answer, answer_text
+
 
 def test_completion():
     cache.init(pre_embedding_func=get_prompt)
@@ -170,6 +296,28 @@ def test_completion():
     answer_text = get_text_from_openai_answer(response)
     assert answer_text == expect_answer
 
+@pytest.mark.asyncio
+async def test_completion_async():
+    cache.init(pre_embedding_func=get_prompt)
+    question = "what is your name?"
+    expect_answer = "gptcache"
+
+    with patch("openai.Completion.acreate", new_callable=AsyncMock) as mock_acreate:
+        mock_acreate.return_value = {
+            "choices": [{"text": expect_answer, "finish_reason": None, "index": 0}],
+            "created": 1677825464,
+            "id": "cmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "text-davinci-003",
+            "object": "text_completion",
+        }
+
+        response = await openai.Completion.acreate(model="text-davinci-003", prompt=question)
+        answer_text = get_text_from_openai_answer(response)
+        assert answer_text == expect_answer
+
+    response = await openai.Completion.acreate(model="text-davinci-003", prompt=question)
+    answer_text = get_text_from_openai_answer(response)
+    assert answer_text == expect_answer
 
 def test_image_create():
     cache.init(pre_embedding_func=get_prompt)
@@ -462,13 +610,14 @@ def test_base_llm_cache():
 
     is_exception = False
     try:
-        openai.ChatCompletion.create(
+        resp = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": question},
             ],
         )
+        breakpoint()
     except Exception:
         is_exception = True
     assert is_exception
