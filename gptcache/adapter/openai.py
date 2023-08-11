@@ -57,6 +57,13 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             return super().create(*llm_args, **llm_kwargs) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
+        
+    @classmethod
+    async def _allm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
 
     @classmethod
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
@@ -182,6 +189,13 @@ class Completion(openai.Completion, BaseCacheLLM):
             return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
+        
+    @classmethod
+    async def _allm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
 
     @classmethod
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
@@ -206,6 +220,17 @@ class Completion(openai.Completion, BaseCacheLLM):
         kwargs = cls.fill_base_args(**kwargs)
         return adapt(
             cls._llm_handler,
+            cls._cache_data_convert,
+            cls._update_cache_callback,
+            *args,
+            **kwargs,
+        )
+    
+    @classmethod
+    async def acreate(cls, *args, **kwargs):
+        kwargs = cls.fill_base_args(**kwargs)
+        return await aadapt(
+            cls._allm_handler,
             cls._cache_data_convert,
             cls._update_cache_callback,
             *args,
