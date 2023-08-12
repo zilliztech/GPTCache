@@ -149,6 +149,7 @@ class PGVector(VectorBase):
             ).order_by(
                 similarity
             ).limit(top_k).all()
+            search_result = [(r[0].id, r[1]) for r in search_result]
 
         return search_result
 
