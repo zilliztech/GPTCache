@@ -277,7 +277,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
 
 
 async def aadapt(
-    llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
+    llm_handler, cache_data_convert, update_cache_callback, *args, aupdate_cache_callback = None, **kwargs
 ):
     """Simple copy of the 'adapt' method to different llm for 'async llm function'
 
@@ -285,6 +285,7 @@ async def aadapt(
     :param cache_data_convert: When the cache hits, convert the answer in the cache to the format of the result returned by llm
     :param update_cache_callback: If the cache misses, after getting the result returned by llm, save the result to the cache
     :param args: llm args
+    :param aupdate_cache_callback: If the cache misses, after getting the result returned by llm, save the async result to the cache
     :param kwargs: llm kwargs
     :return: llm result
     """
@@ -513,10 +514,14 @@ async def aadapt(
                     == 0
                 ):
                     chat_cache.flush()
-
-            llm_data = update_cache_callback(
-                llm_data, update_cache_func, *args, **kwargs
-            )
+            if aupdate_cache_callback is None:
+                llm_data = update_cache_callback(
+                    llm_data, update_cache_func, *args, **kwargs
+                )
+            else:
+                llm_data = await aupdate_cache_callback(
+                    llm_data, update_cache_func, *args, **kwargs
+                )
         except Exception:  # pylint: disable=W0703
             gptcache_log.error("failed to save the data to cache", exc_info=True)
     return llm_data

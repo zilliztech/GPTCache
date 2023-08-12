@@ -3,29 +3,30 @@ import base64
 import os
 import random
 from io import BytesIO
-from unittest.mock import patch, AsyncMock
+from unittest.mock import AsyncMock, patch
 from urllib.request import urlopen
 
 import pytest
 
-from gptcache import cache, Cache
+from gptcache import Cache, cache
 from gptcache.adapter import openai
 from gptcache.adapter.api import init_similar_cache
 from gptcache.manager import get_data_manager
 from gptcache.processor.pre import (
-    get_prompt,
-    get_file_name,
     get_file_bytes,
-    get_openai_moderation_input, last_content,
+    get_file_name,
+    get_openai_moderation_input,
+    get_prompt,
+    last_content,
 )
 from gptcache.utils.response import (
-    get_stream_message_from_openai_answer,
-    get_message_from_openai_answer,
-    get_text_from_openai_answer,
-    get_image_from_openai_b64,
-    get_image_from_path,
-    get_image_from_openai_url,
     get_audio_text_from_openai_answer,
+    get_image_from_openai_b64,
+    get_image_from_openai_url,
+    get_image_from_path,
+    get_message_from_openai_answer,
+    get_stream_message_from_openai_answer,
+    get_text_from_openai_answer,
 )
 
 try:
@@ -77,6 +78,7 @@ def test_normal_openai():
     answer_text = get_message_from_openai_answer(response)
     assert answer_text == expect_answer, answer_text
 
+
 @pytest.mark.asyncio
 async def test_normal_openai_async():
     cache.init()
@@ -117,6 +119,7 @@ async def test_normal_openai_async():
     )
     answer_text = get_message_from_openai_answer(response)
     assert answer_text == expect_answer, answer_text
+
 
 def test_stream_openai():
     cache.init()
@@ -190,11 +193,12 @@ def test_stream_openai():
     answer_text = get_message_from_openai_answer(response)
     assert answer_text == expect_answer, answer_text
 
+
 @pytest.mark.asyncio
 async def test_stream_openai_async():
     cache.init()
-    question = "calculate 1+1"
-    expect_answer = "the result is 2"
+    question = "calculate 1+4"
+    expect_answer = "the result is 5"
 
     with patch("openai.ChatCompletion.acreate", new_callable=AsyncMock) as mock_acreate:
         datas = [
@@ -222,7 +226,7 @@ async def test_stream_openai_async():
             },
             {
                 "choices": [
-                    {"delta": {"content": " is 2"}, "finish_reason": None, "index": 0}
+                    {"delta": {"content": " is 5"}, "finish_reason": None, "index": 0}
                 ],
                 "created": 1677825464,
                 "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
@@ -237,13 +241,16 @@ async def test_stream_openai_async():
                 "object": "chat.completion.chunk",
             },
         ]
+
         async def acreate(*args, **kwargs):
             async def async_generator(input_list):
                 for item in input_list:
                     yield item
-                    breakpoint()
                     await asyncio.sleep(0)  # this makes the function asynchronous
-            yield async_generator(datas)
+
+            async for item in async_generator(datas):
+                yield item
+
         mock_acreate.return_value = acreate()
 
         response = await openai.ChatCompletion.acreate(
@@ -254,7 +261,6 @@ async def test_stream_openai_async():
             ],
             stream=True,
         )
-        breakpoint()
         all_text = ""
         async for res in response:
             all_text += get_stream_message_from_openai_answer(res)
@@ -266,7 +272,7 @@ async def test_stream_openai_async():
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": question},
         ],
-        stream=True
+        stream=True,
     )
     answer_text = ""
     async for res in response:
@@ -296,6 +302,7 @@ def test_completion():
     answer_text = get_text_from_openai_answer(response)
     assert answer_text == expect_answer
 
+
 @pytest.mark.asyncio
 async def test_completion_async():
     cache.init(pre_embedding_func=get_prompt)
@@ -311,13 +318,18 @@ async def test_completion_async():
             "object": "text_completion",
         }
 
-        response = await openai.Completion.acreate(model="text-davinci-003", prompt=question)
+        response = await openai.Completion.acreate(
+            model="text-davinci-003", prompt=question
+        )
         answer_text = get_text_from_openai_answer(response)
         assert answer_text == expect_answer
 
-    response = await openai.Completion.acreate(model="text-davinci-003", prompt=question)
+    response = await openai.Completion.acreate(
+        model="text-davinci-003", prompt=question
+    )
     answer_text = get_text_from_openai_answer(response)
     assert answer_text == expect_answer
+
 
 def test_image_create():
     cache.init(pre_embedding_func=get_prompt)
@@ -460,16 +472,16 @@ def test_moderation():
             input=["I want to kill them."],
         )
         assert (
-                response.get("results")[0].get("category_scores").get("violence")
-                == expect_violence
+            response.get("results")[0].get("category_scores").get("violence")
+            == expect_violence
         )
 
     response = openai.Moderation.create(
         input="I want to kill them.",
     )
     assert (
-            response.get("results")[0].get("category_scores").get("violence")
-            == expect_violence
+        response.get("results")[0].get("category_scores").get("violence")
+        == expect_violence
     )
 
     expect_violence = 0.88708615
@@ -527,8 +539,8 @@ def test_moderation():
         )
         assert not response.get("results")[0].get("flagged")
         assert (
-                response.get("results")[1].get("category_scores").get("violence")
-                == expect_violence
+            response.get("results")[1].get("category_scores").get("violence")
+            == expect_violence
         )
 
     response = openai.Moderation.create(
@@ -536,8 +548,8 @@ def test_moderation():
     )
     assert not response.get("results")[0].get("flagged")
     assert (
-            response.get("results")[1].get("category_scores").get("violence")
-            == expect_violence
+        response.get("results")[1].get("category_scores").get("violence")
+        == expect_violence
     )
 
 
@@ -617,7 +629,6 @@ def test_base_llm_cache():
                 {"role": "user", "content": question},
             ],
         )
-        breakpoint()
     except Exception:
         is_exception = True
     assert is_exception
@@ -637,6 +648,7 @@ def test_base_llm_cache():
     openai.ChatCompletion.llm = None
     openai.ChatCompletion.cache_args = {}
     assert get_message_from_openai_answer(response) == expect_answer, response
+
 
 # def test_audio_api():
 #     data2vec = Data2VecAudio()
