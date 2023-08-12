@@ -627,7 +627,6 @@ def test_base_llm_cache():
                 {"role": "user", "content": question},
             ],
         )
-        breakpoint()
     except Exception:
         is_exception = True
     assert is_exception
