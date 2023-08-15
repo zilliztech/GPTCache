@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, List, Callable
 
 import redis
@@ -8,8 +8,25 @@ from gptcache.manager.eviction.base import EvictionBase
 from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 
 
-class DistributedCacheEviction(EvictionBase, ABC):
-    """eviction: Distributed Cache
+class DistributedEviction(EvictionBase, ABC):
+
+    @abstractmethod
+    def put(self, keys: List[str]):
+        pass
+
+    @abstractmethod
+    def get(self, key: str):
+        pass
+
+    @property
+    @abstractmethod
+    def policy(self) -> str:
+        pass
+
+
+class RedisCacheEviction(DistributedEviction, ABC):
+    """eviction: Distributed Cache Eviction Strategy using Redis.
+
     :param host: the host of redis
     :type host: str
     :param port: the port of redis
@@ -22,33 +39,47 @@ class DistributedCacheEviction(EvictionBase, ABC):
     :type  on_evict: Callable[[List[Any]], None]
     :param maxmemory: the maxmemory of redis
     :type maxmemory: str
-
+    :param redis_cache_storage: the redis cache storage
+    :type redis_cache_storage: RedisCacheStorage
+    :param global_key_prefix: the global key prefix
+    :type global_key_prefix: str
+    :param kwargs: the kwargs
+    :type kwargs: Any
+    :param ttl: the ttl of the cache data
+    :type ttl: int
     """
 
     def __init__(self,
                  host='localhost',
                  port=6379,
-                 maxmemory: str = '100mb',
-                 policy: str = 'allkeys-lru',
-                 redis_cache_storage: RedisCacheStorage = None,
+                 maxmemory: str = None,
+                 policy: str = None,
+                 global_key_prefix="gptcache",
+                 ttl: int = None,
                  **kwargs):
         self._redis = get_redis_connection(host=host, port=port, **kwargs)
-        self._redis.config_set('maxmemory', maxmemory)
-        self._redis.config_set('maxmemory-policy', policy)
-        self._policy = policy.lower()
-        self._s = redis_cache_storage
+        if maxmemory:
+            self._redis.config_set('maxmemory', maxmemory)
+        if policy:
+            self._redis.config_set('maxmemory-policy', policy)
+            self._policy = policy.lower()
+        self._global_key_prefix = global_key_prefix
+        self._ttl = ttl
 
-    def put(self, objs: List[Any], ttl: int = None):
-        if not self._s:
-            for obj in objs:
-                self._redis.set(obj, "True")
+    def _create_key(self, key: str) -> str:
+        return f"{self._global_key_prefix}:{key}"
+
+    def put(self, keys: List[str], expire=False):
+        ttl = self._ttl if expire else None
+        for key in keys:
+            self._redis.set(self._create_key(key), "True", ex=ttl)
 
     def get(self, key: str):
-        if self._s:
-            return self._s.get_data_by_id(key)
 
         try:
-            value = self._redis.get(key)
+            value = self._redis.get(self._create_key(key))
+            # update key expire time when accessed
+            self._redis.expire(self._create_key(key), self._ttl)
             return value
         except redis.RedisError:
             print(f"Error getting key {key} from cache")
@@ -57,3 +88,23 @@ class DistributedCacheEviction(EvictionBase, ABC):
     @property
     def policy(self) -> str:
         return self._policy
+
+
+class NoOpEviction(EvictionBase):
+    """eviction: No Op Eviction Strategy. This is used when Eviction is managed internally
+    by the Databases such as Redis or memcached and no eviction is required to perform.
+
+    """
+
+    @property
+    def policy(self) -> str:
+        return ""
+
+    def __init__(self, **kwargs):
+        pass
+
+    def put(self, keys: List[str]):
+        pass
+
+    def get(self, key: str):
+        pass

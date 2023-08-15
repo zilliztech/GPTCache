@@ -238,6 +238,10 @@ class SSDataManager(DataManager):
         self.v = v
         self.o = o
         self.eviction_manager = EvictionManager(self.s, self.v)
+        if type(self.s) == RedisCacheStorage and eviction_manager == "redis":
+            # if cache manager and eviction manager are both redis, we use no op redis to avoid redundant operations
+            eviction_manager = "no_op_redis"
+
         self.eviction_base = EvictionBase(
             name=eviction_manager,
             policy=policy,
@@ -245,7 +249,8 @@ class SSDataManager(DataManager):
             clean_size=clean_size,
             on_evict=self._clear,
         )
-        if type(self.s) is not RedisCacheStorage:
+        if not eviction_manager == "no_op_redis":
+            # if eviction manager is no op redis, we don't need to put data into eviction base
             self.eviction_base.put(self.s.get_ids(deleted=False))
 
     def _clear(self, marked_keys):

@@ -210,13 +210,8 @@ class RedisCacheStorage(CacheStorage):
             **kwargs
     ):
         self.con = get_redis_connection(host=host, port=port, **kwargs)
-        self._policy = policy
-        if maxmemory:
-            self.con.config_set('maxmemory', maxmemory)
-        if policy:
-            self.con.config_set('maxmemory-policy', policy)
         self.default_ttl = ttl
-
+        self.init_eviction_params(policy=policy, maxmemory=maxmemory, ttl=ttl)
         (
             self._ques,
             self._answer,
@@ -227,6 +222,13 @@ class RedisCacheStorage(CacheStorage):
         ) = get_models(global_key_prefix, redis_connection=self.con)
 
         Migrator().run()
+
+    def init_eviction_params(self, policy, maxmemory, ttl):
+        self.default_ttl = ttl
+        if maxmemory:
+            self.con.config_set('maxmemory', maxmemory)
+        if policy:
+            self.con.config_set('maxmemory-policy', policy)
 
     def create(self):
         pass

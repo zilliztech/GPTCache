@@ -18,8 +18,8 @@ class EvictionBase:
     @staticmethod
     def get(
         name: str,
-        policy: str,
-        maxsize: int,
+        policy: str = "LRU",
+        maxsize: int = 1000,
         clean_size: int = 0,
         on_evict: Callable[[List[Any]], None] = None,
         **kwargs
@@ -32,9 +32,15 @@ class EvictionBase:
             eviction_base = MemoryCacheEviction(
                 policy, maxsize, clean_size, on_evict, **kwargs
             )
-        if name in "distributed":
-            from gptcache.manager.eviction.distributed_cache import DistributedCacheEviction
-            eviction_base = DistributedCacheEviction(**kwargs)
+            return eviction_base
+        if name is "redis":
+            from gptcache.manager.eviction.distributed_cache import RedisCacheEviction
+            eviction_base = RedisCacheEviction(policy=policy, **kwargs)
+            return eviction_base
+        if name is "no_op_eviction":
+            from gptcache. manager.eviction.distributed_cache import NoOpEviction
+            eviction_base = NoOpEviction()
+            return eviction_base
+
         else:
             raise NotFoundError("eviction base", name)
-        return eviction_base
