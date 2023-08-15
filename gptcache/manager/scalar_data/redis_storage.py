@@ -164,15 +164,20 @@ class RedisCacheStorage(CacheStorage):
      Using redis-om as OM to store data in redis cache storage
 
     :param host: redis host, default value 'localhost'
-     :type host: str
-     :param port: redis port, default value 27017
-     :type port: int
-     :param global_key_prefix: A global prefix for keys against which data is stored.
-     For example, for a global_key_prefix ='gptcache', keys would be constructed would look like this:
-     gptcache:questions:abc123
-     :type global_key_prefix: str
-     :param kwargs: Additional parameters to provide in order to create redis om connection
-
+    :type host: str
+    :param port: redis port, default value 27017
+    :type port: int
+    :param global_key_prefix: A global prefix for keys against which data is stored.
+    For example, for a global_key_prefix ='gptcache', keys would be constructed would look like this:
+    gptcache:questions:abc123
+    :type global_key_prefix: str
+    :param maxmemory: Maximum memory to use for redis cache storage
+    :type maxmemory: str
+    :param policy: Policy to use for eviction, default value 'allkeys-lru'
+    :type policy: str
+    :param ttl: Time to live for keys in milliseconds, default value None
+    :type ttl: int
+    :param kwargs: Additional parameters to provide in order to create redis om connection
     Example:
         .. code-block:: python
 
@@ -199,13 +204,18 @@ class RedisCacheStorage(CacheStorage):
             global_key_prefix="gptcache",
             host: str = "localhost",
             port: int = 6379,
+            maxmemory: str = None,
+            policy: str = None,
+            ttl: int = None,
             **kwargs
     ):
         self.con = get_redis_connection(host=host, port=port, **kwargs)
-
-        self.con_encoded = get_redis_connection(
-            host=host, port=port, decode_responses=False, **kwargs
-        )
+        self._policy = policy
+        if maxmemory:
+            self.con.config_set('maxmemory', maxmemory)
+        if policy:
+            self.con.config_set('maxmemory-policy', policy)
+        self.default_ttl = ttl
 
         (
             self._ques,
@@ -272,7 +282,8 @@ class RedisCacheStorage(CacheStorage):
                 else data.question.content,
             )
             session_data.save(pipeline)
-
+        if self.default_ttl:
+            ques_data.expire(self.default_ttl, pipeline=pipeline)
         return int(ques_data.pk)
 
     def batch_insert(self, all_data: List[CacheData]):
@@ -300,7 +311,8 @@ class RedisCacheStorage(CacheStorage):
             obj.session_id
             for obj in self._session.find(self._session.question_id == key).all()
         ]
-
+        if self.default_ttl:
+            qs.expire(self.default_ttl)
         return CacheData(
             question=qs.question if not res_deps else Question(qs.question, res_deps),
             answers=res_ans,
