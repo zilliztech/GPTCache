@@ -1,3 +1,4 @@
+# pylint: disable=wrong-import-position
 from abc import ABC, abstractmethod
 from typing import List
 
