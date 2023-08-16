@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+from gptcache.utils import import_redis
+
+import_redis()
+
 import redis
 from redis_om import get_redis_connection
 
@@ -13,11 +17,11 @@ class DistributedEviction(EvictionBase, ABC):
     """
 
     @abstractmethod
-    def put(self, keys: List[str]):
+    def put(self, objs: List[str]):
         pass
 
     @abstractmethod
-    def get(self, key: str):
+    def get(self, obj: str):
         pass
 
     @property
@@ -70,21 +74,21 @@ class RedisCacheEviction(DistributedEviction, ABC):
     def _create_key(self, key: str) -> str:
         return f"{self._global_key_prefix}:evict:{key}"
 
-    def put(self, keys: List[str], expire=False):
+    def put(self, objs: List[str], expire=False):
         ttl = self._ttl if expire else None
-        for key in keys:
+        for key in objs:
             self._redis.set(self._create_key(key), "True", ex=ttl)
 
-    def get(self, key: str):
+    def get(self, obj: str):
 
         try:
-            value = self._redis.get(self._create_key(key))
+            value = self._redis.get(self._create_key(obj))
             # update key expire time when accessed
             if self._ttl:
-                self._redis.expire(self._create_key(key), self._ttl)
+                self._redis.expire(self._create_key(obj), self._ttl)
             return value
         except redis.RedisError:
-            print(f"Error getting key {key} from cache")
+            print(f"Error getting key {obj} from cache")
             return None
 
     @property
@@ -105,8 +109,8 @@ class NoOpEviction(EvictionBase):
     def __init__(self, **kwargs):
         pass
 
-    def put(self, keys: List[str]):
+    def put(self, objs: List[str]):
         pass
 
-    def get(self, key: str):
+    def get(self, obj: str):
         pass
