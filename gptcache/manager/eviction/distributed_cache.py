@@ -5,13 +5,13 @@ import redis
 from redis_om import get_redis_connection
 
 from gptcache.manager.eviction.base import EvictionBase
-from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 
 
 class DistributedEviction(EvictionBase, ABC):
     """
     Base class for Distributed Eviction Strategy.
     """
+
     @abstractmethod
     def put(self, keys: List[str]):
         pass
@@ -42,8 +42,6 @@ class RedisCacheEviction(DistributedEviction, ABC):
     :type  on_evict: Callable[[List[Any]], None]
     :param maxmemory: the maxmemory of redis
     :type maxmemory: str
-    :param redis_cache_storage: the redis cache storage
-    :type redis_cache_storage: RedisCacheStorage
     :param global_key_prefix: the global key prefix
     :type global_key_prefix: str
     :param kwargs: the kwargs
