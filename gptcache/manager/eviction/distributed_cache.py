@@ -60,13 +60,17 @@ class RedisCacheEviction(DistributedEviction, ABC):
                  policy: str = None,
                  global_key_prefix="gptcache",
                  ttl: int = None,
+                 maxmemory_samples: int = None,
                  **kwargs):
         self._redis = get_redis_connection(host=host, port=port, **kwargs)
         if maxmemory:
             self._redis.config_set("maxmemory", maxmemory)
+        if maxmemory_samples:
+            self._redis.config_set("maxmemory-samples", maxmemory_samples)
         if policy:
             self._redis.config_set("maxmemory-policy", policy)
             self._policy = policy.lower()
+
         self._global_key_prefix = global_key_prefix
         self._ttl = ttl
 

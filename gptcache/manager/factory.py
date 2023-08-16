@@ -115,7 +115,8 @@ def manager_factory(manager="map",
         s.init_eviction_params(
             maxmemory=eviction_params.get("maxmemory", scalar_params.get("maxmemory")),
             policy=eviction_params.get("policy", scalar_params.get("policy")),
-            ttl=eviction_params.get("ttl", scalar_params.get("ttl"))
+            ttl=eviction_params.get("ttl", scalar_params.get("ttl")),
+            maxmemory_samples=eviction_params.get("maxmemory_samples", scalar_params.get("maxmemory_samples")),
         )
 
     e = EvictionBase(
