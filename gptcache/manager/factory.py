@@ -109,7 +109,7 @@ def manager_factory(manager="map",
     if eviction_params is None:
         eviction_params = {}
 
-    if type(s) == RedisCacheStorage and eviction_manager == "redis":
+    if s is RedisCacheStorage and eviction_manager == "redis":
         # if cache manager and eviction manager are both redis, we use no op redis to avoid redundant operations
         eviction_manager = "no_op_eviction"
         gptcache_log.info("Since Scalar Storage and Eviction manager are both redis, "

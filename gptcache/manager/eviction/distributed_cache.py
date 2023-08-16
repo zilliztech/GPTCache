@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Callable
+from typing import List
 
 import redis
 from redis_om import get_redis_connection
@@ -9,7 +9,9 @@ from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 
 
 class DistributedEviction(EvictionBase, ABC):
-
+    """
+    Base class for Distributed Eviction Strategy.
+    """
     @abstractmethod
     def put(self, keys: List[str]):
         pass
@@ -51,7 +53,7 @@ class RedisCacheEviction(DistributedEviction, ABC):
     """
 
     def __init__(self,
-                 host='localhost',
+                 host="localhost",
                  port=6379,
                  maxmemory: str = None,
                  policy: str = None,
@@ -60,9 +62,9 @@ class RedisCacheEviction(DistributedEviction, ABC):
                  **kwargs):
         self._redis = get_redis_connection(host=host, port=port, **kwargs)
         if maxmemory:
-            self._redis.config_set('maxmemory', maxmemory)
+            self._redis.config_set("maxmemory", maxmemory)
         if policy:
-            self._redis.config_set('maxmemory-policy', policy)
+            self._redis.config_set("maxmemory-policy", policy)
             self._policy = policy.lower()
         self._global_key_prefix = global_key_prefix
         self._ttl = ttl

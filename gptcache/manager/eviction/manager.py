@@ -33,13 +33,13 @@ class EvictionBase:
                 policy, maxsize, clean_size, on_evict, **kwargs
             )
             return eviction_base
-        if name is "redis":
+        if name == "redis":
             from gptcache.manager.eviction.distributed_cache import RedisCacheEviction
-            if policy is "LRU":
+            if policy == "LRU":
                 policy = None
             eviction_base = RedisCacheEviction(policy=policy, **kwargs)
             return eviction_base
-        if name is "no_op_eviction":
+        if name == "no_op_eviction":
             from gptcache. manager.eviction.distributed_cache import NoOpEviction
             eviction_base = NoOpEviction()
             return eviction_base

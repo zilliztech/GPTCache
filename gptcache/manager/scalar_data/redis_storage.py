@@ -53,6 +53,7 @@ def get_models(global_key: str, redis_connection: Redis):
         Custom type for embedding data. This will be stored as bytes in redis.
         Latin-1 encoding is used to convert the bytes to string and vice versa.
         """
+
         def __init__(self, data: bytes):
             self.data = data
 
@@ -74,7 +75,7 @@ def get_models(global_key: str, redis_connection: Redis):
             field_schema.update(type="string", format="byte")
 
         def to_numpy(self) -> np.ndarray:
-            return np.frombuffer(self.data.encode('latin-1'), dtype=np.float32)
+            return np.frombuffer(self.data.encode("latin-1"), dtype=np.float32)
 
         def __repr__(self):
             return f"{self.data}"
@@ -119,8 +120,8 @@ def get_models(global_key: str, redis_connection: Redis):
 
         class Config:
             json_encoders = {
-                EmbeddingType: lambda n: n.data.decode('latin-1')
-                if type(n.data) == bytes else n.data
+                EmbeddingType: lambda n: n.data.decode("latin-1")
+                if isinstance(n.data, bytes) else n.data
             }
 
     class Sessions(JsonModel):
@@ -226,9 +227,9 @@ class RedisCacheStorage(CacheStorage):
     def init_eviction_params(self, policy, maxmemory, ttl):
         self.default_ttl = ttl
         if maxmemory:
-            self.con.config_set('maxmemory', maxmemory)
+            self.con.config_set("maxmemory", maxmemory)
         if policy:
-            self.con.config_set('maxmemory-policy', policy)
+            self.con.config_set("maxmemory-policy", policy)
 
     def create(self):
         pass
