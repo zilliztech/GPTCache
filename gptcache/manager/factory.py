@@ -32,7 +32,8 @@ def manager_factory(manager="map",
     :type data_dir: str
     :param max_size: the max size for the LRU cache in MapDataManager, defaults to 1000.
     :type max_size: int
-    :param eviction_manager: the eviction manager, defaults to "memory". It supports "memory" and "redis".
+    :param eviction_manager: The eviction manager, defaults to "memory".
+                             It supports "memory" and "redis" and 'no_op_eviction'.
     :type eviction_manager:  str
     :param get_data_container: a Callable to get the data container, defaults to None.
     :type get_data_container:  Callable
@@ -56,6 +57,17 @@ def manager_factory(manager="map",
             from gptcache.manager import manager_factory
 
             data_manager = manager_factory("sqlite,faiss", data_dir="./workspace", vector_params={"dimension": 128})
+
+            # or using manager factory enabled with redis cache instead of in-memory cache
+            from gptcache.manager import manager_factory
+            data_manager = manager_factory("redis,faiss",
+                                           eviction_manager="redis",
+                                           scalar_params={"maxmemory": "2mb",
+                                                          "policy": "allkeys-lru"
+                                                          },
+                                           vector_params={"dimension": 128},
+                                           eviction_params=dict(url="redis://localhost:6379")
+                                           )
     """
 
     Path(data_dir).mkdir(parents=True, exist_ok=True)
@@ -106,7 +118,7 @@ def manager_factory(manager="map",
             maxmemory=eviction_params.get("maxmemory", scalar_params.get("maxmemory")),
             policy=eviction_params.get("policy", scalar_params.get("policy")),
             ttl=eviction_params.get("ttl", scalar_params.get("ttl"))
-           )
+        )
 
     e = EvictionBase(
         name=eviction_manager,
@@ -137,7 +149,10 @@ def get_data_manager(
     :type object_base: :class:`ObjectBase` or str
     :param max_size: the max size for the LRU cache in MapDataManager, defaults to 1000.
     :type max_size: int
-    :param eviction_base: a EvictionBase object, or the name of the eviction, it is support 'memory' and 'redis'.
+    :param eviction_base: a EvictionBase object, or the name of the eviction, it supports:
+     - 'memory'
+     - 'redis'
+     - 'no_op_eviction'.
     :type eviction_base: :class:`EvictionBase` or str
     :param data_path: the path to save the map data, defaults to 'data_map.txt'.
     :type data_path:  str
@@ -153,6 +168,18 @@ def get_data_manager(
             from gptcache.manager import get_data_manager, CacheBase, VectorBase
 
             data_manager = get_data_manager(CacheBase('sqlite'), VectorBase('faiss', dimension=128))
+
+            # or using manager factory enabled with redis cache instead of in-memory cache
+            # example 1: using redis eviction base with sqlite cache base
+            data_manager = get_data_manager(cache_base=CacheBase("sqlite"),
+                                        vector_base=VectorBase("faiss", dimension=onnx.dimension),
+                                        eviction_base=EvictionBase("redis",  maxmemory="0", policy="noeviction", ttl=1))
+
+           # example 2: using redis eviction base with redis cache base
+           # here no_op_eviction is used since `redis` cache base already handles evictions internally
+            data_manager = get_data_manager(cache_base=CacheBase("redis",  maxmemory="0", policy="noeviction", ttl=1),
+                                        vector_base=VectorBase("faiss", dimension=onnx.dimension),
+                                        eviction_base=EvictionBase("no_op_eviction"))
     """
     if not cache_base and not vector_base:
         return MapDataManager(data_path, max_size, get_data_container)
@@ -163,5 +190,7 @@ def get_data_manager(
         vector_base = VectorBase(name=vector_base)
     if isinstance(object_base, str):
         object_base = ObjectBase(name=object_base)
+    if isinstance(eviction_base, str):
+        eviction_base = EvictionBase(name=eviction_base)
     assert cache_base and vector_base
     return SSDataManager(cache_base, vector_base, object_base, eviction_base)

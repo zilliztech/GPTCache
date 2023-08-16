@@ -31,7 +31,8 @@ class RedisCacheEviction(DistributedEviction, ABC):
     :type host: str
     :param port: the port of redis
     :type port: int
-    :param policy: eviction strategy
+    :param policy: eviction strategy policy of redis such as allkeys-lru, volatile-lru, allkeys-random, volatile-random, etc.
+    refer https://redis.io/docs/reference/eviction/ for more information.
     :type policy: str
     :param maxsize: the maxsize of cache data
     :type maxsize: int
@@ -67,7 +68,7 @@ class RedisCacheEviction(DistributedEviction, ABC):
         self._ttl = ttl
 
     def _create_key(self, key: str) -> str:
-        return f"{self._global_key_prefix}:{key}"
+        return f"{self._global_key_prefix}:evict:{key}"
 
     def put(self, keys: List[str], expire=False):
         ttl = self._ttl if expire else None
@@ -79,7 +80,8 @@ class RedisCacheEviction(DistributedEviction, ABC):
         try:
             value = self._redis.get(self._create_key(key))
             # update key expire time when accessed
-            self._redis.expire(self._create_key(key), self._ttl)
+            if self._ttl:
+                self._redis.expire(self._create_key(key), self._ttl)
             return value
         except redis.RedisError:
             print(f"Error getting key {key} from cache")

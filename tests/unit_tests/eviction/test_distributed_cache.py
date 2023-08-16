@@ -1,12 +1,13 @@
 import time
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from redis_om import get_redis_connection
 
 from gptcache.embedding import Onnx
-from gptcache.manager import manager_factory
-from tempfile import TemporaryDirectory
+from gptcache.manager import manager_factory, get_data_manager, CacheBase, VectorBase
+from gptcache.manager.eviction import EvictionBase
 
 
 class TestDistributedCache(unittest.TestCase):
@@ -138,3 +139,45 @@ class TestDistributedCache(unittest.TestCase):
                                  session_ids=[None for _ in range(len(questions))])
         time.sleep(5)
         self.assertEqual(data_manager.s.count(), 0)
+
+    def test_redis_only_config(self):
+        onnx = Onnx()
+        data_manager = get_data_manager(cache_base=CacheBase("redis", maxmemory="100mb", policy="allkeys-lru"),
+                                        vector_base=VectorBase("faiss", dimension=onnx.dimension),
+                                        eviction_base=EvictionBase("redis"))
+        questions = []
+        answers = []
+        idx_list = []
+        embeddings = []
+        for i in range(10):
+            idx_list.append(i)
+            questions.append(f'This is a question_{i}')
+            answers.append(f'This is an answer_{i}')
+            embeddings.append(onnx.to_embeddings(questions[-1]))
+
+        data_manager.import_data(questions, answers, embedding_datas=embeddings,
+                                 session_ids=[None for _ in range(len(questions))])
+        search_data = data_manager.search(embeddings[0], top_k=1)
+        for res in search_data:
+            self.assertEqual(data_manager.eviction_base.get(res[1]), "True")
+
+    def test_redis_only_with_no_op_eviction_config(self):
+        onnx = Onnx()
+        data_manager = get_data_manager(cache_base=CacheBase("redis", maxmemory="100mb", policy="allkeys-lru"),
+                                        vector_base=VectorBase("faiss", dimension=onnx.dimension),
+                                        eviction_base=EvictionBase("no_op_eviction"))
+        questions = []
+        answers = []
+        idx_list = []
+        embeddings = []
+        for i in range(10):
+            idx_list.append(i)
+            questions.append(f'This is a question_{i}')
+            answers.append(f'This is an answer_{i}')
+            embeddings.append(onnx.to_embeddings(questions[-1]))
+
+        data_manager.import_data(questions, answers, embedding_datas=embeddings,
+                                 session_ids=[None for _ in range(len(questions))])
+        search_data = data_manager.search(embeddings[0], top_k=1)
+        for res in search_data:
+            self.assertEqual(data_manager.eviction_base.get(res[1]), None)
