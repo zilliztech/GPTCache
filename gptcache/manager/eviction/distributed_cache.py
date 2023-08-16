@@ -47,10 +47,12 @@ class RedisCacheEviction(DistributedEviction, ABC):
     :type maxmemory: str
     :param global_key_prefix: the global key prefix
     :type global_key_prefix: str
-    :param kwargs: the kwargs
-    :type kwargs: Any
     :param ttl: the ttl of the cache data
     :type ttl: int
+    :param maxmemory_samples: Number of keys to sample when evicting keys
+    :type maxmemory_samples: int
+    :param kwargs: the kwargs
+    :type kwargs: Any
     """
 
     def __init__(self,

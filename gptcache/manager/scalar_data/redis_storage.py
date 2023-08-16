@@ -178,6 +178,8 @@ class RedisCacheStorage(CacheStorage):
     :type policy: str
     :param ttl: Time to live for keys in milliseconds, default value None
     :type ttl: int
+    :param maxmemory_samples: Number of keys to sample when evicting keys
+    :type maxmemory_samples: int
     :param kwargs: Additional parameters to provide in order to create redis om connection
     Example:
         .. code-block:: python
