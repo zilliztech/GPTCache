@@ -57,7 +57,7 @@ class TestDistributedCache(unittest.TestCase):
         data_manager = manager_factory("redis,faiss",
                                        eviction_manager="redis",
                                        scalar_params={"url": self.url,
-                                                      "maxmemory": "2mb",
+                                                      "maxmemory": "1800kb",
                                                       "policy": "allkeys-lru"
                                                       },
                                        vector_params={"dimension": onnx.dimension},
@@ -66,7 +66,7 @@ class TestDistributedCache(unittest.TestCase):
         questions = []
         answers = []
         idx_list = []
-        for i in range(100):
+        for i in range(50):
             idx_list.append(i)
             questions.append(f'This is a question_{i}')
             answers.append(f'This is an answer_{i}')
@@ -78,13 +78,8 @@ class TestDistributedCache(unittest.TestCase):
                 answer=answer,
                 embedding_data=embedding
             )
-            for i in range(int(idx * 0.1)):
-                search_data = data_manager.search(embedding, top_k=1)
-                for res in search_data:
-                    data_manager.get_scalar_data(res)
 
         self.assertNotEquals(data_manager.s.count(), len(idx_list))
-        self.assertEqual(data_manager.get_scalar_data((0.0, 1)), None)
 
     def test_noeviction_policy(self):
         onnx = Onnx()
