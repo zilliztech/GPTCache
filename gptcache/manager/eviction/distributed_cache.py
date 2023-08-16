@@ -3,13 +3,11 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from gptcache.utils import import_redis
+from gptcache.manager.eviction.base import EvictionBase
 
 import_redis()
-
 import redis
 from redis_om import get_redis_connection
-
-from gptcache.manager.eviction.base import EvictionBase
 
 
 class DistributedEviction(EvictionBase, ABC):
