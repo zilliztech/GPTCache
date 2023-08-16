@@ -84,7 +84,9 @@ async def test_normal_openai_async():
     cache.init()
     question = "calculate 1+3"
     expect_answer = "the result is 4"
-    with patch("openai.ChatCompletion.acreate", new_callable=AsyncMock) as mock_acreate:
+    import openai as real_openai
+
+    with patch.object(real_openai.ChatCompletion, 'acreate', new_callable=AsyncMock) as mock_acreate:
         datas = {
             "choices": [
                 {
@@ -199,8 +201,8 @@ async def test_stream_openai_async():
     cache.init()
     question = "calculate 1+4"
     expect_answer = "the result is 5"
-
-    with patch("openai.ChatCompletion.acreate", new_callable=AsyncMock) as mock_acreate:
+    import openai as real_openai
+    with patch.object(real_openai.ChatCompletion, 'acreate', new_callable=AsyncMock) as mock_acreate:
         datas = [
             {
                 "choices": [
@@ -243,13 +245,9 @@ async def test_stream_openai_async():
         ]
 
         async def acreate(*args, **kwargs):
-            async def async_generator(input_list):
-                for item in input_list:
-                    yield item
-                    await asyncio.sleep(0)  # this makes the function asynchronous
-
-            async for item in async_generator(datas):
+            for item in datas:
                 yield item
+                await asyncio.sleep(0)
 
         mock_acreate.return_value = acreate()
 
@@ -650,6 +648,101 @@ def test_base_llm_cache():
     assert get_message_from_openai_answer(response) == expect_answer, response
 
 
+@pytest.mark.asyncio
+async def test_base_llm_cache_async():
+    cache_obj = Cache()
+    init_similar_cache(
+        data_dir=str(random.random()), pre_func=last_content, cache_obj=cache_obj
+    )
+    question = "What's Github"
+    expect_answer = "Github is a great place to start"
+    import openai as real_openai
+    with patch.object(real_openai.ChatCompletion, 'acreate', new_callable=AsyncMock) as mock_acreate:
+        datas = {
+            "choices": [
+                {
+                    "message": {"content": expect_answer, "role": "assistant"},
+                    "finish_reason": "stop",
+                    "index": 0,
+                }
+            ],
+            "created": 1677825464,
+            "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion.chunk",
+        }
+        mock_acreate.return_value = datas
+
+        
+        async def proxy_openai_chat_complete_exception(*args, **kwargs):
+            raise real_openai.error.APIConnectionError("connect fail")
+
+        openai.ChatCompletion.llm = proxy_openai_chat_complete_exception
+
+        is_openai_exception = False
+        try:
+            await openai.ChatCompletion.acreate(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": question},
+                ],
+                cache_obj=cache_obj,
+            )
+        except real_openai.error.APIConnectionError:
+            is_openai_exception = True
+
+        assert is_openai_exception
+
+        is_proxy = False
+
+        def proxy_openai_chat_complete(*args, **kwargs):
+            nonlocal is_proxy
+            is_proxy = True
+            return real_openai.ChatCompletion.acreate(*args, **kwargs)
+
+        openai.ChatCompletion.llm = proxy_openai_chat_complete
+
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+            cache_obj=cache_obj,
+        )
+        assert is_proxy
+
+        assert get_message_from_openai_answer(response) == expect_answer, response
+
+    is_exception = False
+    try:
+        resp = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+        )
+    except Exception:
+        is_exception = True
+    assert is_exception
+
+    openai.ChatCompletion.cache_args = {"cache_obj": cache_obj}
+
+    print(openai.ChatCompletion.fill_base_args(foo="hello"))
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": question},
+        ],
+    )
+
+    openai.ChatCompletion.llm = None
+    openai.ChatCompletion.cache_args = {}
+    assert get_message_from_openai_answer(response) == expect_answer, response
 # def test_audio_api():
 #     data2vec = Data2VecAudio()
 #     data_manager = manager_factory("sqlite,faiss,local", "audio_api", vector_params={"dimension": data2vec.dimension})
