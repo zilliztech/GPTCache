@@ -31,11 +31,11 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def import_data(
-        self,
-        questions: List[Any],
-        answers: List[Any],
-        embedding_datas: List[Any],
-        session_ids: List[Optional[str]],
+            self,
+            questions: List[Any],
+            answers: List[Any],
+            embedding_datas: List[Any],
+            session_ids: List[Optional[str]],
     ):
         pass
 
@@ -225,15 +225,24 @@ class SSDataManager(DataManager):
         s: CacheStorage,
         v: VectorBase,
         o: Optional[ObjectBase],
-        e: Optional[EvictionBase]
+        e: Optional[EvictionBase],
+        max_size,
+        clean_size,
+        policy="LRU"
     ):
         self.s = s
         self.v = v
         self.o = o
         self.eviction_manager = EvictionManager(self.s, self.v)
+        if e is None:
+            e = EvictionBase(name="memory",
+                             maxsize=max_size,
+                             clean_size=clean_size,
+                             policy=policy,
+                             on_evict=self._clear)
         self.eviction_base = e
 
-        if self.eviction_base is not NoOpEviction:
+        if not isinstance(self.eviction_base, NoOpEviction):
             # if eviction manager is no op redis, we don't need to put data into eviction base
             self.eviction_base.put(self.s.get_ids(deleted=False))
 

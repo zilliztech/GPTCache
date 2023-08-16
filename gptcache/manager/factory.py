@@ -2,13 +2,11 @@ import os
 from pathlib import Path
 from typing import Union, Callable
 
-from gptcache.utils.log import gptcache_log
-
-from gptcache.manager.eviction import EvictionBase
-
 from gptcache.manager import CacheBase, VectorBase, ObjectBase
 from gptcache.manager.data_manager import SSDataManager, MapDataManager
+from gptcache.manager.eviction import EvictionBase
 from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
+from gptcache.utils.log import gptcache_log
 
 
 def manager_factory(manager="map",
@@ -109,7 +107,7 @@ def manager_factory(manager="map",
     if eviction_params is None:
         eviction_params = {}
 
-    if s is RedisCacheStorage and eviction_manager == "redis":
+    if isinstance(s, RedisCacheStorage) and eviction_manager == "redis":
         # if cache manager and eviction manager are both redis, we use no op redis to avoid redundant operations
         eviction_manager = "no_op_eviction"
         gptcache_log.info("Since Scalar Storage and Eviction manager are both redis, "
@@ -133,6 +131,8 @@ def get_data_manager(
         object_base: Union[ObjectBase, str] = None,
         eviction_base: Union[EvictionBase, str] = None,
         max_size: int = 1000,
+        clean_size=None,
+        eviction: str = "LRU",
         data_path: str = "data_map.txt",
         get_data_container: Callable = None,
 ):
@@ -154,6 +154,10 @@ def get_data_manager(
      - 'redis'
      - 'no_op_eviction'.
     :type eviction_base: :class:`EvictionBase` or str
+    :param clean_size: the clean size for the LRU cache in MapDataManager, defaults to None.
+    :type clean_size: int
+    :param eviction: the eviction policy for the LRU cache in MapDataManager, defaults to 'LRU'.
+    :type eviction: str
     :param data_path: the path to save the map data, defaults to 'data_map.txt'.
     :type data_path:  str
     :param get_data_container: a Callable to get the data container, defaults to None.
@@ -193,4 +197,4 @@ def get_data_manager(
     if isinstance(eviction_base, str):
         eviction_base = EvictionBase(name=eviction_base)
     assert cache_base and vector_base
-    return SSDataManager(cache_base, vector_base, object_base, eviction_base)
+    return SSDataManager(cache_base, vector_base, object_base, eviction_base, max_size, clean_size, eviction)
