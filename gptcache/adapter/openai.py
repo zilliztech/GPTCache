@@ -57,11 +57,11 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             return super().create(*llm_args, **llm_kwargs) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
-        
+
     @classmethod
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
+            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else await cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
@@ -189,11 +189,11 @@ class Completion(openai.Completion, BaseCacheLLM):
             return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
-        
+
     @classmethod
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
+            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else await cls.llm(*llm_args, **llm_kwargs)
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
@@ -225,7 +225,7 @@ class Completion(openai.Completion, BaseCacheLLM):
             *args,
             **kwargs,
         )
-    
+
     @classmethod
     async def acreate(cls, *args, **kwargs):
         kwargs = cls.fill_base_args(**kwargs)
