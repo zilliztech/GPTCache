@@ -1,10 +1,12 @@
 import time
 import unittest
+from pathlib import Path
 
 from redis_om import get_redis_connection
 
 from gptcache.embedding import Onnx
 from gptcache.manager import manager_factory
+from tempfile import TemporaryDirectory
 
 
 class TestDistributedCache(unittest.TestCase):
@@ -31,16 +33,23 @@ class TestDistributedCache(unittest.TestCase):
         self.assertEqual(type(manager.s).__name__, "RedisCacheStorage")
 
     def test_redis_sqlite_cache_eviction(self):
-        manager = manager_factory("sqlite,faiss",
-                                  eviction_manager="redis",
-                                  vector_params={"dimension": 5},
-                                  eviction_params=dict(url=self.url,
-                                                       maxmemory="100mb",
-                                                       policy="allkeys-lru"))
-        self.assertEqual(type(manager.s).__name__, "SQLStorage")
-        self.assertEqual(type(manager.eviction_base).__name__, "RedisCacheEviction")
-        self.assertEqual(manager.eviction_base.policy, "allkeys-lru")
-        self.assertEqual(manager.eviction_base._ttl, None)
+        with TemporaryDirectory(dir="./") as root:
+            db_name = "sqlite"
+            db_path = Path(root) / f"{db_name}.db"
+            manager = manager_factory("sqlite,faiss",
+                                      eviction_manager="redis",
+                                      scalar_params={
+                                          "url": f"{db_name}:///" + str(db_path),
+                                      },
+                                      vector_params={"dimension": 5},
+                                      eviction_params=dict(url=self.url,
+                                                           maxmemory="100mb",
+                                                           policy="allkeys-lru"))
+
+            self.assertEqual(type(manager.s).__name__, "SQLStorage")
+            self.assertEqual(type(manager.eviction_base).__name__, "RedisCacheEviction")
+            self.assertEqual(manager.eviction_base.policy, "allkeys-lru")
+            self.assertEqual(manager.eviction_base._ttl, None)
 
     def test_lru_cache(self):
         onnx = Onnx()
