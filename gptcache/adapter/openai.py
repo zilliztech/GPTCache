@@ -65,13 +65,6 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
-    @classmethod
-    async def _allm_handler(cls, *llm_args, **llm_kwargs):
-        try:
-            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else await cls.llm(*llm_args, **llm_kwargs)
-        except openai.OpenAIError as e:
-            raise wrap_error(e) from e
-
     @staticmethod
     async def _aupdate_cache_callback(
         llm_data, update_cache_func, *args, **kwargs
@@ -197,13 +190,6 @@ class Completion(openai.Completion, BaseCacheLLM):
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
-    @classmethod
-    async def _allm_handler(cls, *llm_args, **llm_kwargs):
-        try:
-            return (await super().acreate(*llm_args, **llm_kwargs)) if cls.llm is None else await cls.llm(*llm_args, **llm_kwargs)
-        except openai.OpenAIError as e:
-            raise wrap_error(e) from e
-
     @staticmethod
     def _cache_data_convert(cache_data):
         return _construct_text_from_cache(cache_data)
@@ -236,18 +222,6 @@ class Completion(openai.Completion, BaseCacheLLM):
             *args,
             **kwargs,
         )
-
-    @classmethod
-    async def acreate(cls, *args, **kwargs):
-        kwargs = cls.fill_base_args(**kwargs)
-        return await aadapt(
-            cls._allm_handler,
-            cls._cache_data_convert,
-            cls._update_cache_callback,
-            *args,
-            **kwargs,
-        )
-
 
 class Audio(openai.Audio):
     """Openai Audio Wrapper
