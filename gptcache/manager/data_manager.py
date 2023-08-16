@@ -7,6 +7,7 @@ import numpy as np
 import requests
 
 from gptcache.manager.eviction import EvictionBase
+from gptcache.manager.eviction.distributed_cache import NoOpEviction
 from gptcache.manager.eviction_manager import EvictionManager
 from gptcache.manager.object_data.base import ObjectBase
 from gptcache.manager.scalar_data.base import (
@@ -16,7 +17,6 @@ from gptcache.manager.scalar_data.base import (
     Answer,
     Question,
 )
-from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils.error import CacheError, ParamError
 from gptcache.utils.log import gptcache_log
@@ -214,12 +214,10 @@ class SSDataManager(DataManager):
     :type s: CacheStorage
     :param v: VectorBase to manager the vector data, it can be generated with :meth:`gptcache.manager.VectorBase`.
     :type v:  VectorBase
-    :param max_size: the max size for the cache, defaults to 1000.
-    :type max_size: int
-    :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
-    :type clean_size: int
-    :param eviction: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
-    :type eviction:  str
+    :param o: ObjectBase to manager the object data, it can be generated with :meth:`gptcache.manager.ObjectBase`.
+    :type o:  ObjectBase
+    :param e: EvictionBase to manager the eviction data, it can be generated with :meth:`gptcache.manager.EvictionBase`.
+    :type e:  EvictionBase
     """
 
     def __init__(
@@ -227,29 +225,15 @@ class SSDataManager(DataManager):
         s: CacheStorage,
         v: VectorBase,
         o: Optional[ObjectBase],
-        max_size,
-        clean_size,
-        eviction_manager="memory",
-        policy="LRU",
+        e: Optional[EvictionBase]
     ):
-        self.max_size = max_size
-        self.clean_size = clean_size
         self.s = s
         self.v = v
         self.o = o
         self.eviction_manager = EvictionManager(self.s, self.v)
-        if type(self.s) == RedisCacheStorage and eviction_manager == "redis":
-            # if cache manager and eviction manager are both redis, we use no op redis to avoid redundant operations
-            eviction_manager = "no_op_redis"
+        self.eviction_base = e
 
-        self.eviction_base = EvictionBase(
-            name=eviction_manager,
-            policy=policy,
-            maxsize=max_size,
-            clean_size=clean_size,
-            on_evict=self._clear,
-        )
-        if not eviction_manager == "no_op_redis":
+        if self.eviction_base is not NoOpEviction:
             # if eviction manager is no op redis, we don't need to put data into eviction base
             self.eviction_base.put(self.s.get_ids(deleted=False))
 
