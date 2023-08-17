@@ -25,7 +25,6 @@ import_openai()
 # pylint: disable=E1102
 import openai
 
-
 class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     """Openai ChatCompletion Wrapper
 
@@ -66,26 +65,18 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             raise wrap_error(e) from e
 
     @staticmethod
-    async def _aupdate_cache_callback(
+    def _update_cache_callback(
         llm_data, update_cache_func, *args, **kwargs
     ):  # pylint: disable=unused-argument
         if isinstance(llm_data, AsyncGenerator):
-
             async def hook_openai_data(it):
                 total_answer = ""
                 async for item in it:
                     total_answer += get_stream_message_from_openai_answer(item)
                     yield item
                 update_cache_func(Answer(total_answer, DataType.STR))
-
             return hook_openai_data(llm_data)
-        return ChatCompletion._update_cache_callback(llm_data, update_cache_func, *args, **kwargs)
-
-    @staticmethod
-    def _update_cache_callback(
-        llm_data, update_cache_func, *args, **kwargs
-    ):  # pylint: disable=unused-argument
-        if not isinstance(llm_data, Iterator):
+        elif not isinstance(llm_data, Iterator):
             update_cache_func(
                 Answer(get_message_from_openai_answer(llm_data), DataType.STR)
             )
@@ -148,7 +139,6 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             cache_data_convert,
             cls._update_cache_callback,
             *args,
-            aupdate_cache_callback=cls._aupdate_cache_callback,
             **kwargs,
         )
 

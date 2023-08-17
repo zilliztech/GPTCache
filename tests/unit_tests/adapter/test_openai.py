@@ -86,7 +86,9 @@ async def test_normal_openai_async():
     expect_answer = "the result is 4"
     import openai as real_openai
 
-    with patch.object(real_openai.ChatCompletion, 'acreate', new_callable=AsyncMock) as mock_acreate:
+    with patch.object(
+        real_openai.ChatCompletion, "acreate", new_callable=AsyncMock
+    ) as mock_acreate:
         datas = {
             "choices": [
                 {
@@ -202,7 +204,10 @@ async def test_stream_openai_async():
     question = "calculate 1+4"
     expect_answer = "the result is 5"
     import openai as real_openai
-    with patch.object(real_openai.ChatCompletion, 'acreate', new_callable=AsyncMock) as mock_acreate:
+
+    with patch.object(
+        real_openai.ChatCompletion, "acreate", new_callable=AsyncMock
+    ) as mock_acreate:
         datas = [
             {
                 "choices": [
@@ -657,7 +662,10 @@ async def test_base_llm_cache_async():
     question = "What's Github"
     expect_answer = "Github is a great place to start"
     import openai as real_openai
-    with patch.object(real_openai.ChatCompletion, 'acreate', new_callable=AsyncMock) as mock_acreate:
+
+    with patch.object(
+        real_openai.ChatCompletion, "acreate", new_callable=AsyncMock
+    ) as mock_acreate:
         datas = {
             "choices": [
                 {
@@ -673,7 +681,6 @@ async def test_base_llm_cache_async():
         }
         mock_acreate.return_value = datas
 
-        
         async def proxy_openai_chat_complete_exception(*args, **kwargs):
             raise real_openai.error.APIConnectionError("connect fail")
 
@@ -743,6 +750,8 @@ async def test_base_llm_cache_async():
     openai.ChatCompletion.llm = None
     openai.ChatCompletion.cache_args = {}
     assert get_message_from_openai_answer(response) == expect_answer, response
+
+
 # def test_audio_api():
 #     data2vec = Data2VecAudio()
 #     data_manager = manager_factory("sqlite,faiss,local", "audio_api", vector_params={"dimension": data2vec.dimension})
