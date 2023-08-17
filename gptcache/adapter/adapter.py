@@ -285,7 +285,6 @@ async def aadapt(
     :param cache_data_convert: When the cache hits, convert the answer in the cache to the format of the result returned by llm
     :param update_cache_callback: If the cache misses, after getting the result returned by llm, save the result to the cache
     :param args: llm args
-    :param aupdate_cache_callback: If the cache misses, after getting the result returned by llm, save the async result to the cache
     :param kwargs: llm kwargs
     :return: llm result
     """
