@@ -70,10 +70,6 @@ def get_models(global_key: str, redis_connection: Redis):
 
             return cls(v)
 
-        @classmethod
-        def __modify_schema__(cls, field_schema):
-            field_schema.update(type="string", format="byte")
-
         def to_numpy(self) -> np.ndarray:
             return np.frombuffer(self.data.encode("latin-1"), dtype=np.float32)
 
@@ -204,7 +200,7 @@ class RedisCacheStorage(CacheStorage):
 
     def __init__(
             self,
-            global_key_prefix="gptcache",
+            global_key_prefix: str = "gptcache",
             host: str = "localhost",
             port: int = 6379,
             maxmemory: str = None,

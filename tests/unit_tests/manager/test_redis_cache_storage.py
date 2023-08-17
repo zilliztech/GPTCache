@@ -4,16 +4,18 @@ import unittest
 import numpy as np
 
 from gptcache.manager.scalar_data.base import CacheData, Question
-from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage, get_models
+from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 from gptcache.utils import import_redis
 
 import_redis()
-from redis_om import get_redis_connection, RedisModel
+from redis_om import get_redis_connection
 
 
 class TestRedisStorage(unittest.TestCase):
     test_dbname = "gptcache_test"
     url = "redis://default:default@localhost:6379"
+
+    # url = "redis://default:default@localhost:7000"
 
     def setUp(cls) -> None:
         cls._clear_test_db()
@@ -64,7 +66,9 @@ class TestRedisStorage(unittest.TestCase):
 
     def test_with_deps(self):
         redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname,
-                                          url=self.url)
+                                          url=self.url,
+                                          # cluster=True
+                                          )
         data_id = redis_storage.batch_insert(
             [
                 CacheData(
@@ -151,3 +155,30 @@ class TestRedisStorage(unittest.TestCase):
 
         redis_storage.delete_session(ids[:3])
         assert len(redis_storage.list_sessions()) == 7
+
+    def test_cache_configuration(self):
+        redis_storage = RedisCacheStorage(global_key_prefix=self.test_dbname,
+                                          url=self.url,
+                                          maxmemory_samples=5,
+                                          maxmemory="4mb",
+                                          policy="allkeys-lru",
+                                          ttl=10)
+
+        memory_conf = redis_storage.con.config_get("maxmemory")
+        assert memory_conf is not None
+        assert memory_conf["maxmemory"] == "4194304"
+        policy_conf = redis_storage.con.config_get("maxmemory-policy")
+        assert policy_conf is not None
+        assert policy_conf['maxmemory-policy'] == "allkeys-lru"
+
+        samples_conf = redis_storage.con.config_get("maxmemory-samples")
+        assert samples_conf is not None
+        assert samples_conf['maxmemory-samples'] == "5"
+
+        ids = redis_storage.batch_insert(
+            [CacheData("question_1", ["answer_1"] * 2, np.random.rand(5), session_id=1)])
+        ttl = redis_storage.con.ttl(redis_storage._ques.make_key(ids[0]))
+        assert ttl is not None
+        time.sleep(2)
+        ttl = redis_storage.con.ttl(redis_storage._ques.make_key(ids[0]))
+        assert ttl < 10
