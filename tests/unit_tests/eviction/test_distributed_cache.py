@@ -148,3 +148,48 @@ class TestDistributedCache(unittest.TestCase):
         search_data = data_manager.search(embeddings[0], top_k=1)
         for res in search_data:
             self.assertEqual(data_manager.eviction_base.get(res[1]), None)
+
+    def test_cache_configuration(self):
+        e = EvictionBase("redis", maxmemory="4mb", policy="allkeys-lru", maxmemory_samples=5)
+
+        memory_conf = e._redis.config_get("maxmemory")
+        self.assertIsNotNone(memory_conf)
+        self.assertEqual(memory_conf["maxmemory"], "4194304")
+
+        policy_conf = e._redis.config_get("maxmemory-policy")
+        self.assertIsNotNone(policy_conf)
+        self.assertEqual(policy_conf['maxmemory-policy'], "allkeys-lru")
+
+        samples_conf = e._redis.config_get("maxmemory-samples")
+        self.assertIsNotNone(samples_conf)
+        self.assertEqual(samples_conf['maxmemory-samples'], "5")
+
+    def test_ttl_access(self):
+        e = EvictionBase("redis", maxmemory="4mb", policy="allkeys-lru", maxmemory_samples=5, ttl=5)
+
+        e.put(["key"])
+        value = e.get("key")
+        self.assertEqual(value, "True")
+
+        ttl = e._redis.ttl("key")
+        self.assertIsNotNone(ttl)
+
+        time.sleep(2)
+        ttl = e._redis.ttl("key")
+        self.assertLess(ttl, 5)
+
+        time.sleep(4)
+        ttl = e._redis.ttl("key")
+        self.assertEqual(ttl, -2)
+
+        value = e.get("key")
+        self.assertIsNone(value)
+
+        value = e.get("key1")
+        self.assertIsNone(value)
+
+        e = EvictionBase("redis", maxmemory="4mb", policy="allkeys-lru", maxmemory_samples=5)
+        e.put(["key"])
+        ttl = e._redis.ttl("key")
+        self.assertEqual(e.get("key"), "True")
+        self.assertEqual(ttl, -2)
