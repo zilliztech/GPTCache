@@ -31,7 +31,24 @@ class TestDistributedCache(unittest.TestCase):
                                                        maxmemory="100mb",
                                                        policy="allkeys-lru"))
         self.assertEqual(type(manager.eviction_base).__name__, "NoOpEviction")
+        self.assertEqual(manager.eviction_base.policy, "")
         self.assertEqual(type(manager.s).__name__, "RedisCacheStorage")
+
+    def test_eviction_base_str(self):
+        data_manager = get_data_manager(cache_base="sqlite",
+                                        vector_base=VectorBase("faiss", dimension=5),
+                                        eviction_base="redis"
+                                        )
+        self.assertIsNotNone(data_manager.eviction_base)
+        self.assertEqual(type(data_manager.eviction_base).__name__, "RedisCacheEviction")
+
+        data_manager = get_data_manager(cache_base="sqlite",
+                                        vector_base=VectorBase("faiss", dimension=5),
+                                        eviction_base="no_op_eviction"
+                                        )
+        self.assertIsNotNone(data_manager.eviction_base)
+        self.assertEqual(type(data_manager.eviction_base).__name__, "NoOpEviction")
+
 
     def test_redis_sqlite_cache_eviction(self):
         with TemporaryDirectory(dir="./") as root:
@@ -51,7 +68,6 @@ class TestDistributedCache(unittest.TestCase):
             self.assertEqual(type(manager.eviction_base).__name__, "RedisCacheEviction")
             self.assertEqual(manager.eviction_base.policy, "allkeys-lru")
             self.assertEqual(manager.eviction_base._ttl, None)
-
 
     def test_noeviction_policy(self):
         onnx = Onnx()
