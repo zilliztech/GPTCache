@@ -47,40 +47,34 @@ def get_models(global_key: str, redis_connection: Redis):
         def get(cls):
             return cls.database.get(cls.key_name)
 
-    class Embedding:
+    class EmbeddingType:
         """
-        Custom class for storing embedding result.
-        An embedding of type ``bytes`` is stored against Hash record type for the provided key.
-        :param pk: Primary key against which hash data for embedding would be stored
-        :type pk: str
-        :param embedding: Embedding information to store
-        :type embedding: bytes
-
-        Note:
-            As of this implementation, redis-om doesn't have a good compatibility to store bytes data
-            and successfully retrieve it without corruption.
-            In addition to that, decoding while getting the response is disabled as well.
+        Directly using bytes for embedding data is not supported by redis-om as of now.
+        Custom type for embedding data. This will be stored as bytes in redis.
+        Latin-1 encoding is used to convert the bytes to string and vice versa.
         """
 
-        prefix = global_key + ":embedding"
-
-        def __init__(self, pk: str, embedding: bytes):
-            self.pk = pk
-            self.embedding = embedding
-
-        def save(self, pipeline: Pipeline):
-            pipeline.hset(self.prefix + ":" + str(self.pk), "embedding", self.embedding)
+        def __init__(self, data: bytes):
+            self.data = data
 
         @classmethod
-        def get(cls, key: int, db: Redis):
-            """
-            Returns embedding stored against the ``key``.
-            Decode only key value while creating a response
-            :param key: redis key to fetch embedding
-            :type key: str
-            """
-            result = db.hgetall(cls.prefix + ":" + str(key))
-            return {k.decode("utf-8"): v for k, v in result.items()}
+        def __get_validators__(cls):
+            yield cls.validate
+
+        @classmethod
+        def validate(cls, v: [np.array, bytes]):
+            if isinstance(v, np.ndarray):
+                return cls(v.astype(np.float32).tobytes())
+            elif isinstance(v, bytes):
+                return cls(v)
+
+            return cls(v)
+
+        def to_numpy(self) -> np.ndarray:
+            return np.frombuffer(self.data.encode("latin-1"), dtype=np.float32)
+
+        def __repr__(self):
+            return f"{self.data}"
 
     class Answers(EmbeddedJsonModel):
         """
@@ -93,6 +87,15 @@ def get_models(global_key: str, redis_connection: Redis):
         class Meta:
             database = redis_connection
 
+    class QuestionDeps(EmbeddedJsonModel):
+        """
+        Question Dep collection
+        """
+
+        dep_name: str
+        dep_data: str
+        dep_type: int
+
     class Questions(JsonModel):
         """
         questions collection
@@ -103,11 +106,19 @@ def get_models(global_key: str, redis_connection: Redis):
         last_access: datetime.datetime
         deleted: int = Field(index=True)
         answers: List[Answers]
+        deps: List[QuestionDeps]
+        embedding: EmbeddingType
 
         class Meta:
             global_key_prefix = global_key
             model_key_prefix = "questions"
             database = redis_connection
+
+        class Config:
+            json_encoders = {
+                EmbeddingType: lambda n: n.data.decode("latin-1")
+                if isinstance(n.data, bytes) else n.data
+            }
 
     class Sessions(JsonModel):
         """
@@ -122,21 +133,6 @@ def get_models(global_key: str, redis_connection: Redis):
         session_id: str = Field(index=True)
         session_question: str
         question_id: str = Field(index=True)
-
-    class QuestionDeps(JsonModel):
-        """
-        Question Dep collection
-        """
-
-        class Meta:
-            global_key_prefix = global_key
-            model_key_prefix = "ques_deps"
-            database = redis_connection
-
-        question_id: str = Field(index=True)
-        dep_name: str
-        dep_data: str
-        dep_type: int
 
     class Report(JsonModel):
         """
@@ -157,7 +153,7 @@ def get_models(global_key: str, redis_connection: Redis):
         cache_time: datetime.datetime = Field(index=True)
         extra: Optional[str]
 
-    return Questions, Embedding, Answers, QuestionDeps, Sessions, Counter, Report
+    return Questions, Answers, QuestionDeps, Sessions, Counter, Report
 
 
 class RedisCacheStorage(CacheStorage):
@@ -165,15 +161,22 @@ class RedisCacheStorage(CacheStorage):
      Using redis-om as OM to store data in redis cache storage
 
     :param host: redis host, default value 'localhost'
-     :type host: str
-     :param port: redis port, default value 27017
-     :type port: int
-     :param global_key_prefix: A global prefix for keys against which data is stored.
-     For example, for a global_key_prefix ='gptcache', keys would be constructed would look like this:
-     gptcache:questions:abc123
-     :type global_key_prefix: str
-     :param kwargs: Additional parameters to provide in order to create redis om connection
-
+    :type host: str
+    :param port: redis port, default value 27017
+    :type port: int
+    :param global_key_prefix: A global prefix for keys against which data is stored.
+    For example, for a global_key_prefix ='gptcache', keys would be constructed would look like this:
+    gptcache:questions:abc123
+    :type global_key_prefix: str
+    :param maxmemory: Maximum memory to use for redis cache storage
+    :type maxmemory: str
+    :param policy: Policy to use for eviction, default value 'allkeys-lru'
+    :type policy: str
+    :param ttl: Time to live for keys in milliseconds, default value None
+    :type ttl: int
+    :param maxmemory_samples: Number of keys to sample when evicting keys
+    :type maxmemory_samples: int
+    :param kwargs: Additional parameters to provide in order to create redis om connection
     Example:
         .. code-block:: python
 
@@ -197,20 +200,20 @@ class RedisCacheStorage(CacheStorage):
 
     def __init__(
             self,
-            global_key_prefix="gptcache",
+            global_key_prefix: str = "gptcache",
             host: str = "localhost",
             port: int = 6379,
+            maxmemory: str = None,
+            policy: str = None,
+            ttl: int = None,
+            maxmemory_samples: int = None,
             **kwargs
     ):
         self.con = get_redis_connection(host=host, port=port, **kwargs)
-
-        self.con_encoded = get_redis_connection(
-            host=host, port=port, decode_responses=False, **kwargs
-        )
-
+        self.default_ttl = ttl
+        self.init_eviction_params(policy=policy, maxmemory=maxmemory, maxmemory_samples=maxmemory_samples, ttl=ttl)
         (
             self._ques,
-            self._embedding,
             self._answer,
             self._ques_dep,
             self._session,
@@ -219,6 +222,15 @@ class RedisCacheStorage(CacheStorage):
         ) = get_models(global_key_prefix, redis_connection=self.con)
 
         Migrator().run()
+
+    def init_eviction_params(self, policy, maxmemory, maxmemory_samples, ttl):
+        self.default_ttl = ttl
+        if maxmemory:
+            self.con.config_set("maxmemory", maxmemory)
+        if policy:
+            self.con.config_set("maxmemory-policy", policy)
+        if maxmemory_samples:
+            self.con.config_set("maxmemory-samples", maxmemory_samples)
 
     def create(self):
         pass
@@ -235,6 +247,21 @@ class RedisCacheStorage(CacheStorage):
             )
             all_data.append(answer_data)
 
+        all_deps = []
+        if isinstance(data.question, Question) and data.question.deps is not None:
+            for dep in data.question.deps:
+                all_deps.append(
+                    self._ques_dep(
+                        dep_name=dep.name,
+                        dep_data=dep.data,
+                        dep_type=dep.dep_type,
+                    )
+                )
+        embedding_data = (
+            data.embedding_data
+            if data.embedding_data is not None
+            else None
+        )
         ques_data = self._ques(
             pk=pk,
             question=data.question
@@ -244,29 +271,11 @@ class RedisCacheStorage(CacheStorage):
             last_access=datetime.datetime.utcnow(),
             deleted=0,
             answers=answers,
+            deps=all_deps,
+            embedding=embedding_data
         )
 
         ques_data.save(pipeline)
-
-        embedding_data = (
-            data.embedding_data.astype(np.float32).tobytes()
-            if data.embedding_data is not None
-            else None
-        )
-        self._embedding(pk=ques_data.pk, embedding=embedding_data).save(pipeline)
-
-        if isinstance(data.question, Question) and data.question.deps is not None:
-            all_deps = []
-            for dep in data.question.deps:
-                all_deps.append(
-                    self._ques_dep(
-                        question_id=ques_data.pk,
-                        dep_name=dep.name,
-                        dep_data=dep.data,
-                        dep_type=dep.dep_type,
-                    )
-                )
-            self._ques_dep.add(all_deps, pipeline=pipeline)
 
         if data.session_id:
             session_data = self._session(
@@ -277,7 +286,8 @@ class RedisCacheStorage(CacheStorage):
                 else data.question.content,
             )
             session_data.save(pipeline)
-
+        if self.default_ttl:
+            ques_data.expire(self.default_ttl, pipeline=pipeline)
         return int(ques_data.pk)
 
     def batch_insert(self, all_data: List[CacheData]):
@@ -297,22 +307,20 @@ class RedisCacheStorage(CacheStorage):
 
         qs.update(last_access=datetime.datetime.utcnow())
         res_ans = [(item.answer, item.answer_type) for item in qs.answers]
-
-        deps = self._ques_dep.find(self._ques_dep.question_id == key).all()
         res_deps = [
-            QuestionDep(item.dep_name, item.dep_data, item.dep_type) for item in deps
+            QuestionDep(item.dep_name, item.dep_data, item.dep_type) for item in qs.deps
         ]
 
         session_ids = [
             obj.session_id
             for obj in self._session.find(self._session.question_id == key).all()
         ]
-
-        res_embedding = self._embedding.get(qs.pk, self.con_encoded)["embedding"]
+        if self.default_ttl:
+            qs.expire(self.default_ttl)
         return CacheData(
-            question=qs.question if not deps else Question(qs.question, res_deps),
+            question=qs.question if not res_deps else Question(qs.question, res_deps),
             answers=res_ans,
-            embedding_data=np.frombuffer(res_embedding, dtype=np.float32),
+            embedding_data=qs.embedding.to_numpy(),
             session_id=session_ids,
             create_on=qs.create_on,
             last_access=qs.last_access,
@@ -333,11 +341,6 @@ class RedisCacheStorage(CacheStorage):
                 self._session.question_id << q_ids
             ).all()
             self._session.delete_many(sessions_to_delete, pipeline)
-
-            deps_to_delete = self._ques_dep.find(
-                self._ques_dep.question_id << q_ids
-            ).all()
-            self._ques_dep.delete_many(deps_to_delete, pipeline)
 
             pipeline.execute()
 

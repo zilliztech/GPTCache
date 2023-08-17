@@ -7,6 +7,7 @@ import numpy as np
 import requests
 
 from gptcache.manager.eviction import EvictionBase
+from gptcache.manager.eviction.distributed_cache import NoOpEviction
 from gptcache.manager.eviction_manager import EvictionManager
 from gptcache.manager.object_data.base import ObjectBase
 from gptcache.manager.scalar_data.base import (
@@ -30,11 +31,11 @@ class DataManager(metaclass=ABCMeta):
 
     @abstractmethod
     def import_data(
-        self,
-        questions: List[Any],
-        answers: List[Any],
-        embedding_datas: List[Any],
-        session_ids: List[Optional[str]],
+            self,
+            questions: List[Any],
+            answers: List[Any],
+            embedding_datas: List[Any],
+            session_ids: List[Optional[str]],
     ):
         pass
 
@@ -213,12 +214,10 @@ class SSDataManager(DataManager):
     :type s: CacheStorage
     :param v: VectorBase to manager the vector data, it can be generated with :meth:`gptcache.manager.VectorBase`.
     :type v:  VectorBase
-    :param max_size: the max size for the cache, defaults to 1000.
-    :type max_size: int
-    :param clean_size: the size to clean up, defaults to `max_size * 0.2`.
-    :type clean_size: int
-    :param eviction: The eviction policy, it is support "LRU" and "FIFO" now, and defaults to "LRU".
-    :type eviction:  str
+    :param o: ObjectBase to manager the object data, it can be generated with :meth:`gptcache.manager.ObjectBase`.
+    :type o:  ObjectBase
+    :param e: EvictionBase to manager the eviction data, it can be generated with :meth:`gptcache.manager.EvictionBase`.
+    :type e:  EvictionBase
     """
 
     def __init__(
@@ -226,24 +225,26 @@ class SSDataManager(DataManager):
         s: CacheStorage,
         v: VectorBase,
         o: Optional[ObjectBase],
+        e: Optional[EvictionBase],
         max_size,
         clean_size,
-        policy="LRU",
+        policy="LRU"
     ):
-        self.max_size = max_size
-        self.clean_size = clean_size
         self.s = s
         self.v = v
         self.o = o
         self.eviction_manager = EvictionManager(self.s, self.v)
-        self.eviction_base = EvictionBase(
-            name="memory",
-            policy=policy,
-            maxsize=max_size,
-            clean_size=clean_size,
-            on_evict=self._clear,
-        )
-        self.eviction_base.put(self.s.get_ids(deleted=False))
+        if e is None:
+            e = EvictionBase(name="memory",
+                             maxsize=max_size,
+                             clean_size=clean_size,
+                             policy=policy,
+                             on_evict=self._clear)
+        self.eviction_base = e
+
+        if not isinstance(self.eviction_base, NoOpEviction):
+            # if eviction manager is no op redis, we don't need to put data into eviction base
+            self.eviction_base.put(self.s.get_ids(deleted=False))
 
     def _clear(self, marked_keys):
         self.eviction_manager.soft_evict(marked_keys)

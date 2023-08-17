@@ -33,12 +33,12 @@ class MemoryCacheEviction(EvictionBase):
     """
 
     def __init__(
-        self,
-        policy: str,
-        maxsize: int,
-        clean_size: int = 0,
-        on_evict: Callable[[List[Any]], None] = None,
-        **kwargs,
+            self,
+            policy: str = "LRU",
+            maxsize: int = 1000,
+            clean_size: int = 0,
+            on_evict: Callable[[List[Any]], None] = None,
+            **kwargs,
     ):
         self._policy = policy.upper()
         if self._policy == "LRU":
