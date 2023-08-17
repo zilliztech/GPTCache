@@ -11,6 +11,7 @@ import pytest
 from gptcache import Cache, cache
 from gptcache.adapter import openai
 from gptcache.adapter.api import init_similar_cache
+from gptcache.config import Config
 from gptcache.manager import get_data_manager
 from gptcache.processor.pre import (
     get_file_bytes,
@@ -19,6 +20,7 @@ from gptcache.processor.pre import (
     get_prompt,
     last_content,
 )
+from gptcache.utils.error import CacheError
 from gptcache.utils.response import (
     get_audio_text_from_openai_answer,
     get_image_from_openai_b64,
@@ -38,8 +40,9 @@ except ModuleNotFoundError:
     from PIL import Image
 
 
-def test_normal_openai():
-    cache.init()
+@pytest.mark.parametrize("enable_token_counter", (True, False))
+def test_normal_openai(enable_token_counter):
+    cache.init(config=Config(enable_token_counter=enable_token_counter))
     question = "calculate 1+3"
     expect_answer = "the result is 4"
     with patch("openai.ChatCompletion.create") as mock_create:
@@ -80,8 +83,9 @@ def test_normal_openai():
 
 
 @pytest.mark.asyncio
-async def test_normal_openai_async():
-    cache.init()
+@pytest.mark.parametrize("enable_token_counter", (True, False))
+async def test_normal_openai_async(enable_token_counter):
+    cache.init(config=Config(enable_token_counter=enable_token_counter))
     question = "calculate 1+3"
     expect_answer = "the result is 4"
     import openai as real_openai
@@ -332,6 +336,24 @@ async def test_completion_async():
     )
     answer_text = get_text_from_openai_answer(response)
     assert answer_text == expect_answer
+
+
+@pytest.mark.asyncio
+async def test_completion_error_wrapping():
+    cache.init(pre_embedding_func=get_prompt)
+    import openai as real_openai
+
+    with patch("openai.Completion.acreate", new_callable=AsyncMock) as mock_acreate:
+        mock_acreate.side_effect = real_openai.OpenAIError
+        with pytest.raises(real_openai.OpenAIError) as e:
+            await openai.Completion.acreate(model="text-davinci-003", prompt="boom")
+        assert isinstance(e.value, CacheError)
+
+    with patch("openai.Completion.create") as mock_create:
+        mock_create.side_effect = real_openai.OpenAIError
+        with pytest.raises(real_openai.OpenAIError) as e:
+            openai.Completion.create(model="text-davinci-003", prompt="boom")
+        assert isinstance(e.value, CacheError)
 
 
 def test_image_create():
