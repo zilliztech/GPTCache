@@ -36,7 +36,7 @@ def Milvus(**kwargs):
 2. Automatic installation
 ```python
 # 2.1 Add the import method
-# add new method to util/__init__.py
+# add new method to utils/__init__.py
 __all__ = ['import_pymilvus']
 
 from gptcache.utils.dependency_control import prompt_install
