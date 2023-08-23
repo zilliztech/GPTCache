@@ -5,6 +5,9 @@ To read the following content, you need to understand the basic use of GPTCache,
 - [Readme doc](https://github.com/zilliztech/GPTCache)
 - [Usage doc](https://github.com/zilliztech/GPTCache/blob/main/docs/usage.md)
 
+## v0.1.40 (2023.8.23)
+1. Support the redis eviction
+
 ## v0.1.38 (2023.7.31)
 
 Some improvements:
