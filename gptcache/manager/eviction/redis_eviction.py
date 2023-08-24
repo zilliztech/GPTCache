@@ -1,8 +1,10 @@
+# pylint: disable=wrong-import-position
 from abc import ABC
 from typing import List
 
 from gptcache.manager.eviction.distributed_cache import DistributedEviction
 from gptcache.utils import import_redis
+
 
 import_redis()
 import redis
@@ -79,4 +81,3 @@ class RedisCacheEviction(DistributedEviction, ABC):
     @property
     def policy(self) -> str:
         return self._policy
-    
