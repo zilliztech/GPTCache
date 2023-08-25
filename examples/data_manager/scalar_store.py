@@ -22,6 +22,7 @@ def run():
         CacheBase('mariadb', sql_url='mariadb+pymysql://root:123456@127.0.0.1:3307/mysql'),
         CacheBase('sqlserver', sql_url='ssql+pyodbc://sa:Strongpsw_123@127.0.0.1:1434/msdb?driver=ODBC+Driver+17+for+SQL+Server'),
         CacheBase('oracle', sql_url='oracle+cx_oracle://oracle:123456@127.0.0.1:1521/?service_name=helowin&encoding=UTF-8&nencoding=UTF-8'),
+        CacheBase('dynamo'),
     ]
 
     for scalar_store in scalar_stores:

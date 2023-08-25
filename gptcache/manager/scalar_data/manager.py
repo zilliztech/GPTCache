@@ -102,6 +102,16 @@ class CacheBase:
                 global_key_prefix=kwargs.pop("global_key_prefix", TABLE_NAME),
                 **kwargs
             )
+        elif name == "dynamo":
+            from gptcache.manager.scalar_data.dynamo_storage import DynamoStorage
+
+            return DynamoStorage(
+                aws_access_key_id=kwargs.get("aws_access_key_id"),
+                aws_secret_access_key=kwargs.get("aws_secret_access_key"),
+                aws_region_name=kwargs.get("region_name"),
+                aws_profile_name=kwargs.get("aws_profile_name"),
+                aws_endpoint_url=kwargs.get("endpoint_url"),
+            )
         else:
             raise NotFoundError("cache store", name)
         return cache_base

@@ -40,6 +40,11 @@ jobs:
         image: redis/redis-stack-server
         ports:
           - 6379:6379
+      dynamodb:
+        image: amazon/dynamodb-local:2.0.0
+        # rebinding to a different port since 8000 is a commonly used port
+        ports:
+          - 9999:8000
       mongo:
         image: mongo
         ports:
