@@ -513,7 +513,6 @@ async def aadapt(
                     == 0
                 ):
                     chat_cache.flush()
-
             llm_data = update_cache_callback(
                 llm_data, update_cache_func, *args, **kwargs
             )

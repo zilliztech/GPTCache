@@ -1,28 +1,34 @@
+import asyncio
 import base64
 import os
 import random
 from io import BytesIO
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 from urllib.request import urlopen
 
-from gptcache import cache, Cache
+import pytest
+
+from gptcache import Cache, cache
 from gptcache.adapter import openai
 from gptcache.adapter.api import init_similar_cache
+from gptcache.config import Config
 from gptcache.manager import get_data_manager
 from gptcache.processor.pre import (
-    get_prompt,
-    get_file_name,
     get_file_bytes,
-    get_openai_moderation_input, last_content,
+    get_file_name,
+    get_openai_moderation_input,
+    get_prompt,
+    last_content,
 )
+from gptcache.utils.error import CacheError
 from gptcache.utils.response import (
-    get_stream_message_from_openai_answer,
-    get_message_from_openai_answer,
-    get_text_from_openai_answer,
-    get_image_from_openai_b64,
-    get_image_from_path,
-    get_image_from_openai_url,
     get_audio_text_from_openai_answer,
+    get_image_from_openai_b64,
+    get_image_from_openai_url,
+    get_image_from_path,
+    get_message_from_openai_answer,
+    get_stream_message_from_openai_answer,
+    get_text_from_openai_answer,
 )
 
 try:
@@ -34,8 +40,9 @@ except ModuleNotFoundError:
     from PIL import Image
 
 
-def test_normal_openai():
-    cache.init()
+@pytest.mark.parametrize("enable_token_counter", (True, False))
+def test_normal_openai(enable_token_counter):
+    cache.init(config=Config(enable_token_counter=enable_token_counter))
     question = "calculate 1+3"
     expect_answer = "the result is 4"
     with patch("openai.ChatCompletion.create") as mock_create:
@@ -65,6 +72,53 @@ def test_normal_openai():
         assert get_message_from_openai_answer(response) == expect_answer, response
 
     response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": question},
+        ],
+    )
+    answer_text = get_message_from_openai_answer(response)
+    assert answer_text == expect_answer, answer_text
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("enable_token_counter", (True, False))
+async def test_normal_openai_async(enable_token_counter):
+    cache.init(config=Config(enable_token_counter=enable_token_counter))
+    question = "calculate 1+3"
+    expect_answer = "the result is 4"
+    import openai as real_openai
+
+    with patch.object(
+        real_openai.ChatCompletion, "acreate", new_callable=AsyncMock
+    ) as mock_acreate:
+        datas = {
+            "choices": [
+                {
+                    "message": {"content": expect_answer, "role": "assistant"},
+                    "finish_reason": "stop",
+                    "index": 0,
+                }
+            ],
+            "created": 1677825464,
+            "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion.chunk",
+        }
+        mock_acreate.return_value = datas
+
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+        )
+
+        assert get_message_from_openai_answer(response) == expect_answer, response
+
+    response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
@@ -148,6 +202,91 @@ def test_stream_openai():
     assert answer_text == expect_answer, answer_text
 
 
+@pytest.mark.asyncio
+async def test_stream_openai_async():
+    cache.init()
+    question = "calculate 1+4"
+    expect_answer = "the result is 5"
+    import openai as real_openai
+
+    with patch.object(
+        real_openai.ChatCompletion, "acreate", new_callable=AsyncMock
+    ) as mock_acreate:
+        datas = [
+            {
+                "choices": [
+                    {"delta": {"role": "assistant"}, "finish_reason": None, "index": 0}
+                ],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+            {
+                "choices": [
+                    {
+                        "delta": {"content": "the result"},
+                        "finish_reason": None,
+                        "index": 0,
+                    }
+                ],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+            {
+                "choices": [
+                    {"delta": {"content": " is 5"}, "finish_reason": None, "index": 0}
+                ],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+            {
+                "choices": [{"delta": {}, "finish_reason": "stop", "index": 0}],
+                "created": 1677825464,
+                "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+                "model": "gpt-3.5-turbo-0301",
+                "object": "chat.completion.chunk",
+            },
+        ]
+
+        async def acreate(*args, **kwargs):
+            for item in datas:
+                yield item
+                await asyncio.sleep(0)
+
+        mock_acreate.return_value = acreate()
+
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+            stream=True,
+        )
+        all_text = ""
+        async for res in response:
+            all_text += get_stream_message_from_openai_answer(res)
+        assert all_text == expect_answer, all_text
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": question},
+        ],
+        stream=True,
+    )
+    answer_text = ""
+    async for res in response:
+        answer_text += get_stream_message_from_openai_answer(res)
+    assert answer_text == expect_answer, answer_text
+
+
 def test_completion():
     cache.init(pre_embedding_func=get_prompt)
     question = "what is your name?"
@@ -169,6 +308,52 @@ def test_completion():
     response = openai.Completion.create(model="text-davinci-003", prompt=question)
     answer_text = get_text_from_openai_answer(response)
     assert answer_text == expect_answer
+
+
+@pytest.mark.asyncio
+async def test_completion_async():
+    cache.init(pre_embedding_func=get_prompt)
+    question = "what is your name?"
+    expect_answer = "gptcache"
+
+    with patch("openai.Completion.acreate", new_callable=AsyncMock) as mock_acreate:
+        mock_acreate.return_value = {
+            "choices": [{"text": expect_answer, "finish_reason": None, "index": 0}],
+            "created": 1677825464,
+            "id": "cmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "text-davinci-003",
+            "object": "text_completion",
+        }
+
+        response = await openai.Completion.acreate(
+            model="text-davinci-003", prompt=question
+        )
+        answer_text = get_text_from_openai_answer(response)
+        assert answer_text == expect_answer
+
+    response = await openai.Completion.acreate(
+        model="text-davinci-003", prompt=question
+    )
+    answer_text = get_text_from_openai_answer(response)
+    assert answer_text == expect_answer
+
+
+@pytest.mark.asyncio
+async def test_completion_error_wrapping():
+    cache.init(pre_embedding_func=get_prompt)
+    import openai as real_openai
+
+    with patch("openai.Completion.acreate", new_callable=AsyncMock) as mock_acreate:
+        mock_acreate.side_effect = real_openai.OpenAIError
+        with pytest.raises(real_openai.OpenAIError) as e:
+            await openai.Completion.acreate(model="text-davinci-003", prompt="boom")
+        assert isinstance(e.value, CacheError)
+
+    with patch("openai.Completion.create") as mock_create:
+        mock_create.side_effect = real_openai.OpenAIError
+        with pytest.raises(real_openai.OpenAIError) as e:
+            openai.Completion.create(model="text-davinci-003", prompt="boom")
+        assert isinstance(e.value, CacheError)
 
 
 def test_image_create():
@@ -312,16 +497,16 @@ def test_moderation():
             input=["I want to kill them."],
         )
         assert (
-                response.get("results")[0].get("category_scores").get("violence")
-                == expect_violence
+            response.get("results")[0].get("category_scores").get("violence")
+            == expect_violence
         )
 
     response = openai.Moderation.create(
         input="I want to kill them.",
     )
     assert (
-            response.get("results")[0].get("category_scores").get("violence")
-            == expect_violence
+        response.get("results")[0].get("category_scores").get("violence")
+        == expect_violence
     )
 
     expect_violence = 0.88708615
@@ -379,8 +564,8 @@ def test_moderation():
         )
         assert not response.get("results")[0].get("flagged")
         assert (
-                response.get("results")[1].get("category_scores").get("violence")
-                == expect_violence
+            response.get("results")[1].get("category_scores").get("violence")
+            == expect_violence
         )
 
     response = openai.Moderation.create(
@@ -388,8 +573,8 @@ def test_moderation():
     )
     assert not response.get("results")[0].get("flagged")
     assert (
-            response.get("results")[1].get("category_scores").get("violence")
-            == expect_violence
+        response.get("results")[1].get("category_scores").get("violence")
+        == expect_violence
     )
 
 
@@ -462,7 +647,7 @@ def test_base_llm_cache():
 
     is_exception = False
     try:
-        openai.ChatCompletion.create(
+        resp = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -488,6 +673,106 @@ def test_base_llm_cache():
     openai.ChatCompletion.llm = None
     openai.ChatCompletion.cache_args = {}
     assert get_message_from_openai_answer(response) == expect_answer, response
+
+
+@pytest.mark.asyncio
+async def test_base_llm_cache_async():
+    cache_obj = Cache()
+    init_similar_cache(
+        data_dir=str(random.random()), pre_func=last_content, cache_obj=cache_obj
+    )
+    question = "What's Github"
+    expect_answer = "Github is a great place to start"
+    import openai as real_openai
+
+    with patch.object(
+        real_openai.ChatCompletion, "acreate", new_callable=AsyncMock
+    ) as mock_acreate:
+        datas = {
+            "choices": [
+                {
+                    "message": {"content": expect_answer, "role": "assistant"},
+                    "finish_reason": "stop",
+                    "index": 0,
+                }
+            ],
+            "created": 1677825464,
+            "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion.chunk",
+        }
+        mock_acreate.return_value = datas
+
+        async def proxy_openai_chat_complete_exception(*args, **kwargs):
+            raise real_openai.error.APIConnectionError("connect fail")
+
+        openai.ChatCompletion.llm = proxy_openai_chat_complete_exception
+
+        is_openai_exception = False
+        try:
+            await openai.ChatCompletion.acreate(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": question},
+                ],
+                cache_obj=cache_obj,
+            )
+        except real_openai.error.APIConnectionError:
+            is_openai_exception = True
+
+        assert is_openai_exception
+
+        is_proxy = False
+
+        def proxy_openai_chat_complete(*args, **kwargs):
+            nonlocal is_proxy
+            is_proxy = True
+            return real_openai.ChatCompletion.acreate(*args, **kwargs)
+
+        openai.ChatCompletion.llm = proxy_openai_chat_complete
+
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+            cache_obj=cache_obj,
+        )
+        assert is_proxy
+
+        assert get_message_from_openai_answer(response) == expect_answer, response
+
+    is_exception = False
+    try:
+        resp = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
+        )
+    except Exception:
+        is_exception = True
+    assert is_exception
+
+    openai.ChatCompletion.cache_args = {"cache_obj": cache_obj}
+
+    print(openai.ChatCompletion.fill_base_args(foo="hello"))
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": question},
+        ],
+    )
+
+    openai.ChatCompletion.llm = None
+    openai.ChatCompletion.cache_args = {}
+    assert get_message_from_openai_answer(response) == expect_answer, response
+
 
 # def test_audio_api():
 #     data2vec = Data2VecAudio()

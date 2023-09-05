@@ -3,21 +3,21 @@ import json
 import os
 import time
 from io import BytesIO
-from typing import Iterator, Any, List
+from typing import Any, AsyncGenerator, Iterator, List
 
 from gptcache import cache
-from gptcache.adapter.adapter import adapt
+from gptcache.adapter.adapter import aadapt, adapt
 from gptcache.adapter.base import BaseCacheLLM
 from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.utils import import_openai, import_pillow
 from gptcache.utils.error import wrap_error
 from gptcache.utils.response import (
-    get_stream_message_from_openai_answer,
-    get_message_from_openai_answer,
-    get_text_from_openai_answer,
+    get_audio_text_from_openai_answer,
     get_image_from_openai_b64,
     get_image_from_openai_url,
-    get_audio_text_from_openai_answer,
+    get_message_from_openai_answer,
+    get_stream_message_from_openai_answer,
+    get_text_from_openai_answer,
 )
 from gptcache.utils.token import token_counter
 
@@ -56,7 +56,22 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return super().create(*llm_args, **llm_kwargs) if cls.llm is None else cls.llm(*llm_args, **llm_kwargs)
+            return (
+                super().create(*llm_args, **llm_kwargs)
+                if cls.llm is None
+                else cls.llm(*llm_args, **llm_kwargs)
+            )
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
+
+    @classmethod
+    async def _allm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return (
+                (await super().acreate(*llm_args, **llm_kwargs))
+                if cls.llm is None
+                else await cls.llm(*llm_args, **llm_kwargs)
+            )
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
@@ -64,7 +79,17 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     def _update_cache_callback(
         llm_data, update_cache_func, *args, **kwargs
     ):  # pylint: disable=unused-argument
-        if not isinstance(llm_data, Iterator):
+        if isinstance(llm_data, AsyncGenerator):
+
+            async def hook_openai_data(it):
+                total_answer = ""
+                async for item in it:
+                    total_answer += get_stream_message_from_openai_answer(item)
+                    yield item
+                update_cache_func(Answer(total_answer, DataType.STR))
+
+            return hook_openai_data(llm_data)
+        elif not isinstance(llm_data, Iterator):
             update_cache_func(
                 Answer(get_message_from_openai_answer(llm_data), DataType.STR)
             )
@@ -92,8 +117,6 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
                 saved_token = [input_token, output_token]
             else:
                 saved_token = [0, 0]
-            if kwargs.get("stream", False):
-                return _construct_stream_resp_from_cache(cache_data, saved_token)
             return _construct_resp_from_cache(cache_data, saved_token)
 
         kwargs = cls.fill_base_args(**kwargs)
@@ -104,6 +127,38 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             *args,
             **kwargs,
         )
+
+    @classmethod
+    async def acreate(cls, *args, **kwargs):
+        chat_cache = kwargs.get("cache_obj", cache)
+        enable_token_counter = chat_cache.config.enable_token_counter
+
+        def cache_data_convert(cache_data):
+            if enable_token_counter:
+                input_token = _num_tokens_from_messages(kwargs.get("messages"))
+                output_token = token_counter(cache_data)
+                saved_token = [input_token, output_token]
+            else:
+                saved_token = [0, 0]
+            if kwargs.get("stream", False):
+                return async_iter(
+                    _construct_stream_resp_from_cache(cache_data, saved_token)
+                )
+            return _construct_resp_from_cache(cache_data, saved_token)
+
+        kwargs = cls.fill_base_args(**kwargs)
+        return await aadapt(
+            cls._allm_handler,
+            cache_data_convert,
+            cls._update_cache_callback,
+            *args,
+            **kwargs,
+        )
+
+
+async def async_iter(input_list):
+    for item in input_list:
+        yield item
 
 
 class Completion(openai.Completion, BaseCacheLLM):
@@ -128,7 +183,22 @@ class Completion(openai.Completion, BaseCacheLLM):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
+            return (
+                super().create(*llm_args, **llm_kwargs)
+                if not cls.llm
+                else cls.llm(*llm_args, **llm_kwargs)
+            )
+        except openai.OpenAIError as e:
+            raise wrap_error(e) from e
+
+    @classmethod
+    async def _allm_handler(cls, *llm_args, **llm_kwargs):
+        try:
+            return (
+                (await super().acreate(*llm_args, **llm_kwargs))
+                if cls.llm is None
+                else await cls.llm(*llm_args, **llm_kwargs)
+            )
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
@@ -148,6 +218,17 @@ class Completion(openai.Completion, BaseCacheLLM):
         kwargs = cls.fill_base_args(**kwargs)
         return adapt(
             cls._llm_handler,
+            cls._cache_data_convert,
+            cls._update_cache_callback,
+            *args,
+            **kwargs,
+        )
+
+    @classmethod
+    async def acreate(cls, *args, **kwargs):
+        kwargs = cls.fill_base_args(**kwargs)
+        return await aadapt(
+            cls._allm_handler,
             cls._cache_data_convert,
             cls._update_cache_callback,
             *args,
@@ -319,7 +400,11 @@ class Moderation(openai.Moderation, BaseCacheLLM):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return super().create(*llm_args, **llm_kwargs) if not cls.llm else cls.llm(*llm_args, **llm_kwargs)
+            return (
+                super().create(*llm_args, **llm_kwargs)
+                if not cls.llm
+                else cls.llm(*llm_args, **llm_kwargs)
+            )
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
