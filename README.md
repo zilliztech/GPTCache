@@ -338,6 +338,7 @@ This module is created to extract embeddings from requests for similarity search
   - [x] Support [MariaDB](https://mariadb.org/).
   - [x] Support [SQL Server](https://www.microsoft.com/en-us/sql-server/).
   - [x] Support [Oracle](https://www.oracle.com/).
+  - [x] Support [DynamoDB](https://aws.amazon.com/dynamodb/).
   - [ ] Support [MongoDB](https://www.mongodb.com/).
   - [ ] Support [Redis](https://redis.io/).
   - [ ] Support [Minio](https://min.io/).

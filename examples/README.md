@@ -250,6 +250,7 @@ Support general database
 - MariaDB.
 - SQL Server.
 - Oracle.
+- DynamoDB
 
 > [Example code](https://github.com/zilliztech/GPTCache/blob/main/examples/data_manager/scalar_store.py)
 
