@@ -1,5 +1,5 @@
 """gptcache version"""
-__version__ = "0.1.40"
+__version__ = "0.1.41"
 
 from gptcache.config import Config
 from gptcache.core import Cache
