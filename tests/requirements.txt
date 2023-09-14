@@ -16,6 +16,7 @@ pytest-sugar==0.9.5
 pytest-parallel
 psycopg2-binary
 transformers==4.29.2
+anyio==3.6.2
 torch
 mock
 pexpect

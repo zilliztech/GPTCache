@@ -117,6 +117,8 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
                 saved_token = [input_token, output_token]
             else:
                 saved_token = [0, 0]
+            if kwargs.get("stream", False):
+                return _construct_stream_resp_from_cache(cache_data, saved_token)
             return _construct_resp_from_cache(cache_data, saved_token)
 
         kwargs = cls.fill_base_args(**kwargs)

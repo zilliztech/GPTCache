@@ -1,5 +1,8 @@
 from unittest.mock import patch, Mock
 
+from gptcache.utils import import_httpx
+
+import_httpx()
 from gptcache.client import Client
 
 
