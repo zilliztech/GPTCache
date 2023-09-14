@@ -249,6 +249,7 @@ More Docs：
 - [Usage, how to use GPTCache better](docs/usage.md)
 - [Features, all features currently supported by the cache](docs/feature.md)
 - [Examples, learn better custom caching](examples/README.md)
+- [Distributed Caching and Horizontal Scaling ](docs/horizontal-scaling-usage.md)
 
 ## 🎓 Bootcamp
 
@@ -355,16 +356,29 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [PGVector](https://github.com/pgvector/pgvector), open-source vector similarity search for Postgres.
   - [x] Support [Chroma](https://github.com/chroma-core/chroma), the AI-native open-source embedding database.
   - [x] Support [DocArray](https://github.com/docarray/docarray), DocArray is a library for representing, sending and storing multi-modal data, perfect for Machine Learning applications.
-  - [ ] Support qdrant
-  - [ ] Support weaviate
+  - [x] Support qdrant
+  - [x] Support weaviate
   - [ ] Support other vector databases.
 - **Cache Manager**:
 The **Cache Manager** is responsible for controlling the operation of both the **Cache Storage** and **Vector Store**.
   - **Eviction Policy**:
+  Cache eviction can be managed in memory using python's `cachetools` or in a distributed fashion using Redis as a key-value store. 
+  - **In-Memory Caching**
+  
   Currently, GPTCache makes decisions about evictions based solely on the number of lines. This approach can result in inaccurate resource evaluation and may cause out-of-memory (OOM) errors. We are actively investigating and developing a more sophisticated strategy.
     - [x] Support LRU eviction policy.
     - [x] Support FIFO eviction policy.
+    - [x] Support LFU eviction policy.
+    - [x] Support RR eviction policy.
     - [ ] Support more complicated eviction policies.
+  - **Distributed Caching**
+  
+  If you were to scale your GPTCache deployment horizontally using in-memory caching, it won't be possible. Since the cached information would be limited to the single pod.
+  
+  With Distributed Caching, cache information consistent across all replicas we can use Distributed Cache stores like Redis. 
+    - [x] Support Redis distributed cache
+    - [x] Support memcached distributed cache
+  
 - **Similarity Evaluator**: 
 This module collects data from both the **Cache Storage** and **Vector Store**, and uses various strategies to determine the similarity between the input request and the requests from the **Vector Store**. Based on this similarity, it determines whether a request matches the cache. GPTCache provides a standardized interface for integrating various strategies, along with a collection of implementations to use. The following similarity definitions are currently supported or will be supported in the future:
   - [x] The distance we obtain from the **Vector Store**.
