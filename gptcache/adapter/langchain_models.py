@@ -1,10 +1,10 @@
 from typing import Optional, List, Any, Mapping
 
 from gptcache.adapter.adapter import adapt, aadapt
+from gptcache.core import cache
 from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.session import Session
 from gptcache.utils import import_pydantic, import_langchain
-from gptcache.core import Cache,cache
 
 import_pydantic()
 import_langchain()
@@ -51,7 +51,6 @@ class LangChainLLMs(LLM, BaseModel):
 
     llm: Any
     session: Session = None
-    cache_obj: Cache = cache
     tmp_args: Any = None
 
     @property
@@ -76,13 +75,14 @@ class LangChainLLMs(LLM, BaseModel):
             if "session" not in self.tmp_args
             else self.tmp_args.pop("session")
         )
+        cache_obj = self.tmp_args.pop("cache_obj", cache)
         return adapt(
             self.llm,
             _cache_data_convert,
             _update_cache_callback,
             prompt=prompt,
             stop=stop,
-            cache_obj=self.cache_obj,
+            cache_obj=cache_obj,
             session=session,
             **self.tmp_args,
         )
@@ -153,9 +153,8 @@ class LangChainChat(BaseChatModel, BaseModel):
         return "gptcache_llm_chat"
 
     chat: Any
-    session: Session = None
-    cache_obj: Cache = cache
-    tmp_args: Any = None
+    session: Optional[Session] = None
+    tmp_args: Optional[Any] = None
 
     def _generate(
         self,
@@ -168,13 +167,14 @@ class LangChainChat(BaseChatModel, BaseModel):
             if "session" not in self.tmp_args
             else self.tmp_args.pop("session")
         )
+        cache_obj = self.tmp_args.pop("cache_obj", cache)
         return adapt(
             self.chat._generate,
             _cache_msg_data_convert,
             _update_cache_msg_callback,
             messages=messages,
             stop=stop,
-            cache_obj=self.cache_obj,
+            cache_obj=cache_obj,
             session=session,
             run_manager=run_manager,
             **self.tmp_args,
@@ -191,14 +191,14 @@ class LangChainChat(BaseChatModel, BaseModel):
             if "session" not in self.tmp_args
             else self.tmp_args.pop("session")
         )
-
+        cache_obj = self.tmp_args.pop("cache_obj", cache)
         return await aadapt(
             self.chat._agenerate,
             _cache_msg_data_convert,
             _update_cache_msg_callback,
             messages=messages,
             stop=stop,
-            cache_obj=self.cache_obj,
+            cache_obj=cache_obj,
             session=session,
             run_manager=run_manager,
             **self.tmp_args,
