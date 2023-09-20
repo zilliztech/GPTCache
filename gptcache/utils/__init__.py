@@ -258,7 +258,7 @@ def import_fastapi():
 
 def import_redis():
     _check_library("redis")
-    _check_library("redis-om")
+    _check_library("redis_om", package="redis-om")
 
 
 def import_starlette():
@@ -267,3 +267,4 @@ def import_starlette():
 
 def import_weaviate():
     _check_library("weaviate-client")
+B
