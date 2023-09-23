@@ -42,7 +42,7 @@ def test_gptcache_api():
     put("api-hello2", "foo2", cache_obj=inner_cache)
     put("api-hello3", "foo3", cache_obj=inner_cache)
 
-    messages = get("hello", cache_obj=inner_cache, top_k=3)
+    messages = get("hello", cache_obj=inner_cache, top_k=3, hit_callback=lambda x: print("hit_callback", x))
     assert len(messages) == 3
     assert "foo1" in messages
     assert "foo2" in messages
