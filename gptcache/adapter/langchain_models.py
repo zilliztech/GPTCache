@@ -144,7 +144,7 @@ class LangChainChat(BaseChatModel, BaseModel):
             from langchain.chat_models import ChatOpenAI
             from gptcache.adapter.langchain_models import LangChainChat
             # run chat model with gptcache
-            chat = LangChainLLMs(chat=ChatOpenAI(temperature=0))
+            chat = LangChainChat(chat=ChatOpenAI(temperature=0))
             chat([HumanMessage(content="Translate this sentence from English to French. I love programming.")])
     """
 
