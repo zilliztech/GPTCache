@@ -4,13 +4,11 @@ from gptcache.adapter.adapter import adapt, aadapt
 from gptcache.core import cache
 from gptcache.manager.scalar_data.base import Answer, DataType
 from gptcache.session import Session
-from gptcache.utils import import_pydantic, import_langchain
+from gptcache.utils import import_langchain
 
-import_pydantic()
 import_langchain()
 
 # pylint: disable=C0413
-from pydantic import BaseModel
 from langchain.llms.base import LLM
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import (
@@ -27,7 +25,7 @@ from langchain.callbacks.manager import (
 
 
 # pylint: disable=protected-access
-class LangChainLLMs(LLM, BaseModel):
+class LangChainLLMs(LLM):
     """LangChain LLM Wrapper.
 
     :param llm: LLM from langchain.llms.
@@ -127,7 +125,7 @@ class LangChainLLMs(LLM, BaseModel):
 
 
 # pylint: disable=protected-access
-class LangChainChat(BaseChatModel, BaseModel):
+class LangChainChat(BaseChatModel):
     """LangChain LLM Wrapper.
 
     :param chat: LLM from langchain.chat_models.
