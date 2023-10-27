@@ -266,4 +266,4 @@ def import_starlette():
 
 
 def import_weaviate():
-    _check_library("weaviate")
+    _check_library("weaviate", package="weaviate-client")
