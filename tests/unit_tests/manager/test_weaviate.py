@@ -13,7 +13,7 @@ class TestWeaviateDB(unittest.TestCase):
         class_name = "Vectorcache"
 
         db = VectorBase(
-            "weaviate-client",
+            "weaviate",
             class_name=class_name,
             top_k=top_k
         )
@@ -53,7 +53,7 @@ class TestWeaviateDB(unittest.TestCase):
         }
 
         db = VectorBase(
-            "weaviate-client",
+            "weaviate",
             class_schema=class_schema,
             top_k=top_k
         )
