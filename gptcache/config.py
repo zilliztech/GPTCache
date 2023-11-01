@@ -46,6 +46,7 @@ class Config:
             context_len: Optional[int] = None,
             skip_list: List[str] = None,
             data_check: bool = False,
+            disable_report: bool = False,
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError(
@@ -63,3 +64,4 @@ class Config:
             skip_list = ["system", "assistant"]
         self.skip_list = skip_list
         self.data_check = data_check
+        self.disable_report = disable_report

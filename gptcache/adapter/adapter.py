@@ -206,7 +206,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 chat_cache.data_manager.add_session(
                     cache_whole_data[2], session.name, pre_embedding_data
                 )
-            if cache_whole_data:
+            if cache_whole_data and not chat_cache.config.disable_report:
                 # user_question / cache_question / cache_question_id / cache_answer / similarity / consume time/ time
                 report_cache_data = cache_whole_data[3]
                 report_search_data = cache_whole_data[2]

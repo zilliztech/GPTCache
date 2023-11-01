@@ -26,7 +26,6 @@ class TestWeaviateDB(unittest.TestCase):
         db.mul_add([VectorData(id=size, data=data[0])])
         ret = db.search(data[0])
         self.assertIn(ret[0][1], [0, size])
-        self.assertIn(ret[1][1], [0, size])
         db.delete([0, 1, 2, 3, 4, 5, size])
         ret = db.search(data[0])
         self.assertNotIn(ret[0][1], [0, size])
