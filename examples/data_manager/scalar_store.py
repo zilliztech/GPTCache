@@ -1,15 +1,15 @@
 import os
+
 import numpy as np
 
-from gptcache.adapter import openai
 from gptcache import cache
+from gptcache.adapter import openai
 from gptcache.manager import get_data_manager, CacheBase, VectorBase
 from gptcache.similarity_evaluation.distance import SearchDistanceEvaluation
 
-
 d = 8
 
-
+# Change the embdding function to your own
 def mock_embeddings(data, **kwargs):
     return np.random.random((d, )).astype('float32')
 

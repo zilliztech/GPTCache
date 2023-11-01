@@ -93,14 +93,6 @@ jobs:
           export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
           python3 -m pytest -k "not embedding and not processor" --cov=gptcache --cov-report xml:coverage.xml --cov-append ./tests/
 
-      - name: Embedding Unit Tests
-        timeout-minutes: 30
-        shell: bash
-        run: |
-          export IS_CI=true
-          export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-          python3 -m pytest --cov=gptcache --cov-report xml:coverage.xml --cov-append ./tests/unit_tests/embedding/
-
       - name: Processor Unit Tests
         timeout-minutes: 30
         shell: bash
@@ -108,6 +100,14 @@ jobs:
           export IS_CI=true
           export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
           python3 -m pytest --cov=gptcache --cov-append --cov-report xml:coverage.xml ./tests/unit_tests/processor/
+
+      - name: Embedding Unit Tests
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          export IS_CI=true
+          export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+          python3 -m pytest --cov=gptcache --cov-report xml:coverage.xml --cov-append ./tests/unit_tests/embedding/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.0
