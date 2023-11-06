@@ -53,7 +53,7 @@ async def get_cache(cache_data: CacheData) -> CacheData:
 
 
 @app.post("/flush")
-async def get_cache() -> str:
+async def flush_cache() -> str:
     cache.flush()
     return "successfully flush the cache"
 
