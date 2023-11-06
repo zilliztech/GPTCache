@@ -133,7 +133,7 @@ print(answer)
 Here's an example that utilizes OpenAI's stream response API:
 
 ```python
-from gptcache.cache import get_data_manager
+from gptcache.manager import get_data_manager
 from gptcache.core import cache, Cache
 from gptcache.adapter import openai
 
