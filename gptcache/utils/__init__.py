@@ -231,7 +231,7 @@ def import_httpx():
 
 
 def import_openai():
-    _check_library("openai")
+    _check_library("openai", package="openai==0.28.1")
 
 
 def import_docarray():
