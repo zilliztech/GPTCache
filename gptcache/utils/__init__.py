@@ -81,7 +81,7 @@ def import_cohere():
 
 
 def import_fasttext():
-    _check_library("fasttext")
+    _check_library("fasttext", package="fasttext==0.9.2")
 
 
 def import_huggingface():
