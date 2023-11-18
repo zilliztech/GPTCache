@@ -8,10 +8,9 @@ from gptcache.adapter import openai
 from gptcache.adapter.api import init_similar_cache, get
 from gptcache.adapter.langchain_models import LangChainLLMs, LangChainChat, _cache_msg_data_convert
 from gptcache.processor.pre import get_prompt, last_content_without_template, get_messages_last_content
-from gptcache.utils import import_pydantic, import_langchain
+from gptcache.utils import import_langchain
 from gptcache.utils.response import get_message_from_openai_answer
 
-import_pydantic()
 import_langchain()
 
 from langchain import OpenAI, PromptTemplate
