@@ -60,7 +60,7 @@ class AzureOpenAIEmbedding(BaseEmbedding):
         :param _:
         :return: Array of Float32 numbers that represent the string
         """
-        sentence_embeddings = await self.client.embeddings.create(
+        sentence_embeddings = self.client.embeddings.create(
             input=data,
             model=self.__azure_embedding_model_deployment,
         )
