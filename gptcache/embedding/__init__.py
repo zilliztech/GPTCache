@@ -18,6 +18,7 @@ __all__ = [
 from gptcache.utils.lazy_import import LazyImport
 
 openai = LazyImport("openai", globals(), "gptcache.embedding.openai")
+azureopenai = LazyImport("azureopenai", globals(), "gptcache.embedding.azureopenai")
 huggingface = LazyImport("huggingface", globals(), "gptcache.embedding.huggingface")
 sbert = LazyImport("sbert", globals(), "gptcache.embedding.sbert")
 onnx = LazyImport("onnx", globals(), "gptcache.embedding.onnx")
@@ -37,7 +38,7 @@ def Cohere(model="large", api_key=None):
 
 
 def OpenAI(model="text-embedding-ada-002", api_key=None):
-    return openai.OpenAI(model, api_key)
+    return openai.OpenAIEmbedding(model, api_key)
 
 
 def Huggingface(model="distilbert-base-uncased"):
