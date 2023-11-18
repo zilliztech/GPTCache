@@ -1,4 +1,4 @@
-import os
+from typing import Union
 
 import numpy as np
 
@@ -7,39 +7,35 @@ from gptcache.utils import import_openai
 
 import_openai()
 
-import openai  # pylint: disable=C0413
+from openai import OpenAI, AsyncOpenAI
 
-class OpenAI(BaseEmbedding):
+
+class OpenAIEmbedding(BaseEmbedding):
     """Generate text embedding for given text using OpenAI.
 
-    :param model: model name, defaults to 'text-embedding-ada-002'.
+    :param model: OpenAI Client with any modifications you intend to use.
     :type model: str
-    :param api_key: OpenAI API Key. When the parameter is not specified, it will load the key by default if it is available.
-    :type api_key: str
+
+    :param model: model id from the API, defaults to 'text-embedding-ada-002'.
+    :type model: str
 
     Example:
         .. code-block:: python
 
-            from gptcache.embedding import OpenAI
+            from gptcache.embedding import OpenAIEmbedding
+            from openai import OpenAI
 
             test_sentence = 'Hello, world.'
-            encoder = OpenAI(api_key='your_openai_key')
+            client = OpenAI(api_key='your_openai_key')
+            encoder = OpenAIEmbedding(client, model="MyEmbeddingModelId")
             embed = encoder.to_embeddings(test_sentence)
     """
 
-    def __init__(self, model: str = "text-embedding-ada-002", api_key: str = None, api_base: str = None):
-        if not api_key:
-            if openai.api_key:
-                api_key = openai.api_key
-            else:
-                api_key = os.getenv("OPENAI_API_KEY")
-        if not api_base:
-            if openai.api_base:
-                api_base = openai.api_base
-            else:
-                api_base = os.getenv("OPENAI_API_BASE")
-        openai.api_key = api_key
-        self.api_base = api_base  # don't override all of openai as we may just want to override for say embeddings
+    def __init__(self,
+                 client: Union[OpenAI, AsyncOpenAI],
+                 model: str = "text-embedding-ada-002",
+                 ):
+        self.client = client
         self.model = model
         if model in self.dim_dict():
             self.__dimension = self.dim_dict()[model]
@@ -54,8 +50,8 @@ class OpenAI(BaseEmbedding):
 
         :return: a text embedding in shape of (dim,).
         """
-        sentence_embeddings = openai.Embedding.create(model=self.model, input=data, api_base=self.api_base)
-        return np.array(sentence_embeddings["data"][0]["embedding"]).astype("float32")
+        sentence_embeddings = await self.client.embeddings.create(model=self.model, input=data)
+        return np.array(sentence_embeddings.data[0].embedding).astype("float32")
 
     @property
     def dimension(self):
