@@ -41,8 +41,8 @@ def OpenAI(client, model="text-embedding-ada-002"):
     return openai.OpenAIEmbedding(client, model)
 
 
-def AzureOpenAI(client, model="text-embedding-ada-002"):
-    return azureopenai.AzureOpenAIEmbedding(client, model)
+def AzureOpenAI(client, azure_deployment, model="text-embedding-ada-002"):
+    return azureopenai.AzureOpenAIEmbedding(client, azure_deployment, model)
 
 
 def Huggingface(model="distilbert-base-uncased"):
