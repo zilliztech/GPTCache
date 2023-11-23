@@ -5,7 +5,6 @@ from typing import Union, Callable
 from gptcache.manager import CacheBase, VectorBase, ObjectBase
 from gptcache.manager.data_manager import SSDataManager, MapDataManager
 from gptcache.manager.eviction import EvictionBase
-from gptcache.manager.scalar_data.redis_storage import RedisCacheStorage
 from gptcache.utils.log import gptcache_log
 
 
@@ -107,7 +106,7 @@ def manager_factory(manager="map",
     if eviction_params is None:
         eviction_params = {}
 
-    if isinstance(s, RedisCacheStorage) and eviction_manager == "redis":
+    if  scalar == "redis" and eviction_manager == "redis":
         # if cache manager and eviction manager are both redis, we use no op redis to avoid redundant operations
         eviction_manager = "no_op_eviction"
         gptcache_log.info("Since Scalar Storage and Eviction manager are both redis, "
