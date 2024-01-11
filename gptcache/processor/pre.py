@@ -60,7 +60,7 @@ def _get_pattern_value(pattern_str: str, value_str: str):
 
     pattern_values = {}
     last_end = 0
-    for i, literal_text in enumerate(literal_text_arr):
+    for i, (literal_text, field_name) in enumerate(zip(literal_text_arr, field_name_arr)):
         start = value_str.find(literal_text, last_end)
         if i == len(literal_text_arr) - 1:
             end = len(value_str)
@@ -69,7 +69,7 @@ def _get_pattern_value(pattern_str: str, value_str: str):
         if start == -1 or end == -1:
             break
         start += len(literal_text)
-        pattern_values[field_name_arr[i]] = value_str[start:end]
+        pattern_values[field_name] = value_str[start:end]
         last_end = end
     return pattern_values
 
