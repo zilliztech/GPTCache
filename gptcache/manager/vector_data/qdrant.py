@@ -106,7 +106,7 @@ class QdrantVectorStore(VectorBase):
                 optimizers_config=optimizers_config,
             )
 
-    def mul_add(self, datas: List[VectorData]):
+    def mul_add(self, datas: List[VectorData], **_):
         points = [
             PointStruct(id=d.id, vector=d.data.reshape(-1).tolist()) for d in datas
         ]
@@ -114,7 +114,7 @@ class QdrantVectorStore(VectorBase):
             collection_name=self._collection_name, points=points, wait=False
         )
 
-    def search(self, data: np.ndarray, top_k: int = -1):
+    def search(self, data: np.ndarray, top_k: int = -1, **_):
         if top_k == -1:
             top_k = self.top_k
         reshaped_data = data.reshape(-1).tolist()

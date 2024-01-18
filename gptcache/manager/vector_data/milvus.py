@@ -132,6 +132,12 @@ class Milvus(VectorBase):
                     auto_id=False,
                 ),
                 FieldSchema(
+                    name="partition_key",
+                    dtype=DataType.VARCHAR,
+                    max_length=256,
+                    is_partition_key=True,
+                ),
+                FieldSchema(
                     name="embedding", dtype=DataType.FLOAT_VECTOR, dim=self.dimension
                 ),
             ]
@@ -163,20 +169,20 @@ class Milvus(VectorBase):
 
         self.col.load()
 
-    def mul_add(self, datas: List[VectorData]):
-        data_array, id_array = map(list, zip(*((data.data, data.id) for data in datas)))
-        np_data = np.array(data_array).astype("float32")
-        entities = [id_array, np_data]
-        self.col.insert(entities)
+    def mul_add(self, datas: List[VectorData], **kwargs):
+        partition_key = kwargs.get("partition_key", "")
+        self.col.insert([{"id": data.id, "embedding": np.array(data.data).astype("float32"), "partition_key": partition_key} for data in datas])
 
-    def search(self, data: np.ndarray, top_k: int = -1):
+    def search(self, data: np.ndarray, top_k: int = -1, **kwargs):
         if top_k == -1:
             top_k = self.top_k
+        partition_key = kwargs.get("partition_key")
         search_result = self.col.search(
             data=data.reshape(1, -1).tolist(),
             anns_field="embedding",
             param=self.search_params,
             limit=top_k,
+            expr=f'partition_key=="{partition_key}"' if partition_key else None,
         )
         return list(zip(search_result[0].distances, search_result[0].ids))
 
