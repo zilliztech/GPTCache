@@ -87,7 +87,7 @@ class Cache:
                 if not os.getenv("IS_CI"):
                     gptcache_log.error(e)
 
-    def import_data(self, questions: List[Any], answers: List[Any], session_ids: Optional[List[Optional[str]]] = None) -> None:
+    def import_data(self, questions: List[Any], answers: List[Any], session_ids: Optional[List[Optional[str]]] = None, **kwargs) -> None:
         """Import data to GPTCache
 
         :param questions: preprocessed question Data
@@ -101,6 +101,7 @@ class Cache:
             answers=answers,
             embedding_datas=[self.embedding_func(question) for question in questions],
             session_ids=session_ids if session_ids else [None for _ in range(len(questions))],
+            **kwargs,
         )
 
     def flush(self):
