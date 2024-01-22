@@ -170,7 +170,7 @@ class Milvus(VectorBase):
         self.col.load()
 
     def mul_add(self, datas: List[VectorData], **kwargs):
-        partition_key = kwargs.get("partition_key", "")
+        partition_key = kwargs.get("partition_key") or ""
         self.col.insert([{"id": data.id, "embedding": np.array(data.data).astype("float32"), "partition_key": partition_key} for data in datas])
 
     def search(self, data: np.ndarray, top_k: int = -1, **kwargs):
