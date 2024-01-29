@@ -76,6 +76,8 @@ class VectorBase:
     :type local_mode: bool
     :param local_data: required when local_mode is True.
     :type local_data: str
+    :param use_partition_key: if true, use partition key feature in milvus.
+    :type use_partition_key: bool
 
     :param url: the connection url for PostgreSQL database, defaults to 'postgresql://postgres@localhost:5432/postgres'
     :type url: str
@@ -125,6 +127,7 @@ class VectorBase:
             search_params = kwargs.get("search_params", None)
             local_mode = kwargs.get("local_mode", False)
             local_data = kwargs.get("local_data", "./milvus_data")
+            use_partition_key = kwargs.get("use_partition_key", False)
             vector_base = Milvus(
                 host=host,
                 port=port,
@@ -138,6 +141,7 @@ class VectorBase:
                 search_params=search_params,
                 local_mode=local_mode,
                 local_data=local_data,
+                use_partition_key=use_partition_key
             )
         elif name == "faiss":
             from gptcache.manager.vector_data.faiss import Faiss
