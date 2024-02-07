@@ -301,6 +301,7 @@ async def aadapt(
     chat_cache = kwargs.pop("cache_obj", cache)
     session = kwargs.pop("session", None)
     require_object_store = kwargs.pop("require_object_store", False)
+    hit_callback = kwargs.pop("hit_callback", None)
     if require_object_store:
         assert chat_cache.data_manager.o, "Object store is required for adapter."
     if not chat_cache.has_init:
@@ -442,6 +443,10 @@ async def aadapt(
         cache_answers = sorted(cache_answers, key=lambda x: x[0], reverse=True)
         answers_dict = dict((d[1], d) for d in cache_answers)
         if len(cache_answers) != 0:
+            if hit_callback and callable(hit_callback):
+                factor = max_rank - min_rank
+                hit_callback([(d[3].question, d[0] / factor if factor else d[0]) for d in cache_answers])
+
             def post_process():
                 if chat_cache.post_process_messages_func is temperature_softmax:
                     return_message = chat_cache.post_process_messages_func(
