@@ -42,6 +42,7 @@ __all__ = [
     "import_redis",
     "import_qdrant",
     "import_weaviate",
+    "import_marqo",
     ]
 
 import importlib.util
@@ -59,6 +60,8 @@ def _check_library(libname: str, prompt: bool = True, package: Optional[str] = N
         prompt_install(package if package else libname)
     return is_avail
 
+def import_marqo():
+    _check_library("marqo")
 
 def import_pymilvus():
     _check_library("pymilvus")
