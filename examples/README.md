@@ -150,6 +150,20 @@ paddlenlp = PaddleNLP()
 
 </details>
 
+<details>
+
+<summary> Nomic </summary>
+
+```python
+from gptcache.embedding import Nomic
+
+nm = Nomic(api_key='your-api-key')
+# nm.dimension
+# nm.to_embeddings
+```
+
+</details>
+
 ### Custom embedding
 
 The function has two parameters: the preprocessed string and parameters reserved for user customization. To acquire these parameters, a similar method to the one above is used: `kwargs.get("embedding_func", {})`.
