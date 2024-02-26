@@ -1,3 +1,5 @@
+"""Nomic embedding integration"""
+
 import numpy as np
 
 from gptcache.utils import import_nomic
@@ -5,20 +7,17 @@ from gptcache.embedding.base import BaseEmbedding
 
 import_nomic()
 
-import nomic
-from nomic import embed
+import nomic # pylint: disable=C0413
+from nomic import embed # pylint: disable=C0413
 
 class Nomic(BaseEmbedding):
     """Generate text embedding for given text using Cohere.
-
     """
-
-    def __init__(self, 
+    def __init__(self,
                  model: str = "nomic-embed-text-v1.5",
                  api_key: str = None,
                  task_type: str = "search_document",
-                 dimensionality: int = None,
-                ) -> None:
+                 dimensionality: int = None) -> None:
         """Generate text embedding for given text using Nomic embed.
 
         :param model: model name, defaults to 'nomic-embed-text-v1.5'.
@@ -42,14 +41,13 @@ class Nomic(BaseEmbedding):
                             dimensionality=64)
             embed = encoder.to_embeddings(test_sentence)
         """
-        
         # Login to nomic
         nomic.cli.login(token=api_key)
 
         self._model = model
         self._task_type = task_type
         self._dimensionality = dimensionality
-        
+
     def to_embeddings(self, data, **_):
         """Generate embedding given text input
 
@@ -60,7 +58,7 @@ class Nomic(BaseEmbedding):
         """
         if not isinstance(data, list):
             data = [data]
-        
+
         # Response will be a dictionary with key 'embeddings'
         # and value will be a list of lists
         response = embed.text(
@@ -70,7 +68,7 @@ class Nomic(BaseEmbedding):
             dimensionality=self._dimensionality)
         embeddings = response['embeddings']
         return np.array(embeddings).astype("float32").squeeze(0)
-        
+
     @property
     def dimension(self):
         """Embedding dimension.
@@ -81,6 +79,4 @@ class Nomic(BaseEmbedding):
             foo_emb = self.to_embeddings("foo")
             self._dimensionality = len(foo_emb)
         return self._dimensionality
-
-
         
