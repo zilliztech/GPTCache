@@ -7,7 +7,8 @@ from gptcache.embedding.base import BaseEmbedding
 
 import_nomic()
 
-import nomic # pylint: disable=C0413
+# import nomic # pylint: disable=C0413
+from nomic import cli # pylint: disable=C0413
 from nomic import embed # pylint: disable=C0413
 
 class Nomic(BaseEmbedding):
@@ -36,13 +37,13 @@ class Nomic(BaseEmbedding):
             from gptcache.embedding import Nomic
 
             test_sentence = 'Hey this is Nomic embedding integration to gaptcache.'
-            encoder = Nomic(model='nomic-embed-text-v1.5', 
-                            api_key=os.getenv("NOMIC_API_KEY"), 
+            encoder = Nomic(model='nomic-embed-text-v1.5',
+                            api_key=os.getenv("NOMIC_API_KEY"),
                             dimensionality=64)
             embed = encoder.to_embeddings(test_sentence)
         """
         # Login to nomic
-        nomic.cli.login(token=api_key)
+        cli.login(token=api_key)
 
         self._model = model
         self._task_type = task_type
