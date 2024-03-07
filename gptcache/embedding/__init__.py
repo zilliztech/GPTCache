@@ -33,8 +33,8 @@ uform = LazyImport("uform", globals(), "gptcache.embedding.uform")
 nomic = LazyImport("nomic", globals(), "gptcache.embedding.nomic")
 
 
-def Nomic(model: str = "nomic-embed-text-v1.5", 
-          api_key: str = None, 
+def Nomic(model: str = "nomic-embed-text-v1.5",
+          api_key: str = None,
           task_type: str = "search_document",
           dimensionality: int = None):
     return nomic.Nomic(model, api_key, task_type, dimensionality)
