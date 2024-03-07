@@ -80,4 +80,3 @@ class Nomic(BaseEmbedding):
             foo_emb = self.to_embeddings("foo")
             self._dimensionality = len(foo_emb)
         return self._dimensionality
-        
