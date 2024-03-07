@@ -67,7 +67,7 @@ class Nomic(BaseEmbedding):
             model=self._model,
             task_type=self._task_type,
             dimensionality=self._dimensionality)
-        embeddings = response['embeddings']
+        embeddings = response["embeddings"]
         return np.array(embeddings).astype("float32").squeeze(0)
 
     @property
