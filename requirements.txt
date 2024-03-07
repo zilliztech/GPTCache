@@ -1,3 +1,6 @@
-numpy
-cachetools
-requests
+numpy~=1.26.2
+cachetools~=5.3.2
+requests~=2.31.0
+pydantic~=2.5.1
+httpx~=0.25.1
+setuptools~=60.2.0
