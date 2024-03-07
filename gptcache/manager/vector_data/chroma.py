@@ -39,9 +39,15 @@ class Chromadb(VectorBase):
         else:
             self._client_settings = chromadb.config.Settings()
             if persist_directory is not None:
-                self._client_settings = chromadb.config.Settings(
-                    chroma_db_impl="duckdb+parquet", persist_directory=persist_directory
-                )
+                major, minor, _ = chromadb.__version__.split(".")
+                if int(major) == 0 and int(minor) < 4:
+                    self._client_settings = chromadb.config.Settings(
+                        chroma_db_impl="duckdb+parquet",
+                    )
+                else:
+                    self._client_settings = chromadb.config.Settings(is_persistent=True)
+                self._client_settings.persist_directory = persist_directory
+
         self._client = chromadb.Client(self._client_settings)
         self._persist_directory = persist_directory
         self._collection = self._client.get_or_create_collection(name=collection_name)
