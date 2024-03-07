@@ -3,6 +3,7 @@ __all__ = [
     "import_milvus_lite",
     "import_sbert",
     "import_cohere",
+    "import_nomic",
     "import_fasttext",
     "import_huggingface",
     "import_uform",
@@ -78,6 +79,10 @@ def import_sbert():
 
 def import_cohere():
     _check_library("cohere")
+
+
+def import_nomic():
+    _check_library("nomic")
 
 
 def import_fasttext():
