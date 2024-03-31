@@ -9,6 +9,8 @@ import_openai()
 
 import openai  # pylint: disable=C0413
 
+# TODO should adapt to the new openai library
+
 class OpenAI(BaseEmbedding):
     """Generate text embedding for given text using OpenAI.
 

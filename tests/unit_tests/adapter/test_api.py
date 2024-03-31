@@ -1,7 +1,6 @@
 # pylint: disable=wrong-import-position
 import os
 from pathlib import Path
-from unittest.mock import patch
 
 from gptcache import cache, Config, Cache
 from gptcache.adapter import openai
@@ -126,16 +125,13 @@ def test_init_with_new_config():
             "data_dir": "test-new-config/",
         },
         "embedding": "onnx",
-        "embedding_config": {
-            "model": "GPTCache/paraphrase-albert-onnx"
-        },
         "evaluation": "distance",
         "evaluation_config": {
             "max_distance": 4.0,
             "positive": False,
         },
-        "pre_context_function": "concat",
         "post_function": "first",
+        "pre_function": "last_content",
     }
 
     with open(yaml_path, "w+", encoding="utf-8") as f:
@@ -148,33 +144,14 @@ def test_init_with_new_config():
 
     question = "calculate 1+3"
     expect_answer = "the result is 4"
-    with patch("openai.ChatCompletion.create") as mock_create:
-        datas = {
-            "choices": [
-                {
-                    "message": {"content": expect_answer, "role": "assistant"},
-                    "finish_reason": "stop",
-                    "index": 0,
-                }
-            ],
-            "created": 1677825464,
-            "id": "chatcmpl-6ptKyqKOGXZT6iQnqiXAH8adNLUzD",
-            "model": "gpt-3.5-turbo-0301",
-            "object": "chat.completion.chunk",
-        }
-        mock_create.return_value = datas
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": question},
-            ],
-        )
+    cache.data_manager.save(question, expect_answer, cache.embedding_func(question))
 
-        assert get_message_from_openai_answer(response) == expect_answer, response
-
-    response = openai.ChatCompletion.create(
+    from openai import OpenAI
+    response = openai.cache_openai_chat_complete(
+        OpenAI(
+            api_key="API_KEY",
+        ),
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},

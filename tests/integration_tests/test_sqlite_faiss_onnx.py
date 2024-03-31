@@ -68,7 +68,11 @@ class TestSqliteInvalid(Base):
 
         is_exception = False
         try:
-            openai.ChatCompletion.create(
+            from openai import OpenAI
+            openai.cache_openai_chat_complete(
+                OpenAI(
+                    api_key="API_KEY",
+                ),
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
@@ -114,7 +118,11 @@ class TestSqliteFaiss(Base):
         answer = "chatgpt is a good application"
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
-        openai.ChatCompletion.create(
+        from openai import OpenAI
+        openai.cache_openai_chat_complete(
+            OpenAI(
+                api_key="API_KEY",
+            ),
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -147,7 +155,11 @@ class TestSqliteFaiss(Base):
         answer = "chatgpt is a good application"
         cache.data_manager.save(question, answer, cache.embedding_func(question))
 
-        openai.ChatCompletion.create(
+        from openai import OpenAI
+        openai.cache_openai_chat_complete(
+            OpenAI(
+                api_key="API_KEY",
+            ),
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -181,7 +193,11 @@ class TestSqliteFaiss(Base):
 
         is_exception = False
         try:
-            openai.ChatCompletion.create(
+            from openai import OpenAI
+            openai.cache_openai_chat_complete(
+                OpenAI(
+                    api_key="API_KEY",
+                ),
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
@@ -221,7 +237,11 @@ class TestSqliteFaiss(Base):
 
         is_exception = False
         try:
-            openai.ChatCompletion.create(
+            from openai import OpenAI
+            openai.cache_openai_chat_complete(
+                OpenAI(
+                    api_key="API_KEY",
+                ),
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},

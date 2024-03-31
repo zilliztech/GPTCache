@@ -24,14 +24,14 @@ def test_wrap():
 
     def raise_error():
         try:
-            raise openai.error.OpenAIError(message="test")
-        except openai.error.OpenAIError as e:
+            raise openai.OpenAIError()
+        except openai.OpenAIError as e:
             raise wrap_error(e)
 
     is_exception = False
     try:
         raise_error()
-    except openai.error.OpenAIError as e:
+    except openai.OpenAIError:
         is_exception = True
 
     assert is_exception
