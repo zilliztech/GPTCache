@@ -22,7 +22,9 @@ def test_pre_without_prompt():
             [f"receiver the foo {i}" for i in range(10)],
         )
 
-    answer = openai.ChatCompletion.create(
+    from openai import OpenAI
+    answer = openai.cache_openai_chat_complete(
+        OpenAI(),
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},

@@ -1,30 +1,28 @@
-import json
-from typing import Any, AsyncGenerator, Iterator, List, Mapping
-from deprecated import deprecated
+from typing import Any, AsyncGenerator, Iterator
 
 from gptcache import cache
-from gptcache.adapter.adapter import aadapt, adapt
-from gptcache.adapter.base import BaseCacheLLM
+from gptcache.adapter.adapter import adapt
 from gptcache.manager.scalar_data.base import Answer, DataType
-from gptcache.utils import import_openai, import_pillow
+from gptcache.utils import import_openai
 from gptcache.utils.error import wrap_error
 from gptcache.utils.response import (
-    get_audio_text_from_openai_answer,
-    get_image_from_openai_b64,
-    get_image_from_openai_url,
-    get_message_from_openai_answer,
+    # get_audio_text_from_openai_answer,
+    # get_image_from_openai_b64,
+    # get_image_from_openai_url,
+    # get_message_from_openai_answer,
     get_message_from_openai_answer2,
     get_stream_message_from_openai_answer,
-    get_stream_message_from_openai_answer2,
-    get_text_from_openai_answer,
+    # get_stream_message_from_openai_answer2,
+    # get_text_from_openai_answer,
 )
 from gptcache.utils.token import token_counter
 from ._util import (
-    _construct_audio_text_from_cache,
-    _construct_image_create_resp_from_cache,
+    # _construct_audio_text_from_cache,
+    # _construct_image_create_resp_from_cache,
     _construct_resp_from_cache,
     _construct_stream_resp_from_cache,
-    _construct_text_from_cache, _num_tokens_from_messages
+    # _construct_text_from_cache,
+    _num_tokens_from_messages,
 )
 
 import_openai()

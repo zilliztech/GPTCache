@@ -41,7 +41,12 @@ def test_sqlite_faiss_onnx():
     ]
 
     start_time = time.time()
-    answer = openai.ChatCompletion.create(
+    from openai import OpenAI
+    openai_client = OpenAI(
+        api_key="API_KEY",
+    )
+    answer = openai.cache_openai_chat_complete(
+        openai_client,
         model="gpt-3.5-turbo",
         messages=mock_messages,
     )
@@ -51,7 +56,8 @@ def test_sqlite_faiss_onnx():
 
     is_exception = False
     try:
-        openai.ChatCompletion.create(
+        openai.cache_openai_chat_complete(
+            openai_client,
             model="gpt-3.5-turbo",
             messages=mock_messages,
             cache_factor=100,
@@ -67,7 +73,8 @@ def test_sqlite_faiss_onnx():
     ]
     is_exception = False
     try:
-        openai.ChatCompletion.create(
+        openai.cache_openai_chat_complete(
+            openai_client,
             model="gpt-3.5-turbo",
             messages=mock_messages,
         )
@@ -78,7 +85,8 @@ def test_sqlite_faiss_onnx():
 
     is_exception = False
     try:
-        openai.ChatCompletion.create(
+        openai.cache_openai_chat_complete(
+            openai_client,
             model="gpt-3.5-turbo",
             messages=mock_messages,
             cache_factor=0.5,
