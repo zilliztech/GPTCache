@@ -293,6 +293,20 @@ class VectorBase:
                 class_schema=class_schema,
                 top_k=top_k,
             )
+        elif name=="marqo":
+            from gptcache.manager.vector_data.marqo_vectorstore import MarqoVectorStore
+
+            marqo_url = kwargs.get("marqo_url", None)
+            index_name = kwargs.get("index_name", COLLECTION_NAME)
+            dimension = kwargs.get("dimension", DIMENSION)
+            top_k = kwargs.get("top_k", TOP_K)
+            
+            vector_base = MarqoVectorStore(
+                marqo_url=marqo_url,
+                index_name=index_name,
+                dimension=dimension,
+                top_k=top_k,
+            )
         else:
             raise NotFoundError("vector store", name)
         return vector_base
