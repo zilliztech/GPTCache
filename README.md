@@ -14,6 +14,8 @@ Slash Your LLM API Costs by 10x 💰, Boost Speed by 100x ⚡
 
 📔 This project is undergoing swift development, and as such, the API may be subject to change at any time. For the most up-to-date information, please refer to the latest [documentation]( https://gptcache.readthedocs.io/en/latest/) and [release note](https://github.com/zilliztech/GPTCache/blob/main/docs/release_note.md).
 
+**NOTE:** As the number of large models is growing explosively and their API shape is constantly evolving, we no longer add support for new API or models. We encourage the usage of using the get and set API in gptcache, here is the demo code: https://github.com/zilliztech/GPTCache/blob/main/examples/adapter/api.py
+
 ## Quick Install
 
 `pip install gptcache`
