@@ -118,6 +118,12 @@ def manager_factory(manager="map",
             maxmemory_samples=eviction_params.get("maxmemory_samples", scalar_params.get("maxmemory_samples")),
         )
 
+    if eviction_manager == "memory":
+        return get_data_manager(s, v, o, None,
+                                eviction_params.get("max_size", 1000),
+                                eviction_params.get("clean_size", None),
+                                eviction_params.get("eviction", "LRU"),)
+
     e = EvictionBase(
         name=eviction_manager,
         **eviction_params
@@ -194,7 +200,7 @@ def get_data_manager(
         vector_base = VectorBase(name=vector_base)
     if isinstance(object_base, str):
         object_base = ObjectBase(name=object_base)
-    if isinstance(eviction_base, str):
+    if isinstance(eviction_base, str) and eviction_base != "memory":
         eviction_base = EvictionBase(name=eviction_base)
     assert cache_base and vector_base
     return SSDataManager(cache_base, vector_base, object_base, eviction_base, max_size, clean_size, eviction)
