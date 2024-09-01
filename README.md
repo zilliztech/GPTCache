@@ -360,6 +360,7 @@ The **Vector Store** module helps find the K most similar requests from the inpu
   - [x] Support [DocArray](https://github.com/docarray/docarray), DocArray is a library for representing, sending and storing multi-modal data, perfect for Machine Learning applications.
   - [x] Support qdrant
   - [x] Support weaviate
+  - [x] Support [LanceDB](https://github.com/lancedb/lancedb),Developer-friendly, serverless vector database for AI applications. Easily add long-term memory to your LLM apps!
   - [ ] Support other vector databases.
 - **Cache Manager**:
 The **Cache Manager** is responsible for controlling the operation of both the **Cache Storage** and **Vector Store**.
