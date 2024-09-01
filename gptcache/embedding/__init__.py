@@ -44,8 +44,8 @@ def Cohere(model="large", api_key=None):
     return cohere.Cohere(model, api_key)
 
 
-def OpenAI(model="text-embedding-ada-002", api_key=None):
-    return openai.OpenAI(model, api_key)
+def OpenAI(model="text-embedding-ada-002", api_key=None, api_base=None, client=None):
+    return openai.OpenAI(model, api_key, api_base, client)
 
 
 def Huggingface(model="distilbert-base-uncased"):
