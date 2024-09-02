@@ -224,6 +224,7 @@ For the similar cache of text, only cache store and vector store are needed. If 
 - docarray
 - usearch
 - redis
+- lancedb
 
 ### object store
 

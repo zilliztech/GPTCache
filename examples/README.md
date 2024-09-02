@@ -260,6 +260,7 @@ Support vector database
 - Zilliz Cloud
 - FAISS
 - ChromaDB
+- LanceDB
 
 > [Example code](https://github.com/zilliztech/GPTCache/blob/main/examples/data_manager/vector_store.py)
 

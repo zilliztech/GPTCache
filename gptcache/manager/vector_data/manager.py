@@ -42,6 +42,7 @@ class VectorBase:
        `Chromadb` (with `top_k`, `client_settings`, `persist_directory`, `collection_name` params),
        `Hnswlib` (with `index_file_path`, `dimension`, `top_k`, `max_elements` params).
        `pgvector` (with `url`, `collection_name`, `index_params`, `top_k`, `dimension` params).
+       `lancedb` (with `url`, `collection_name`, `index_params`, `top_k`,).
 
     :param name: the name of the vectorbase, it is support 'milvus', 'faiss', 'chromadb', 'hnswlib' now.
     :type name: str
@@ -89,6 +90,14 @@ class VectorBase:
     :param persist_directory: the directory to persist, defaults to '.chromadb/' in the current directory.
     :type persist_directory: str
 
+    :param client_settings: the setting for LanceDB.
+    :param persist_directory: The directory to persist, defaults to '/tmp/lancedb'.
+    :type persist_directory: str
+    :param table_name: The name of the table in LanceDB, defaults to 'gptcache'.
+    :type table_name: str
+    :param top_k: The number of the vectors results to return, defaults to 1.
+    :type top_k: int
+    
     :param index_path: the path to hnswlib index, defaults to 'hnswlib_index.bin'.
     :type index_path: str
     :param max_elements: max_elements of hnswlib, defaults 100000.
@@ -264,7 +273,7 @@ class VectorBase:
             from gptcache.manager.vector_data.weaviate import Weaviate
 
             url = kwargs.get("url", None)
-            auth_client_secret = kwargs.get("auth_client_secret", None)
+            auth_client_secret = kwargs.get("auth_client_secrets", None)
             timeout_config = kwargs.get("timeout_config", WEAVIATE_TIMEOUT_CONFIG)
             proxies = kwargs.get("proxies", None)
             trust_env = kwargs.get("trust_env", False)
@@ -289,6 +298,20 @@ class VectorBase:
                 class_schema=class_schema,
                 top_k=top_k,
             )
+
+        elif name == "lancedb":
+            from gptcache.manager.vector_data.lancedb import LanceDB
+            
+            persist_directory = kwargs.get("persist_directory", None)
+            table_name = kwargs.get("table_name", COLLECTION_NAME)
+            top_k: int = kwargs.get("top_k", TOP_K)
+
+            vector_base = LanceDB(
+                persist_directory=persist_directory,
+                table_name=table_name,
+                top_k=top_k,
+            )
+                    
         else:
             raise NotFoundError("vector store", name)
         return vector_base
