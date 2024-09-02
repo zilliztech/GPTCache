@@ -10,9 +10,9 @@ from gptcache.utils import import_lancedb, import_torch
 import_torch()
 import_lancedb()
 
+
 class LanceDB(VectorBase):
     """Vector store: LanceDB
-
     :param persist_directory: The directory to persist, defaults to '/tmp/lancedb'.
     :type persist_directory: str
     :param table_name: The name of the table in LanceDB, defaults to 'gptcache'.
@@ -34,21 +34,28 @@ class LanceDB(VectorBase):
         # Initialize LanceDB database
         self._db = lancedb.connect(self._persist_directory)
 
-        # Define the schema if creating a new table
-        schema = pa.schema([
-            pa.field("id", pa.string()),
-            pa.field("vector", pa.list_(pa.float32(), list_size=10))  # Assuming dimension 10 for vectors
-        ])
-
         # Initialize or open table
         if self._table_name not in self._db.table_names():
-            self._table = self._db.create_table(self._table_name, schema=schema)
+            self._table = None  # Table will be created with the first insertion
         else:
             self._table = self._db.open_table(self._table_name)
 
     def mul_add(self, datas: List[VectorData]):
         """Add multiple vectors to the LanceDB table"""
         vectors, ids = map(list, zip(*((data.data.tolist(), str(data.id)) for data in datas)))
+        
+        # Infer the dimension of the vectors
+        vector_dim = len(vectors[0]) if vectors else 0
+        
+        # Create table with the inferred schema if it doesn't exist
+        if self._table is None:
+            schema = pa.schema([
+                pa.field("id", pa.string()),
+                pa.field("vector", pa.list_(pa.float32(), list_size=vector_dim))
+            ])
+            self._table = self._db.create_table(self._table_name, schema=schema)
+
+        # Prepare data for insertion
         data = [{"id": id, "vector": vector} for id, vector in zip(ids, vectors)]
         self._table.add(data)
 
