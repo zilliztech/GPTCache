@@ -126,7 +126,10 @@ class Cache:
 
         openai.api_type = "azure"
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        openai.api_base = os.getenv("OPENAI_API_BASE")
+        if hasattr(openai, "api_base"):
+            openai.api_base = os.getenv("OPENAI_API_BASE")
+        elif hasattr(openai, "base_url"):
+            openai.base_url = os.getenv("OPENAI_BASE_URL", os.getenv("OPENAI_API_BASE"))
         openai.api_version = os.getenv("OPENAI_API_VERSION")
 
 cache = Cache()
