@@ -273,7 +273,7 @@ class VectorBase:
             from gptcache.manager.vector_data.weaviate import Weaviate
 
             url = kwargs.get("url", None)
-            auth_client_secret = kwargs.get("auth_client_secrets", None)
+            auth_client_secret = kwargs.get("auth_client_secret", None)
             timeout_config = kwargs.get("timeout_config", WEAVIATE_TIMEOUT_CONFIG)
             proxies = kwargs.get("proxies", None)
             trust_env = kwargs.get("trust_env", False)
