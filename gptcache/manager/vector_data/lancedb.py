@@ -2,7 +2,6 @@ from typing import List, Optional
 
 import numpy as np
 import pyarrow as pa
-
 import lancedb
 from gptcache.manager.vector_data.base import VectorBase, VectorData
 from gptcache.utils import import_lancedb, import_torch
@@ -45,7 +44,7 @@ class LanceDB(VectorBase):
         vectors, vector_ids = map(list, zip(*((data.data.tolist(), str(data.id)) for data in datas)))
         # Infer the dimension of the vectors
         vector_dim = len(vectors[0]) if vectors else 0
-        
+
         # Create table with the inferred schema if it doesn't exist
         if self._table is None:
             schema = pa.schema([
@@ -54,9 +53,8 @@ class LanceDB(VectorBase):
             ])
             self._table = self._db.create_table(self._table_name, schema=schema)
 
-        # Prepare data for insertion
-        data = [{"id": vector_id, "vector": vector} for vector_id, vector in zip(vector_ids, vectors)]
-        self._table.add(data)
+        # Prepare and add data to the table
+        self._table.add(({"id": vector_id, "vector": vector} for vector_id, vector in zip(vector_ids, vectors)))
 
     def search(self, data: np.ndarray, top_k: int = -1):
         """Search for the most similar vectors in the LanceDB table"""
@@ -66,15 +64,18 @@ class LanceDB(VectorBase):
         if top_k == -1:
             top_k = self._top_k
 
-        results = self._table.search(data.tolist()).limit(top_k).to_list()
-        return [(result["_distance"], int(result["id"])) for result in results]
+        try:
+            results = self._table.search(data.tolist()).limit(top_k).to_list()
+            return [(result["_distance"], int(result["id"])) for result in results]
+        except Exception as e:
+            return []
 
     def delete(self, ids: List[int]):
         """Delete vectors from the LanceDB table based on IDs"""
         for vector_id in ids:
             self._table.delete(f"id = '{vector_id}'")
 
-    def rebuild(self, ids: Optional[List[int]] = None):  
+    def rebuild(self, ids: Optional[List[int]] = None):
         """Rebuild the index, if applicable"""
         return True
 
