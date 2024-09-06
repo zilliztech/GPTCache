@@ -43,6 +43,7 @@ __all__ = [
     "import_redis",
     "import_qdrant",
     "import_weaviate",
+    "import_lancedb",
     ]
 
 import importlib.util
@@ -152,6 +153,8 @@ def import_duckdb():
     _check_library("duckdb", package="duckdb")
     _check_library("duckdb-engine", package="duckdb-engine")
 
+def import_lancedb():
+    _check_library("lancedb", package="lancedb")
 
 def import_sql_client(db_name):
     if db_name == "postgresql":
