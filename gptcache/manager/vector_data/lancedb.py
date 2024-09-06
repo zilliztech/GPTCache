@@ -64,11 +64,8 @@ class LanceDB(VectorBase):
         if top_k == -1:
             top_k = self._top_k
 
-        try:
-            results = self._table.search(data.tolist()).limit(top_k).to_list()
-            return [(result["_distance"], int(result["id"])) for result in results]
-        except Exception as e:
-            return []
+        results = self._table.search(data.tolist()).limit(top_k).to_list()
+        return [(result["_distance"], int(result["id"])) for result in results]
 
     def delete(self, ids: List[int]):
         """Delete vectors from the LanceDB table based on IDs"""
