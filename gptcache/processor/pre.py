@@ -51,9 +51,9 @@ def last_content_without_prompt(data: Dict[str, Any], **params: Dict[str, Any]) 
 def _get_pattern_value(pattern_str: str, value_str: str):
     parts = list(string.Formatter().parse(pattern_str))
     field_names = [field_name for _, field_name, _, _ in parts if field_name is not None]
-    
-    pattern_values = {field: '' for field in field_names}  # Initialize all fields with empty strings
-    
+
+    pattern_values = {field: "" for field in field_names}  # Initialize all fields with empty strings
+
     last_end = 0
     for i, (literal_text, field_name, _, _) in enumerate(parts):
         if literal_text:
@@ -64,8 +64,8 @@ def _get_pattern_value(pattern_str: str, value_str: str):
                 pattern_values[field_names[i-1]] = value_str[last_end:start].strip()
             last_end = start + len(literal_text)
         elif i > 0 and field_name:  # Handle consecutive fields
-            pattern_values[field_names[i-1]] = ''
-    
+            pattern_values[field_names[i-1]] = ""
+
     # Handle the last field if it exists
     if field_names and last_end < len(value_str):
         pattern_values[field_names[-1]] = value_str[last_end:].strip()
