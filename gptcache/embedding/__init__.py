@@ -12,6 +12,7 @@ __all__ = [
     "Rwkv",
     "PaddleNLP",
     "UForm",
+    "VoyageAI",
 ]
 
 
@@ -31,7 +32,7 @@ rwkv = LazyImport("rwkv", globals(), "gptcache.embedding.rwkv")
 paddlenlp = LazyImport("paddlenlp", globals(), "gptcache.embedding.paddlenlp")
 uform = LazyImport("uform", globals(), "gptcache.embedding.uform")
 nomic = LazyImport("nomic", globals(), "gptcache.embedding.nomic")
-
+voyageai = LazyImport("voyageai", globals(), "gptcache.embedding.voyageai")
 
 def Nomic(model: str = "nomic-embed-text-v1.5",
           api_key: str = None,
@@ -90,3 +91,6 @@ def PaddleNLP(model="ernie-3.0-medium-zh"):
 
 def UForm(model="unum-cloud/uform-vl-multilingual", embedding_type="text"):
     return uform.UForm(model, embedding_type)
+
+def VoyageAI(model: str="voyage-3", api_key: str=None, api_key_path:str=None, input_type:str=None, truncation:bool=True):
+    return voyageai.VoyageAI(model=model, api_key=api_key, api_key_path=api_key_path, input_type=input_type, truncation=truncation)
