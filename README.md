@@ -331,6 +331,7 @@ This module is created to extract embeddings from requests for similarity search
   - [x] Support [fastText](https://fasttext.cc) embedding.
   - [x] Support [SentenceTransformers](https://www.sbert.net) embedding.
   - [x] Support [Timm](https://timm.fast.ai/) models for image embedding.
+  - [x] Support [VoyageAI](https://www.voyageai.com/) embedding API for Anthropic.
   - [ ] Support other embedding APIs.
 - **Cache Storage**:
 **Cache Storage** is where the response from LLMs, such as ChatGPT, is stored. Cached responses are retrieved to assist in evaluating similarity and are returned to the requester if there is a good semantic match. At present, GPTCache supports SQLite and offers a universally accessible interface for extension of this module.

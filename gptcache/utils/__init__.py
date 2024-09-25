@@ -4,6 +4,7 @@ __all__ = [
     "import_sbert",
     "import_cohere",
     "import_nomic",
+    "import_voyageai",
     "import_fasttext",
     "import_huggingface",
     "import_uform",
@@ -84,6 +85,9 @@ def import_cohere():
 
 def import_nomic():
     _check_library("nomic")
+
+def import_voyageai():
+    _check_library("voyageai")
 
 
 def import_fasttext():
