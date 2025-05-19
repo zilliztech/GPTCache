@@ -131,8 +131,6 @@ class PGVector(VectorBase):
     def _create_collection(self):
         with self._engine.connect() as con:
             con.execution_options(isolation_level="AUTOCOMMIT").execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
-            if self.use_halfvec:
-                con.execution_options(isolation_level="AUTOCOMMIT").execute(text("CREATE EXTENSION IF NOT EXISTS halfvec;"))
       
         self._store.__table__.create(bind=self._engine, checkfirst=True)
         self._index.create(bind=self._engine, checkfirst=True)
