@@ -112,7 +112,7 @@ class PGVector(VectorBase):
 
         #correcting the index type passed by user
         if use_halfvec and "halfvec" not in index_params["index_type"]:
-            index_params["index_type"] = f"halfvec_{index_params['index_type'].lower()"
+            index_params["index_type"] = f"halfvec_{index_params['index_type'].lower()}"
             
         self._store, self._index = _get_model_and_index(
             collection_name,
@@ -131,7 +131,9 @@ class PGVector(VectorBase):
     def _create_collection(self):
         with self._engine.connect() as con:
             con.execution_options(isolation_level="AUTOCOMMIT").execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
-
+            if self.use_halfvec:
+                con.execution_options(isolation_level="AUTOCOMMIT").execute(text("CREATE EXTENSION IF NOT EXISTS halfvec;"))
+      
         self._store.__table__.create(bind=self._engine, checkfirst=True)
         self._index.create(bind=self._engine, checkfirst=True)
 
@@ -139,9 +141,7 @@ class PGVector(VectorBase):
         return session.query(self._store)
 
     def _format_data_for_search(self, data):
-        if self.use_halfvec:
-            data = np.array(data,dtype=np.float16)
-            
+        
         return f"[{','.join(map(str, data))}]"
 
     def mul_add(self, datas: List[VectorData]):
