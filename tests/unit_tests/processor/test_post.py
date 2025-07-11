@@ -1,4 +1,5 @@
 from gptcache.processor.post import random_one, first, nop, temperature_softmax
+from unittest.mock import Mock
 
 
 def test_random_one():
@@ -28,8 +29,33 @@ def test_temperature_softmax():
     assert message == "foo2"
 
 
+def test_llm_verifier():
+    # mock client that always returns 'yes'
+    mock_client = Mock()
+    mock_resp = Mock()
+    mock_choice = Mock()
+    mock_choice.message.content = 'yes'
+    mock_resp.choices = [mock_choice]
+    mock_client.chat.completions.create.return_value = mock_resp
+
+    from gptcache.processor.post import LlmVerifier
+    verifier = LlmVerifier(client=mock_client, system_prompt="test prompt", model="fake-model")
+    messages = ["foo", "bar"]
+    scores = [0.1, 0.9]
+    result = verifier(messages, scores=scores, original_question="test question")
+    assert result == "bar"
+
+    # mock client that returns 'no'
+    mock_choice.message.content = 'no'
+    result = verifier(messages, scores=scores, original_question="test question")
+    assert result is None
+
+
+
+
 if __name__ == "__main__":
     test_first()
     test_nop()
     test_random_one()
     test_temperature_softmax()
+    test_llm_verifier()

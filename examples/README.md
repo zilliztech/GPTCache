@@ -1,13 +1,21 @@
 # Example
 
-- [How to run Visual Question Answering with MiniGPT-4](#How-to-run-Visual-Question-Answering-with-MiniGPT-4)
-- [How to set the **embedding** function](#How-to-set-the-embedding-function)
-- [How to set the **data manager** class](#How-to-set-the-data-manager-class)
-- [How to set the **similarity evaluation** interface](#How-to-set-the-similarity-evaluation-interface)
-- [Other cache init params](#Other-cache-init-params)
-- [How to run with session](#How-to-run-with-session)
-- [How to use GPTCache server](#How-to-use-GPTCache-server)
-- [Benchmark](#Benchmark)
+- [Example](#example)
+  - [How to run Visual Question Answering with MiniGPT-4](#how-to-run-visual-question-answering-with-minigpt-4)
+  - [How to set the `embedding` function](#how-to-set-the-embedding-function)
+    - [Default embedding function](#default-embedding-function)
+    - [Suitable for embedding methods consisting of a cached storage and vector store](#suitable-for-embedding-methods-consisting-of-a-cached-storage-and-vector-store)
+    - [Custom embedding](#custom-embedding)
+  - [How to set the `data manager` class](#how-to-set-the-data-manager-class)
+  - [How to set the `similarity evaluation` interface](#how-to-set-the-similarity-evaluation-interface)
+  - [Request cache parameter customization](#request-cache-parameter-customization)
+  - [How to run with session](#how-to-run-with-session)
+    - [Run in `with` method](#run-in-with-method)
+    - [Custom Session](#custom-session)
+  - [How to use GPTCache server](#how-to-use-gptcache-server)
+    - [Start server](#start-server)
+  - [Benchmark](#benchmark)
+  - [How to use post-process function](#how-to-use-post-process-function)
 
 ## How to run Visual Question Answering with MiniGPT-4
 
@@ -686,3 +694,24 @@ similarity evaluation func: pair_evaluation (search distance)
 | 0.95      | 0.12s        | 425      | 25       | 549        |
 | 0.9       | 0.23s        | 804      | 77       | 118        |
 | 0.8       | 0.26s        | 904      | 92       | 3          |
+## How to use post-process function
+
+You can use the LlmVerifier() function to process the cached answer list after recall. This is similar to  `first` or `random_one`, but it will call a LLM to verify whether the recalled question is truly similar to the user's question. You can define your own system prompt to decide under what circumstances the LLM should actively reject. You can also choose a small model to perform the verification step, so only a small additional cost is required.
+Example usage:
+
+```python
+from gptcache.processor.post import post
+
+# ... (init cache, embedding, data_manager, etc.)
+
+cache.init(
+    embedding_func=onnx.to_embeddings,
+    data_manager=data_manager,
+    similarity_evaluation=SearchDistanceEvaluation(),
+    post_process_messages_func=LlmVerifier(client=None,
+                       system_prompt=custom_prompt,
+                       model="gpt-3.5-turbo")
+)
+```
+
+See [processor/post_example.py](./processor/post_example.py) for a runnable example.

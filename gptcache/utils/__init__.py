@@ -105,7 +105,7 @@ def import_huggingface_hub():
 
 
 def import_onnxruntime():
-    _check_library("onnxruntime", package="onnxruntime==1.14.1")
+    _check_library("onnxruntime", package="onnxruntime==1.21.1")
 
 
 def import_faiss():

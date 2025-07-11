@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 from gptcache import cache
-from gptcache.processor.post import temperature_softmax
+from gptcache.processor.post import temperature_softmax, LlmVerifier
 from gptcache.utils.error import NotInitError
 from gptcache.utils.log import gptcache_log
 from gptcache.utils.time import time_cal
@@ -189,6 +189,12 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                         scores=[t[0] for t in cache_answers],
                         temperature=temperature,
                     )
+                elif chat_cache.post_process_messages_func is LlmVerifier:
+                    return_message = chat_cache.post_process_messages_func(
+                        messages=[t[1] for t in cache_answers],
+                        scores=[t[0] for t in cache_answers],
+                        original_question=pre_embedding_data
+                    )
                 else:
                     return_message = chat_cache.post_process_messages_func(
                         [t[1] for t in cache_answers]
@@ -200,29 +206,30 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 func_name="post_process",
                 report_func=chat_cache.report.post,
             )()
-            chat_cache.report.hint_cache()
-            cache_whole_data = answers_dict.get(str(return_message))
-            if session and cache_whole_data:
-                chat_cache.data_manager.add_session(
-                    cache_whole_data[2], session.name, pre_embedding_data
-                )
-            if cache_whole_data and not chat_cache.config.disable_report:
-                # user_question / cache_question / cache_question_id / cache_answer / similarity / consume time/ time
-                report_cache_data = cache_whole_data[3]
-                report_search_data = cache_whole_data[2]
-                chat_cache.data_manager.report_cache(
-                    pre_store_data if isinstance(pre_store_data, str) else "",
-                    report_cache_data.question
-                    if isinstance(report_cache_data.question, str)
-                    else "",
-                    report_search_data[1],
-                    report_cache_data.answers[0].answer
-                    if isinstance(report_cache_data.answers[0].answer, str)
-                    else "",
-                    cache_whole_data[0],
-                    round(time.time() - start_time, 6),
-                )
-            return cache_data_convert(return_message)
+            if return_message is not None:
+                chat_cache.report.hint_cache()
+                cache_whole_data = answers_dict.get(str(return_message))
+                if session and cache_whole_data:
+                    chat_cache.data_manager.add_session(
+                        cache_whole_data[2], session.name, pre_embedding_data
+                    )
+                if cache_whole_data and not chat_cache.config.disable_report:
+                    # user_question / cache_question / cache_question_id / cache_answer / similarity / consume time/ time
+                    report_cache_data = cache_whole_data[3]
+                    report_search_data = cache_whole_data[2]
+                    chat_cache.data_manager.report_cache(
+                        pre_store_data if isinstance(pre_store_data, str) else "",
+                        report_cache_data.question
+                        if isinstance(report_cache_data.question, str)
+                        else "",
+                        report_search_data[1],
+                        report_cache_data.answers[0].answer
+                        if isinstance(report_cache_data.answers[0].answer, str)
+                        else "",
+                        cache_whole_data[0],
+                        round(time.time() - start_time, 6),
+                    )
+                return cache_data_convert(return_message)
 
     next_cache = chat_cache.next_cache
     if next_cache:
@@ -444,6 +451,13 @@ async def aadapt(
                         scores=[t[0] for t in cache_answers],
                         temperature=temperature,
                     )
+                elif chat_cache.post_process_messages_func is LlmVerifier:
+                    return_message = chat_cache.post_process_messages_func(
+                        messages=[t[1] for t in cache_answers],
+                        scores=[t[0] for t in cache_answers],
+                        original_question=pre_embedding_data,
+                        temperature=temperature,
+                    )
                 else:
                     return_message = chat_cache.post_process_messages_func(
                         [t[1] for t in cache_answers]
@@ -455,29 +469,30 @@ async def aadapt(
                 func_name="post_process",
                 report_func=chat_cache.report.post,
             )()
-            chat_cache.report.hint_cache()
-            cache_whole_data = answers_dict.get(str(return_message))
-            if session and cache_whole_data:
-                chat_cache.data_manager.add_session(
-                    cache_whole_data[2], session.name, pre_embedding_data
-                )
-            if cache_whole_data:
-                # user_question / cache_question / cache_question_id / cache_answer / similarity / consume time/ time
-                report_cache_data = cache_whole_data[3]
-                report_search_data = cache_whole_data[2]
-                chat_cache.data_manager.report_cache(
-                    pre_store_data if isinstance(pre_store_data, str) else "",
-                    report_cache_data.question
-                    if isinstance(report_cache_data.question, str)
-                    else "",
-                    report_search_data[1],
-                    report_cache_data.answers[0].answer
-                    if isinstance(report_cache_data.answers[0].answer, str)
-                    else "",
-                    cache_whole_data[0],
-                    round(time.time() - start_time, 6),
-                )
-            return cache_data_convert(return_message)
+            if return_message is not None:
+                chat_cache.report.hint_cache()
+                cache_whole_data = answers_dict.get(str(return_message))
+                if session and cache_whole_data:
+                    chat_cache.data_manager.add_session(
+                        cache_whole_data[2], session.name, pre_embedding_data
+                    )
+                if cache_whole_data:
+                    # user_question / cache_question / cache_question_id / cache_answer / similarity / consume time/ time
+                    report_cache_data = cache_whole_data[3]
+                    report_search_data = cache_whole_data[2]
+                    chat_cache.data_manager.report_cache(
+                        pre_store_data if isinstance(pre_store_data, str) else "",
+                        report_cache_data.question
+                        if isinstance(report_cache_data.question, str)
+                        else "",
+                        report_search_data[1],
+                        report_cache_data.answers[0].answer
+                        if isinstance(report_cache_data.answers[0].answer, str)
+                        else "",
+                        cache_whole_data[0],
+                        round(time.time() - start_time, 6),
+                    )
+                return cache_data_convert(return_message)
 
     next_cache = chat_cache.next_cache
     if next_cache:
@@ -485,6 +500,7 @@ async def aadapt(
         kwargs["cache_context"] = context
         kwargs["cache_skip"] = cache_skip
         kwargs["cache_factor"] = cache_factor
+        kwargs["search_only"] = search_only_flag
         llm_data = adapt(
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
