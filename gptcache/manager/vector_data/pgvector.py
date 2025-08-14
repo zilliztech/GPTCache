@@ -15,7 +15,8 @@ from sqlalchemy.types import (  # pylint: disable=C0413
 )
 from sqlalchemy.orm import sessionmaker  # pylint: disable=C0413
 from sqlalchemy.ext.declarative import declarative_base  # pylint: disable=C0413
-
+from sqlalchemy.exc import ProgrammingError # pylint: disable=C0413
+import psycopg2 # pylint: disable=C0413
 Base = declarative_base()
 
 
@@ -114,8 +115,16 @@ class PGVector(VectorBase):
         self._session = sessionmaker(bind=self._engine)  # pylint: disable=invalid-name
 
     def _create_collection(self):
-        with self._engine.connect() as con:
-            con.execution_options(isolation_level="AUTOCOMMIT").execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+        try:
+            with self._engine.connect() as con:
+                con.execution_options(isolation_level="AUTOCOMMIT").execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+        except ProgrammingError as e:
+            # If this isn't a UniqueViolation related to the extension already existing, re-raise
+            if not (isinstance(getattr(e, 'orig', None), psycopg2.errors.UniqueViolation) and
+                    ("pg_extension_name_index" in str(e) or "pg_extension_name_key" in str(e))):
+                raise
+            # If the extension already exists, we can ignore the error
+            pass
 
         self._store.__table__.create(bind=self._engine, checkfirst=True)
         self._index.create(bind=self._engine, checkfirst=True)
