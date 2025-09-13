@@ -1,7 +1,7 @@
-sphinx
-urllib3<2.0
-pyqt5<5.13
-pyqtwebengine<5.13
+sphinx==8.2.3
+urllib3>=2.0
+pyqt5>=5.13
+pyqtwebengine>=5.13
 nbsphinx
 autodoc_pydantic
 myst_nb
