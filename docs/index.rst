@@ -427,6 +427,8 @@ A `sample benchmark <https://github.com/zilliztech/gpt-cache/blob/main/examples/
   * [x] Support `PGVector <https://github.com/pgvector/pgvector>`_\ , open-source vector similarity search for Postgres.
   * [x] Support `Chroma <https://github.com/chroma-core/chroma>`_\ , the AI-native open-source embedding database.
   * [x] Support `DocArray <https://github.com/docarray/docarray>`_\ , DocArray is a library for representing, sending and storing multi-modal data, perfect for Machine Learning applications.
+  * [x] Support `Redis <https://redis.io/>`_.
+  * [x] Support `ValkeySearch <https://github.com/valkey-io/valkey-search/>`_\ , provided as a Valkey module, is a high-performance Vector Similarity Search engine optimized for AI-driven workloads.
   * [ ] Support qdrant
   * [ ] Support weaviate
   * [ ] Support other vector databases.

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 
@@ -13,10 +13,11 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 from redis.commands.search.field import TagField, VectorField
 from redis.client import Redis
+from redis.exceptions import ResponseError
 
 
 class RedisVectorStore(VectorBase):
-    """ vector store: Redis
+    """ vector store: Redis or Valkey
 
     :param host: redis host, defaults to "localhost".
     :type host: str
@@ -60,6 +61,32 @@ class RedisVectorStore(VectorBase):
         self.namespace = namespace
         self.doc_prefix = f"{self.namespace}doc:"  # Prefix with the specified namespace
         self._create_collection(collection_name)
+
+    _sortby_supported: bool | None = None
+
+    def _check_sortby_support(self, index_name: str, sort_field: str) -> bool:
+        """
+        Runtime capability detection for FT.SEARCH SORTBY.
+        Issues a zero-result query using SORTBY against the provided index.
+        - If the server rejects the keyword (e.g., Valkey builds without SORTBY), we cache False and return False.
+        - If the server *parses* SORTBY but complains about the field or schema (e.g., 'Property is not sortable'
+        or 'No such field'), we treat that as SORTBY being *supported* and bubble up the original error when the real
+        query runs.
+        """
+
+        if self._sortby_supported is not None:
+            return self._sortby_supported
+
+        try:
+            self._client.execute_command("FT.SEARCH", index_name, "*", "SORTBY", sort_field, "ASC", "LIMIT", 0, 0)
+            self._sortby_supported = True
+
+        except ResponseError as e:
+            if "SORTBY" in str(e):
+                self._sortby_supported = False
+            else:
+                self._sortby_supported = True
+            return self._sortby_supported
 
     def _check_index_exists(self, index_name: str) -> bool:
         """Check if Redis index exists."""
@@ -115,11 +142,13 @@ class RedisVectorStore(VectorBase):
             Query(
                 f"*=>[KNN {top_k if top_k > 0 else self.top_k} @vector $vec as score]"
             )
-            .sort_by("score")
             .return_fields("id", "score")
             .paging(0, top_k if top_k > 0 else self.top_k)
             .dialect(2)
         )
+        if self._check_sortby_support(self.collection_name, "score"):
+            query = query.sort_by("score")
+
         query_params = {"vec": data.astype(np.float32).tobytes()}
         results = (
             self._client.ft(self.collection_name)
