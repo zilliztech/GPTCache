@@ -78,7 +78,7 @@ def test_redis_vector_store_sortby_supported(monkeypatch, ascending):
 
     from gptcache.manager.vector_data.redis_vectorstore import RedisVectorStore
 
-    def _always_supports_sortby() -> bool:  # noqa: ARG002
+    def _always_supports_sortby(self, index_name, field) -> bool:  # noqa: ARG002
         return not _is_valkey()
 
     monkeypatch.setattr(
@@ -101,7 +101,7 @@ def test_redis_vector_store_sortby_supported(monkeypatch, ascending):
 def test_redis_vector_store_sortby_unsupported(monkeypatch):
     """
     Force the probe to say SORTBY is NOT supported (e.g., Valkey without SORTBY).
-    The search should still succeed and return k results; we don't assert ordering here.
+    The search should still succeed and return k results;
     """
     encoder = Onnx()
     dim = encoder.dimension
@@ -125,3 +125,9 @@ def test_redis_vector_store_sortby_unsupported(monkeypatch):
     res = vector_base.search(query_vec, top_k=k)
     assert isinstance(res, (list, tuple))
     assert len(res) == k
+
+    scores = [extract_score(item) for item in res]
+    if _is_valkey():
+        assert is_nondecreasing(scores), f"Scores not sorted ASC: {scores}"
+    else:
+        assert not is_nondecreasing(scores) and not _is_nonincreasing(scores), f"Scores sorted: {scores}"

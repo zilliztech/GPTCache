@@ -41,6 +41,7 @@ class RedisVectorStore(VectorBase):
 
             vector_base = VectorBase("redis", dimension=10)
     """
+
     def __init__(
         self,
         host: str = "localhost",
@@ -72,6 +73,9 @@ class RedisVectorStore(VectorBase):
         - If the server *parses* SORTBY but complains about the field or schema (e.g., 'Property is not sortable'
         or 'No such field'), we treat that as SORTBY being *supported* and bubble up the original error when the real
         query runs.
+        NOTE: Valkey KNN results are ALWAYS sorted by distance.
+        'The first name/value pair is for the distance computed' -
+        Ref: https://github.com/valkey-io/valkey-search/blob/main/COMMANDS.md
         """
 
         if self._sortby_supported is not None:
@@ -83,7 +87,12 @@ class RedisVectorStore(VectorBase):
 
         except ResponseError as e:
             if "SORTBY" in str(e):
-                self._sortby_supported = False
+                try:
+                    info = self._client.info("server")
+                    is_valkey = info.get("server_name") == "valkey" or "valkey_version" in info
+                    self._sortby_supported = not is_valkey
+                except Exception:
+                    self._sortby_supported = False
             else:
                 self._sortby_supported = True
             return self._sortby_supported
