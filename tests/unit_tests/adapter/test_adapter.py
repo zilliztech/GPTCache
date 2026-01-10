@@ -1,6 +1,7 @@
 import os
 import random
 import time
+from unittest.mock import patch
 
 import numpy
 
@@ -189,3 +190,44 @@ def test_input_summarization():
         text="A large language model (LLM)",
         cache_obj=cache_obj,
     )
+
+
+def test_vector_cleanup_on_expired_cache():
+    """Test that vector data is deleted when corresponding cache data is missing."""
+    from unittest.mock import MagicMock
+
+    cache_obj = Cache()
+
+    def llm_handler(*llm_args, **llm_kwargs):
+        return "test response"
+
+    def cache_data_convert(cache_data):
+        return cache_data
+
+    def update_cache_callback(llm_data, update_cache_func, *args, **kwargs):
+        update_cache_func(llm_data)
+        return llm_data
+
+    def pre_embedding(data, **kwargs):
+        return data.get("prompt", "")
+
+    # Create a mock data manager
+    mock_data_manager = MagicMock()
+    mock_data_manager.search.return_value = [[0.9, 123]]  # score, id
+    mock_data_manager.get_scalar_data.return_value = None  # Simulate expired cache
+    mock_data_manager.v.delete = MagicMock()
+
+    cache_obj.init(
+        pre_func=pre_embedding,
+        embedding_func=lambda x, **_: numpy.random.random(3).astype('float32'),
+        data_manager=mock_data_manager,
+    )
+
+    # Call adapt - should find vector result but no scalar data, triggering delete
+    result = adapt(
+        llm_handler, cache_data_convert, update_cache_callback,
+        prompt="test query", cache_obj=cache_obj
+    )
+
+    # Verify delete was called with the id from search result
+    mock_data_manager.v.delete.assert_called_with([123])
