@@ -118,6 +118,8 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 session=session,
             )
             if cache_data is None:
+                # Remove vector data when corresponding cache data has expired
+                chat_cache.data_manager.v.delete([search_data[1]])
                 continue
 
             # cache consistency check
@@ -399,6 +401,8 @@ async def aadapt(
                 session=session,
             )
             if cache_data is None:
+                # Remove vector data when corresponding cache data has expired
+                chat_cache.data_manager.v.delete([search_data[1]])
                 continue
 
             if "deps" in context and hasattr(cache_data.question, "deps"):
