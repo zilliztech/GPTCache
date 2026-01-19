@@ -197,7 +197,7 @@ def init_similar_cache_from_config(config_dir: str, cache_obj: Optional[Cache] =
 
     if config_dir:
         with open(config_dir, "r", encoding="utf-8") as f:
-            yaml = YAML(typ="unsafe", pure=True)
+            yaml = YAML(typ="safe", pure=True)
             init_conf = yaml.load(f)
     else:
         init_conf = {}
