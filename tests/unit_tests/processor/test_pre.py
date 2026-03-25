@@ -4,8 +4,15 @@ from gptcache.processor.pre import (
     nop,
     last_content_without_prompt,
     get_prompt, get_openai_moderation_input,
-    concat_all_queries
+    concat_all_queries,
+    get_file_bytes,
+    get_input_str,
+    get_image_question,
 )
+
+import io
+import os
+import tempfile
 
 from gptcache.config import Config
 
@@ -68,6 +75,82 @@ def test_concat_all_queries():
                                         {"role": "user",     "content": "foo6"}]}, **{'cache_config':config})
     assert content == 'USER: foo4\nUSER: foo6'
 
-    
-if __name__  == '__main__':   
+
+if __name__  == '__main__':
     test_concat_all_queries()
+
+
+# ---------- AC-2 fix: peek() → sha256(read()) ----------
+
+SHARED_HEADER = b"\xff\xd8\xff\xe0" + b"\x00" * 8188  # 8192 bytes
+
+
+def _make_stream(tail: bytes) -> io.BufferedReader:
+    return io.BufferedReader(io.BytesIO(SHARED_HEADER + tail))
+
+
+def test_get_file_bytes_no_collision():
+    """Two files sharing the same 8KB header must produce different cache keys."""
+    key_a = get_file_bytes({"file": _make_stream(b"\xAA" * 4096)})
+    key_b = get_file_bytes({"file": _make_stream(b"\xBB" * 4096)})
+    assert key_a != key_b
+
+
+def test_get_file_bytes_same_content():
+    """Identical files must still produce the same cache key."""
+    key_a = get_file_bytes({"file": _make_stream(b"\xAA" * 4096)})
+    key_b = get_file_bytes({"file": _make_stream(b"\xAA" * 4096)})
+    assert key_a == key_b
+
+
+def test_get_file_bytes_resets_pointer():
+    """File pointer must be at 0 after get_file_bytes so LLM can read the full file."""
+    stream = _make_stream(b"\xAA" * 4096)
+    get_file_bytes({"file": stream})
+    assert stream.tell() == 0
+
+
+def test_get_input_str_no_collision():
+    question = "What is this?"
+    key_a = get_input_str({"input": {"image": _make_stream(b"\xAA" * 4096), "question": question}})
+    key_b = get_input_str({"input": {"image": _make_stream(b"\xBB" * 4096), "question": question}})
+    assert key_a != key_b
+
+
+def test_get_input_str_same_content():
+    question = "What is this?"
+    key_a = get_input_str({"input": {"image": _make_stream(b"\xAA" * 4096), "question": question}})
+    key_b = get_input_str({"input": {"image": _make_stream(b"\xAA" * 4096), "question": question}})
+    assert key_a == key_b
+
+
+def test_get_input_str_different_question():
+    stream_data = b"\xAA" * 4096
+    key_a = get_input_str({"input": {"image": _make_stream(stream_data), "question": "Q1"}})
+    key_b = get_input_str({"input": {"image": _make_stream(stream_data), "question": "Q2"}})
+    assert key_a != key_b
+
+
+def test_get_input_str_resets_pointer():
+    stream = _make_stream(b"\xAA" * 4096)
+    get_input_str({"input": {"image": stream, "question": "test"}})
+    assert stream.tell() == 0
+
+
+def test_get_image_question_no_collision():
+    question = "What is this?"
+    key_a = get_image_question({"image": _make_stream(b"\xAA" * 4096), "question": question})
+    key_b = get_image_question({"image": _make_stream(b"\xBB" * 4096), "question": question})
+    assert key_a != key_b
+
+
+def test_get_image_question_with_filepath():
+    """Test get_image_question when image is a file path string."""
+    fd, path = tempfile.mkstemp(suffix=".jpg")
+    try:
+        os.write(fd, SHARED_HEADER + b"\xCC" * 4096)
+        os.close(fd)
+        key = get_image_question({"image": path, "question": "test"})
+        assert len(key) > 64  # sha256 hex (64 chars) + question
+    finally:
+        os.unlink(path)
