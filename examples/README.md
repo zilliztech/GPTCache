@@ -158,6 +158,20 @@ paddlenlp = PaddleNLP()
 
 </details>
 
+<details>
+
+<summary> Nomic </summary>
+
+```python
+from gptcache.embedding import Nomic
+
+nm = Nomic(api_key='your-api-key')
+# nm.dimension
+# nm.to_embeddings
+```
+
+</details>
+
 ### Custom embedding
 
 The function has two parameters: the preprocessed string and parameters reserved for user customization. To acquire these parameters, a similar method to the one above is used: `kwargs.get("embedding_func", {})`.
@@ -268,6 +282,7 @@ Support vector database
 - Zilliz Cloud
 - FAISS
 - ChromaDB
+- LanceDB
 
 > [Example code](https://github.com/zilliztech/GPTCache/blob/main/examples/data_manager/vector_store.py)
 
@@ -419,7 +434,90 @@ Reference: [similarity evaluation dir](https://github.com/zilliztech/GPTCache/tr
   
   cache.init(data_manager=get_data_manager(), next_cache=bak_cache)
   ```
-  
+## How to set the `pre-process` function
+
+The `pre_embedding_func` extracts the cache key from the raw LLM request dictionary before embedding.
+
+All functions are importable from `gptcache.processor.pre`.
+
+### get_content_by_role
+
+Extracts all messages belonging to a given role and joins them with a newline.
+
+```python
+from gptcache.processor.pre import get_content_by_role
+
+content = get_content_by_role(
+    {
+        "messages": [
+            {"role": "system",    "content": "You are a helpful assistant."},
+            {"role": "user",      "content": "Who won the world series in 2020?"},
+            {"role": "assistant", "content": "The Los Angeles Dodgers won."},
+            {"role": "user",      "content": "Where was it played?"},
+        ]
+    },
+    role="user",
+)
+# content = "Who won the world series in 2020?\nWhere was it played?"
+```
+
+### get_system_prompt_and_last_content
+
+Returns the system prompt + last user message. Prevents false cache hits when different system prompts are used with the same user query.
+
+```python
+from gptcache.processor.pre import get_system_prompt_and_last_content
+
+content = get_system_prompt_and_last_content(
+    {
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user",   "content": "Where was it played?"},
+        ]
+    }
+)
+# content = "You are a helpful assistant.\nWhere was it played?"
+```
+
+### last_n_turns_content
+
+Builds a cache key from the last *n* conversational turns. System messages are excluded.
+
+```python
+from gptcache.processor.pre import last_n_turns_content
+
+content = last_n_turns_content(
+    {
+        "messages": [
+            {"role": "system",    "content": "You are a helpful assistant."},
+            {"role": "user",      "content": "Who won the world series in 2020?"},
+            {"role": "assistant", "content": "The Los Angeles Dodgers won."},
+            {"role": "user",      "content": "Where was it played?"},
+        ]
+    },
+    n=1,
+)
+# content = "ASSISTANT: The Los Angeles Dodgers won.\nUSER: Where was it played?"
+```
+
+### get_model_and_last_content
+
+Prefixes the cache key with the model name — useful when one GPTCache instance serves multiple models.
+
+```python
+from gptcache.processor.pre import get_model_and_last_content
+
+content = get_model_and_last_content(
+    {
+        "model": "gpt-4",
+        "messages": [
+            {"role": "user", "content": "Where was it played?"},
+        ],
+    }
+)
+# content = "gpt-4::Where was it played?"
+```
+
 ## Request cache parameter customization
 
 - **cache_obj**: customize request cache, use global variable cache by default.

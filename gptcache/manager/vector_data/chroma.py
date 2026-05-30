@@ -46,11 +46,11 @@ class Chromadb(VectorBase):
         self._persist_directory = persist_directory
         self._collection = self._client.get_or_create_collection(name=collection_name)
 
-    def mul_add(self, datas: List[VectorData]):
+    def mul_add(self, datas: List[VectorData], **_):
         data_array, id_array = map(list, zip(*((data.data.tolist(), str(data.id)) for data in datas)))
         self._collection.add(embeddings=data_array, ids=id_array)
 
-    def search(self, data, top_k: int = -1):
+    def search(self, data, top_k: int = -1, **_):
         if self._collection.count() == 0:
             return []
         if top_k == -1:

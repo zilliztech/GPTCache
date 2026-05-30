@@ -33,6 +33,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         raise NotInitError()
     cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
     context = kwargs.pop("cache_context", {})
+    partition_key = kwargs.pop("partition_key", None)
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
 
@@ -91,6 +92,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             top_k=kwargs.pop("top_k", 5)
             if (user_temperature and not user_top_k)
             else kwargs.pop("top_k", -1),
+            partition_key=partition_key,
         )
         if search_data_list is None:
             search_data_list = []
@@ -270,6 +272,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     embedding_data,
                     extra_param=context.get("save_func", None),
                     session=session,
+                    partition_key=partition_key,
                 )
                 if (
                     chat_cache.report.op_save.count > 0
@@ -311,6 +314,7 @@ async def aadapt(
         raise NotInitError()
     cache_enable = chat_cache.cache_enable_func(*args, **kwargs)
     context = kwargs.pop("cache_context", {})
+    partition_key = kwargs.pop("partition_key", None)
     embedding_data = None
     # you want to retry to send the request to chatgpt when the cache is negative
 
@@ -369,6 +373,7 @@ async def aadapt(
             top_k=kwargs.pop("top_k", 5)
             if (user_temperature and not user_top_k)
             else kwargs.pop("top_k", -1),
+            partition_key=partition_key,
         )
         if search_data_list is None:
             search_data_list = []
@@ -525,6 +530,7 @@ async def aadapt(
                     embedding_data,
                     extra_param=context.get("save_func", None),
                     session=session,
+                    partition_key=partition_key,
                 )
                 if (
                     chat_cache.report.op_save.count > 0

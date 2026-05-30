@@ -9,6 +9,8 @@ import_openai()
 
 import openai  # pylint: disable=C0413
 
+# TODO should adapt to the new openai library
+
 class OpenAI(BaseEmbedding):
     """Generate text embedding for given text using OpenAI.
 
@@ -27,20 +29,23 @@ class OpenAI(BaseEmbedding):
             embed = encoder.to_embeddings(test_sentence)
     """
 
-    def __init__(self, model: str = "text-embedding-ada-002", api_key: str = None, api_base: str = None):
+    def __init__(self, model: str = "text-embedding-ada-002", api_key: str = None, api_base: str = None, client = None):
         if not api_key:
             if openai.api_key:
                 api_key = openai.api_key
             else:
                 api_key = os.getenv("OPENAI_API_KEY")
         if not api_base:
-            if openai.api_base:
+            if hasattr(openai, "api_base") and openai.api_base:
                 api_base = openai.api_base
+            elif hasattr(openai, "base_url") and openai.base_url:
+                api_base = openai.base_url
             else:
-                api_base = os.getenv("OPENAI_API_BASE")
+                api_base = os.getenv("OPENAI_API_BASE", os.getenv("OPENAI_BASE_URL"))
         openai.api_key = api_key
         self.api_base = api_base  # don't override all of openai as we may just want to override for say embeddings
         self.model = model
+        self.client = client
         if model in self.dim_dict():
             self.__dimension = self.dim_dict()[model]
         else:
@@ -54,8 +59,12 @@ class OpenAI(BaseEmbedding):
 
         :return: a text embedding in shape of (dim,).
         """
-        sentence_embeddings = openai.Embedding.create(model=self.model, input=data, api_base=self.api_base)
-        return np.array(sentence_embeddings["data"][0]["embedding"]).astype("float32")
+        if self.client:
+            sentence_embeddings = self.client.embeddings.create(model=self.model, input=data)
+            return np.array(sentence_embeddings.data[0].embedding).astype("float32")
+        else:
+            sentence_embeddings = openai.Embedding.create(model=self.model, input=data, api_base=self.api_base)
+            return np.array(sentence_embeddings["data"][0]["embedding"]).astype("float32")
 
     @property
     def dimension(self):

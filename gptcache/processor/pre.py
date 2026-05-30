@@ -60,7 +60,7 @@ def _get_pattern_value(pattern_str: str, value_str: str):
 
     pattern_values = {}
     last_end = 0
-    for i, literal_text in enumerate(literal_text_arr):
+    for i, (literal_text, field_name) in enumerate(zip(literal_text_arr, field_name_arr)):
         start = value_str.find(literal_text, last_end)
         if i == len(literal_text_arr) - 1:
             end = len(value_str)
@@ -69,7 +69,7 @@ def _get_pattern_value(pattern_str: str, value_str: str):
         if start == -1 or end == -1:
             break
         start += len(literal_text)
-        pattern_values[field_name_arr[i]] = value_str[start:end]
+        pattern_values[field_name] = value_str[start:end]
         last_end = end
     return pattern_values
 
@@ -383,3 +383,142 @@ def concat_all_queries(data: Dict[str, Any], **params: Dict[str, Any]) -> Any:
         else:
             s += f'{message["role"].upper()}: {message["content"]}\n'
     return s
+# ── New pre-processors ────────────────────────────────────────────────────────
+ 
+def get_content_by_role(data: Dict[str, Any], **params: Dict[str, Any]) -> str:
+    """Get concatenated content of messages that match a specific role.
+ 
+    Useful when you only want to cache the user-side of a conversation,
+    ignoring system prompts or assistant turns entirely.
+ 
+    :param data: the user llm request data
+    :type data: Dict[str, Any]
+    :param params: must contain a ``role`` key (``"user"``, ``"system"``, or ``"assistant"``)
+    :type params: Dict[str, Any]
+ 
+    Example:
+        .. code-block:: python
+ 
+            from gptcache.processor.pre import get_content_by_role
+ 
+            content = get_content_by_role(
+                {
+                    "messages": [
+                        {"role": "system",    "content": "You are a helpful assistant."},
+                        {"role": "user",      "content": "Who won the world series in 2020?"},
+                        {"role": "assistant", "content": "The Los Angeles Dodgers won."},
+                        {"role": "user",      "content": "Where was it played?"},
+                    ]
+                },
+                role="user",
+            )
+            # content = "Who won the world series in 2020?\nWhere was it played?"
+    """
+    role = params.get("role", "user")
+    messages = data.get("messages", [])
+    parts = [m["content"] for m in messages if m.get("role") == role]
+    return "\n".join(parts)
+ 
+ 
+def get_system_prompt_and_last_content(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
+    """Return the system prompt (if present) concatenated with the last user message.
+ 
+    Many LLM applications keep the same system prompt while varying only the user
+    turn.  Including the system prompt in the cache key prevents false cache hits
+    when different system prompts are paired with the same user query.
+ 
+    :param data: the user llm request data
+    :type data: Dict[str, Any]
+ 
+    Example:
+        .. code-block:: python
+ 
+            from gptcache.processor.pre import get_system_prompt_and_last_content
+ 
+            content = get_system_prompt_and_last_content(
+                {
+                    "messages": [
+                        {"role": "system",    "content": "You are a helpful assistant."},
+                        {"role": "user",      "content": "Who won the world series in 2020?"},
+                        {"role": "assistant", "content": "The Los Angeles Dodgers won."},
+                        {"role": "user",      "content": "Where was it played?"},
+                    ]
+                }
+            )
+            # content = "You are a helpful assistant.\nWhere was it played?"
+    """
+    messages = data.get("messages", [])
+    system_content = next(
+        (m["content"] for m in messages if m.get("role") == "system"), ""
+    )
+    last = messages[-1]["content"] if messages else ""
+    return f"{system_content}\n{last}" if system_content else last
+ 
+ 
+def last_n_turns_content(data: Dict[str, Any], **params: Dict[str, Any]) -> str:
+    """Return the concatenated content of the last *n* conversational turns.
+ 
+    A "turn" is one user message plus its following assistant reply (2 messages).
+    System messages are always excluded.  This gives the cache a short but
+    meaningful context window without exploding the key space.
+ 
+    :param data: the user llm request data
+    :type data: Dict[str, Any]
+    :param params: accepts ``n`` (int, default ``2``) – number of turns to include
+    :type params: Dict[str, Any]
+ 
+    Example:
+        .. code-block:: python
+ 
+            from gptcache.processor.pre import last_n_turns_content
+ 
+            content = last_n_turns_content(
+                {
+                    "messages": [
+                        {"role": "system",    "content": "You are a helpful assistant."},
+                        {"role": "user",      "content": "Who won the world series in 2020?"},
+                        {"role": "assistant", "content": "The Los Angeles Dodgers won."},
+                        {"role": "user",      "content": "Where was it played?"},
+                    ]
+                },
+                n=1,
+            )
+            # content = "ASSISTANT: The Los Angeles Dodgers won.\nUSER: Where was it played?"
+    """
+    n = int(params.get("n", 2))
+    messages = [m for m in data.get("messages", []) if m.get("role") != "system"]
+    window = messages[-(n * 2):]
+    return "\n".join(f'{m["role"].upper()}: {m["content"]}' for m in window)
+ 
+ 
+def get_model_and_last_content(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
+    """Prefix the last message content with the requested model name.
+ 
+    When a single GPTCache instance serves multiple models (e.g. gpt-3.5-turbo
+    and gpt-4), the same question should NOT share a cached response across
+    models.  Prepending the model name creates isolated key spaces automatically.
+ 
+    :param data: the user llm request data, expected to contain a top-level
+                 ``"model"`` key alongside ``"messages"``
+    :type data: Dict[str, Any]
+ 
+    Example:
+        .. code-block:: python
+ 
+            from gptcache.processor.pre import get_model_and_last_content
+ 
+            content = get_model_and_last_content(
+                {
+                    "model": "gpt-4",
+                    "messages": [
+                        {"role": "user", "content": "Where was it played?"},
+                    ],
+                }
+            )
+            # content = "gpt-4::Where was it played?"
+    """
+    model = data.get("model", "")
+    messages = data.get("messages", [])
+    last = messages[-1]["content"] if messages else ""
+    return f"{model}::{last}"
+

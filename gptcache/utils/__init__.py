@@ -3,6 +3,7 @@ __all__ = [
     "import_milvus_lite",
     "import_sbert",
     "import_cohere",
+    "import_nomic",
     "import_fasttext",
     "import_huggingface",
     "import_uform",
@@ -42,6 +43,7 @@ __all__ = [
     "import_redis",
     "import_qdrant",
     "import_weaviate",
+    "import_lancedb",
     ]
 
 import importlib.util
@@ -78,6 +80,10 @@ def import_sbert():
 
 def import_cohere():
     _check_library("cohere")
+
+
+def import_nomic():
+    _check_library("nomic")
 
 
 def import_fasttext():
@@ -147,6 +153,8 @@ def import_duckdb():
     _check_library("duckdb", package="duckdb")
     _check_library("duckdb-engine", package="duckdb-engine")
 
+def import_lancedb():
+    _check_library("lancedb", package="lancedb")
 
 def import_sql_client(db_name):
     if db_name == "postgresql":
@@ -231,7 +239,7 @@ def import_httpx():
 
 
 def import_openai():
-    _check_library("openai", package="openai==0.28.1")
+    _check_library("openai")
 
 
 def import_docarray():

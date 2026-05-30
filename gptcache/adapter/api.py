@@ -18,6 +18,7 @@ from gptcache.embedding import (
     Rwkv,
     PaddleNLP,
     UForm,
+    Nomic
 )
 from gptcache.embedding.base import BaseEmbedding
 from gptcache.manager import manager_factory
@@ -285,6 +286,8 @@ def _get_model(model_src, model_config=None):
         return PaddleNLP(**model_config)
     if model_src == "uform":
         return UForm(**model_config)
+    if model_src == "nomic":
+        return Nomic(**model_config)
 
 
 def _get_eval(strategy, kws=None):

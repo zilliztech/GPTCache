@@ -30,13 +30,13 @@ class Faiss(VectorBase):
         if os.path.isfile(index_file_path):
             self._index = faiss.read_index(index_file_path)
 
-    def mul_add(self, datas: List[VectorData]):
+    def mul_add(self, datas: List[VectorData], **_):
         data_array, id_array = map(list, zip(*((data.data, data.id) for data in datas)))
         np_data = np.array(data_array).astype("float32")
         ids = np.array(id_array)
         self._index.add_with_ids(np_data, ids)
 
-    def search(self, data: np.ndarray, top_k: int = -1):
+    def search(self, data: np.ndarray, top_k: int = -1, **_):
         if self._index.ntotal == 0:
             return None
         if top_k == -1:

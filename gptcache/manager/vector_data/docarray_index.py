@@ -36,7 +36,7 @@ class DocArrayIndex(VectorBase):
         self._index_file_path = index_file_path
         self._top_k = top_k
 
-    def mul_add(self, datas: List[VectorData]) -> None:
+    def mul_add(self, datas: List[VectorData], **_) -> None:
         """
         Add multiple vector data elements to the index.
 
@@ -48,7 +48,7 @@ class DocArrayIndex(VectorBase):
         self._index.index(docs)
 
     def search(
-        self, data: np.ndarray, top_k: int = -1
+        self, data: np.ndarray, top_k: int = -1, **_
     ) -> Optional[List[Tuple[float, int]]]:
         """
         Search for the nearest vector data elements in the index.

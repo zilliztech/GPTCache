@@ -34,7 +34,11 @@ def test_map():
         )
 
     expect_answer = "receiver the foo 15"
-    answer = openai.ChatCompletion.create(
+    from openai import OpenAI
+    answer = openai.cache_openai_chat_complete(
+        OpenAI(
+            api_key="API_KEY",
+        ),
         model="gpt-3.5-turbo",
         messages=mock_messages,
     )
@@ -48,7 +52,10 @@ def test_map():
         data_manager=get_data_manager(data_path=data_file, max_size=10),
         next_cache=bak_cache2,
     )
-    answer = openai.ChatCompletion.create(
+    answer = openai.cache_openai_chat_complete(
+        OpenAI(
+            api_key="API_KEY",
+        ),
         model="gpt-3.5-turbo",
         messages=mock_messages,
     )

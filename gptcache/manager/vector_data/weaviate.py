@@ -86,7 +86,7 @@ class Weaviate(VectorBase):
             "vectorIndexConfig": {"distance": "cosine"},
         }
 
-    def mul_add(self, datas: List[VectorData]):
+    def mul_add(self, datas: List[VectorData], **_):
         with self.client.batch(batch_size=100, dynamic=True) as batch:
             for data in datas:
                 properties = {
@@ -97,7 +97,7 @@ class Weaviate(VectorBase):
                     data_object=properties, class_name=self.class_name, vector=data.data
                 )
 
-    def search(self, data: np.ndarray, top_k: int = -1):
+    def search(self, data: np.ndarray, top_k: int = -1, **_):
         if top_k == -1:
             top_k = self.top_k
 
