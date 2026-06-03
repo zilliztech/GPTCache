@@ -43,7 +43,11 @@ def test_sqlite_faiss():
         [f"foo{i}" for i in range(10)], [f"receiver the foo {i}" for i in range(10)]
     )
 
-    answer = openai.ChatCompletion.create(
+    from openai import OpenAI
+    answer = openai.cache_openai_chat_complete(
+        OpenAI(
+            api_key="API_KEY",
+        ),
         model="gpt-3.5-turbo",
         messages=mock_messages,
     )
@@ -60,7 +64,10 @@ def test_sqlite_faiss():
             similarity_threshold=0,
         ),
     )
-    answer = openai.ChatCompletion.create(
+    answer = openai.cache_openai_chat_complete(
+        OpenAI(
+            api_key="API_KEY",
+        ),
         model="gpt-3.5-turbo",
         messages=mock_messages,
     )

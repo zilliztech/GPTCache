@@ -30,14 +30,22 @@ langchain = LazyImport("langchain", globals(), "gptcache.embedding.langchain")
 rwkv = LazyImport("rwkv", globals(), "gptcache.embedding.rwkv")
 paddlenlp = LazyImport("paddlenlp", globals(), "gptcache.embedding.paddlenlp")
 uform = LazyImport("uform", globals(), "gptcache.embedding.uform")
+nomic = LazyImport("nomic", globals(), "gptcache.embedding.nomic")
+
+
+def Nomic(model: str = "nomic-embed-text-v1.5",
+          api_key: str = None,
+          task_type: str = "search_document",
+          dimensionality: int = None):
+    return nomic.Nomic(model, api_key, task_type, dimensionality)
 
 
 def Cohere(model="large", api_key=None):
     return cohere.Cohere(model, api_key)
 
 
-def OpenAI(model="text-embedding-ada-002", api_key=None):
-    return openai.OpenAI(model, api_key)
+def OpenAI(model="text-embedding-ada-002", api_key=None, api_base=None, client=None):
+    return openai.OpenAI(model, api_key, api_base, client)
 
 
 def Huggingface(model="distilbert-base-uncased"):

@@ -87,7 +87,7 @@ class Cache:
                 if not os.getenv("IS_CI"):
                     gptcache_log.error(e)
 
-    def import_data(self, questions: List[Any], answers: List[Any], session_ids: Optional[List[Optional[str]]] = None) -> None:
+    def import_data(self, questions: List[Any], answers: List[Any], session_ids: Optional[List[Optional[str]]] = None, **kwargs) -> None:
         """Import data to GPTCache
 
         :param questions: preprocessed question Data
@@ -101,6 +101,7 @@ class Cache:
             answers=answers,
             embedding_datas=[self.embedding_func(question) for question in questions],
             session_ids=session_ids if session_ids else [None for _ in range(len(questions))],
+            **kwargs,
         )
 
     def flush(self):
@@ -125,7 +126,10 @@ class Cache:
 
         openai.api_type = "azure"
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        openai.api_base = os.getenv("OPENAI_API_BASE")
+        if hasattr(openai, "api_base"):
+            openai.api_base = os.getenv("OPENAI_API_BASE")
+        elif hasattr(openai, "base_url"):
+            openai.base_url = os.getenv("OPENAI_BASE_URL", os.getenv("OPENAI_API_BASE"))
         openai.api_version = os.getenv("OPENAI_API_VERSION")
 
 cache = Cache()

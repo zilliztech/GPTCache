@@ -126,7 +126,7 @@ class PGVector(VectorBase):
     def _format_data_for_search(self, data):
         return f"[{','.join(map(str, data))}]"
 
-    def mul_add(self, datas: List[VectorData]):
+    def mul_add(self, datas: List[VectorData], **_):
         data_array, id_array = map(list, zip(*((data.data, data.id) for data in datas)))
         np_data = np.array(data_array).astype("float32")
         entities = [{"id": id, "embedding": embedding.tolist()} for id, embedding in zip(id_array, np_data)]
@@ -135,7 +135,7 @@ class PGVector(VectorBase):
             session.bulk_insert_mappings(self._store, entities)
             session.commit()
 
-    def search(self, data: np.ndarray, top_k: int = -1):
+    def search(self, data: np.ndarray, top_k: int = -1, **_):
         if top_k == -1:
             top_k = self.top_k
 
