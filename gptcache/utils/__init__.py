@@ -132,7 +132,7 @@ def import_pymysql():
     _check_library("pymysql")
 
 
-# `brew install unixodbc` in mac
+# `brew install unixODBC` in mac
 # and install PyODBC driver.
 def import_pyodbc():
     _check_library("pyodbc")
