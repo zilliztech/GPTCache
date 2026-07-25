@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, List
+from typing import Any, List, Optional
 
 
 class EvictionBase(metaclass=ABCMeta):
@@ -8,7 +8,14 @@ class EvictionBase(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def put(self, objs: List[Any]):
+    def put(self, objs: List[Any], costs: Optional[List[float]] = None):
+        """Insert entries, optionally with a per-entry cost.
+
+        :param costs: optional list matching ``objs``, giving how expensive
+            each entry was to produce (e.g. generated tokens or answer
+            length). Only cost-aware policies (GDSF) use it; all other
+            implementations ignore it.
+        """
         pass
 
     @abstractmethod

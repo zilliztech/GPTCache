@@ -1,8 +1,9 @@
-from typing import Any, Callable, List
+from typing import Any, Callable, List, Optional
 
 import cachetools
 
 from gptcache.manager.eviction.base import EvictionBase
+from gptcache.manager.eviction.gdsf import GDSFCache
 
 
 def popitem_wrapper(func, wrapper_func, clean_size):
@@ -49,14 +50,22 @@ class MemoryCacheEviction(EvictionBase):
             self._cache = cachetools.FIFOCache(maxsize=maxsize, **kwargs)
         elif self._policy == "RR":
             self._cache = cachetools.RRCache(maxsize=maxsize, **kwargs)
+        elif self._policy == "GDSF":
+            self._cache = GDSFCache(maxsize=maxsize, **kwargs)
         else:
             raise ValueError(f"Unknown policy {policy}")
 
         self._cache.popitem = popitem_wrapper(self._cache.popitem, on_evict, clean_size)
 
-    def put(self, objs: List[Any]):
-        for obj in objs:
-            self._cache[obj] = True
+    def put(self, objs: List[Any], costs: Optional[List[float]] = None):
+        """Insert entries, optionally with a per-entry cost.
+
+        :param costs: optional list matching ``objs``, giving how expensive
+            each entry was to produce (e.g. generated tokens). Only used by
+            cost-aware policies (GDSF); other policies ignore it.
+        """
+        for i, obj in enumerate(objs):
+            self._cache[obj] = costs[i] if costs is not None else True
 
     def get(self, obj: Any):
         return self._cache.get(obj)
