@@ -22,6 +22,25 @@ from gptcache.utils.error import CacheError, ParamError
 from gptcache.utils.log import gptcache_log
 
 
+def _answer_cost(answers: Union[str, Answer, List[Answer]]) -> float:
+    """Rough generation cost of an answer: its text length in characters.
+
+    Character count is proportional to token count on average and needs no
+    tokenizer dependency; eviction only cares about relative costs, so the
+    unit does not matter. Non-text answers count as cost 1.
+    """
+    if isinstance(answers, Answer):
+        answers = [answers]
+    if isinstance(answers, str):
+        return float(max(len(answers), 1))
+    total = 0
+    for ans in answers:
+        content = ans.answer if isinstance(ans, Answer) else ans
+        if isinstance(content, str):
+            total += len(content)
+    return float(max(total, 1))
+
+
 class DataManager(metaclass=ABCMeta):
     """DataManager manage the cache data, including save and search"""
 
@@ -339,7 +358,9 @@ class SSDataManager(DataManager):
             ],
             **kwargs,
         )
-        self.eviction_base.put(ids)
+        self.eviction_base.put(
+            ids, costs=[_answer_cost(cache_data.answers) for cache_data in cache_datas]
+        )
 
     def get_scalar_data(self, res_data, **kwargs) -> Optional[CacheData]:
         session = kwargs.get("session", None)
