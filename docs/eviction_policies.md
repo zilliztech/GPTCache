@@ -43,7 +43,7 @@ clusters and WildChat prompts, mean of 10 seeds, capacity 100):
 | LRU (default) | 48.87% | 48.05% | 28.90% | 28.90% |
 | LFU | 56.53% | 28.68% | 11.96% | **11.96%** |
 | FIFO | 43.56% | 42.94% | 28.50% | 28.50% |
-| RR | 43.56% | 42.83% | 27.23% | 27.23% |
+| RR | 43.73% | 42.68% | 27.21% | 27.21% |
 | **ARC** | 58.08% | 54.21% | 29.02% | **29.02%** |
 
 Read that table honestly: **LFU beats plain LRU by 7.7 points on stationary

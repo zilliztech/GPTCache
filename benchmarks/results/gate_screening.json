@@ -4,17 +4,17 @@
   "check1": {
     "sketch": {
       "exact": {
-        "mean_estimate": 0.511,
-        "max_estimate": 5.0,
-        "corr_with_true_popularity": 0.004793488434238617
+        "mean_estimate": 0.198,
+        "max_estimate": 2.0,
+        "corr_with_true_popularity": -0.03691885284496204
       },
       "lsh": {
-        "mean_estimate": 3.413,
+        "mean_estimate": 2.15,
         "max_estimate": 7.0,
-        "corr_with_true_popularity": 0.7506024673662526
+        "corr_with_true_popularity": 0.9314314776987669
       }
     },
-    "corr_exact": 0.004793488434238617,
+    "corr_exact": -0.03691885284496204,
     "threshold": 0.15,
     "passed": true
   },

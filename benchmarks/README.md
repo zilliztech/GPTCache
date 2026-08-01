@@ -170,10 +170,31 @@ that loss is what makes the robustness claim worth anything.
 
 ## Determinism
 
-Given the same `data/` the pipeline is deterministic: seeds control the arrival
-process, the embeddings are fixed on disk, and `data/*_meta.json` records the
-sha256 of every input file plus the model name and dimensions. Latency and heap
-figures are hardware-dependent by nature; hit rates are not.
+Every correctness metric is bit-for-bit reproducible. Verified by running the
+full 1260-cell sweep twice and diffing: max |delta| over `hit_rate`,
+`false_hit_rate`, `n_hits`, `p_final` and `p_max` is exactly `0.0`.
+
+That took two fixes worth knowing about, because both are easy to get wrong:
+
+- **`RR` was the only nondeterministic policy.** `cachetools.RRCache` picks its
+  victim with the unseeded global `random`, so RR moved by up to 0.78pp between
+  runs while every other policy was already exact. `run_bench.py` now passes a
+  per-cell seeded `choice`, so RR is random *within* a run — the property being
+  benchmarked — but identical across runs.
+- **The exact-key sketch in `gate_screening.py` used the builtin `hash()`**,
+  which Python salts per process for `str`. That silently affected only the
+  exact-key arm, which is precisely what the gate measures. It now uses a
+  blake2b-based stable hash.
+
+Embedding is deterministic given the same batch size: re-encoding the same texts
+in a fresh process yields bitwise-identical vectors on both CPU and MPS
+(verified). Changing `--batch-size` perturbs them at the 1e-7 level, which can
+flip a handful of near-threshold similarity decisions, so regenerate with the
+default 256 to match the committed figures. `data/*_meta.json` records the
+sha256 of every input file, the model name and the dimensions.
+
+Latency, throughput and heap figures are hardware-dependent by nature and will
+not match exactly; hit rates will.
 
 Reference hardware for the committed numbers: MacBook Pro, Apple M-series,
 24 GB, macOS 26.4, Python 3.10.11, numpy 2.2.6.

@@ -61,6 +61,7 @@ import csv
 import itertools
 import os
 import platform
+import random
 import sys
 import time
 import tracemalloc
@@ -104,6 +105,12 @@ def run_one(regime, policy_name, capacity, seed, n_queries, tau, keep_p=False):
     queries, cids = traces.build_trace(regime, n_queries, seed)
     policy, kwargs = POLICIES[policy_name]
     kwargs = dict(kwargs)   # SemanticCacheSim mutates it
+    if policy == "RR":
+        # cachetools.RRCache defaults to the unseeded global `random`, which is
+        # the only source of run-to-run variation in this harness. Seeding it
+        # per cell makes the whole sweep reproducible; RR stays random *within*
+        # a run, which is the property being benchmarked.
+        kwargs["choice"] = random.Random(seed).choice
 
     lat = np.empty(len(queries), dtype=np.float64)
     resident = np.empty(len(queries), dtype=np.int32)
@@ -185,8 +192,11 @@ def emit_latency_cdf(path, regime, capacity, n_queries, tau, seeds=3):
             for seed in range(seeds):
                 queries, cids = traces.build_trace(regime, n_queries, seed)
                 policy, kwargs = POLICIES[pol]
+                kwargs = dict(kwargs)
+                if policy == "RR":
+                    kwargs["choice"] = random.Random(seed).choice
                 sim = SemanticCacheSim(policy, capacity, tau,
-                                       queries.shape[1], **dict(kwargs))
+                                       queries.shape[1], **kwargs)
                 lat = np.empty(len(queries))
                 for i in range(len(queries)):
                     t0 = time.perf_counter()

@@ -44,6 +44,7 @@ Exit status is 0 if both checks pass, 1 otherwise. Results are written to
 ``benchmarks/results/gate_screening.json`` and ``gate_screening.txt``.
 """
 
+import hashlib
 import json
 import os
 import sys
@@ -315,6 +316,21 @@ def run_arc(queries, cids, cap, tau, ghost_matching="semantic", keep_p=False):
 # ==========================================================================
 # check 1: frequency sketches
 # ==========================================================================
+def _stable_hash(obj):
+    """Deterministic hash, unlike the builtin.
+
+    Python salts ``hash()`` of ``str`` and ``bytes`` per process
+    (``PYTHONHASHSEED``), so a sketch keyed through the builtin gives
+    different numbers on every run. That is invisible in the LSH arm, whose
+    keys are tuples of ints, and *only* affects the exact-key arm -- which is
+    precisely the measurement the gate reports. Hashing the repr with blake2b
+    makes both arms reproducible run to run.
+    """
+    return int.from_bytes(
+        hashlib.blake2b(repr(obj).encode(), digest_size=8).digest(), "big"
+    )
+
+
 class CountMinSketch:
     """4-bit saturating Count-Min Sketch with periodic halving (as TinyLFU)."""
 
@@ -327,7 +343,7 @@ class CountMinSketch:
         self.n = 0
 
     def _idx(self, key):
-        return [(hash((key, int(s))) % self.w) for s in self.salt]
+        return [(_stable_hash((key, int(s))) % self.w) for s in self.salt]
 
     def add(self, key):
         for r, c in enumerate(self._idx(key)):

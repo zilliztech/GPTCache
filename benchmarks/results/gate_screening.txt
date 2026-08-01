@@ -10,11 +10,11 @@ corpus wildchat : 71637 items, 0 clusters, sentence-transformers/all-MiniLM-L6-v
 CHECK 1  exact-key frequency sketch carries no signal
 ------------------------------------------------------------------------------
 keying        mean est    max   corr(est, true cluster popularity)
-exact             0.51      5                                0.005
-lsh               3.41      7                                0.751
+exact             0.20      2                               -0.037
+lsh               2.15      7                                0.931
 
 synthetic reference (resources/RESULTS.md): exact mean 0.21, corr -0.059 | lsh corr +0.743
-PASS CONDITION |corr_exact| < 0.15  ->  |0.005| = 0.005  ->  PASS
+PASS CONDITION |corr_exact| < 0.15  ->  |-0.037| = 0.037  ->  PASS
 
 ------------------------------------------------------------------------------
 CHECK 2  semantic ghosts beat exact ghosts on drifting traffic
