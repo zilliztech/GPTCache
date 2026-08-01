@@ -1,0 +1,30 @@
+BASELINE TEST RUN (pre-change, commit c59fb3a + branch feature/semantic-arc)
+Recorded before any source modification. See benchmarks/README.md.
+
+$ python -m pytest tests/unit_tests/eviction/test_memory_cache.py \
+                   tests/unit_tests/manager/test_eviction.py \
+                   tests/unit_tests/manager/test_base.py \
+                   tests/unit_tests/manager/test_map.py -q
+  11 passed in 0.26s
+
+These 11 are the tests that exercise the eviction code paths this work touches
+(MemoryCacheEviction policy chain, EvictionBase factory, SSDataManager eviction
+wiring, MapDataManager). They are the "no regression" baseline.
+
+$ python -m pytest tests/unit_tests/eviction/ tests/unit_tests/manager/ -q \
+        --ignore=tests/unit_tests/manager/test_local_index.py
+  29 failed, 25 passed in 408.40s
+
+All 29 pre-existing failures require external services or optional deps that are
+not available in this environment, and none touch eviction policy code:
+  redis server        test_distributed_cache.py (4), test_redis_cache_storage.py (5),
+                      test_redis.py (1)
+  aws dynamodb        test_dynamo_storage.py (11)
+  milvus / pgvector / mongo / qdrant servers
+                      test_milvusdb.py, test_pgvector.py, test_mongo.py, test_qdrant.py
+  missing optional pkg chromadb (test_chromadb.py, test_factory.py),
+                      usearch (test_usearch.py), duckdb (test_sql_scalar.py::test_duckdb)
+  test_local_index.py ignored: hnswlib has no wheel for this platform/python.
+
+The same 29 fail on an unmodified checkout of main. The success criterion for
+this project is that this set does not grow.
