@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-position
 from abc import ABC
-from typing import List
+from typing import Any, List, Optional
 
 from gptcache.manager.eviction.distributed_cache import DistributedEviction
 from gptcache.utils import import_redis
@@ -61,7 +61,10 @@ class RedisCacheEviction(DistributedEviction, ABC):
     def _create_key(self, key: str) -> str:
         return f"{self._global_key_prefix}:evict:{key}"
 
-    def put(self, objs: List[str], expire=False):
+    def put(self, objs: List[str], embeddings: Optional[List[Any]] = None,
+            expire=False):
+        # embeddings is accepted and ignored: Redis performs its own eviction
+        # by its configured maxmemory-policy and never sees the vectors
         ttl = self._ttl if expire else None
         for key in objs:
             self._redis.set(self._create_key(key), "True", ex=ttl)

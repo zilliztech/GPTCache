@@ -28,3 +28,16 @@ not available in this environment, and none touch eviction policy code:
 
 The same 29 fail on an unmodified checkout of main. The success criterion for
 this project is that this set does not grow.
+
+
+----------------------------------------------------------------------------
+AFTER the Semantic-ARC change (same commands, same environment)
+----------------------------------------------------------------------------
+$ python -m pytest tests/unit_tests/eviction/ tests/unit_tests/manager/ -q \
+        --ignore=tests/unit_tests/manager/test_local_index.py
+  29 failed, 52 passed
+
+Failures: 29 -> 29, the identical set, in the identical 12 files (all external
+services / missing optional deps, listed above). Passes: 25 -> 52, the 27 new
+ARC tests. No existing test file was modified except test_eviction.py, which
+gained one parametrised ARC case and no changes to its LRU or FIFO cases.

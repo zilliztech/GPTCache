@@ -218,6 +218,9 @@ class SSDataManager(DataManager):
     :type o:  ObjectBase
     :param e: EvictionBase to manager the eviction data, it can be generated with :meth:`gptcache.manager.EvictionBase`.
     :type e:  EvictionBase
+    :param eviction_params: extra keyword arguments for the eviction policy, used only when `e` is None.
+                            For example `policy="ARC"` accepts `tau` and `ghost_matching`.
+    :type eviction_params: dict
     """
 
     def __init__(
@@ -228,7 +231,8 @@ class SSDataManager(DataManager):
         e: Optional[EvictionBase],
         max_size,
         clean_size,
-        policy="LRU"
+        policy="LRU",
+        eviction_params=None,
     ):
         self.s = s
         self.v = v
@@ -239,7 +243,8 @@ class SSDataManager(DataManager):
                              maxsize=max_size,
                              clean_size=clean_size,
                              policy=policy,
-                             on_evict=self._clear)
+                             on_evict=self._clear,
+                             **(eviction_params or {}))
         self.eviction_base = e
 
         if not isinstance(self.eviction_base, NoOpEviction):
@@ -335,7 +340,9 @@ class SSDataManager(DataManager):
                 for i, embedding_data in enumerate(embedding_datas)
             ]
         )
-        self.eviction_base.put(ids)
+        # embedding_datas are already normalised above; policies that ignore
+        # them (every policy except ARC) drop the kwarg
+        self.eviction_base.put(ids, embeddings=embedding_datas)
 
     def get_scalar_data(self, res_data, **kwargs) -> Optional[CacheData]:
         session = kwargs.get("session", None)

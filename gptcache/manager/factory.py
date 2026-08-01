@@ -119,10 +119,14 @@ def manager_factory(manager="map",
         )
 
     if eviction_manager == "memory":
+        # anything left over is policy-specific (e.g. ARC's tau / ghost_matching)
+        extra = {k: v_ for k, v_ in eviction_params.items()
+                 if k not in ("max_size", "clean_size", "eviction")}
         return get_data_manager(s, v, o, None,
                                 eviction_params.get("max_size", 1000),
                                 eviction_params.get("clean_size", None),
-                                eviction_params.get("eviction", "LRU"),)
+                                eviction_params.get("eviction", "LRU"),
+                                eviction_params=extra or None,)
 
     e = EvictionBase(
         name=eviction_manager,
@@ -141,6 +145,7 @@ def get_data_manager(
         eviction: str = "LRU",
         data_path: str = "data_map.txt",
         get_data_container: Callable = None,
+        eviction_params: dict = None,
 ):
     """Generate `SSDataManager` (with `cache_base`, `vector_base`, `max_size`, `clean_size` and `eviction` params),
        or `MAPDataManager` (with `data_path`, `max_size` and `get_data_container` params) to manager the data.
@@ -203,4 +208,5 @@ def get_data_manager(
     if isinstance(eviction_base, str) and eviction_base != "memory":
         eviction_base = EvictionBase(name=eviction_base)
     assert cache_base and vector_base
-    return SSDataManager(cache_base, vector_base, object_base, eviction_base, max_size, clean_size, eviction)
+    return SSDataManager(cache_base, vector_base, object_base, eviction_base, max_size, clean_size, eviction,
+                         eviction_params)
