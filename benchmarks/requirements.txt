@@ -1,0 +1,27 @@
+# Pinned dependencies for the eviction-policy benchmarks.
+#
+#   pip install -e .                            # GPTCache itself
+#   pip install -r benchmarks/requirements.txt  # this file
+#
+# Versions are the ones the committed results/ figures were produced with, on
+# Python 3.10.11 / macOS 26.4 / Apple M-series. See benchmarks/README.md.
+
+# data preparation: download, parse, embed
+datasets==5.0.1
+pyarrow==25.0.0
+sentence-transformers==5.6.1
+transformers==5.14.1
+torch==2.13.0
+
+# the benchmark itself
+numpy==2.2.6
+psutil==7.2.2
+
+# analysis and figures
+pandas==2.3.3
+matplotlib==3.10.9
+
+# end-to-end tests through get_data_manager
+faiss-cpu==1.14.3
+SQLAlchemy==2.0.51
+pytest==9.1.1

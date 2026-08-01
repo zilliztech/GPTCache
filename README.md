@@ -372,6 +372,7 @@ The **Cache Manager** is responsible for controlling the operation of both the *
     - [x] Support FIFO eviction policy.
     - [x] Support LFU eviction policy.
     - [x] Support RR eviction policy.
+    - [x] Support ARC eviction policy, with semantic ghost lists. See [Choosing an eviction policy](docs/eviction_policies.md).
     - [ ] Support more complicated eviction policies.
   - **Distributed Caching**
   

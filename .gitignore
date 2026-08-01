@@ -138,4 +138,7 @@ dmypy.json
 **/example.db
 **/.chroma
 docs/references/*
-!docs/references/index.rstbenchmarks/data/
+!docs/references/index.rst
+
+# Prepared embedding corpora: ~190 MB, regenerate with benchmarks/prepare_data.py
+benchmarks/data/
