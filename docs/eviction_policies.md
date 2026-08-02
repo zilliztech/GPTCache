@@ -10,7 +10,7 @@ in-memory policies:
 | `LFU` | the most frequently used entries | traffic is **stationary**: today's popular questions are tomorrow's. |
 | `FIFO` | the most recently inserted entries | insertion order is meaningful and access order is not. |
 | `RR` | an arbitrary subset | you want the cheapest possible decision and do not care which entry goes. |
-| `ARC` | balances recency and frequency, and **retunes that balance as traffic changes** | traffic is mixed or drifts, or you do not know which regime you are in and do not want to tune. |
+| `ARC` | balances recency and frequency, and **retunes that balance as traffic changes** | your cache is small relative to your working set, or you do not know which regime you are in and do not want to tune. See [when ARC beats LRU](#when-arc-beats-lru-and-by-how-much). |
 
 ```python
 from gptcache.manager import get_data_manager, CacheBase, VectorBase
@@ -55,7 +55,105 @@ At large capacities the policies converge — at 1600 entries on the drifting
 trace every policy lands within a point of the others, because the cache is
 large enough that the replacement decision stops mattering. The gains are in
 the capacity-constrained regime, which is the regime you are in if eviction is
-happening at all.
+happening at all. The next section makes that precise.
+
+## When ARC beats LRU, and by how much
+
+The three workloads above establish the worst-case claim but cannot say *what
+property of a workload* decides the winner, because the two synthetic regimes
+are the endpoints of an axis with nothing sampled between them.
+`benchmarks/sweep_crossover.py` makes the axis continuous: `drift_rate` is the
+fraction of the popularity ranking re-permuted each epoch, so 0.0 is the
+stationary regime, 1.0 is the drifting one, and everything between is measured.
+Numbers below are the mean of 5 seeds with 95% paired bootstrap CIs.
+
+**The answer is mostly about capacity, not drift.** ARC − LRU on Quora at
+Zipf s=1.1, in percentage points of hit rate (bold = 95% paired bootstrap CI
+excludes zero):
+
+| capacity | drift 0 | drift 0.2 | drift 0.5 | drift 1.0 |
+|---|---|---|---|---|
+| 50 | **+10.93** | **+10.25** | **+9.58** | **+9.05** |
+| 100 | **+9.23** | **+8.75** | **+7.51** | **+6.21** |
+| 200 | **+7.46** | **+6.40** | **+4.84** | **+2.49** |
+| 400 | **+5.38** | **+3.87** | **+2.15** | +0.10 |
+| 800 | **+3.08** | **+1.57** | **+0.35** | **−1.16** |
+| 1600 | **+0.88** | **+0.36** | **−0.25** | **−0.34** |
+
+Two things to read off it. First, the margin falls monotonically as capacity
+grows — that is the dominant effect. Second, and against intuition, **the
+margin also falls as drift rises**: ARC's advantage over LRU is *largest* on
+stationary traffic, not on drifting traffic. ARC loses to LRU only in the
+corner where capacity is large *and* drift is heavy. The same surface, with the
+same signs, reproduces on a second ground-truth corpus (StackExchange
+duplicate titles, 35,878 clusters): +13.07 at capacity 50 falling to −1.67 at
+capacity 1600 under total reshuffle.
+
+### The rule of thumb
+
+The single best predictor is capacity relative to the **working set** — the
+number of distinct semantic clusters covering 90% of your traffic, which you
+can measure from a request log. Correlation with ARC − LRU is r = **−0.71**
+against log10(capacity / working set), against −0.36 for drift rate.
+
+| capacity / working set | mean ARC − LRU | share of cells where ARC is significantly ahead |
+|---|---|---|
+| < 0.02 | +8.77 pp | 100% |
+| 0.02 – 0.05 | +7.57 pp | 100% |
+| 0.05 – 0.15 | +4.47 pp | 93% |
+| 0.15 – 0.40 | +1.78 pp | 74% |
+
+Below roughly 15% of the working set, ARC is worth its overhead. Above it the
+margin is small and the sign is no longer reliable. This is a partial collapse,
+not a law — at a fixed ratio the spread across popularity skews is still a few
+points — but it orders the results better than anything else measured.
+
+### On real traffic the margin is about a point
+
+Both synthetic regimes above invent an arrival order. Two traces do not:
+`wildchat` is two months of real timestamped prompts, `wildchat-long` is
+150,000 prompts spanning April 2023 to April 2024. ARC − LRU:
+
+| capacity | WildChat, 2 months | WildChat, 12.5 months |
+|---|---|---|
+| 50 | **+0.06** | **+1.31** |
+| 400 | **+0.34** | **+0.53** |
+| 1600 | −0.01 | **+0.23** |
+
+Significant, small. The longer trace is friendlier to ARC, but that comparison
+is confounded and the benchmark says so: `wildchat-long` is subsampled to
+150,000 rows, making it ~2.2x sparser in time as well as longer, and a control
+that thins the two-month stream by the same factor recovers +0.20 to +0.76 pp
+on its own. Some of the difference is span, some is sparsity, and this data
+cannot separate them.
+
+The practical reading: on a real prompt stream, expect ARC to match LRU or beat
+it by around a point — and to save you from LFU, which is 10 to 18 points
+behind on the same traces.
+
+### Why the drift result is not a contradiction
+
+ARC's own adaptive state explains it. `p` is the target size of the recency
+list `T1`; a low `p` means ARC is leaning on frequency, a high `p` means it is
+leaning on recency and therefore behaving like LRU. Measured as a fraction of
+capacity on Quora:
+
+| | drift 0 | drift 0.5 | drift 1.0 |
+|---|---|---|---|
+| capacity 200 | 4.5% | 14.0% | 35.9% |
+| capacity 400 | 5.7% | 25.6% | 44.9% |
+
+At zero drift ARC runs almost pure frequency, and that frequency component is
+where its win over LRU comes from. As drift rises, the ghosts correctly report
+that the frequency bet is failing, `p` climbs, and ARC converges *toward* LRU —
+so its margin over LRU converges toward zero at the same time. The adaptation
+is insurance against the LFU-style collapse, not a source of gain. That is
+exactly the shape you want from a default, but it means the honest pitch is
+"never much worse, often much better", not "handles drift better than LRU".
+
+What the adaptation buys is visible by comparing against the policies that
+cannot do it, at capacity 100 on the drifting trace: LFU 28.68%, classic
+exact-ghost ARC 36.76%, LRU 48.05%, **semantic-ghost ARC 54.21%**.
 
 ## What is different about ARC here
 
@@ -99,8 +197,13 @@ ARC is not free, and the benchmark measures the cost rather than hiding it.
   LRU.
 - **Time.** A miss scans both ghost lists — O(`2 * maxsize`) similarity
   computations — against LRU's O(1) `popitem`. Measured at capacity 400 on the
-  drifting trace: 12.2 µs per request spent on the eviction decision against
-  LRU's 4.1 µs; mean end-to-end request 21.2 µs against 14.0 µs.
+  drifting trace: **11.51 µs per request spent on the eviction decision against
+  LRU's 3.37 µs**. Mean whole-request time in the benchmark harness is 20.16 µs
+  against 12.29 µs — but note that is a *simulator* request, not a GPTCache
+  one: the harness replaces the vector and scalar stores with numpy and a dict
+  (see `benchmarks/README.md` §0). Real GPTCache adds ONNX embedding, FAISS and
+  SQLite on top, which are milliseconds. The eviction-decision figure is the one
+  measured on shipped code, and it is the one that matters here.
 
 Whether that is worth paying depends entirely on what a miss costs you. These
 are microseconds against an LLM call measured in hundreds of milliseconds, so
@@ -112,10 +215,15 @@ vectors, not `c`.
 
 - **Stationary traffic where you know it is stationary.** Use `LFU`. It is
   simpler, cheaper, has no vector overhead, and on that regime ARC's advantage
-  is small.
-- **Very large caches.** Above roughly 1600 entries on these traces the
-  policies converge, and ARC's ghost scan grows linearly with capacity while its
-  advantage shrinks.
+  over it is about 1.5 points (58.08% against 56.53% at capacity 100). Note
+  the conditional: LFU is the right call only if you are confident popularity
+  will not move, because the same table shows it at 28.68% when it does.
+- **Caches that are large relative to the working set.** Once capacity passes
+  roughly 15% of the clusters covering 90% of your traffic the margin drops
+  under two points, and past 40% its sign is no longer reliable — if traffic
+  also drifts hard, ARC is measurably *behind* LRU (−1.16 pp at capacity 800
+  under total reshuffle). Meanwhile the ghost scan grows linearly with
+  capacity. Two bad trends at once: use `LRU`.
 - **You cannot supply embeddings.** `put()` accepts entries without them —
   `SSDataManager` does this at start-up for rows already in the database — but
   those entries can never produce a ghost hit, so ARC degrades toward classic
@@ -123,8 +231,9 @@ vectors, not `c`.
 
 ## Reproducing these numbers
 
-See `benchmarks/README.md`. Every figure and table above regenerates from a
-clean clone with two commands.
+See `benchmarks/README.md`. The three-workload comparison regenerates from a
+clean clone with two commands; the crossover study in this document is
+section 7 of that README and adds two more corpora and a 5,520-cell sweep.
 
 ## Reference
 

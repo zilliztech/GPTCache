@@ -168,6 +168,68 @@ The claim is the last column: best worst case, no per-workload tuning. LFU beats
 LRU by 7.7 points on stationary traffic and collapses to 12% on real prompts;
 that loss is what makes the robustness claim worth anything.
 
+## 7. Crossover study — *when* does ARC beat LRU?  (~4 min)
+
+Sections 2–6 compare policies on three fixed workloads. That establishes the
+worst-case claim but cannot say *what property of a workload* decides the
+winner, because the two synthetic regimes are the endpoints of an axis with
+nothing sampled between them. This part makes the axis continuous.
+
+```bash
+python benchmarks/prepare_data_ext.py    # 2 more corpora, ~20 min, ~3 GB
+python benchmarks/sweep_crossover.py     # 5,520 cells, ~2 min on 10 cores
+python benchmarks/analyze_crossover.py   # fig7-fig11 + crossover.md
+```
+
+Two extra corpora, for reasons the original three could not cover:
+
+| Corpus | Why |
+|---|---|
+| `stackexchange` | 35,878 duplicate-title clusters, 225,540 titles. A second **ground-truth** cluster corpus in a different register, so the crossover can be shown to be a property of traffic rather than of Quora. |
+| `wildchat-long` | All 14 WildChat shards, 150k prompts spanning **2023-04-09 → 2024-04-29**. The original `wildchat` covers two months; this one covers a year, so it contains real long-range drift. |
+
+LMSYS-Chat-1M is still gated to this account — `list_repo_files` succeeds but
+downloads raise `GatedRepoError`, so the substitution noted in
+`prepare_data.py` stands.
+
+Four experiments (`crossover_*.csv`), all driving the same shipped eviction
+classes through `SemanticCacheSim` with the same `clean_size=1` control:
+
+- **`drift-skew`** — ARC−LRU over drift rate × Zipf skew at capacity 200.
+- **`drift-capacity`** — ARC−LRU over drift rate × capacity at s=1.1.
+- **`real`** — every policy over both real timestamp-ordered streams.
+- **`density`** — control. `wildchat-long` is both longer *and* ~2.2× sparser
+  in time; this thins the two-month stream by `stride` to see how much of its
+  larger ARC margin is sparsity rather than span.
+
+`drift_rate` is the fraction of the popularity ranking re-permuted at each of 6
+epochs. **0.0 reproduces `quora-stationary` and 1.0 reproduces `quora-drift`** —
+verified: at capacity 100 the endpoints land at LRU 49.16%/ARC 58.40% and LRU
+47.73%/ARC 53.94% against the committed 48.87/58.08 and 48.05/54.21.
+
+### Expected headline result
+
+ARC−LRU falls **monotonically** as drift rises — the opposite of the intuition
+that ARC is "for" drifting traffic. Quora, s=1.1:
+
+| capacity | drift 0 | drift 0.2 | drift 0.5 | drift 1.0 |
+|---|---|---|---|---|
+| 50 | +10.93 | +10.25 | +9.58 | +9.05 |
+| 200 | +7.46 | +6.40 | +4.84 | +2.49 |
+| 800 | +3.08 | +1.57 | +0.35 | **−1.16** |
+| 1600 | +0.88 | +0.36 | −0.25 | **−0.34** |
+
+ARC loses only where capacity is large *and* drift is high. The stronger
+predictor is capacity relative to the working set (Zipf ranks covering 90% of
+traffic): r = −0.71 against log10(capacity/working set) versus −0.36 against
+drift rate.
+
+The mechanism is visible in ARC's own `p` (target size of the recency list):
+at zero drift p is 4–8% of capacity — ARC is running almost pure frequency —
+and it climbs to 45% under total reshuffle, i.e. ARC converges *toward* LRU
+exactly as its advantage converges to zero. `ARC-exact` holds `p_mean = 0.000`
+on every cell of both new corpora, so the semantic-ghost ablation replicates.
+
 ## Determinism
 
 Every correctness metric is bit-for-bit reproducible. Verified by running the
