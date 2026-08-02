@@ -48,6 +48,36 @@ The claim for ARC is robustness, not a uniform win: the best *worst case*, with 
 | 800 | 31.92% | 22.82% | 31.66% | 31.49% | 21.52% | 31.40% | 30.95% |
 | 1600 | 32.80% | 29.01% | 32.81% | 32.70% | 27.26% | 32.52% | 32.05% |
 
+## Iso-memory: ARC charged for its ghosts
+
+ARC(c) holds c residents plus up to c embedding-only ghosts, so it cannot be compared to LRU(c) entry-for-entry. The charge is `1 + ghost/resident`, not 2x: a ghost is the 1536 B embedding alone, while a resident also carries the question and the cached response. Measured over the 71,637 WildChat entries (response mean 1531 B, median 1185 B; question mean 346 B), a resident entry is 3414 B and the charge is **1.450x**. The 2.0x figure corresponds to an empty payload, which is what the simulator holds and what an entry-count plot implicitly assumes.
+
+Deltas below are ARC(c) minus LRU(charge x c), LRU interpolated log-linearly within each seed, 95% paired bootstrap CI. **Bold** = interval excludes zero. `-` means charge x c lands past the largest capacity in the sweep, so LRU was never measured there.
+
+### Quora, stationary popularity
+
+| charge | c=50 | c=100 | c=200 | c=400 | c=800 | c=1600 |
+|---|---|---|---|---|---|---|
+| 1.00x (ghosts free) | **+10.64 [+10.19, +11.09]** | **+9.21 [+8.98, +9.42]** | **+7.53 [+7.31, +7.77]** | **+5.33 [+5.16, +5.50]** | **+3.06 [+2.94, +3.17]** | **+0.95 [+0.89, +1.03]** |
+| 1.45x (measured) | **+6.08 [+5.81, +6.35]** | **+4.88 [+4.67, +5.09]** | **+3.48 [+3.31, +3.67]** | **+1.63 [+1.48, +1.79]** | -0.07 [-0.19, +0.02] | - |
+| 2.00x (empty payload) | **+2.13 [+1.95, +2.29]** | **+1.14 [+0.89, +1.37]** | -0.02 [-0.17, +0.15] | **-1.56 [-1.73, -1.39]** | **-2.79 [-2.92, -2.68]** | - |
+
+### Quora, popularity drift
+
+| charge | c=50 | c=100 | c=200 | c=400 | c=800 | c=1600 |
+|---|---|---|---|---|---|---|
+| 1.00x (ghosts free) | **+9.11 [+8.88, +9.34]** | **+6.16 [+6.01, +6.30]** | **+2.52 [+2.40, +2.64]** | **+0.16 [+0.08, +0.24]** | **-1.11 [-1.16, -1.06]** | **-0.34 [-0.41, -0.27]** |
+| 1.45x (measured) | **+4.64 [+4.49, +4.78]** | **+2.03 [+1.92, +2.15]** | **-0.97 [-1.08, -0.86]** | **-2.41 [-2.48, -2.33]** | **-2.38 [-2.44, -2.32]** | - |
+| 2.00x (empty payload) | **+0.76 [+0.63, +0.93]** | **-1.54 [-1.65, -1.41]** | **-3.99 [-4.10, -3.89]** | **-4.63 [-4.72, -4.54]** | **-3.48 [-3.55, -3.40]** | - |
+
+### WildChat, real arrival order
+
+| charge | c=50 | c=100 | c=200 | c=400 | c=800 | c=1600 |
+|---|---|---|---|---|---|---|
+| 1.00x (ghosts free) | **+0.06 [+0.02, +0.09]** | **+0.12 [+0.09, +0.14]** | **+0.23 [+0.16, +0.29]** | **+0.34 [+0.29, +0.38]** | **+0.26 [+0.19, +0.33]** | -0.01 [-0.10, +0.06] |
+| 1.45x (measured) | **-0.60 [-0.68, -0.54]** | **-0.40 [-0.46, -0.35]** | **-0.23 [-0.30, -0.15]** | **-0.17 [-0.21, -0.14]** | **-0.35 [-0.43, -0.29]** | - |
+| 2.00x (empty payload) | **-1.18 [-1.29, -1.08]** | **-0.85 [-0.94, -0.77]** | **-0.62 [-0.70, -0.54]** | **-0.61 [-0.64, -0.58]** | **-0.89 [-0.97, -0.82]** | - |
+
 ## Cost of the ghost scan
 
 | trace | capacity | policy | mean lat (us) | p99 lat (us) | evict decision (us/req) | policy vectors | peak heap (KB) |

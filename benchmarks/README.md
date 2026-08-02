@@ -128,6 +128,35 @@ and is not reproducible across parallel workers. `tracemalloc` peak is all
 three. The analytic cost is reported alongside as `policy_vectors`.
 </details>
 
+## 4b. Measure the payload  (~1 min, optional but recommended)
+
+```bash
+python benchmarks/measure_payload.py
+```
+
+ARC(c) keeps c residents **plus up to c ghosts**, so comparing it to LRU(c)
+entry-for-entry undercharges it. This script recovers the assistant response for
+every prompt in the WildChat trace — the text GPTCache would actually cache —
+and writes the byte model to `results/payload.json`. It re-reads the shards
+named in `wildchat_meta.json` under the same filters, so its rows correspond
+one-for-one with the trace's embeddings; it aborts if the count drifts.
+
+The charge is `1 + ghost/resident`, **not** 2x: a ghost holds the 1536 B
+embedding alone, a resident also holds the question and the response.
+
+| | bytes |
+|---|---|
+| embedding (384-d float32) | 1,536 |
+| question, mean | 346 |
+| response, mean | 1,531 |
+| **resident entry** | **3,414** |
+| **ghost** | **1,536** |
+| **charge** | **1.450x** |
+
+2.00x is the empty-payload case — which is what `simcache.py` holds, since the
+simulator stores vectors and no text, and what an entry-count plot implicitly
+assumes. It is a legitimate worst case to report, not the default.
+
 ## 5. Figures and tables  (~10 s)
 
 ```bash
@@ -145,7 +174,15 @@ rerunning the sweep. Writes to `results/`:
 | `fig4_p_over_time.png` | `p` trajectory — the flat line is the whole argument |
 | `fig5_sketch_inertness.png` | the same failure mode in a second policy family |
 | `fig6_false_hit_rate.png` | wrong-cluster hits |
+| `fig12_isomemory.png` | hit rate vs **bytes**, ARC charged 1.45x for its ghosts |
+| `fig13_charge_sensitivity.png` | where the ARC win survives that charge |
 | `summary.md`, `summary.csv` | improvement vs LRU with paired bootstrap CIs |
+
+The last two need `results/payload.json` (step 4b); without it they are skipped
+and everything else still builds. In the iso-memory tables, LRU is interpolated
+log-linearly *within each seed*, which keeps the pairing intact; cells where
+`charge x c` lands past the largest capacity in the sweep are left blank rather
+than clamped.
 
 Policies are compared with a **paired bootstrap**: every policy sees the same
 ten seeds on the same trace, and a seed fixes the arrival sequence, so runs pair
@@ -167,6 +204,24 @@ At capacity 100, mean of 10 seeds:
 The claim is the last column: best worst case, no per-workload tuning. LFU beats
 LRU by 7.7 points on stationary traffic and collapses to 12% on real prompts;
 that loss is what makes the robustness claim worth anything.
+
+### The same result charged for memory
+
+That table counts entries. Charged the measured 1.45x for its ghosts, ARC(c) vs
+LRU(1.45c) in points of hit rate:
+
+| | c=50 | c=100 | c=200 | c=400 | c=800 |
+|---|---|---|---|---|---|
+| Stationary | **+6.08** | **+4.88** | **+3.48** | **+1.63** | −0.07 |
+| Drift | **+4.64** | **+2.03** | **−0.97** | **−2.41** | **−2.38** |
+| WildChat | **−0.60** | **−0.40** | **−0.23** | **−0.17** | **−0.35** |
+
+So the advantage is real but narrower than the entry-count plot suggests: it
+holds on stationary traffic and, on drift, only while the cache is small
+relative to the working set. It decays as `c` grows — the classic ARC shape —
+and on WildChat it is a wash either way, which the entry-count table already
+showed. Under the 2.00x worst case only `c=50` survives. Report the charge
+alongside the hit rate; the entry-count number on its own overstates the case.
 
 ## 7. Crossover study — *when* does ARC beat LRU?  (~4 min)
 

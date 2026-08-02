@@ -145,6 +145,16 @@ class ARCCache(EvictionBase):
     - Memory: ghosts hold an embedding but no response, so the cache carries at
       most ``2 * maxsize`` vectors. At ``maxsize=1000`` and 384-d float32 that
       is about 3 MB.
+
+      That is *not* a 2x memory cost, because a ghost is the embedding alone
+      while a resident entry also carries the question and the cached response.
+      The charge is ``1 + ghost/resident``. Measured over WildChat -- 1536 B
+      embedding, 346 B question, 1531 B response -- a resident entry is 3414 B
+      and ARC(c) costs **1.45x** what a ghost-free policy costs at the same
+      capacity. It approaches 2x only as the cached responses approach empty.
+      ``benchmarks/measure_payload.py`` recomputes this for a given corpus, and
+      the benchmark reports hit rate against bytes on that basis; compare
+      policies at equal memory, not at equal entry count.
     - Time: a miss scans both ghost lists, O(``2 * maxsize``) similarity
       computations, versus LRU's O(1) ``popitem``. A hit costs nothing extra.
       The benchmark harness measures this rather than hiding it.

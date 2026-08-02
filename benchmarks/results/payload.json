@@ -1,0 +1,39 @@
+{
+  "embedding_bytes": 1536,
+  "embedding_dim": 384,
+  "n_entries": 71637,
+  "n_without_reply": 0,
+  "question_bytes": {
+    "mean": 346.2708237363374,
+    "median": 140.0,
+    "p05": 25.0,
+    "p95": 1395.0,
+    "max": 5198.0
+  },
+  "response_bytes": {
+    "mean": 1531.2914136549548,
+    "median": 1185.0,
+    "p05": 77.0,
+    "p95": 4228.0,
+    "max": 20532.0
+  },
+  "resident_bytes_mean": 3413.562237391292,
+  "ghost_bytes": 1536,
+  "ratio": 1.4499698242425603,
+  "ratio_note": "ARC(c) holds c resident entries plus up to c embedding-only ghosts; charge ARC ratio*c entries when comparing against a policy that keeps no ghosts.",
+  "traces": {
+    "wildchat": {
+      "ratio": 1.4499698242425603,
+      "source": "measured"
+    },
+    "quora-stationary": {
+      "ratio": 1.4499698242425603,
+      "source": "transferred"
+    },
+    "quora-drift": {
+      "ratio": 1.4499698242425603,
+      "source": "transferred"
+    }
+  },
+  "transferred_note": "Quora is a paraphrase corpus with no assistant responses, so its entries are charged under WildChat's measured response distribution rather than one of its own."
+}

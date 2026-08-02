@@ -22,8 +22,13 @@ Outputs (to ``benchmarks/results/``)
 ``fig4_p_over_time.png``            p trajectory; the flat line is the point
 ``fig5_sketch_inertness.png``       exact-key vs LSH-keyed frequency sketch
 ``fig6_false_hit_rate.png``         wrong-cluster hits, the underreported cost
+``fig12_isomemory.png``             hit rate vs bytes, ARC charged for ghosts
+``fig13_charge_sensitivity.png``    where the ARC win survives that charge
 ``summary.md`` / ``summary.csv``    relative improvement vs LRU, with CIs
 ==================================  ========================================
+
+The iso-memory figures need ``results/payload.json`` from
+``measure_payload.py``; without it they are skipped and the rest still builds.
 
 Usage::
 
@@ -39,6 +44,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+from matplotlib.ticker import FuncFormatter, NullFormatter  # noqa: E402
 
 RESULTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 
@@ -349,7 +355,224 @@ def fig_false_hits(df):
 
 
 # --------------------------------------------------------------------------
-def summary(df):
+# Iso-memory: charging ARC for its ghosts
+#
+# fig1 plots hit rate against *entries*, which assumes every policy pays the
+# same price per entry. ARC does not -- it keeps up to c embedding-carrying
+# ghosts on top of its c residents. measure_payload.py measures the real charge
+# from the WildChat responses; these two figures re-run the comparison in bytes
+# and then show how the verdict moves if that charge is wrong.
+
+# capacity is an ordered variable, so it gets a sequential single-hue ramp
+# (light -> dark), not categorical hues
+CAP_RAMP = ["#a9c9ef", "#7fabe4", "#5389d6", "#2f6ac0", "#17508f"]
+GHOST_POLICIES = ("ARC", "ARC-exact")   # the only policies charged a surcharge
+
+
+def load_payload():
+    """Measured byte model from ``measure_payload.py``, or ``None``."""
+    path = os.path.join(RESULTS, "payload.json")
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _interp_loglinear(pts, x):
+    """Hit rate at fractional capacity ``x``, linear in ``log(capacity)``.
+
+    Hit rate is close to linear against log capacity over a doubling grid, so
+    this reads a policy's curve between two measured capacities rather than
+    requiring a rerun at 1.45x every point. Outside the grid it clamps, which
+    is why the sensitivity figure stops at the capacity where 2.0x still lands
+    inside the measured range.
+    """
+    if x <= pts[0][0]:
+        return pts[0][1]
+    if x >= pts[-1][0]:
+        return pts[-1][1]
+    for (c0, h0), (c1, h1) in zip(pts, pts[1:]):
+        if c0 <= x <= c1:
+            w = (np.log(x) - np.log(c0)) / (np.log(c1) - np.log(c0))
+            return h0 + w * (h1 - h0)
+    return pts[-1][1]
+
+
+def _seed_curve(sub, policy, seed):
+    """``[(capacity, hit_rate)]`` for one policy and one seed, capacity-sorted.
+
+    Seeds pair across capacities -- a seed fixes the arrival sequence -- so
+    interpolating within a seed keeps the paired bootstrap valid.
+    """
+    s = sub[(sub.policy == policy) & (sub.seed == seed)]
+    return sorted(zip(s.capacity.values, s.hit_rate.values))
+
+
+def _iso_delta_per_seed(sub, cap, ratio, policy="ARC", base=BASELINE):
+    """Per-seed ``policy(cap) - base(ratio*cap)`` hit-rate difference.
+
+    Empty when ``ratio * cap`` falls outside the measured capacity grid:
+    ``_interp_loglinear`` would clamp, which silently reports the 1.0x number
+    at every charge instead of admitting the baseline was never measured that
+    large.
+    """
+    if cap * ratio > max(sub.capacity):
+        return np.empty(0)
+    out = []
+    for seed in sorted(sub.seed.unique()):
+        pol_pts = dict(_seed_curve(sub, policy, seed))
+        base_pts = _seed_curve(sub, base, seed)
+        if cap not in pol_pts or not base_pts:
+            continue
+        out.append(pol_pts[cap] - _interp_loglinear(base_pts, cap * ratio))
+    return np.asarray(out, dtype=float)
+
+
+def fig_isomemory(df, payload):
+    """Hit rate against bytes rather than entries."""
+    resident = payload["resident_bytes_mean"]
+    ratio = payload["ratio"]
+    tr = [t for t in TRACE_LABEL if t in set(df.trace)]
+    fig, axes = plt.subplots(1, len(tr), figsize=(13, 4.2), sharey=False)
+    axes = np.atleast_1d(axes)
+    for ax, trace in zip(axes, tr):
+        sub = df[df.trace == trace]
+        caps = sorted(sub.capacity.unique())
+        for pol in ORDER:
+            if pol not in set(sub.policy):
+                continue
+            charge = ratio if pol in GHOST_POLICIES else 1.0
+            xs = [c * resident * charge / 1e6 for c in caps]
+            mid, lo, hi = [], [], []
+            for c in caps:
+                v = sub[(sub.policy == pol) & (sub.capacity == c)].hit_rate
+                m, l, h = bootstrap_mean(v.values)
+                mid.append(m * 100)
+                lo.append(l * 100)
+                hi.append(h * 100)
+            ax.plot(xs, mid, color=COLORS[pol], marker=MARKERS[pol],
+                    markersize=5, linewidth=2, label=pol)
+            ax.fill_between(xs, lo, hi, color=COLORS[pol], alpha=0.15,
+                            linewidth=0)
+        ax.set_xscale("log", base=2)
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
+        ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.set_xlabel("cache memory (MB)")
+        ax.set_title(TRACE_LABEL[trace])
+    axes[0].set_ylabel("hit rate (%)")
+    _legend(axes[0], ncol=2)
+    fig.suptitle(
+        f"Hit rate vs memory  (ARC charged {ratio:.2f}x for its ghosts; "
+        f"resident entry {resident / 1024:.1f} KB, measured)",
+        y=1.02, fontsize=13)
+    fig.tight_layout()
+    out = os.path.join(RESULTS, "fig12_isomemory.png")
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  {out}")
+
+
+def fig_charge_sensitivity(df, payload):
+    """ARC's iso-memory margin as a function of the assumed ghost charge.
+
+    The measured charge depends on response length, which varies by
+    deployment. This sweeps the charge from 1.0 (ghosts free) to 2.0 (the
+    empty-payload worst case, and what a naive entry-count comparison implies)
+    so the reader can see where the verdict flips rather than taking one
+    number on faith.
+    """
+    ratio = payload["ratio"]
+    ratios = np.linspace(1.0, 2.0, 41)
+    tr = [t for t in TRACE_LABEL if t in set(df.trace)]
+    fig, axes = plt.subplots(1, len(tr), figsize=(13, 4.2), sharey=True)
+    axes = np.atleast_1d(axes)
+    for ax, trace in zip(axes, tr):
+        sub = df[df.trace == trace]
+        caps = sorted(sub.capacity.unique())
+        # only capacities whose 2.0x charge stays inside the measured grid,
+        # so no point on the curve is a clamped extrapolation
+        caps = [c for c in caps if c * ratios[-1] <= max(caps)]
+        for i, c in enumerate(caps):
+            ys = [_iso_delta_per_seed(sub, c, r).mean() * 100 for r in ratios]
+            ax.plot(ratios, ys, color=CAP_RAMP[i % len(CAP_RAMP)],
+                    linewidth=2, label=f"c = {c}")
+        ax.axhline(0, color=INK_2, linewidth=1, linestyle="-", zorder=1)
+        ax.axvline(ratio, color=INK, linewidth=1.2, linestyle="--", zorder=1)
+        ax.annotate(f"measured\n{ratio:.2f}x", xy=(ratio, ax.get_ylim()[1]),
+                    xytext=(3, -4), textcoords="offset points",
+                    va="top", ha="left", fontsize=9, color=INK)
+        ax.axvline(2.0, color=INK_2, linewidth=1, linestyle=":", zorder=1)
+        ax.annotate("empty\npayload", xy=(2.0, ax.get_ylim()[1]),
+                    xytext=(-3, -4), textcoords="offset points",
+                    va="top", ha="right", fontsize=9, color=INK_2)
+        ax.set_xlabel("memory charged to ARC (x capacity)")
+        ax.set_title(TRACE_LABEL[trace])
+    axes[0].set_ylabel("ARC - LRU at equal memory (pp)")
+    axes[0].legend(frameon=False, ncol=1, loc="lower left",
+                   handlelength=1.8, labelcolor=INK)
+    fig.suptitle("Where the ARC advantage survives its own memory cost  "
+                 "(above zero = ARC wins at equal bytes)",
+                 y=1.02, fontsize=13)
+    fig.tight_layout()
+    out = os.path.join(RESULTS, "fig13_charge_sensitivity.png")
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  {out}")
+
+
+def isomemory_section(df, payload):
+    """Markdown for the iso-memory comparison, appended to summary.md."""
+    ratio = payload["ratio"]
+    resident = payload["resident_bytes_mean"]
+    lines = ["## Iso-memory: ARC charged for its ghosts", ""]
+    lines.append(
+        f"ARC(c) holds c residents plus up to c embedding-only ghosts, so it "
+        f"cannot be compared to {BASELINE}(c) entry-for-entry. The charge is "
+        f"`1 + ghost/resident`, not 2x: a ghost is the "
+        f"{payload['embedding_bytes']} B embedding alone, while a resident "
+        f"also carries the question and the cached response. Measured over the "
+        f"{payload['n_entries']:,} WildChat entries "
+        f"(response mean {payload['response_bytes']['mean']:.0f} B, median "
+        f"{payload['response_bytes']['median']:.0f} B; question mean "
+        f"{payload['question_bytes']['mean']:.0f} B), a resident entry is "
+        f"{resident:.0f} B and the charge is **{ratio:.3f}x**. The 2.0x figure "
+        f"corresponds to an empty payload, which is what the simulator holds "
+        f"and what an entry-count plot implicitly assumes.")
+    lines.append("")
+    lines.append(f"Deltas below are ARC(c) minus {BASELINE}(charge x c), "
+                 f"{BASELINE} interpolated log-linearly within each seed, "
+                 f"95% paired bootstrap CI. **Bold** = interval excludes zero. "
+                 f"`-` means charge x c lands past the largest capacity in the "
+                 f"sweep, so {BASELINE} was never measured there.")
+    lines.append("")
+
+    charges = [("1.00x (ghosts free)", 1.0),
+               (f"{ratio:.2f}x (measured)", ratio),
+               ("2.00x (empty payload)", 2.0)]
+    for trace in [t for t in TRACE_LABEL if t in set(df.trace)]:
+        sub = df[df.trace == trace]
+        caps = sorted(sub.capacity.unique())
+        lines.append(f"### {TRACE_LABEL[trace]}")
+        lines.append("")
+        lines.append("| charge | " + " | ".join(f"c={c}" for c in caps) + " |")
+        lines.append("|---" * (len(caps) + 1) + "|")
+        for label, r in charges:
+            cells = []
+            for c in caps:
+                d = _iso_delta_per_seed(sub, c, r)
+                if len(d) == 0:
+                    cells.append("-")
+                    continue
+                m, lo, hi = bootstrap_mean(d)
+                txt = f"{m * 100:+.2f} [{lo * 100:+.2f}, {hi * 100:+.2f}]"
+                cells.append(f"**{txt}**" if not lo <= 0 <= hi else txt)
+            lines.append(f"| {label} | " + " | ".join(cells) + " |")
+        lines.append("")
+    return lines
+
+
+# --------------------------------------------------------------------------
+def summary(df, payload=None):
     """Relative improvement vs LRU at each capacity, with paired CIs."""
     rows = []
     for trace in df.trace.unique():
@@ -425,6 +648,10 @@ def summary(df):
         lines.append(f"| {cap} | " + " | ".join(cells) + " |")
     lines.append("")
 
+    # memory cost, then time cost
+    if payload is not None:
+        lines.extend(isomemory_section(df, payload))
+
     # cost table
     lines.append("## Cost of the ghost scan")
     lines.append("")
@@ -462,6 +689,10 @@ def main():
     print(f"loaded {len(df)} rows: {df.trace.nunique()} traces, "
           f"{df.policy.nunique()} policies, {df.capacity.nunique()} capacities, "
           f"{df.seed.nunique()} seeds")
+    payload = load_payload()
+    if payload is None:
+        print("note: results/payload.json missing -- skipping the iso-memory "
+              "figures. Run measure_payload.py to generate it.")
     print("writing:")
     fig_hitrate(df)
     fig_latency(os.path.join(RESULTS, "lat_cdf.csv"))
@@ -469,7 +700,10 @@ def main():
     fig_p_over_time(os.path.join(RESULTS, "p_trace.csv"))
     fig_sketch(os.path.join(RESULTS, "gate_screening.json"))
     fig_false_hits(df)
-    summary(df)
+    if payload is not None:
+        fig_isomemory(df, payload)
+        fig_charge_sensitivity(df, payload)
+    summary(df, payload)
     return 0
 
 
