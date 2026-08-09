@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-position
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Any, List, Optional
 
 from gptcache.manager.eviction.base import EvictionBase
 
@@ -11,7 +11,7 @@ class DistributedEviction(EvictionBase, ABC):
     """
 
     @abstractmethod
-    def put(self, objs: List[str]):
+    def put(self, objs: List[str], embeddings: Optional[List[Any]] = None):
         pass
 
     @abstractmethod
@@ -37,7 +37,7 @@ class NoOpEviction(EvictionBase):
     def __init__(self, **kwargs):
         pass
 
-    def put(self, objs: List[str]):
+    def put(self, objs: List[str], embeddings: Optional[List[Any]] = None):
         pass
 
     def get(self, obj: str):
