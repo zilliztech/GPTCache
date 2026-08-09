@@ -1,0 +1,40 @@
+# Build context for benchmarks/Dockerfile. Without this, `COPY . .` ships ~2.5 GB.
+# Note the `**/` prefixes: unlike .gitignore, a bare `__pycache__/` matches only
+# the repo root.
+
+# Regenerated inside the container. Figures, summary.csv and the *.md summaries
+# are deliberately NOT excluded: when a previous run's results are present on the
+# host they are the reference `compare_results.py --ref` reads.
+benchmarks/data/
+benchmarks/results/bench.csv
+benchmarks/results/p_trace.csv
+benchmarks/results/lat_cdf.csv
+benchmarks/results/crossover_drift_skew.csv
+benchmarks/results/crossover_drift_capacity.csv
+benchmarks/results/crossover_real.csv
+benchmarks/results/crossover_density.csv
+
+# Local environments, VCS, and docs (README.md is copied explicitly).
+.venv/
+venv/
+.git/
+.github/
+docs/
+
+# Bytecode, caches, and stray artefacts the tests drop in the CWD.
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+**/.pytest_cache
+**/.mypy_cache
+**/.ipynb_checkpoints
+**/*.index
+**/*.db
+**/data_map*.txt
+**/example.py
+
+# Editor / OS noise
+.DS_Store
+.idea/
+.vscode/
+.claude/
