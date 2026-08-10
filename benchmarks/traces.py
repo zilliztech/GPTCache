@@ -105,9 +105,18 @@ def load_tau(default=0.65):
 
 
 def load_corpus(name):
-    """Return ``(emb[n, d] float32 unit-norm, cid[n] int32)`` for a corpus."""
-    emb = np.load(os.path.join(DATA_DIR, f"{name}_emb.npy"))
-    cid = np.load(os.path.join(DATA_DIR, f"{name}_cid.npy"))
+    """Return ``(emb[n, d] float32 unit-norm, cid[n] int32)`` for a corpus.
+
+    Memory-mapped, which matters under ``--jobs``: the corpus caches above are
+    per-*process* and never evict, so a plain ``np.load`` gives every worker a
+    private copy of every corpus it touches (~948 MB each on the crossover
+    stage, ~7.6 GB across 8 workers) and the run goes to swap. Mapping lets the
+    OS page cache hold one shared copy. Read-only here -- every consumer
+    materialises a slice via ``emb[idx]``, which copies -- so values are
+    unchanged.
+    """
+    emb = np.load(os.path.join(DATA_DIR, f"{name}_emb.npy"), mmap_mode="r")
+    cid = np.load(os.path.join(DATA_DIR, f"{name}_cid.npy"), mmap_mode="r")
     return emb, cid
 
 
