@@ -64,6 +64,7 @@ def test_carma_import_preserves_vector_store_keyword_arguments():
         )
 
         assert observed == {"caller_marker": "preserved"}
+        assert manager.s.clear_deleted_data_by_ids([]) is True
         manager.close()
 
 
