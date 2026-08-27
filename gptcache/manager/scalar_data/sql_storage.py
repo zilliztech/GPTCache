@@ -275,6 +275,14 @@ class SQLStorage(CacheStorage):
         return ids
 
     def get_data_by_id(self, key: int) -> Optional[CacheData]:
+        return self._read_data_by_id(key, update_access=True)
+
+    def peek_data_by_id(self, key: int) -> Optional[CacheData]:
+        return self._read_data_by_id(key, update_access=False)
+
+    def _read_data_by_id(
+        self, key: int, update_access: bool
+    ) -> Optional[CacheData]:
         with self.Session() as session:
             qs = (
                 session.query(self._ques)
@@ -285,7 +293,8 @@ class SQLStorage(CacheStorage):
             if qs is None:
                 return None
             last_access = qs.last_access
-            qs.last_access = datetime.now()
+            if update_access:
+                qs.last_access = datetime.now()
             ans = (
                 session.query(self._answer.answer, self._answer.answer_type)
                 .filter(self._answer.question_id == qs.id)
@@ -310,7 +319,8 @@ class SQLStorage(CacheStorage):
                 QuestionDep(item.dep_name, item.dep_data, item.dep_type)
                 for item in deps
             ]
-            session.commit()
+            if update_access:
+                session.commit()
 
             return CacheData(
                 question=qs.question if not deps else Question(qs.question, res_deps),
@@ -349,6 +359,32 @@ class SQLStorage(CacheStorage):
             ).delete()
             objs.delete()
             session.commit()
+
+    def clear_deleted_data_by_ids(self, keys):
+        """Physically clear only the requested soft-deleted questions."""
+        keys = list(keys)
+        if not keys:
+            return True
+        with self.Session() as session:
+            objs = (
+                session.query(self._ques)
+                .filter(self._ques.deleted == -1)
+                .filter(self._ques.id.in_(keys))
+            )
+            q_ids = [obj.id for obj in objs]
+            if q_ids:
+                session.query(self._answer).filter(
+                    self._answer.question_id.in_(q_ids)
+                ).delete(synchronize_session=False)
+                session.query(self._ques_dep).filter(
+                    self._ques_dep.question_id.in_(q_ids)
+                ).delete(synchronize_session=False)
+                session.query(self._session).filter(
+                    self._session.question_id.in_(q_ids)
+                ).delete(synchronize_session=False)
+                objs.delete(synchronize_session=False)
+            session.commit()
+        return True
 
     def count(self, state: int = 0, is_all: bool = False):
         with self.Session() as session:

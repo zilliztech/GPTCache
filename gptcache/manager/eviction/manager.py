@@ -24,9 +24,20 @@ class EvictionBase:
         on_evict: Callable[[List[Any]], None] = None,
         **kwargs
     ):
+        if not isinstance(maxsize, int) or isinstance(maxsize, bool) or maxsize <= 0:
+            raise ValueError("maxsize must be a positive integer")
         if not clean_size:
-            clean_size = int(maxsize * 0.2)
-        if name in "memory":
+            clean_size = max(1, int(maxsize * 0.2))
+        if name == "memory" and policy.upper() == "CARMA":
+            from gptcache.manager.eviction.carma import ClusterAdaptiveEviction
+
+            return ClusterAdaptiveEviction(
+                maxsize=maxsize,
+                clean_size=clean_size,
+                on_evict=on_evict,
+                **kwargs,
+            )
+        if name == "memory":
             from gptcache.manager.eviction.memory_cache import MemoryCacheEviction
 
             eviction_base = MemoryCacheEviction(

@@ -34,6 +34,9 @@ def manager_factory(manager="map",
     :type eviction_manager:  str
     :param get_data_container: a Callable to get the data container, defaults to None.
     :type get_data_container:  Callable
+    :param policy_params: optional keyword arguments for the selected in-memory
+                          eviction policy.
+    :type policy_params: dict
 
     :param scalar_params: Params of scalar storage.
     :type scalar_params:  dict
@@ -105,6 +108,8 @@ def manager_factory(manager="map",
 
     if eviction_params is None:
         eviction_params = {}
+    else:
+        eviction_params = dict(eviction_params)
 
     if  scalar == "redis" and eviction_manager == "redis":
         # if cache manager and eviction manager are both redis, we use no op redis to avoid redundant operations
@@ -119,10 +124,12 @@ def manager_factory(manager="map",
         )
 
     if eviction_manager == "memory":
+        policy_params = dict(eviction_params.get("policy_params", {}))
         return get_data_manager(s, v, o, None,
                                 eviction_params.get("max_size", 1000),
                                 eviction_params.get("clean_size", None),
-                                eviction_params.get("eviction", "LRU"),)
+                                eviction_params.get("eviction", "LRU"),
+                                policy_params=policy_params)
 
     e = EvictionBase(
         name=eviction_manager,
@@ -141,6 +148,7 @@ def get_data_manager(
         eviction: str = "LRU",
         data_path: str = "data_map.txt",
         get_data_container: Callable = None,
+        policy_params=None,
 ):
     """Generate `SSDataManager` (with `cache_base`, `vector_base`, `max_size`, `clean_size` and `eviction` params),
        or `MAPDataManager` (with `data_path`, `max_size` and `get_data_container` params) to manager the data.
@@ -203,4 +211,13 @@ def get_data_manager(
     if isinstance(eviction_base, str) and eviction_base != "memory":
         eviction_base = EvictionBase(name=eviction_base)
     assert cache_base and vector_base
-    return SSDataManager(cache_base, vector_base, object_base, eviction_base, max_size, clean_size, eviction)
+    return SSDataManager(
+        cache_base,
+        vector_base,
+        object_base,
+        eviction_base,
+        max_size,
+        clean_size,
+        eviction,
+        policy_params=policy_params,
+    )

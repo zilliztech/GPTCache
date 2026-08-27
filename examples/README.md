@@ -3,6 +3,7 @@
 - [How to run Visual Question Answering with MiniGPT-4](#How-to-run-Visual-Question-Answering-with-MiniGPT-4)
 - [How to set the **embedding** function](#How-to-set-the-embedding-function)
 - [How to set the **data manager** class](#How-to-set-the-data-manager-class)
+- [How to use the **CARMA eviction policy**](#How-to-use-the-CARMA-eviction-policy)
 - [How to set the **similarity evaluation** interface](#How-to-set-the-similarity-evaluation-interface)
 - [Other cache init params](#Other-cache-init-params)
 - [How to run with session](#How-to-run-with-session)
@@ -291,6 +292,40 @@ from gptcache.manager import get_data_manager
 data_manager=get_data_manager(cache_base=CustomCacheStore(), vector_base=CustomVectorStore())
 cache.init(data_manager=data_manager)
 ```
+
+## How to use the `CARMA` eviction policy
+
+CARMA is an opt-in, count-bounded policy for SQLite/FAISS managers. It groups
+embeddings into online topics and redundancy cells, decays old demand, and
+uses bounded ghost evidence to avoid admitting a one-off scan over a reused
+resident. The default eviction policy remains LRU.
+
+Configure it through the existing `manager_factory` interface:
+
+```python
+from gptcache.manager import manager_factory
+
+data_manager = manager_factory(
+    "sqlite,faiss",
+    data_dir="./cache-data",
+    vector_params={"dimension": 768, "top_k": 1},
+    eviction_params={
+        "eviction": "CARMA",
+        "max_size": 100,
+        "clean_size": 1,
+        "policy_params": {
+            "topic_threshold": 0.70,
+            "cell_threshold": 0.97,
+            "demand_half_life": 500,
+            "quota_strength": 1.0,
+            "ghost_support_threshold": 1.5,
+            "admission_margin": 1.05,
+        },
+    },
+)
+```
+
+See the complete [CARMA configuration example](./eviction/carma.py).
 
 ## How to set the `similarity evaluation` interface
 
