@@ -113,6 +113,10 @@ class CacheStorage(metaclass=ABCMeta):
     def get_data_by_id(self, key):
         pass
 
+    def peek_data_by_id(self, key):
+        """Read cache data without updating access metadata when supported."""
+        return self.get_data_by_id(key)
+
     @abstractmethod
     def mark_deleted(self, keys):
         pass
@@ -120,6 +124,16 @@ class CacheStorage(metaclass=ABCMeta):
     @abstractmethod
     def clear_deleted_data(self):
         pass
+
+    def clear_deleted_data_by_ids(self, keys):
+        """Physically clear selected tombstones when the backend supports it.
+
+        Returning ``False`` preserves compatibility with existing third-party
+        stores: callers can safely leave those rows soft-deleted instead of
+        invoking the global cleanup operation.
+        """
+        del keys
+        return False
 
     @abstractmethod
     def get_ids(self, deleted=True):

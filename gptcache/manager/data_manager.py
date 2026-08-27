@@ -1,4 +1,5 @@
 import pickle
+import threading
 from abc import abstractmethod, ABCMeta
 from typing import List, Any, Optional, Union
 
@@ -204,9 +205,16 @@ class MapDataManager(DataManager):
 
 
 def normalize(vec):
-    magnitude = np.linalg.norm(vec)
-    normalized_v = vec / magnitude
-    return normalized_v
+    try:
+        array = np.asarray(vec, dtype=np.float32)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ParamError("embedding data must be a finite one-dimensional vector") from exc
+    if array.ndim != 1 or array.size == 0 or not np.all(np.isfinite(array)):
+        raise ParamError("embedding data must be a finite one-dimensional vector")
+    magnitude = float(np.linalg.norm(array))
+    if not np.isfinite(magnitude) or magnitude <= 0:
+        raise ParamError("embedding data must have a positive finite norm")
+    return array / magnitude
 
 
 class SSDataManager(DataManager):
@@ -230,28 +238,128 @@ class SSDataManager(DataManager):
         e: Optional[EvictionBase],
         max_size,
         clean_size,
-        policy="LRU"
+        policy="LRU",
+        policy_params=None,
     ):
         self.s = s
         self.v = v
         self.o = o
+        self._operation_lock = threading.RLock()
         self.eviction_manager = EvictionManager(self.s, self.v)
+        if policy_params is None:
+            policy_params = {}
         if e is None:
             e = EvictionBase(name="memory",
                              maxsize=max_size,
                              clean_size=clean_size,
                              policy=policy,
-                             on_evict=self._clear)
+                             on_evict=self._clear,
+                             **dict(policy_params))
         self.eviction_base = e
 
         if not isinstance(self.eviction_base, NoOpEviction):
             # if eviction manager is no op redis, we don't need to put data into eviction base
-            self.eviction_base.put(self.s.get_ids(deleted=False))
+            ids = self.s.get_ids(deleted=False)
+            if getattr(self.eviction_base, "requires_embedding_restore", False):
+                peek = getattr(self.s, "peek_data_by_id", self.s.get_data_by_id)
+                cache_datas = [peek(cache_id) for cache_id in ids]
+                embeddings = [
+                    None if cache_data is None else cache_data.embedding_data
+                    for cache_data in cache_datas
+                ]
+                last_accesses = [
+                    None if cache_data is None else cache_data.last_access
+                    for cache_data in cache_datas
+                ]
+                self.eviction_base.restore(
+                    ids, embeddings=embeddings, last_accesses=last_accesses
+                )
+            else:
+                self.eviction_base.put(ids)
 
     def _clear(self, marked_keys):
+        if not marked_keys:
+            return
         self.eviction_manager.soft_evict(marked_keys)
-        if self.eviction_manager.check_evict():
+        if getattr(self.eviction_base, "requires_immediate_cleanup", False):
             self.eviction_manager.delete()
+        elif self.eviction_manager.check_evict():
+            self.eviction_manager.delete()
+
+    def _rebuild_eviction_state(self):
+        if not getattr(self.eviction_base, "requires_embedding_restore", False):
+            return
+        ids = self.s.get_ids(deleted=False)
+        peek = getattr(self.s, "peek_data_by_id", self.s.get_data_by_id)
+        cache_datas = [peek(cache_id) for cache_id in ids]
+        self.eviction_base.rebuild(
+            ids,
+            embeddings=[
+                None if cache_data is None else cache_data.embedding_data
+                for cache_data in cache_datas
+            ],
+            last_accesses=[
+                None if cache_data is None else cache_data.last_access
+                for cache_data in cache_datas
+            ],
+        )
+
+    @staticmethod
+    def _unique_ids(values):
+        result = []
+        seen = set()
+        for value in values:
+            if value not in seen:
+                seen.add(value)
+                result.append(value)
+        return result
+
+    def _mark_eviction_unhealthy(self, reason):
+        marker = getattr(self.eviction_base, "mark_unhealthy", None)
+        if callable(marker):
+            try:
+                marker(reason)
+            # pylint: disable-next=broad-except
+            except Exception as marker_error:  # pragma: no cover - defensive
+                # Defensive: a custom eviction implementation must not mask the
+                # storage error that caused this fail-stop path.
+                gptcache_log.error(
+                    "Failed to mark eviction policy unhealthy: %s", marker_error
+                )
+
+    def _recover_failed_import(self, ids, marked_before):
+        """Roll back this import without clearing pre-existing tombstones."""
+        try:
+            self.s.mark_deleted(ids)
+            before = set(marked_before)
+            marked_after = self.s.get_ids(deleted=True)
+            recovery_ids = self._unique_ids(
+                list(ids) + [key for key in marked_after if key not in before]
+            )
+
+            if recovery_ids:
+                delete_result = self.v.delete(recovery_ids)
+                if delete_result is False:
+                    raise RuntimeError("vector store reported unsuccessful deletion")
+
+            live_ids = set(self.s.get_ids(deleted=False))
+            if any(key in live_ids for key in ids):
+                raise RuntimeError("scalar rollback left imported rows live")
+
+            targeted_clear = getattr(self.s, "clear_deleted_data_by_ids", None)
+            if callable(targeted_clear):
+                targeted_clear(recovery_ids)
+            return True
+        # pylint: disable-next=broad-except
+        except Exception as recovery_error:  # pragma: no cover - backend-specific
+            # Storage plugins expose different exception types. Recovery must
+            # fail closed for any backend-specific error.
+            gptcache_log.error(
+                "Failed to restore cache consistency after cache import: %s",
+                recovery_error,
+            )
+            self._mark_eviction_unhealthy(recovery_error)
+            return False
 
     def save(self, question, answer, embedding_data, **kwargs):
         """Save the data and vectors to cache and vector storage.
@@ -317,6 +425,16 @@ class SSDataManager(DataManager):
         embedding_datas = [
             normalize(embedding_data) for embedding_data in embedding_datas
         ]
+        expected_dimension = getattr(
+            self.v, "_dimension", getattr(self.v, "dimension", None)
+        )
+        if expected_dimension is not None and any(
+            embedding_data.size != expected_dimension
+            for embedding_data in embedding_datas
+        ):
+            raise ParamError(
+                "embedding dimension does not match the configured vector store"
+            )
         for i, embedding_data in enumerate(embedding_datas):
             if self.o is not None and not isinstance(answers[i], str):
                 ans = self._process_answer_data(answers[i])
@@ -331,15 +449,44 @@ class SSDataManager(DataManager):
                     session_id=session_ids[i],
                 )
             )
-        ids = self.s.batch_insert(cache_datas)
-        self.v.mul_add(
-            [
-                VectorData(id=ids[i], data=embedding_data)
-                for i, embedding_data in enumerate(embedding_datas)
-            ],
-            **kwargs,
-        )
-        self.eviction_base.put(ids)
+        with self._operation_lock:
+            marked_before = self.s.get_ids(deleted=True)
+            ids = []
+            try:
+                ids = self.s.batch_insert(cache_datas)
+                self.v.mul_add(
+                    [
+                        VectorData(id=ids[i], data=embedding_data)
+                        for i, embedding_data in enumerate(embedding_datas)
+                    ],
+                    **kwargs,
+                )
+                if getattr(self.eviction_base, "accepts_embedding_metadata", False):
+                    self.eviction_base.put_with_metadata(
+                        ids,
+                        embeddings=[
+                            cache_data.embedding_data for cache_data in cache_datas
+                        ],
+                    )
+                else:
+                    self.eviction_base.put(ids)
+            except Exception:
+                recovered = not ids or self._recover_failed_import(
+                    ids, marked_before
+                )
+                if recovered:
+                    try:
+                        self._rebuild_eviction_state()
+                    # pylint: disable-next=broad-except
+                    except Exception as rebuild_error:  # pragma: no cover
+                        # Rebuild is the last recovery boundary; any plugin
+                        # failure leaves the policy explicitly unhealthy.
+                        gptcache_log.error(
+                            "Failed to rebuild eviction state after cache import: %s",
+                            rebuild_error,
+                        )
+                        self._mark_eviction_unhealthy(rebuild_error)
+                raise
 
     def get_scalar_data(self, res_data, **kwargs) -> Optional[CacheData]:
         session = kwargs.get("session", None)
