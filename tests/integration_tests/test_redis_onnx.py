@@ -36,7 +36,7 @@ def test_redis_sqlite():
         )
         question = "what's github"
         expect_answer = "GitHub is an online platform used primarily for version control and coding collaborations."
-        with patch("openai.ChatCompletion.create") as mock_create:
+        with patch("openai.resources.chat.Completions.create") as mock_create:
             datas = {
                 "choices": [
                     {

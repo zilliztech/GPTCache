@@ -1,11 +1,11 @@
 import os
-import openai
 import time
+from openai import OpenAI
 
-openai.api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 before = time.time()
-response = openai.ChatCompletion.create(
+response = client.chat.completions.create(
   model='gpt-3.5-turbo',
   messages=[
     {'role': 'user',
@@ -14,7 +14,7 @@ response = openai.ChatCompletion.create(
   ],
 )
 print('Time Spent =', time.time() - before)	
-print(response['choices'])
+print(response.choices)
 
 ## import gptcache
 print('Cache loading.....')

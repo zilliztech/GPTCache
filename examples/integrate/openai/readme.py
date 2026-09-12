@@ -1,7 +1,7 @@
 import os
 import time
 
-import openai
+from openai import OpenAI
 
 
 def response_text(openai_resp):
@@ -13,9 +13,9 @@ def response_text(openai_resp):
 question = 'what‘s chatgpt'
 
 # OpenAI API original usage
-openai.api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 start_time = time.time()
-response = openai.ChatCompletion.create(
+response = client.chat.completions.create(
   model='gpt-3.5-turbo',
   messages=[
     {
@@ -26,7 +26,7 @@ response = openai.ChatCompletion.create(
 )
 print(f'Question: {question}')
 print('Time consuming: {:.2f}s'.format(time.time() - start_time))
-print(f'Answer: {response_text(response)}\n')
+print(f'Answer: {response.choices[0].message.content}\n')
 
 # GPTCache exact matching usage
 print('GPTCache exact matching example.....')

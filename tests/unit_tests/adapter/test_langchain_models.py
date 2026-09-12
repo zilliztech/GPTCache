@@ -150,7 +150,7 @@ def test_last_content_without_template():
     subject_str = "animal"
     expect_answer = "this is a joke"
 
-    with patch("openai.ChatCompletion.create") as mock_create:
+    with patch("openai.resources.chat.Completions.create") as mock_create:
         datas = {
             "choices": [
                 {
