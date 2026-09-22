@@ -115,18 +115,24 @@ class Cache:
     def set_openai_key():
         import_openai()
         import openai  # pylint: disable=C0415
+        from gptcache.adapter import openai as cache_openai  # pylint: disable=C0415
 
-        openai.api_key = os.getenv("OPENAI_API_KEY")
+        cache_openai.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        cache_openai.aclient = openai.AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     @staticmethod
     def set_azure_openai_key():
         import_openai()
         import openai  # pylint: disable=C0415
+        from gptcache.adapter import openai as cache_openai  # pylint: disable=C0415
 
-        openai.api_type = "azure"
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        openai.api_base = os.getenv("OPENAI_API_BASE")
-        openai.api_version = os.getenv("OPENAI_API_VERSION")
+        azure_args = {
+            "api_key": os.getenv("OPENAI_API_KEY"),
+            "azure_endpoint": os.getenv("OPENAI_API_BASE"),
+            "api_version": os.getenv("OPENAI_API_VERSION"),
+        }
+        cache_openai.client = openai.AzureOpenAI(**azure_args)
+        cache_openai.aclient = openai.AsyncAzureOpenAI(**azure_args)
 
     @staticmethod
     def set_anthropic_key():

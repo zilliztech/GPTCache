@@ -33,7 +33,7 @@ def test_context_process():
 
         question = "test calculate 1+3"
         expect_answer = "the result is 4"
-        with patch("openai.ChatCompletion.create") as mock_create:
+        with patch("openai.resources.chat.Completions.create") as mock_create:
             datas = {
                 "choices": [
                     {

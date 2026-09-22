@@ -3,7 +3,7 @@ import json
 import os
 import time
 from io import BytesIO
-from typing import Any, AsyncGenerator, Iterator, List
+from typing import Any, AsyncIterator, Iterator, List
 
 from gptcache import cache
 from gptcache.adapter.adapter import aadapt, adapt
@@ -27,8 +27,13 @@ import_openai()
 # pylint: disable=E1102
 import openai
 
+# The v1 SDK is client based: one client per process, rebuilt from the environment
+# by `Cache.set_openai_key()` / `Cache.set_azure_openai_key()`.
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+aclient = openai.AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 
-class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
+
+class ChatCompletion(BaseCacheLLM):
     """Openai ChatCompletion Wrapper
 
     Example:
@@ -56,22 +61,24 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return (
-                super().create(*llm_args, **llm_kwargs)
+            res = (
+                client.chat.completions.create(*llm_args, **llm_kwargs)
                 if cls.llm is None
                 else cls.llm(*llm_args, **llm_kwargs)
             )
+            return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
     @classmethod
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return (
-                (await super().acreate(*llm_args, **llm_kwargs))
+            res = (
+                (await aclient.chat.completions.create(*llm_args, **llm_kwargs))
                 if cls.llm is None
                 else await cls.llm(*llm_args, **llm_kwargs)
             )
+            return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
@@ -79,11 +86,12 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
     def _update_cache_callback(
         llm_data, update_cache_func, *args, **kwargs
     ):  # pylint: disable=unused-argument
-        if isinstance(llm_data, AsyncGenerator):
+        if isinstance(llm_data, AsyncIterator):
 
             async def hook_openai_data(it):
                 total_answer = ""
                 async for item in it:
+                    item = item.model_dump(exclude_none=True) if hasattr(item, "model_dump") else item
                     total_answer += get_stream_message_from_openai_answer(item)
                     yield item
                 update_cache_func(Answer(total_answer, DataType.STR))
@@ -99,6 +107,7 @@ class ChatCompletion(openai.ChatCompletion, BaseCacheLLM):
             def hook_openai_data(it):
                 total_answer = ""
                 for item in it:
+                    item = item.model_dump(exclude_none=True) if hasattr(item, "model_dump") else item
                     total_answer += get_stream_message_from_openai_answer(item)
                     yield item
                 update_cache_func(Answer(total_answer, DataType.STR))
@@ -163,7 +172,7 @@ async def async_iter(input_list):
         yield item
 
 
-class Completion(openai.Completion, BaseCacheLLM):
+class Completion(BaseCacheLLM):
     """Openai Completion Wrapper
 
     Example:
@@ -185,22 +194,24 @@ class Completion(openai.Completion, BaseCacheLLM):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return (
-                super().create(*llm_args, **llm_kwargs)
+            res = (
+                client.completions.create(*llm_args, **llm_kwargs)
                 if not cls.llm
                 else cls.llm(*llm_args, **llm_kwargs)
             )
+            return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
     @classmethod
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return (
-                (await super().acreate(*llm_args, **llm_kwargs))
+            res = (
+                (await aclient.completions.create(*llm_args, **llm_kwargs))
                 if cls.llm is None
                 else await cls.llm(*llm_args, **llm_kwargs)
             )
+            return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
@@ -238,7 +249,7 @@ class Completion(openai.Completion, BaseCacheLLM):
         )
 
 
-class Audio(openai.Audio):
+class Audio:
     """Openai Audio Wrapper
 
     Example:
@@ -264,7 +275,8 @@ class Audio(openai.Audio):
     def transcribe(cls, model: str, file: Any, *args, **kwargs):
         def llm_handler(*llm_args, **llm_kwargs):
             try:
-                return super(Audio, cls).transcribe(*llm_args, **llm_kwargs)
+                res = client.audio.transcriptions.create(*llm_args, **llm_kwargs)
+                return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
             except openai.OpenAIError as e:
                 raise wrap_error(e) from e
 
@@ -293,7 +305,8 @@ class Audio(openai.Audio):
     def translate(cls, model: str, file: Any, *args, **kwargs):
         def llm_handler(*llm_args, **llm_kwargs):
             try:
-                return super(Audio, cls).translate(*llm_args, **llm_kwargs)
+                res = client.audio.translations.create(*llm_args, **llm_kwargs)
+                return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
             except openai.OpenAIError as e:
                 raise wrap_error(e) from e
 
@@ -319,7 +332,7 @@ class Audio(openai.Audio):
         )
 
 
-class Image(openai.Image):
+class Image:
     """Openai Image Wrapper
 
     Example:
@@ -344,7 +357,8 @@ class Image(openai.Image):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return super().create(*llm_args, **llm_kwargs)
+            res = client.images.generate(*llm_args, **llm_kwargs)
+            return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 
@@ -383,7 +397,7 @@ class Image(openai.Image):
         )
 
 
-class Moderation(openai.Moderation, BaseCacheLLM):
+class Moderation(BaseCacheLLM):
     """Openai Moderation Wrapper
 
     Example:
@@ -402,11 +416,12 @@ class Moderation(openai.Moderation, BaseCacheLLM):
     @classmethod
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
-            return (
-                super().create(*llm_args, **llm_kwargs)
+            res = (
+                client.moderations.create(*llm_args, **llm_kwargs)
                 if not cls.llm
                 else cls.llm(*llm_args, **llm_kwargs)
             )
+            return res.model_dump(exclude_none=True) if hasattr(res, "model_dump") else res
         except openai.OpenAIError as e:
             raise wrap_error(e) from e
 

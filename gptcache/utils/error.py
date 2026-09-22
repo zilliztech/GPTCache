@@ -37,14 +37,14 @@ def wrap_error(e: Exception) -> Exception:
 
             def raise_error():
                 try:
-                    raise openai.error.OpenAIError(message="test")
-                except openai.error.OpenAIError as e:
+                    raise openai.OpenAIError("test")
+                except openai.OpenAIError as e:
                     raise wrap_error(e)
 
 
             try:
                 raise_error()
-            except openai.error.OpenAIError as e:
+            except openai.OpenAIError as e:
                 print("exception:")
                 print(e)
 

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from openai.error import AuthenticationError
+from openai import AuthenticationError
 
 from gptcache import cache
 from gptcache.adapter import openai
@@ -30,7 +30,7 @@ class TestSession(unittest.TestCase):
 
         session0 = Session(self.session_id, check_hit_func=check_hit)
         self.assertEqual(session0.name, self.session_id)
-        with patch("openai.Completion.create") as mock_create:
+        with patch("openai.resources.Completions.create") as mock_create:
             mock_create.return_value = {
                 "choices": [{"text": self.expect_answer, "finish_reason": None, "index": 0}],
                 "created": 1677825464,
@@ -50,7 +50,7 @@ class TestSession(unittest.TestCase):
         cache.init(data_manager=data_manager, pre_embedding_func=get_prompt)
 
         session0 = Session(self.session_id, check_hit_func=check_hit)
-        with patch("openai.Completion.create") as mock_create:
+        with patch("openai.resources.Completions.create") as mock_create:
             mock_create.return_value = {
                 "choices": [{"text": self.expect_answer, "finish_reason": None, "index": 0}],
                 "created": 1677825464,
@@ -91,7 +91,7 @@ class TestSession(unittest.TestCase):
         )
 
         session0 = Session(self.session_id, check_hit_func=check_hit)
-        with patch("openai.Completion.create") as mock_create:
+        with patch("openai.resources.Completions.create") as mock_create:
             mock_create.return_value = {
                 "choices": [{"text": self.expect_answer, "finish_reason": None, "index": 0}],
                 "created": 1677825464,
