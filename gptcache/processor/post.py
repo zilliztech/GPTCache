@@ -140,14 +140,22 @@ def llm_semantic_verification(
     best_answer = messages[0] if not scores else messages[scores.index(max(scores))]
     if client is None:
         client = openai
+    # The verification request is a chat request: it sends `messages` and reads
+    # `choices[0].message.content`, so it has to go to a chat endpoint. The completions
+    # endpoint takes `prompt` instead of `messages`, and the legacy module-level client
+    # exposes `ChatCompletion` rather than `chat.completions`.
+    if hasattr(client, "chat"):
+        create = client.chat.completions.create
+    elif hasattr(client, "ChatCompletion"):
+        create = client.ChatCompletion.create
     else:
-        client = client if hasattr(client, 'completions') else client.chat # Ensure client has the correct method for completions
+        create = client.completions.create
     if system_prompt is None:
         system_prompt = ("You are a strict semantic verification assistant. "
                          "… Only answer 'yes' or 'no'. If unsure, answer 'no'.")
 
     try:
-        resp = client.completions.create(
+        resp = create(
             model=model,
             messages=[
                 {"role": "system", "content": system_prompt},

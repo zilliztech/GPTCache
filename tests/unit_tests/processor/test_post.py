@@ -51,6 +51,64 @@ def test_llm_verifier():
     assert result is None
 
 
+def _response(verdict):
+    choice = Mock()
+    choice.message.content = verdict
+    resp = Mock()
+    resp.choices = [choice]
+    return resp
+
+
+class _ChatClient:
+    """openai>=1.0 client: only `chat.completions` accepts `messages`."""
+
+    def __init__(self, verdict):
+        self.verdict = verdict
+        self.chat_calls = []
+        chat = Mock()
+        chat.completions.create.side_effect = lambda **kwargs: (
+            self.chat_calls.append(kwargs), _response(self.verdict))[1]
+        self.chat = chat
+        self.completions = None
+
+
+class _LegacyClient:
+    """pre-1.0 module-style client, which the examples in this repo still use."""
+
+    def __init__(self, verdict):
+        self.calls = []
+
+        def create(**kwargs):
+            self.calls.append(kwargs)
+            return _response(verdict)
+
+        self.ChatCompletion = Mock(side_effect=None)
+        self.ChatCompletion.create = create
+
+
+def test_llm_verifier_uses_the_chat_endpoint():
+    from gptcache.processor.post import LlmVerifier
+    client = _ChatClient("yes")
+    verifier = LlmVerifier(client=client, model="fake-model")
+    assert verifier(["foo", "bar"], scores=[0.1, 0.9], original_question="q") == "bar"
+    assert len(client.chat_calls) == 1
+    assert client.chat_calls[0]["messages"][0]["content"] is not None
+
+
+def test_llm_verifier_supports_legacy_module_client():
+    from gptcache.processor.post import LlmVerifier
+    client = _LegacyClient("yes")
+    verifier = LlmVerifier(client=client, model="fake-model")
+    assert verifier(["foo", "bar"], scores=[0.9, 0.1], original_question="q") == "foo"
+    assert len(client.calls) == 1
+
+
+def test_llm_verifier_swallows_api_errors():
+    from gptcache.processor.post import LlmVerifier
+    client = _ChatClient("yes")
+    client.chat.completions.create.side_effect = RuntimeError("boom")
+    verifier = LlmVerifier(client=client, model="fake-model")
+    assert verifier(["foo", "bar"], scores=[0.1, 0.9], original_question="q") is None
 
 
 if __name__ == "__main__":
@@ -59,3 +117,6 @@ if __name__ == "__main__":
     test_random_one()
     test_temperature_softmax()
     test_llm_verifier()
+    test_llm_verifier_uses_the_chat_endpoint()
+    test_llm_verifier_supports_legacy_module_client()
+    test_llm_verifier_swallows_api_errors()
