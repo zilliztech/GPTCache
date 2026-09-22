@@ -1,7 +1,8 @@
-from typing import Any, Callable, List
+from typing import Any, Callable, List, Optional
 
 import cachetools
 
+from gptcache.manager.eviction.arc import ARCCache
 from gptcache.manager.eviction.base import EvictionBase
 
 
@@ -28,6 +29,13 @@ class MemoryCacheEviction(EvictionBase):
     :type clean_size: int
     :param on_evict: the function for cleaning the data in the store
     :type  on_evict: Callable[[List[Any]], None]
+    :param tau: ``ARC`` only -- cosine similarity at or above which a ghost
+        entry is considered a match. Should match the threshold the cache's
+        similarity evaluation uses.
+    :type tau: float
+    :param ghost_matching: ``ARC`` only -- ``"semantic"`` (default) or
+        ``"exact"``. See :class:`~gptcache.manager.eviction.arc.ARCCache`.
+    :type ghost_matching: str
 
 
     """
@@ -49,12 +57,21 @@ class MemoryCacheEviction(EvictionBase):
             self._cache = cachetools.FIFOCache(maxsize=maxsize, **kwargs)
         elif self._policy == "RR":
             self._cache = cachetools.RRCache(maxsize=maxsize, **kwargs)
+        elif self._policy == "ARC":
+            # ARCCache decides and performs its own eviction, and reports it
+            # through on_evict directly -- so it is deliberately not wrapped in
+            # popitem_wrapper, which exists to adapt the cachetools policies.
+            self._cache = ARCCache(maxsize=maxsize, on_evict=on_evict, **kwargs)
+            return
         else:
             raise ValueError(f"Unknown policy {policy}")
 
         self._cache.popitem = popitem_wrapper(self._cache.popitem, on_evict, clean_size)
 
-    def put(self, objs: List[Any]):
+    def put(self, objs: List[Any], embeddings: Optional[List[Any]] = None):
+        if self._policy == "ARC":
+            self._cache.put(objs, embeddings=embeddings)
+            return
         for obj in objs:
             self._cache[obj] = True
 

@@ -1,0 +1,36 @@
+# Pinned dependencies for the eviction-policy benchmarks.
+#
+#   pip install -e .                            # GPTCache itself
+#   pip install -r benchmarks/requirements.txt  # this file
+#
+# These are the versions results/ is produced with. The
+# reference environment is the container (benchmarks/Dockerfile: linux/amd64,
+# Python 3.10.11) -- running natively on another OS or CPU architecture installs
+# the same versions but is not guaranteed bit-identical, because BLAS kernels
+# differ in reduction order, which moves embeddings and so a few near-threshold
+# similarity decisions.
+
+# data preparation: download, parse, embed
+datasets==5.0.1
+pyarrow==25.0.0
+huggingface-hub==1.26.0
+sentence-transformers==5.6.1
+transformers==5.14.1
+torch==2.13.0
+
+# the benchmark itself.
+# cachetools backs LRU/LFU/FIFO/RR through MemoryCacheEviction, so its version is
+# part of what the measured hit rates depend on -- the root requirements.txt
+# leaves it unpinned, which is fine for the library but not for a benchmark.
+numpy==2.2.6
+cachetools==7.1.6
+psutil==7.2.2
+
+# analysis and figures
+pandas==2.3.3
+matplotlib==3.10.9
+
+# end-to-end tests through get_data_manager
+faiss-cpu==1.14.3
+SQLAlchemy==2.0.51
+pytest==9.1.1

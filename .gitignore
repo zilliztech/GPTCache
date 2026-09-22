@@ -139,3 +139,29 @@ dmypy.json
 **/.chroma
 docs/references/*
 !docs/references/index.rst
+
+# Prepared embedding corpora: ~1.2 GB, regenerate with benchmarks/prepare_data.py
+# and benchmarks/prepare_data_ext.py
+benchmarks/data/
+
+# Raw sweep dumps: intermediate data only. Every figure and table derived from
+# them is committed under benchmarks/results/; rerun the producer to rebuild.
+# rebuilt by benchmarks/run_bench.py
+benchmarks/results/bench.csv
+benchmarks/results/p_trace.csv
+benchmarks/results/lat_cdf.csv
+# rebuilt by benchmarks/sweep_crossover.py
+benchmarks/results/crossover_drift_skew.csv
+benchmarks/results/crossover_drift_capacity.csv
+benchmarks/results/crossover_real.csv
+benchmarks/results/crossover_density.csv
+
+# Output of the reduced pipeline modes (run_pipeline.sh smoke|quick). Only the
+# `full` mode writes the reference artifacts; these are scratch.
+benchmarks/results/_smoke/
+benchmarks/results/_quick/
+
+# Provenance of whichever machine last ran the pipeline (revision, arch, BLAS,
+# thread counts, package versions, input hashes). Written every run and specific
+# to that host, so it is produced and read rather than committed.
+benchmarks/results/environment.json

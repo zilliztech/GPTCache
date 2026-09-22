@@ -1,0 +1,23 @@
+# Eviction-policy benchmarks.
+#
+#   docker compose run --rm bench          # smoke run, ~3 min
+#   docker compose run --rm bench full     # everything, ~1-2 h
+#
+# Results appear in ./benchmarks/results on the host.
+
+services:
+  bench:
+    build:
+      context: .
+      dockerfile: benchmarks/Dockerfile
+    image: gptcache-arc-bench
+    volumes:
+      - ./benchmarks/results:/app/benchmarks/results
+      # Downloaded datasets and prepared embeddings, so a second run is fast.
+      # Discard them with: docker compose down -v
+      - bench-data:/app/benchmarks/data
+      - hf-cache:/root/.cache/huggingface
+
+volumes:
+  bench-data:
+  hf-cache:
