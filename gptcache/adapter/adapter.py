@@ -74,6 +74,21 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             pre_embedding_data, chat_cache.config.input_summary_len
         )
 
+    # Pre-embedding exact-match shortcut: hash the normalized query and return
+    # the cached answer if seen. Skips embedder + vector search for the heavy
+    # exact-repeat tail (canned prompts, agent self-talk, FAQs).
+    exact_match_cache = getattr(chat_cache, "exact_match_cache", None)
+    if (
+        cache_enable
+        and not cache_skip
+        and exact_match_cache is not None
+        and isinstance(pre_store_data, str)
+    ):
+        exact_hit = exact_match_cache.get(pre_store_data)
+        if exact_hit is not None:
+            chat_cache.report.hint_cache()
+            return cache_data_convert(exact_hit)
+
     if cache_enable:
         embedding_data = time_cal(
             chat_cache.embedding_func,
@@ -208,6 +223,10 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
             )()
             if return_message is not None:
                 chat_cache.report.hint_cache()
+                # Populate the exact-match cache from a semantic hit so the
+                # next exact repeat skips embed + search entirely.
+                if exact_match_cache is not None and isinstance(pre_store_data, str):
+                    exact_match_cache.put(pre_store_data, return_message)
                 cache_whole_data = answers_dict.get(str(return_message))
                 if session and cache_whole_data:
                     chat_cache.data_manager.add_session(
@@ -232,6 +251,7 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                 return cache_data_convert(return_message)
 
     next_cache = chat_cache.next_cache
+    _llm_elapsed_ms = 0.0
     if next_cache:
         kwargs["cache_obj"] = next_cache
         kwargs["cache_context"] = context
@@ -245,9 +265,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
         if search_only_flag:
             # cache miss
             return None
+        _llm_t0 = time.perf_counter()
         llm_data = time_cal(
             llm_handler, func_name="llm_request", report_func=chat_cache.report.llm
         )(*args, **kwargs)
+        _llm_elapsed_ms = (time.perf_counter() - _llm_t0) * 1000.0
 
     if not llm_data:
         return None
@@ -260,6 +282,11 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     question = pre_store_data
                 else:
                     question.content = pre_store_data
+
+                llm_cost = _build_llm_cost(
+                    handled_llm_data, _llm_elapsed_ms, chat_cache.config
+                )
+
                 time_cal(
                     chat_cache.data_manager.save,
                     func_name="save",
@@ -270,7 +297,14 @@ def adapt(llm_handler, cache_data_convert, update_cache_callback, *args, **kwarg
                     embedding_data,
                     extra_param=context.get("save_func", None),
                     session=session,
+                    llm_cost=llm_cost,
                 )
+                # Mirror the answer into the exact-match cache so the next
+                # identical query short-circuits before the embedder.
+                if exact_match_cache is not None and isinstance(pre_store_data, str):
+                    answer_string = _extract_answer_string(handled_llm_data)
+                    if answer_string is not None:
+                        exact_match_cache.put(pre_store_data, answer_string)
                 if (
                     chat_cache.report.op_save.count > 0
                     and chat_cache.report.op_save.count % chat_cache.config.auto_flush
@@ -351,6 +385,21 @@ async def aadapt(
         pre_embedding_data = _summarize_input(
             pre_embedding_data, chat_cache.config.input_summary_len
         )
+
+    # Pre-embedding exact-match shortcut: hash the normalized query and return
+    # the cached answer if seen. Skips embedder + vector search for the heavy
+    # exact-repeat tail (canned prompts, agent self-talk, FAQs).
+    exact_match_cache = getattr(chat_cache, "exact_match_cache", None)
+    if (
+        cache_enable
+        and not cache_skip
+        and exact_match_cache is not None
+        and isinstance(pre_store_data, str)
+    ):
+        exact_hit = exact_match_cache.get(pre_store_data)
+        if exact_hit is not None:
+            chat_cache.report.hint_cache()
+            return cache_data_convert(exact_hit)
 
     if cache_enable:
         embedding_data = time_cal(
@@ -471,6 +520,10 @@ async def aadapt(
             )()
             if return_message is not None:
                 chat_cache.report.hint_cache()
+                # Populate the exact-match cache from a semantic hit so the
+                # next exact repeat skips embed + search entirely.
+                if exact_match_cache is not None and isinstance(pre_store_data, str):
+                    exact_match_cache.put(pre_store_data, return_message)
                 cache_whole_data = answers_dict.get(str(return_message))
                 if session and cache_whole_data:
                     chat_cache.data_manager.add_session(
@@ -495,6 +548,7 @@ async def aadapt(
                 return cache_data_convert(return_message)
 
     next_cache = chat_cache.next_cache
+    _llm_elapsed_ms = 0.0
     if next_cache:
         kwargs["cache_obj"] = next_cache
         kwargs["cache_context"] = context
@@ -505,7 +559,9 @@ async def aadapt(
             llm_handler, cache_data_convert, update_cache_callback, *args, **kwargs
         )
     else:
+        _llm_t0 = time.perf_counter()
         llm_data = await llm_handler(*args, **kwargs)
+        _llm_elapsed_ms = (time.perf_counter() - _llm_t0) * 1000.0
 
     if cache_enable:
         try:
@@ -515,6 +571,11 @@ async def aadapt(
                     question = pre_store_data
                 else:
                     question.content = pre_store_data
+
+                llm_cost = _build_llm_cost(
+                    handled_llm_data, _llm_elapsed_ms, chat_cache.config
+                )
+
                 time_cal(
                     chat_cache.data_manager.save,
                     func_name="save",
@@ -525,7 +586,14 @@ async def aadapt(
                     embedding_data,
                     extra_param=context.get("save_func", None),
                     session=session,
+                    llm_cost=llm_cost,
                 )
+                # Mirror the answer into the exact-match cache so the next
+                # identical query short-circuits before the embedder.
+                if exact_match_cache is not None and isinstance(pre_store_data, str):
+                    answer_string = _extract_answer_string(handled_llm_data)
+                    if answer_string is not None:
+                        exact_match_cache.put(pre_store_data, answer_string)
                 if (
                     chat_cache.report.op_save.count > 0
                     and chat_cache.report.op_save.count % chat_cache.config.auto_flush
@@ -538,6 +606,47 @@ async def aadapt(
         except Exception:  # pylint: disable=W0703
             gptcache_log.error("failed to save the data to cache", exc_info=True)
     return llm_data
+
+
+def _extract_answer_string(handled_llm_data):
+    """Pull a string out of whatever update_cache_callback passes us.
+
+    Adapters wrap the LLM answer in many shapes - a raw ``str``, an
+    ``Answer(str, DataType)``, a list of ``Answer``s, etc. The semantic
+    layer stores ``Answer.answer`` (a str), so we mirror that here so the
+    next exact-match lookup returns a string compatible with
+    ``cache_data_convert``.
+    """
+    if handled_llm_data is None:
+        return None
+    if isinstance(handled_llm_data, str):
+        return handled_llm_data
+    answer_attr = getattr(handled_llm_data, "answer", None)
+    if isinstance(answer_attr, str):
+        return answer_attr
+    if isinstance(handled_llm_data, list) and handled_llm_data:
+        return _extract_answer_string(handled_llm_data[0])
+    return None
+
+
+def _build_llm_cost(handled_llm_data, elapsed_ms, config):
+    """Build the per-entry regeneration cost for the CA_W_TINYLFU eviction layer.
+
+    Latency is measured around the real LLM call; token count is estimated from
+    the answer length (chars / 4 ≈ tokens) as a universal proxy that works across
+    all adapter backends. Returns ``None`` if the eviction module is unavailable.
+    """
+    try:
+        from gptcache.manager.eviction.ca_w_tinylfu import LLMCost  # pylint: disable=C0415
+    except ImportError:
+        return None
+    answer_str = _extract_answer_string(handled_llm_data)
+    token_estimate = max(1, len(answer_str) // 4) if answer_str else 100
+    return LLMCost(
+        generation_latency_ms=elapsed_ms,
+        token_count=token_estimate,
+        model_tier=getattr(config, "model_tier", 1.0),
+    )
 
 
 _input_summarizer = None

@@ -1,0 +1,3 @@
+tiktoken
+datasets
+sentence-transformers

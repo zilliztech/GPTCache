@@ -11,7 +11,7 @@ class DistributedEviction(EvictionBase, ABC):
     """
 
     @abstractmethod
-    def put(self, objs: List[str]):
+    def put(self, objs: List[str], costs=None):
         pass
 
     @abstractmethod
@@ -37,7 +37,7 @@ class NoOpEviction(EvictionBase):
     def __init__(self, **kwargs):
         pass
 
-    def put(self, objs: List[str]):
+    def put(self, objs: List[str], costs=None):
         pass
 
     def get(self, obj: str):

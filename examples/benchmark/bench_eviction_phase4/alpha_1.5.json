@@ -1,0 +1,86 @@
+{
+  "args": {
+    "n_items": 5000,
+    "n_queries": 50000,
+    "max_size": 1000,
+    "clean_size": 200,
+    "zipf_alpha": 1.5,
+    "expensive_fraction": 0.1,
+    "policies": "LRU,LFU,FIFO,RR,CA_W_TINYLFU",
+    "seed": 0,
+    "workdir": "bench_eviction_phase4",
+    "out": "bench_eviction_phase4/alpha_1.5.json"
+  },
+  "workload": {
+    "n_items": 5000,
+    "n_queries": 50000,
+    "cost_min": 205.5441998799236,
+    "cost_median": 1076.1775604364218,
+    "cost_max": 864977.1091440431,
+    "cost_p99": 714153.8310732597,
+    "unique_items_touched": 1730,
+    "top10_share_pct": 76.548
+  },
+  "results": [
+    {
+      "policy": "LRU",
+      "max_size": 1000,
+      "clean_size": 200,
+      "queries": 50000,
+      "hits": 48014,
+      "misses": 1986,
+      "hit_rate": 0.96028,
+      "cost_weighted_hit_rate": 0.9252123743350494,
+      "evictions": 1000,
+      "elapsed_seconds": 0.017625999986194074
+    },
+    {
+      "policy": "LFU",
+      "max_size": 1000,
+      "clean_size": 200,
+      "queries": 50000,
+      "hits": 47944,
+      "misses": 2056,
+      "hit_rate": 0.95888,
+      "cost_weighted_hit_rate": 0.9220191261337412,
+      "evictions": 1200,
+      "elapsed_seconds": 0.02352220000466332
+    },
+    {
+      "policy": "FIFO",
+      "max_size": 1000,
+      "clean_size": 200,
+      "queries": 50000,
+      "hits": 47661,
+      "misses": 2339,
+      "hit_rate": 0.95322,
+      "cost_weighted_hit_rate": 0.9110871423470694,
+      "evictions": 1400,
+      "elapsed_seconds": 0.010712999966926873
+    },
+    {
+      "policy": "RR",
+      "max_size": 1000,
+      "clean_size": 200,
+      "queries": 50000,
+      "hits": 47741,
+      "misses": 2259,
+      "hit_rate": 0.95482,
+      "cost_weighted_hit_rate": 0.914420777249861,
+      "evictions": 1400,
+      "elapsed_seconds": 0.011961500043980777
+    },
+    {
+      "policy": "CA_W_TINYLFU",
+      "max_size": 1000,
+      "clean_size": 200,
+      "queries": 50000,
+      "hits": 47390,
+      "misses": 2610,
+      "hit_rate": 0.9478,
+      "cost_weighted_hit_rate": 0.8982132136257183,
+      "evictions": 2039,
+      "elapsed_seconds": 0.24219880002783611
+    }
+  ]
+}

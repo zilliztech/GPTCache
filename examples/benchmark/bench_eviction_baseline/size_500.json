@@ -1,0 +1,78 @@
+{
+  "args": {
+    "n_items": 5000,
+    "n_queries": 50000,
+    "max_size": 500,
+    "clean_size": 100,
+    "zipf_alpha": 1.2,
+    "expensive_fraction": 0.1,
+    "policies": "LRU,LFU,FIFO,RR",
+    "seed": 0,
+    "workdir": "bench_eviction_baseline",
+    "out": "bench_eviction_baseline/size_500.json"
+  },
+  "workload": {
+    "n_items": 5000,
+    "n_queries": 50000,
+    "cost_min": 205.5441998799236,
+    "cost_median": 1076.1775604364218,
+    "cost_max": 864977.1091440431,
+    "cost_p99": 714153.8310732597,
+    "unique_items_touched": 4558,
+    "top10_share_pct": 44.264
+  },
+  "results": [
+    {
+      "policy": "LRU",
+      "max_size": 500,
+      "clean_size": 100,
+      "queries": 50000,
+      "hits": 33897,
+      "misses": 16103,
+      "hit_rate": 0.67794,
+      "cost_weighted_hit_rate": 0.6146082003167547,
+      "evictions": 15700,
+      "elapsed_seconds": 0.04076629999326542,
+      "final_cache_size": 403
+    },
+    {
+      "policy": "LFU",
+      "max_size": 500,
+      "clean_size": 100,
+      "queries": 50000,
+      "hits": 34981,
+      "misses": 15019,
+      "hit_rate": 0.69962,
+      "cost_weighted_hit_rate": 0.6381377519349888,
+      "evictions": 14600,
+      "elapsed_seconds": 0.04801319999387488,
+      "final_cache_size": 419
+    },
+    {
+      "policy": "FIFO",
+      "max_size": 500,
+      "clean_size": 100,
+      "queries": 50000,
+      "hits": 32207,
+      "misses": 17793,
+      "hit_rate": 0.64414,
+      "cost_weighted_hit_rate": 0.5622008834519574,
+      "evictions": 17300,
+      "elapsed_seconds": 0.024167600000509992,
+      "final_cache_size": 493
+    },
+    {
+      "policy": "RR",
+      "max_size": 500,
+      "clean_size": 100,
+      "queries": 50000,
+      "hits": 32248,
+      "misses": 17752,
+      "hit_rate": 0.64496,
+      "cost_weighted_hit_rate": 0.5595468920903378,
+      "evictions": 17300,
+      "elapsed_seconds": 0.033933900005649775,
+      "final_cache_size": 452
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "args": {
+    "dataset": "ultrachat",
+    "n_prompts": 200,
+    "concurrency_levels": "1,10,50,100",
+    "num_workers": null,
+    "seed": 0,
+    "out": "bench_embedding_dispatcher/results.json"
+  },
+  "results": [
+    {
+      "concurrency": 1,
+      "n_prompts": 200,
+      "num_workers": 8,
+      "sequential": {
+        "elapsed_s": 5.6539942000526935,
+        "throughput_qps": 35.37322341047609,
+        "p50_ms": 23.8263001665473,
+        "p99_ms": 81.13910001702607,
+        "rss_mb": 701.48828125
+      },
+      "dispatcher": {
+        "elapsed_s": 8.004060700070113,
+        "throughput_qps": 24.987316750140096,
+        "p50_ms": 37.531400099396706,
+        "p99_ms": 90.39160003885627,
+        "rss_mb": 4801.9765625
+      },
+      "speedup": 0.7063907199008581
+    },
+    {
+      "concurrency": 10,
+      "n_prompts": 200,
+      "num_workers": 8,
+      "sequential": {
+        "elapsed_s": 4.390920999925584,
+        "throughput_qps": 45.54853070765554,
+        "p50_ms": 196.07449998147786,
+        "p99_ms": 480.39949988014996,
+        "rss_mb": 724.76953125
+      },
+      "dispatcher": {
+        "elapsed_s": 5.171741399914026,
+        "throughput_qps": 38.67169383282094,
+        "p50_ms": 237.11850005201995,
+        "p99_ms": 519.5031000766903,
+        "rss_mb": 4915.53125
+      },
+      "speedup": 0.8490217627661308
+    },
+    {
+      "concurrency": 50,
+      "n_prompts": 200,
+      "num_workers": 8,
+      "sequential": {
+        "elapsed_s": 6.7705257998313755,
+        "throughput_qps": 29.539803246149823,
+        "p50_ms": 1358.778800116852,
+        "p99_ms": 2356.544499984011,
+        "rss_mb": 965.34765625
+      },
+      "dispatcher": {
+        "elapsed_s": 5.171374300029129,
+        "throughput_qps": 38.67443901689217,
+        "p50_ms": 1286.084300139919,
+        "p99_ms": 1527.9705000575632,
+        "rss_mb": 5151.2265625
+      },
+      "speedup": 1.3092314357893682
+    },
+    {
+      "concurrency": 100,
+      "n_prompts": 200,
+      "num_workers": 8,
+      "sequential": {
+        "elapsed_s": 10.260954999830574,
+        "throughput_qps": 19.491363133675407,
+        "p50_ms": 4071.96080009453,
+        "p99_ms": 7824.335200013593,
+        "rss_mb": 1233.7109375
+      },
+      "dispatcher": {
+        "elapsed_s": 5.315830399980769,
+        "throughput_qps": 37.62347271288481,
+        "p50_ms": 2372.0857999287546,
+        "p99_ms": 3071.2874999735504,
+        "rss_mb": 5354.56640625
+      },
+      "speedup": 1.9302638022213228
+    }
+  ]
+}

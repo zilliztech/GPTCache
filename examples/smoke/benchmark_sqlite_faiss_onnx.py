@@ -1,3 +1,8 @@
+# SMOKE TEST - not a benchmark.
+# Drives openai.ChatCompletion; the measured "time" is dominated by network
+# round-trips and is not meaningful for GPTCache performance work.
+# Use examples/benchmark/benchmark_qqp.py for memory and search-speed numbers.
+
 import json
 import os
 import time
@@ -95,7 +100,8 @@ def run():
             consume_time = time.time() - start_time
             all_time += consume_time
             print("cache hint time consuming: {:.2f}s".format(consume_time))
-        except:
+        except Exception as e:
+            print(f"OpenAI API Error: {e}")
             fail_count += 1
 
     print("average time: {:.2f}s".format(all_time / len(mock_data)))
@@ -104,6 +110,22 @@ def run():
     print("fail_count:", fail_count)
     print("average embedding time: ", cache.report.average_embedding_time())
     print("average search time: ", cache.report.average_search_time())
+
+    data_manager.close()
+    # --- Storage size measurement ---
+    print("\n--- Storage Sizes ---")
+    for filepath in [faiss_file, sqlite_file]:
+        if os.path.isfile(filepath):
+            size_bytes = os.path.getsize(filepath)
+            if size_bytes >= 1024 * 1024:
+                size_str = f"{size_bytes / (1024 * 1024):.2f} MB"
+            elif size_bytes >= 1024:
+                size_str = f"{size_bytes / 1024:.2f} KB"
+            else:
+                size_str = f"{size_bytes} B"
+            print(f"  {filepath}: {size_str} ({size_bytes:,} bytes)")
+        else:
+            print(f"  {filepath}: FILE NOT FOUND!")
 
 
 if __name__ == "__main__":

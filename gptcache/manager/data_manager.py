@@ -36,6 +36,7 @@ class DataManager(metaclass=ABCMeta):
             answers: List[Any],
             embedding_datas: List[Any],
             session_ids: List[Optional[str]],
+            llm_costs=None,
     ):
         pass
 
@@ -136,6 +137,7 @@ class MapDataManager(DataManager):
         answers: List[Any],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        llm_costs=None,
     ):
         if (
             len(questions) != len(answers)
@@ -228,7 +230,8 @@ class SSDataManager(DataManager):
         e: Optional[EvictionBase],
         max_size,
         clean_size,
-        policy="LRU"
+        policy="LRU",
+        eviction_params=None,
     ):
         self.s = s
         self.v = v
@@ -239,7 +242,8 @@ class SSDataManager(DataManager):
                              maxsize=max_size,
                              clean_size=clean_size,
                              policy=policy,
-                             on_evict=self._clear)
+                             on_evict=self._clear,
+                             **(eviction_params or {}))
         self.eviction_base = e
 
         if not isinstance(self.eviction_base, NoOpEviction):
@@ -272,7 +276,11 @@ class SSDataManager(DataManager):
         """
         session = kwargs.get("session", None)
         session_id = session.name if session else None
-        self.import_data([question], [answer], [embedding_data], [session_id])
+        llm_cost = kwargs.get("llm_cost", None)
+        self.import_data(
+            [question], [answer], [embedding_data], [session_id],
+            llm_costs=[llm_cost] if llm_cost is not None else None,
+        )
 
     def _process_answer_data(self, answers: Union[Answer, List[Answer]]):
         if isinstance(answers, Answer):
@@ -303,6 +311,7 @@ class SSDataManager(DataManager):
         answers: List[Answer],
         embedding_datas: List[Any],
         session_ids: List[Optional[str]],
+        llm_costs=None,
     ):
         if (
             len(questions) != len(answers)
@@ -335,7 +344,7 @@ class SSDataManager(DataManager):
                 for i, embedding_data in enumerate(embedding_datas)
             ]
         )
-        self.eviction_base.put(ids)
+        self.eviction_base.put(ids, costs=llm_costs)
 
     def get_scalar_data(self, res_data, **kwargs) -> Optional[CacheData]:
         session = kwargs.get("session", None)

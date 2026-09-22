@@ -139,3 +139,10 @@ dmypy.json
 **/.chroma
 docs/references/*
 !docs/references/index.rst
+
+CLAUDE.md
+.claude/*
+.env
+
+docs
+onnx_dynamic

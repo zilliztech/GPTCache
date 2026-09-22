@@ -1,0 +1,54 @@
+{
+  "args": {
+    "dataset": "ultrachat",
+    "n_queries": 50,
+    "cache_sizes": "10",
+    "policies": "LRU,CA_W_TINYLFU",
+    "threshold": 0.85,
+    "repeats": 1,
+    "clean_pct": 0.2,
+    "seed": 0,
+    "workdir": "bench_lmsys_test",
+    "out": null
+  },
+  "dataset": "ultrachat",
+  "n_loaded": 50,
+  "embed_model": "all-MiniLM-L6-v2",
+  "embed_dim": 384,
+  "results": [
+    {
+      "policy": "LRU",
+      "cache_size": 10,
+      "similarity_threshold": 0.85,
+      "n_queries": 50,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "token_saving_ratio": 0.0,
+      "cost_weighted_hit_rate": 0.0,
+      "latency_p50_ms": 5.731999990530312,
+      "latency_p95_ms": 7.64949998119846,
+      "latency_p99_ms": 7.773099991027266,
+      "latency_mean_ms": 5.880621996475384,
+      "peak_memory_mb": 26.524537086486816,
+      "throughput_qps": 170.0500390263753,
+      "repeats": 1
+    },
+    {
+      "policy": "CA_W_TINYLFU",
+      "cache_size": 10,
+      "similarity_threshold": 0.85,
+      "n_queries": 50,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "token_saving_ratio": 0.0,
+      "cost_weighted_hit_rate": 0.0,
+      "latency_p50_ms": 4.407600034028292,
+      "latency_p95_ms": 9.462599991820753,
+      "latency_p99_ms": 12.218299962114543,
+      "latency_mean_ms": 5.381960001541302,
+      "peak_memory_mb": 0.8065633773803711,
+      "throughput_qps": 185.80591452066108,
+      "repeats": 1
+    }
+  ]
+}

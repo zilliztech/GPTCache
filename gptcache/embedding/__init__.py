@@ -1,7 +1,8 @@
-__all__ = [
+﻿__all__ = [
     "OpenAI",
     "Huggingface",
     "SBERT",
+    "SBERTMRL",
     "Cohere",
     "Onnx",
     "FastText",
@@ -12,14 +13,19 @@ __all__ = [
     "Rwkv",
     "PaddleNLP",
     "UForm",
+    "CachedEmbedding",
+    "EmbeddingDispatcher",
 ]
 
 
 from gptcache.utils.lazy_import import LazyImport
+from gptcache.embedding.cached_embedding import CachedEmbedding
+from gptcache.embedding.dispatcher import EmbeddingDispatcher
 
 openai = LazyImport("openai", globals(), "gptcache.embedding.openai")
 huggingface = LazyImport("huggingface", globals(), "gptcache.embedding.huggingface")
 sbert = LazyImport("sbert", globals(), "gptcache.embedding.sbert")
+sbert_mrl = LazyImport("sbert_mrl", globals(), "gptcache.embedding.sbert_mrl")
 onnx = LazyImport("onnx", globals(), "gptcache.embedding.onnx")
 cohere = LazyImport("cohere", globals(), "gptcache.embedding.cohere")
 fasttext = LazyImport("fasttext", globals(), "gptcache.embedding.fasttext")
@@ -46,6 +52,10 @@ def Huggingface(model="distilbert-base-uncased"):
 
 def SBERT(model="all-MiniLM-L6-v2"):
     return sbert.SBERT(model)
+
+
+def SBERTMRL(model="nomic-ai/nomic-embed-text-v1.5", target_dim=256, trust_remote_code=True):
+    return sbert_mrl.SBERTMRL(model, target_dim, trust_remote_code)
 
 
 def Onnx(model="GPTCache/paraphrase-albert-onnx"):

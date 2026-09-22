@@ -26,6 +26,25 @@ class Config:
     :param context_len: optional, the length of context.
     :type context_len: Optional[int]
 
+    :param exact_match_enabled: enable the pre-embedding exact-match shortcut
+        that hashes the normalized query and skips both the embedder and the
+        vector search on an exact repeat. Defaults to True.
+    :type exact_match_enabled: bool
+    :param exact_match_max_size: max number of entries in the exact-match LRU.
+        Defaults to 10000.
+    :type exact_match_max_size: int
+    :param exact_match_ttl_seconds: max age of an exact-match entry, in seconds.
+        Bounds staleness when the semantic layer evicts an answer the exact-match
+        cache still holds. Defaults to 300 seconds (5 minutes). Set to None to
+        disable TTL (not recommended unless full coupling is wired up).
+    :type exact_match_ttl_seconds: Optional[float]
+
+    :param model_tier: pricing tier multiplier for the LLM being cached. Used by
+        the CA_W_TINYLFU eviction policy to weight regeneration cost; a GPT-4-class
+        model at ~$0.06/1k tokens might use ``model_tier=20`` relative to a
+        GPT-3.5-class default of ``1.0``. Has no effect with other eviction policies.
+    :type model_tier: float
+
     Example:
         .. code-block:: python
 
@@ -47,6 +66,10 @@ class Config:
             skip_list: List[str] = None,
             data_check: bool = False,
             disable_report: bool = False,
+            exact_match_enabled: bool = True,
+            exact_match_max_size: int = 10000,
+            exact_match_ttl_seconds: Optional[float] = 300.0,
+            model_tier: float = 1.0,
     ):
         if similarity_threshold < 0 or similarity_threshold > 1:
             raise CacheError(
@@ -65,3 +88,7 @@ class Config:
         self.skip_list = skip_list
         self.data_check = data_check
         self.disable_report = disable_report
+        self.exact_match_enabled = exact_match_enabled
+        self.exact_match_max_size = exact_match_max_size
+        self.exact_match_ttl_seconds = exact_match_ttl_seconds
+        self.model_tier = model_tier

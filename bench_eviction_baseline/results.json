@@ -1,0 +1,50 @@
+{
+  "args": {
+    "n_items": 5000,
+    "n_queries": 5000,
+    "max_size": 1000,
+    "clean_size": 200,
+    "zipf_alpha": 1.2,
+    "expensive_fraction": 0.1,
+    "policies": "LRU,LFU",
+    "seed": 0,
+    "workdir": "bench_eviction_baseline",
+    "out": null
+  },
+  "workload": {
+    "n_items": 5000,
+    "n_queries": 5000,
+    "cost_min": 205.5441998799236,
+    "cost_median": 1076.1775604364218,
+    "cost_max": 864977.1091440431,
+    "cost_p99": 714153.8310732597,
+    "unique_items_touched": 1438,
+    "top10_share_pct": 44.2
+  },
+  "results": [
+    {
+      "policy": "LRU",
+      "max_size": 1000,
+      "clean_size": 200,
+      "queries": 5000,
+      "hits": 3504,
+      "misses": 1496,
+      "hit_rate": 0.7008,
+      "cost_weighted_hit_rate": 0.6226067574827068,
+      "evictions": 600,
+      "elapsed_seconds": 0.00414920000184793
+    },
+    {
+      "policy": "LFU",
+      "max_size": 1000,
+      "clean_size": 200,
+      "queries": 5000,
+      "hits": 3476,
+      "misses": 1524,
+      "hit_rate": 0.6952,
+      "cost_weighted_hit_rate": 0.6165877840714369,
+      "evictions": 600,
+      "elapsed_seconds": 0.003671300000860356
+    }
+  ]
+}

@@ -141,6 +141,7 @@ def get_data_manager(
         eviction: str = "LRU",
         data_path: str = "data_map.txt",
         get_data_container: Callable = None,
+        eviction_params: dict = None,
 ):
     """Generate `SSDataManager` (with `cache_base`, `vector_base`, `max_size`, `clean_size` and `eviction` params),
        or `MAPDataManager` (with `data_path`, `max_size` and `get_data_container` params) to manager the data.
@@ -168,6 +169,11 @@ def get_data_manager(
     :type data_path:  str
     :param get_data_container: a Callable to get the data container, defaults to None.
     :type get_data_container:  Callable
+    :param eviction_params: extra keyword arguments forwarded to the in-memory eviction policy
+                            (e.g. ``window_ratio``, ``decay_rate``, ``cost_aware``, ``freq_weight``,
+                            ``time_fn`` for ``CA_W_TINYLFU``). Only applied when the eviction base
+                            is created internally (i.e. ``eviction_base`` is not a pre-built object).
+    :type eviction_params: dict
 
 
     :return: SSDataManager or MapDataManager.
@@ -203,4 +209,5 @@ def get_data_manager(
     if isinstance(eviction_base, str) and eviction_base != "memory":
         eviction_base = EvictionBase(name=eviction_base)
     assert cache_base and vector_base
-    return SSDataManager(cache_base, vector_base, object_base, eviction_base, max_size, clean_size, eviction)
+    return SSDataManager(cache_base, vector_base, object_base, eviction_base, max_size, clean_size, eviction,
+                         eviction_params=eviction_params)

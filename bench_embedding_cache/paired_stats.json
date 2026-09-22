@@ -1,0 +1,79 @@
+{
+  "n_seeds": 7,
+  "wins": 7,
+  "mean_speedup": 3.84340662557634,
+  "geo_mean_speedup": 3.7999989733726105,
+  "wilcoxon_p": 0.015625,
+  "per_seed": [
+    {
+      "file": "bench_embedding_cache\\results_seed0.json",
+      "seed": 0,
+      "dup_ratio": 0.7646,
+      "hit_rate": 0.7646,
+      "baseline_s": 178.19780110009015,
+      "cached_s": 56.08079390018247,
+      "speedup": 3.1775192308664937,
+      "log_speedup": 1.1561007762634703
+    },
+    {
+      "file": "bench_embedding_cache\\results_seed1.json",
+      "seed": 1,
+      "dup_ratio": 0.7634,
+      "hit_rate": 0.7634,
+      "baseline_s": 189.12617619987577,
+      "cached_s": 50.950543500017375,
+      "speedup": 3.7119560108286436,
+      "log_speedup": 1.3115589643226595
+    },
+    {
+      "file": "bench_embedding_cache\\results_seed2.json",
+      "seed": 2,
+      "dup_ratio": 0.7558,
+      "hit_rate": 0.7558,
+      "baseline_s": 210.05275289993733,
+      "cached_s": 44.72786270012148,
+      "speedup": 4.69623944046329,
+      "log_speedup": 1.5467620693995563
+    },
+    {
+      "file": "bench_embedding_cache\\results_seed3.json",
+      "seed": 3,
+      "dup_ratio": 0.7618,
+      "hit_rate": 0.7618,
+      "baseline_s": 178.04727910016663,
+      "cached_s": 53.515427799895406,
+      "speedup": 3.3270271101245803,
+      "log_speedup": 1.202079145522702
+    },
+    {
+      "file": "bench_embedding_cache\\results_seed4.json",
+      "seed": 4,
+      "dup_ratio": 0.7628,
+      "hit_rate": 0.7628,
+      "baseline_s": 198.64719970012084,
+      "cached_s": 41.48776759998873,
+      "speedup": 4.7880908323487334,
+      "log_speedup": 1.5661317583488517
+    },
+    {
+      "file": "bench_embedding_cache\\results_seed5.json",
+      "seed": 5,
+      "dup_ratio": 0.7585999999999999,
+      "hit_rate": 0.7586,
+      "baseline_s": 188.81048940005712,
+      "cached_s": 51.48761470010504,
+      "speedup": 3.6671050018495404,
+      "log_speedup": 1.2994025229441777
+    },
+    {
+      "file": "bench_embedding_cache\\results_seed6.json",
+      "seed": 6,
+      "dup_ratio": 0.763,
+      "hit_rate": 0.763,
+      "baseline_s": 176.16490660002455,
+      "cached_s": 49.821677800035104,
+      "speedup": 3.535908752553099,
+      "log_speedup": 1.2629703391689904
+    }
+  ]
+}

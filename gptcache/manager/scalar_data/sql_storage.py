@@ -196,6 +196,15 @@ class SQLStorage(CacheStorage):
     :type sql_url: str
     :param table_name: the table name for sql database, defaults to 'gptcache'.
     :type table_name: str
+    :param store_embedding: whether to persist the float embedding into the
+        SQL ``embedding_data`` column. Defaults to ``False`` because the
+        default ``SearchDistanceEvaluation`` consumes only the FAISS
+        ``search_result`` and never reads the SQL blob, making the blob
+        ~512 bytes/row of dead storage at 256d float16. Set to ``True`` if
+        you enable ``Config.data_check`` or use an evaluator that needs
+        the raw query embedding (e.g. ``NumpyNormEvaluation``,
+        ``OnnxModelEvaluation``).
+    :type store_embedding: bool
     """
 
     def __init__(
@@ -204,10 +213,12 @@ class SQLStorage(CacheStorage):
         url: str = "sqlite:///./sqlite.db",
         table_name: str = "gptcache",
         table_len_config=None,
+        store_embedding: bool = False,
     ):
         if table_len_config is None:
             table_len_config = {}
         self._url = url
+        self._store_embedding = store_embedding
         self._ques, self._answer, self._ques_dep, self._session, self._report = get_models(
             table_name, db_type, table_len_config
         )
@@ -227,9 +238,15 @@ class SQLStorage(CacheStorage):
             question=data.question
             if isinstance(data.question, str)
             else data.question.content,
-            embedding_data=data.embedding_data.tobytes()
-            if data.embedding_data is not None
-            else None,
+            # Store as float16: ~2x size reduction vs float32 with no
+            # measurable recall impact for L2-normalized embeddings.
+            # Only persisted when the user opts in via ``store_embedding=True``
+            # because the default ``SearchDistanceEvaluation`` never reads it.
+            embedding_data=(
+                data.embedding_data.astype(np.float16).tobytes()
+                if (self._store_embedding and data.embedding_data is not None)
+                else None
+            ),
         )
         session.add(ques_data)
         session.flush()
@@ -315,7 +332,9 @@ class SQLStorage(CacheStorage):
             return CacheData(
                 question=qs.question if not deps else Question(qs.question, res_deps),
                 answers=res_ans,
-                embedding_data=np.frombuffer(qs.embedding_data, dtype=np.float32),
+                embedding_data=np.frombuffer(qs.embedding_data, dtype=np.float16).astype(np.float32)
+                if qs.embedding_data is not None
+                else None,
                 session_id=session_ids,
                 create_on=qs.create_on,
                 last_access=last_access,

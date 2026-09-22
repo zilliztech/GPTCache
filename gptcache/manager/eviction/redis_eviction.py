@@ -61,7 +61,7 @@ class RedisCacheEviction(DistributedEviction, ABC):
     def _create_key(self, key: str) -> str:
         return f"{self._global_key_prefix}:evict:{key}"
 
-    def put(self, objs: List[str], expire=False):
+    def put(self, objs: List[str], expire=False, costs=None):
         ttl = self._ttl if expire else None
         for key in objs:
             self._redis.set(self._create_key(key), "True", ex=ttl)

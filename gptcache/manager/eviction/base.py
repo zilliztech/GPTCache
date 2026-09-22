@@ -8,7 +8,7 @@ class EvictionBase(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def put(self, objs: List[Any]):
+    def put(self, objs: List[Any], costs=None):
         pass
 
     @abstractmethod

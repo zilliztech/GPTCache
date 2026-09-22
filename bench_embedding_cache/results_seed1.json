@@ -1,0 +1,35 @@
+{
+  "args": {
+    "dataset": "ultrachat",
+    "n_queries": 2000,
+    "synthetic_repeat_ratio": 0.3,
+    "embed_model": "all-MiniLM-L6-v2",
+    "cache_size": 10000,
+    "drift": true,
+    "drift_queries": 5000,
+    "drift_zipf": 1.2,
+    "drift_rotate": 3000,
+    "drift_shift": 0.1,
+    "seed": 1,
+    "workdir": "bench_embedding_cache",
+    "out": "bench_embedding_cache\\results_seed1.json"
+  },
+  "n_queries": 5000,
+  "exact_duplicate_ratio": 0.7634,
+  "baseline": {
+    "total_seconds": 189.12617619987577,
+    "avg_ms_per_query": 37.82523523997516
+  },
+  "with_cache": {
+    "total_seconds": 50.950543500017375,
+    "avg_ms_per_query": 10.190108700003474
+  },
+  "cache_stats": {
+    "hits": 3817,
+    "misses": 1183,
+    "hit_rate": 0.7634,
+    "size": 1183,
+    "maxsize": 10000
+  },
+  "speedup": 3.7119560108286436
+}

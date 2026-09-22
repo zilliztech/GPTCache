@@ -9,12 +9,12 @@ from setuptools import find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
 def parse_requirements(file_name: str) -> List[str]:
-    with open(file_name) as f:
+    with open(file_name, encoding="utf-8") as f:
         return [
             require.strip() for require in f
             if require.strip() and not require.startswith('#')
@@ -22,7 +22,7 @@ def parse_requirements(file_name: str) -> List[str]:
 
 
 def read(*parts):
-    with codecs.open(os.path.join(here, *parts), "r") as fp:
+    with codecs.open(os.path.join(here, *parts), "r", encoding="utf-8") as fp:
         return fp.read()
 
 

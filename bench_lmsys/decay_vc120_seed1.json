@@ -1,0 +1,54 @@
+{
+  "args": {
+    "dataset": "lmsys",
+    "n_queries": 3000,
+    "cache_sizes": "100",
+    "policies": "CA_W_TINYLFU",
+    "threshold": 0.8,
+    "window_ratio": 0.01,
+    "freq_weight": 16.0,
+    "sweep": false,
+    "adaptive_window": false,
+    "virtual_clock_sec": 120.0,
+    "drift": true,
+    "drift_queries": 30000,
+    "drift_zipf": 1.2,
+    "drift_rotate": 3000,
+    "drift_shift": 0.1,
+    "repeats": 1,
+    "clean_pct": 0.2,
+    "track_mem": false,
+    "seed": 1,
+    "workdir": "bench_lmsys",
+    "out": "bench_lmsys/decay_vc120_seed1.json"
+  },
+  "dataset": "lmsys",
+  "n_loaded": 3000,
+  "embed_model": "all-MiniLM-L6-v2",
+  "embed_dim": 384,
+  "results": [
+    {
+      "policy": "CA_W_TINYLFU",
+      "eviction_policy": "CA_W_TINYLFU",
+      "eviction_params": {
+        "window_ratio": 0.01,
+        "freq_weight": 16.0,
+        "cost_aware": true
+      },
+      "cache_size": 100,
+      "similarity_threshold": 0.8,
+      "n_queries": 30000,
+      "hits": 18924,
+      "hit_rate": 0.6308,
+      "token_saving_ratio": 0.6540915237213206,
+      "cost_weighted_hit_rate": 0.6434840045385304,
+      "latency_p50_ms": 9.266500012017787,
+      "latency_p95_ms": 10.272999992594123,
+      "latency_p99_ms": 11.555500037502497,
+      "latency_mean_ms": 7.286265106404122,
+      "peak_memory_mb": 0.0,
+      "throughput_qps": 137.24452588488293,
+      "repeats": 1
+    }
+  ]
+}

@@ -76,12 +76,14 @@ class CacheBase:
             sql_url = kwargs.get("sql_url", SQL_URL[name])
             table_name = kwargs.get("table_name", TABLE_NAME)
             table_len_config = kwargs.get("table_len_config", {})
+            store_embedding = kwargs.get("store_embedding", False)
             import_sql_client(name)
             cache_base = SQLStorage(
                 db_type=name,
                 url=sql_url,
                 table_name=table_name,
                 table_len_config=table_len_config,
+                store_embedding=store_embedding,
             )
         elif name == "mongo":
             from gptcache.manager.scalar_data.mongo import MongoStorage

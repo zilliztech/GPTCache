@@ -49,14 +49,35 @@ class MemoryCacheEviction(EvictionBase):
             self._cache = cachetools.FIFOCache(maxsize=maxsize, **kwargs)
         elif self._policy == "RR":
             self._cache = cachetools.RRCache(maxsize=maxsize, **kwargs)
+        elif self._policy == "CA_W_TINYLFU":
+            from gptcache.manager.eviction.ca_w_tinylfu import CostAwareWTinyLFU
+            # clean_size intentionally not forwarded: CA evicts one item per
+            # admission contest, so the batch-evict knob does not apply.
+            self._cache = CostAwareWTinyLFU(
+                maxsize=maxsize,
+                on_evict=on_evict,
+                **kwargs,
+            )
+        elif self._policy == "GDSF":
+            from gptcache.manager.eviction.gdsf import GreedyDualSizeFrequency
+            # clean_size not forwarded: GDSF evicts exactly enough to make room.
+            self._cache = GreedyDualSizeFrequency(
+                maxsize=maxsize,
+                on_evict=on_evict,
+                **kwargs,
+            )
         else:
             raise ValueError(f"Unknown policy {policy}")
 
-        self._cache.popitem = popitem_wrapper(self._cache.popitem, on_evict, clean_size)
+        if self._policy not in ("CA_W_TINYLFU", "GDSF"):
+            self._cache.popitem = popitem_wrapper(self._cache.popitem, on_evict, clean_size)
 
-    def put(self, objs: List[Any]):
-        for obj in objs:
-            self._cache[obj] = True
+    def put(self, objs: List[Any], costs=None):
+        if self._policy in ("CA_W_TINYLFU", "GDSF"):
+            self._cache.put(objs, costs=costs)
+        else:
+            for obj in objs:
+                self._cache[obj] = True
 
     def get(self, obj: Any):
         return self._cache.get(obj)
