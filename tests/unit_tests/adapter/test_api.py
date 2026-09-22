@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from gptcache import cache, Config, Cache
 from gptcache.adapter import openai
 from gptcache.adapter.api import put, get, init_similar_cache, init_similar_cache_from_config
@@ -112,6 +114,25 @@ def test_init_with_config():
     assert get("api-hello") == "foo"
 
     yaml_path.unlink()
+
+
+def test_init_from_config_rejects_python_tags():
+    """A config carrying !!python tags must fail closed, not construct (#687)."""
+    yaml_path = Path("test_evil.yaml")
+
+    if yaml_path.exists():
+        yaml_path.unlink()
+
+    with open(yaml_path, "w+", encoding="utf-8") as f:
+        f.write("embedding: !!python/name:os.system\n")
+
+    try:
+        with pytest.raises(Exception):
+            init_similar_cache_from_config(
+                config_dir=str(yaml_path.resolve()),
+            )
+    finally:
+        yaml_path.unlink()
 
 
 def test_init_with_new_config():
