@@ -1,8 +1,8 @@
 import os
 import time
-from typing import Any, AsyncGenerator, Iterator
+from types import SimpleNamespace
+from typing import AsyncGenerator, Iterator
 
-from gptcache import cache
 from gptcache.adapter.adapter import aadapt, adapt
 from gptcache.adapter.base import BaseCacheLLM
 from gptcache.manager.scalar_data.base import Answer, DataType
@@ -57,7 +57,7 @@ class ChatCompletion(BaseCacheLLM):
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
             if cls.llm is not None:
-                return cls.llm(*llm_args, **llm_kwargs)
+                return cls.llm(*llm_args, **llm_kwargs)  # pylint: disable=not-callable
             return cls._sync_client().chat.completions.create(*llm_args, **llm_kwargs)
         except Exception as e:  # pylint: disable=W0703
             raise wrap_error(e) from e
@@ -66,7 +66,7 @@ class ChatCompletion(BaseCacheLLM):
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
         try:
             if cls.llm is not None:
-                return cls.llm(*llm_args, **llm_kwargs)
+                return cls.llm(*llm_args, **llm_kwargs)  # pylint: disable=not-callable
             return await cls._async_client().chat.completions.create(
                 *llm_args, **llm_kwargs
             )
@@ -79,14 +79,14 @@ class ChatCompletion(BaseCacheLLM):
     ):  # pylint: disable=unused-argument
         if isinstance(llm_data, AsyncGenerator):
 
-            async def hook_openai_data(it):
+            async def hook_async_openai_data(it):
                 total_answer = ""
                 async for item in it:
                     total_answer += get_stream_message_from_openai_client_answer(item)
                     yield item
                 update_cache_func(Answer(total_answer, DataType.STR))
 
-            return hook_openai_data(llm_data)
+            return hook_async_openai_data(llm_data)
         if isinstance(llm_data, Iterator):
 
             def hook_openai_data(it):
@@ -163,8 +163,6 @@ def get_stream_message_from_openai_client_answer(chunk):
 
 
 def _construct_resp_from_cache(return_message, model=None):
-    from types import SimpleNamespace
-
     message = SimpleNamespace(role="assistant", content=return_message)
     choice = SimpleNamespace(index=0, finish_reason="stop", message=message)
     return SimpleNamespace(
@@ -181,8 +179,6 @@ def _construct_resp_from_cache(return_message, model=None):
 
 
 def _construct_stream_resp_from_cache(return_message, model=None):
-    from types import SimpleNamespace
-
     created = int(time.time())
     return [
         SimpleNamespace(

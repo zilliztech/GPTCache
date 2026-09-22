@@ -1,7 +1,7 @@
 import os
-from typing import Any, AsyncGenerator, Iterator
+from types import SimpleNamespace
+from typing import AsyncGenerator, Iterator
 
-from gptcache import cache
 from gptcache.adapter.adapter import aadapt, adapt
 from gptcache.adapter.base import BaseCacheLLM
 from gptcache.manager.scalar_data.base import Answer, DataType
@@ -60,7 +60,7 @@ class ChatCompletion(BaseCacheLLM):
     def _llm_handler(cls, *llm_args, **llm_kwargs):
         try:
             if cls.llm is not None:
-                return cls.llm(*llm_args, **llm_kwargs)
+                return cls.llm(*llm_args, **llm_kwargs)  # pylint: disable=not-callable
             return cls._sync_client().messages.create(*llm_args, **llm_kwargs)
         except anthropic.APIError as e:
             raise wrap_error(e) from e
@@ -69,7 +69,7 @@ class ChatCompletion(BaseCacheLLM):
     async def _allm_handler(cls, *llm_args, **llm_kwargs):
         try:
             if cls.llm is not None:
-                return cls.llm(*llm_args, **llm_kwargs)
+                return cls.llm(*llm_args, **llm_kwargs)  # pylint: disable=not-callable
             return await cls._async_client().messages.create(*llm_args, **llm_kwargs)
         except anthropic.APIError as e:
             raise wrap_error(e) from e
@@ -80,14 +80,14 @@ class ChatCompletion(BaseCacheLLM):
     ):  # pylint: disable=unused-argument
         if isinstance(llm_data, AsyncGenerator):
 
-            async def hook_anthropic_data(it):
+            async def hook_async_anthropic_data(it):
                 total_answer = ""
                 async for item in it:
                     total_answer += get_stream_message_from_anthropic_answer(item)
                     yield item
                 update_cache_func(Answer(total_answer, DataType.STR))
 
-            return hook_anthropic_data(llm_data)
+            return hook_async_anthropic_data(llm_data)
         if isinstance(llm_data, Iterator):
 
             def hook_anthropic_data(it):
@@ -147,7 +147,7 @@ async def async_iter(input_list):
 
 def _construct_resp_from_cache(return_message, model=None):
     try:
-        from anthropic.types import Message, TextBlock, Usage
+        from anthropic.types import Message, TextBlock, Usage  # pylint: disable=import-outside-toplevel
 
         return Message(
             id="chatcmpl-gptcache",
@@ -160,8 +160,6 @@ def _construct_resp_from_cache(return_message, model=None):
             usage=Usage(input_tokens=0, output_tokens=0),
         )
     except Exception:  # pylint: disable=W0703
-        from types import SimpleNamespace
-
         content_block = SimpleNamespace(type="text", text=return_message)
         return SimpleNamespace(
             gptcache=True,
@@ -175,8 +173,7 @@ def _construct_resp_from_cache(return_message, model=None):
 
 
 def _construct_stream_resp_from_cache(return_message, model=None):
-    from types import SimpleNamespace
-
+    del model
     return [
         SimpleNamespace(
             type="content_block_delta",

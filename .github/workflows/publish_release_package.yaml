@@ -24,11 +24,11 @@ on:
 
 jobs:
   build-and-publish-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
     # - name: Get history and tags for SCM versioning
@@ -49,7 +49,7 @@ jobs:
         --wheel
         --outdir dist/
         .
-    - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@master
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.14.2
       with:
         password: ${{ secrets.PYPI_TOKEN }}

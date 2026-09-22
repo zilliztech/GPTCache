@@ -87,21 +87,18 @@ def temperature_softmax(messages: List[Any], scores: List[float], temperature: f
     else:
         m_s = list(zip(messages, scores))
         return sorted(m_s, key=lambda x: x[1], reverse=True)[0][0]
-
-
-
 def llm_semantic_verification(
         messages: List[Any],
         scores: List[float] = None,
         original_question: str = None,
         *,
-        client=None,                          
-        system_prompt: str = None,            
+        client=None,
+        system_prompt: str = None,
         model: str = "gpt-3.5-turbo",
-        **kwargs                              
+        **_kwargs
 ) -> Any:
     """
-    Use LLM to verify whether the answer is semantically consistent with the question. 
+    Use LLM to verify whether the answer is semantically consistent with the question.
     If the answer passes verification, return it; otherwise, return None (to trigger a real LLM call).
 
     :param messages: A list of candidate outputs.
@@ -134,20 +131,27 @@ def llm_semantic_verification(
     """
     if not messages or not original_question:
         return None
-    import openai
-
     # Select the answer with the highest score
     best_answer = messages[0] if not scores else messages[scores.index(max(scores))]
     if client is None:
+        import openai  # pylint: disable=import-outside-toplevel
         client = openai
-    else:
-        client = client if hasattr(client, 'completions') else client.chat # Ensure client has the correct method for completions
+
     if system_prompt is None:
         system_prompt = ("You are a strict semantic verification assistant. "
                          "… Only answer 'yes' or 'no'. If unsure, answer 'no'.")
 
     try:
-        resp = client.completions.create(
+        if hasattr(client, "chat") and hasattr(client.chat, "completions"):
+            completions = client.chat.completions
+        elif hasattr(client, "completions"):
+            completions = client.completions
+        elif hasattr(client, "ChatCompletion"):
+            completions = client.ChatCompletion
+        else:
+            raise ValueError("The LLM client does not provide a chat completions API")
+
+        resp = completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -162,11 +166,8 @@ def llm_semantic_verification(
         verdict = resp.choices[0].message.content.strip().lower()
         if verdict in {"yes"}:
             return best_answer
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print("LLM verification failed:", e)
-
-
-
     return None
 
 

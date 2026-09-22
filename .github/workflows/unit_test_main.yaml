@@ -25,7 +25,7 @@ on:
 
 jobs:
   unit-test-main:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
     services:
@@ -50,10 +50,10 @@ jobs:
         ports:
           - 27017:27017
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.8
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
           cache: pip
@@ -110,7 +110,7 @@ jobs:
           python3 -m pytest --cov=gptcache --cov-report xml:coverage.xml --cov-append ./tests/unit_tests/embedding/
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml

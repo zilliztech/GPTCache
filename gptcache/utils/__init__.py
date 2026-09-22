@@ -47,6 +47,7 @@ __all__ = [
     ]
 
 import importlib.util
+import sys
 from typing import Optional
 
 from gptcache.utils.dependency_control import prompt_install
@@ -107,7 +108,8 @@ def import_huggingface_hub():
 
 
 def import_onnxruntime():
-    _check_library("onnxruntime", package="onnxruntime==1.21.1")
+    package = "onnxruntime==1.16.3" if sys.version_info < (3, 9) else "onnxruntime==1.21.1"
+    _check_library("onnxruntime", package=package)
 
 
 def import_faiss():
