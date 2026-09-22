@@ -1,6 +1,23 @@
+import hashlib
 import re
 import string
 from typing import Dict, Any
+
+
+def _hash_file(f, chunk_size=65536) -> str:
+    """Compute SHA-256 hash of the full file content, then reset the file pointer.
+
+    This replaces the use of peek() which only reads the buffer prefix (~8192 bytes),
+    making it vulnerable to cache key collisions between files sharing the same header.
+    """
+    h = hashlib.sha256()
+    while True:
+        chunk = f.read(chunk_size)
+        if not chunk:
+            break
+        h.update(chunk)
+    f.seek(0)
+    return h.hexdigest()
 
 
 def last_content(data: Dict[str, Any], **_: Dict[str, Any]) -> Any:
@@ -213,8 +230,8 @@ def get_file_name(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
     return data.get("file").name
 
 
-def get_file_bytes(data: Dict[str, Any], **_: Dict[str, Any]) -> bytes:
-    """get the file bytes of the llm request params
+def get_file_bytes(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
+    """get the hash of the file content of the llm request params
 
     :param data: the user llm request data
     :type data: Dict[str, Any]
@@ -226,7 +243,7 @@ def get_file_bytes(data: Dict[str, Any], **_: Dict[str, Any]) -> bytes:
 
             content = get_file_bytes({"file": open("test.txt", "rb")})
     """
-    return data.get("file").peek()
+    return _hash_file(data.get("file"))
 
 
 def get_input_str(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
@@ -243,7 +260,7 @@ def get_input_str(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
             content = get_input_str({"input": {"image": open("test.png", "rb"), "question": "foo"}})
     """
     input_data = data.get("input")
-    return str(input_data["image"].peek()) + input_data["question"]
+    return _hash_file(input_data["image"]) + input_data["question"]
 
 
 def get_input_image_file_name(data: Dict[str, Any], **_: Dict[str, Any]) -> str:
@@ -278,7 +295,11 @@ def get_image_question(data: Dict[str, Any], **_: Dict[str, Any]) -> str:  # pra
             content = get_image_question({"image": open("test.png", "rb"), "question": "foo"})
     """
     img = data.get("image")
-    data_img = str(open(img, "rb").peek()) if isinstance(img, str) else str(img)  # pylint: disable=consider-using-with
+    if isinstance(img, str):
+        with open(img, "rb") as f:
+            data_img = _hash_file(f)
+    else:
+        data_img = _hash_file(img)
     return data_img + data.get("question")
 
 
