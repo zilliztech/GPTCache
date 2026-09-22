@@ -14,7 +14,7 @@ Slash Your LLM API Costs by 10x 💰, Boost Speed by 100x ⚡
 
 📔 This project is undergoing swift development, and as such, the API may be subject to change at any time. For the most up-to-date information, please refer to the latest [documentation]( https://gptcache.readthedocs.io/en/latest/) and [release note](https://github.com/zilliztech/GPTCache/blob/main/docs/release_note.md).
 
-**NOTE:** As the number of large models is growing explosively and their API shape is constantly evolving, we no longer add support for new API or models. We encourage the usage of using the get and set API in gptcache, here is the demo code: https://github.com/zilliztech/GPTCache/blob/main/examples/adapter/api.py
+**NOTE:** As the number of large models is growing explosively and their API shape is constantly evolving, we no longer add support for new API or models. We encourage using the get and set API in gptcache, here is the demo code: https://github.com/zilliztech/GPTCache/blob/main/examples/adapter/api.py
 
 ## Quick Install
 
@@ -287,7 +287,7 @@ GPTCache offers the following primary benefits:
 
 Online services often exhibit data locality, with users frequently accessing popular or trending content. Cache systems take advantage of this behavior by storing commonly accessed data, which in turn reduces data retrieval time, improves response times, and eases the burden on backend servers. Traditional cache systems typically utilize an exact match between a new query and a cached query to determine if the requested content is available in the cache before fetching the data.
 
-However, using an exact match approach for LLM caches is less effective due to the complexity and variability of LLM queries, resulting in a low cache hit rate. To address this issue, GPTCache adopt alternative strategies like semantic caching. Semantic caching identifies and stores similar or related queries, thereby increasing cache hit probability and enhancing overall caching efficiency. 
+However, using an exact match approach for LLM caches is less effective due to the complexity and variability of LLM queries, resulting in a low cache hit rate. To address this issue, GPTCache adopts alternative strategies like semantic caching. Semantic caching identifies and stores similar or related queries, thereby increasing cache hit probability and enhancing overall caching efficiency. 
 
 GPTCache employs embedding algorithms to convert queries into embeddings and uses a vector store for similarity search on these embeddings. This process allows GPTCache to identify and retrieve similar or related queries from the cache storage, as illustrated in the [Modules section](https://github.com/zilliztech/GPTCache#-modules). 
 
@@ -388,7 +388,7 @@ This module collects data from both the **Cache Storage** and **Vector Store**, 
   - [x] Exact matches between the input request and the requests obtained from the **Vector Store**.
   - [x] Distance represented by applying linalg.norm from numpy to the embeddings.
   - [ ] BM25 and other similarity measurements.
-  - [ ] Support other model serving framework such as PyTorch.
+  - [ ] Support other model serving frameworks such as PyTorch.
  
   
   **Note**:Not all combinations of different modules may be compatible with each other. For instance, if we disable the **Embedding Extractor**, the **Vector Store** may not function as intended. We are currently working on implementing a combination sanity check for **GPTCache**.
