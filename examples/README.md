@@ -16,6 +16,7 @@
     - [Start server](#start-server)
   - [Benchmark](#benchmark)
   - [How to use post-process function](#how-to-use-post-process-function)
+  - [How to set the eviction policy](#how-to-set-the-eviction-policy)
 
 ## How to run Visual Question Answering with MiniGPT-4
 
@@ -715,3 +716,29 @@ cache.init(
 ```
 
 See [processor/post_example.py](./processor/post_example.py) for a runnable example.
+
+## How to set the `eviction` policy
+
+GPTCache supports several eviction policies: LRU (default), FIFO, LFU, and W-TinyLFU.
+
+### W-TinyLFU eviction
+
+The W-TinyLFU policy combines a TinyLFU admission filter with a segmented LRU, achieving near-optimal hit rates. It optionally supports cost-aware admission for LLM workloads where response regeneration costs vary.
+
+See [eviction/wtinylfu_eviction.py](./eviction/wtinylfu_eviction.py) for full examples.
+
+```python
+from gptcache.manager import get_data_manager, CacheBase, VectorBase
+from gptcache.manager.eviction import EvictionBase
+
+data_manager = get_data_manager(
+    cache_base=CacheBase("sqlite"),
+    vector_base=VectorBase("faiss", dimension=onnx.dimension),
+    eviction_base=EvictionBase(
+        "wtinylfu",
+        maxsize=200,
+        clean_size=50,
+        cost_aware=True,      # weight admission by response token count
+    ),
+)
+```

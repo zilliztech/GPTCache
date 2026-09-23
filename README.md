@@ -372,7 +372,7 @@ The **Cache Manager** is responsible for controlling the operation of both the *
     - [x] Support FIFO eviction policy.
     - [x] Support LFU eviction policy.
     - [x] Support RR eviction policy.
-    - [ ] Support more complicated eviction policies.
+    - [x] Support W-TinyLFU eviction policy with cost-aware admission.
   - **Distributed Caching**
   
   If you were to scale your GPTCache deployment horizontally using in-memory caching, it won't be possible. Since the cached information would be limited to the single pod.

@@ -43,6 +43,11 @@ class EvictionBase:
             from gptcache.manager.eviction.distributed_cache import NoOpEviction
             eviction_base = NoOpEviction()
             return eviction_base
+        if name == "wtinylfu":
+            from gptcache.manager.eviction.wtinylfu_eviction import WTinyLFUEviction
+            eviction_base = WTinyLFUEviction(
+                maxsize=maxsize, clean_size=clean_size, on_evict=on_evict, **kwargs
+            )
+            return eviction_base
 
-        else:
-            raise NotFoundError("eviction base", name)
+        raise NotFoundError("eviction base", name)
