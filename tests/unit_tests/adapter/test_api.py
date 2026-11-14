@@ -19,6 +19,7 @@ from gptcache.utils.response import get_message_from_openai_answer
 import_ruamel()
 
 from ruamel.yaml import YAML
+from ruamel.yaml.constructor import ConstructorError
 
 
 faiss_file = "faiss.index"
@@ -127,10 +128,12 @@ def test_init_from_config_rejects_python_tags():
         f.write("embedding: !!python/name:os.system\n")
 
     try:
-        with pytest.raises(Exception):
-            init_similar_cache_from_config(
-                config_dir=str(yaml_path.resolve()),
-            )
+        with patch("gptcache.adapter.api._get_model") as get_model:
+            with pytest.raises(ConstructorError):
+                init_similar_cache_from_config(
+                    config_dir=str(yaml_path.resolve()),
+                )
+            get_model.assert_not_called()
     finally:
         yaml_path.unlink()
 
