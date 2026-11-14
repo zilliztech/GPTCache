@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from gptcache import cache, Config, Cache
 from gptcache.adapter import openai
 from gptcache.adapter.api import put, get, init_similar_cache, init_similar_cache_from_config
@@ -17,6 +19,7 @@ from gptcache.utils.response import get_message_from_openai_answer
 import_ruamel()
 
 from ruamel.yaml import YAML
+from ruamel.yaml.constructor import ConstructorError
 
 
 faiss_file = "faiss.index"
@@ -112,6 +115,27 @@ def test_init_with_config():
     assert get("api-hello") == "foo"
 
     yaml_path.unlink()
+
+
+def test_init_from_config_rejects_python_tags():
+    """A config carrying !!python tags must fail closed, not construct (#687)."""
+    yaml_path = Path("test_evil.yaml")
+
+    if yaml_path.exists():
+        yaml_path.unlink()
+
+    with open(yaml_path, "w+", encoding="utf-8") as f:
+        f.write("embedding: !!python/name:os.system\n")
+
+    try:
+        with patch("gptcache.adapter.api._get_model") as get_model:
+            with pytest.raises(ConstructorError):
+                init_similar_cache_from_config(
+                    config_dir=str(yaml_path.resolve()),
+                )
+            get_model.assert_not_called()
+    finally:
+        yaml_path.unlink()
 
 
 def test_init_with_new_config():
