@@ -32,6 +32,19 @@ def test_last_content_without_prompt():
     assert content == "2"
 
 
+def test_last_content_without_prompt_special_characters():
+    content = last_content_without_prompt(
+        {"messages": [{"content": "Answer (briefly). What is C++?"}]},
+        prompts=["Answer (briefly). ", "C++"],
+    )
+    assert content == "What is ?"
+
+    content = last_content_without_prompt(
+        {"messages": [{"content": "Reply (short: hi"}]}, prompts=["Reply (short: "]
+    )
+    assert content == "hi"
+
+
 def test_all_content():
     content = all_content({"messages": [{"content": "foo1"}, {"content": "foo2"}]})
 
